@@ -38,6 +38,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\rendering\application\WindowsApplication.cpp" />
     <ClCompile Include="src\rendering\device\Device.cpp" />
     <ClCompile Include="src\rendering\RenderingEngine.cpp" />
     <ClCompile Include="src\rendering\shapes\Bloc.cpp" />
