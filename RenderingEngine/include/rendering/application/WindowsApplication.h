@@ -1,8 +1,6 @@
 #ifndef WINDOWS_APPLICATION_H
 #define WINDOWS_APPLICATION_H
 
-#include "systems/MainEngine.h"
-
 class WindowsApplication
 {
 public:
@@ -12,8 +10,8 @@ public:
 	WindowsApplication(WindowsApplication&&) = delete;
 	WindowsApplication& operator=(WindowsApplication&&) = delete;
 
-	explicit WindowsApplication(const HINSTANCE hInstance)
-		: instance(hInstance)
+	explicit WindowsApplication(const HINSTANCE hInstance, const LPCWSTR windowTitle, const LPCWSTR className)
+		: instance(hInstance), className(className), windowTitle(windowTitle)
 	{
 	}
 
@@ -50,11 +48,11 @@ public:
 	}
 
 private:
-	static constexpr auto className = L"PhysicsEngineWindowClass";
-	static constexpr auto windowTitle = L"PhysicsEngine";
-
 	HINSTANCE instance{};
 	HWND mainWindow{};
+
+	LPCWSTR className{};
+	LPCWSTR windowTitle{};
 
 	bool CreateMainWindow()
 	{
@@ -81,7 +79,7 @@ private:
 
 		wcex.cbSize = sizeof(wcex);
 		wcex.style = CS_HREDRAW | CS_VREDRAW;
-		wcex.lpfnWndProc = &WindowsApplication::WindowsMessageHandler;
+		wcex.lpfnWndProc = &WindowsApplication::HandleWindowsMessage;
 		wcex.hInstance = instance;
 		wcex.hIcon = LoadIconW(nullptr, IDI_APPLICATION);
 		wcex.hCursor = LoadCursorW(nullptr, IDC_ARROW);
@@ -92,7 +90,7 @@ private:
 		return RegisterClassExW(&wcex);
 	}
 
-	[[nodiscard]] static LRESULT HandleWindowsMessage(const HWND hWnd, const UINT msg, const WPARAM wp, const LPARAM lp)
+	[[nodiscard]] static LRESULT ProcessWindowMessage(const HWND hWnd, const UINT msg, const WPARAM wp, const LPARAM lp)
 	{
 		static constexpr LRESULT MESSAGE_HANDLED = 0;
 
@@ -106,7 +104,7 @@ private:
 		return DefWindowProcW(hWnd, msg, wp, lp);
 	}
 
-	static LRESULT CALLBACK WindowsMessageHandler(const HWND hWnd, const UINT message, const WPARAM wParam,
+	static LRESULT CALLBACK HandleWindowsMessage(const HWND hWnd, const UINT message, const WPARAM wParam,
 	                                              const LPARAM lParam)
 	{
 		if (message == WM_NCCREATE)
@@ -118,7 +116,7 @@ private:
 		}
 
 		if (const auto self = reinterpret_cast<WindowsApplication*>(GetWindowLongPtrW(hWnd, GWLP_USERDATA)))
-			return HandleWindowsMessage(hWnd, message, wParam, lParam);
+			return ProcessWindowMessage(hWnd, message, wParam, lParam);
 
 		return DefWindowProcW(hWnd, message, wParam, lParam);
 	}

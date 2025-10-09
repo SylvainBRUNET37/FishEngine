@@ -1,4 +1,5 @@
-#pragma once
+#ifndef COM_PTR_H
+#define COM_PTR_H
 
 template <typename PtrType>
 class ComPtr
@@ -114,3 +115,5 @@ private:
 
 	PtrType* m_ptr;
 };
+
+#endif

@@ -6,7 +6,7 @@
 #include <functional>
 #include <memory>
 
-#include "rendering/device/DispositifD3D11.h"
+#include "rendering/device/Device.h"
 #include "rendering/shapes/Bloc.h"
 #include "rendering/shapes/Objet3D.h"
 #include "rendering/utils/Horloge.h"
@@ -16,7 +16,7 @@ class MainEngine
 public:
 	using MainLoopCallback = std::function<bool()>;
 
-	explicit MainEngine(PM3D::CDispositifD3D11* dispositif, const std::initializer_list<MainLoopCallback> callbacks)
+	explicit MainEngine(Device* dispositif, const std::initializer_list<MainLoopCallback> callbacks)
 		: mainLoopCallbacks{callbacks}, pDispositif{dispositif}
 	{
 		InitScene();
@@ -27,7 +27,7 @@ public:
 
 	void AddObjectToScene(const DirectX::XMMATRIX& pos, const float dx, const float dy, const float dz)
 	{
-		ListeScene.emplace_back(std::make_unique<PM3D::CBloc>(pos, dx, dy, dz, pDispositif));
+		ListeScene.emplace_back(std::make_unique<::CBloc>(pos, dx, dy, dz, pDispositif));
 	}
 
 	void Run()
@@ -53,11 +53,11 @@ private:
 	DirectX::XMMATRIX matView{};
 	DirectX::XMMATRIX matProj{};
 	DirectX::XMMATRIX matViewProj{};
-	PM3D::CDispositifD3D11* pDispositif;
+	::Device* pDispositif;
 
-	std::vector<std::unique_ptr<PM3D::CObjet3D>> ListeScene;
+	std::vector<std::unique_ptr<::CObjet3D>> ListeScene;
 
-	PM3D::Horloge horloge{};
+	::Horloge horloge{};
 	int64_t TempsSuivant{};
 	int64_t TempsCompteurPrecedent{};
 
@@ -94,7 +94,7 @@ private:
 
 	static int64_t GetTimeSpecific()
 	{
-		return PM3D::Horloge::GetTimeCount();
+		return ::Horloge::GetTimeCount();
 	}
 
 	[[nodiscard]] double GetTimeIntervalsInSec(const int64_t start, const int64_t stop) const

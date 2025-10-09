@@ -1,7 +1,5 @@
 #pragma once
 
-namespace PM3D
-{
 	class CSommetBloc
 	{
 	public:
@@ -16,7 +14,7 @@ namespace PM3D
 				D3D11_INPUT_PER_VERTEX_DATA, 0
 			}
 		};
-		inline static UINT numElements = ARRAYSIZE(PM3D::CSommetBloc::layout);
+		inline static UINT numElements = ARRAYSIZE(::CSommetBloc::layout);
 
 		CSommetBloc() = default;
 		CSommetBloc(DirectX::XMFLOAT3 position, DirectX::XMFLOAT3 normal);
@@ -25,4 +23,3 @@ namespace PM3D
 		DirectX::XMFLOAT3 m_Position;
 		DirectX::XMFLOAT3 m_Normal;
 	};
-}

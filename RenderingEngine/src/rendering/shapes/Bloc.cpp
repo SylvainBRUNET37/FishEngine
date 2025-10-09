@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "rendering/shapes/Bloc.h"
 
-#include "rendering/device/DispositifD3D11.h"
+#include "rendering/device/Device.h"
 #include "rendering/shapes/SommetBloc.h"
 #include "rendering/utils/Util.h"
 
@@ -13,8 +13,6 @@ namespace
 	constexpr int RENDERING_ERROR_CODE = -1;
 }
 
-namespace PM3D
-{
 	const uint16_t index_bloc[36] = {
 		0, 1, 2, // devant
 		0, 2, 3, // devant
@@ -35,7 +33,7 @@ namespace PM3D
 	// PARAM�TRES:
 	// dx, dy, dz:dimension en x, y, et z
 	// pDispositif: pointeur sur notre objet dispositif
-	CBloc::CBloc(const XMMATRIX& matWorld, const float dx, const float dy, const float dz, CDispositifD3D11* pDispositif_)
+	CBloc::CBloc(const XMMATRIX& matWorld, const float dx, const float dy, const float dz, Device* pDispositif_)
 		: pDispositif(pDispositif_), matWorld{ matWorld }, rotation(0.0f)
 	{
 		// Les points
@@ -218,4 +216,3 @@ namespace PM3D
 			RENDERING_ERROR_CODE);
 		pPSBlob->Release(); // On n�a plus besoin du blob
 	}
-}

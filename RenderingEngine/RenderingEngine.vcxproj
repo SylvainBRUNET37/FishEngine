@@ -20,8 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\rendering\application\WindowsApplication.h" />
-    <ClInclude Include="include\rendering\device\Dispositif.h" />
-    <ClInclude Include="include\rendering\device\DispositifD3D11.h" />
+    <ClInclude Include="include\rendering\device\Device.h" />
     <ClInclude Include="include\rendering\shapes\Bloc.h" />
     <ClInclude Include="include\rendering\shapes\Objet3D.h" />
     <ClInclude Include="include\rendering\shapes\SommetBloc.h" />
@@ -30,6 +29,7 @@
     <ClInclude Include="include\rendering\utils\Util.h" />
     <ClInclude Include="include\systems\MainEngine.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="resources\resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -38,10 +38,13 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="src\rendering\device\DispositifD3D11.cpp" />
+    <ClCompile Include="src\rendering\device\Device.cpp" />
     <ClCompile Include="src\rendering\shapes\Bloc.cpp" />
     <ClCompile Include="src\rendering\shapes\SommetBloc.cpp" />
     <ClCompile Include="src\rendering\utils\Horloge.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resources\Resource.rc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

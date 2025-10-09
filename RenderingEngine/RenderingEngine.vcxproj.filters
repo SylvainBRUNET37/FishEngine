@@ -18,10 +18,7 @@
     <ClInclude Include="include\rendering\application\WindowsApplication.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\rendering\device\Dispositif.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\device\DispositifD3D11.h">
+    <ClInclude Include="include\rendering\device\Device.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\rendering\shapes\Bloc.h">
@@ -48,9 +45,12 @@
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="resources\resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\rendering\device\DispositifD3D11.cpp">
+    <ClCompile Include="src\rendering\device\Device.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\rendering\shapes\Bloc.cpp">
@@ -65,5 +65,10 @@
     <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resources\Resource.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

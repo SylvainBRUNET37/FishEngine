@@ -1,0 +1,36 @@
+//{{NO_DEPENDENCIES}}
+// Microsoft Visual C++ generated include file.
+// Used by Resource.rc
+//
+#define DXE_ERREURCREATIONDEVICE        101
+#define DXE_ERREUROBTENTIONBUFFER       102
+#define DXE_ERREURCREATIONRENDERTARGET  103
+#define DXE_CREATIONVERTEXBUFFER        104
+#define DXE_CREATIONINDEXBUFFER         105
+#define DXE_FICHIER_VS                  106
+#define IDS_STRING107                   107
+#define DXE_CREATION_VS                 107
+#define DXE_CREATIONLAYOUT              108
+#define DXE_FICHIER_PS                  109
+#define DXE_CREATION_PS                 110
+#define DXE_ERREURCREATIONTEXTURE       111
+#define DXE_ERREURCREATIONDEPTHSTENCILTARGET 112
+#define DXE_ERREURCREATION_FX           113
+#define DXE_FICHIERTEXTUREINTROUVABLE   114
+#define DXE_ERREURCREATION_BLENDSTATE   115
+#define ERREUR_CREATION_DIRECTINPUT     116
+#define ERREUR_CREATION_CLAVIER         117
+#define ERREUR_CREATION_FORMAT_CLAVIER  118
+#define ERREUR_CREATION_SOURIS          119
+#define ERREUR_CREATION_FORMAT_SOURIS   120
+
+// Next default values for new objects
+// 
+#ifdef APSTUDIO_INVOKED
+#ifndef APSTUDIO_READONLY_SYMBOLS
+#define _APS_NEXT_RESOURCE_VALUE        102
+#define _APS_NEXT_COMMAND_VALUE         40001
+#define _APS_NEXT_CONTROL_VALUE         1001
+#define _APS_NEXT_SYMED_VALUE           101
+#endif
+#endif

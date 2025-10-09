@@ -1,16 +1,14 @@
 #pragma once
 
 #include "Objet3D.h"
-#include "rendering/device/DispositifD3D11.h"
+#include "rendering/device/Device.h"
 
-namespace PM3D
-{
 	// Classe : CBloc
 	// BUT : Classe de bloc
 	class CBloc : public CObjet3D
 	{
 	public:
-		CBloc(const DirectX::XMMATRIX& matWorld, float dx, float dy, float dz, CDispositifD3D11* pDispositif_);
+		CBloc(const DirectX::XMMATRIX& matWorld, float dx, float dy, float dz, Device* pDispositif_);
 
 		~CBloc() override;
 
@@ -19,7 +17,7 @@ namespace PM3D
 		void Draw(const DirectX::XMMATRIX& viewProj) override;
 
 	private:
-		CDispositifD3D11* pDispositif;
+		Device* pDispositif;
 		ID3D11Buffer* pVertexBuffer;
 		ID3D11Buffer* pIndexBuffer;
 		ID3D11VertexShader* pVertexShader;
@@ -32,4 +30,3 @@ namespace PM3D
 
 		void InitShaders();
 	};
-}

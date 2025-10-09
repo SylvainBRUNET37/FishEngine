@@ -1,7 +1,5 @@
 #pragma once
 
-namespace PM3D
-{
 	class CObjet3D
 	{
 	public:
@@ -13,4 +11,3 @@ namespace PM3D
 
 		virtual void Draw(const DirectX::XMMATRIX& viewProj) = 0;
 	};
-}
