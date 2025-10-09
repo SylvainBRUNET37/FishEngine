@@ -7,8 +7,9 @@
 #include <cstdlib>
 #include <minwindef.h>
 
+#include "rendering/RenderingEngine.h"
 #include "rendering/application/WindowsApplication.h"
-#include "systems/MainEngine.h"
+#include "rendering/device/Device.h"
 
 using namespace std;
 using namespace DirectX;
@@ -23,13 +24,13 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 	if (!application.Init())
 		return EXIT_FAILURE;
 
-	const auto dispositif = new ::Device{Device::CDS_FENETRE, application.GetMainWindow()};
-	MainEngine mainEngine{dispositif, {WindowsApplication::ProcessWindowMessages}};
+	const auto dispositif = new Device{Device::CDS_FENETRE, application.GetMainWindow()};
+	RenderingEngine renderingEngine{dispositif, {WindowsApplication::ProcessWindowMessages}};
 
 	const auto wallMat = XMMatrixTranslation(0.0f, 0.0f, 0.0f);
 
-	mainEngine.AddObjectToScene(wallMat, 2.0f, 2.0f, 2.0f);
-	mainEngine.Run();
+	renderingEngine.AddObjectToScene(wallMat, 2.0f, 2.0f, 2.0f);
+	renderingEngine.Run();
 
 	return EXIT_SUCCESS;
 }

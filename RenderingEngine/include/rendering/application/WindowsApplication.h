@@ -94,14 +94,23 @@ private:
 	{
 		static constexpr LRESULT MESSAGE_HANDLED = 0;
 
-		if (msg == WM_DESTROY)
+		switch (msg)
 		{
-			PostQuitMessage(MESSAGE_HANDLED);
+		case WM_PAINT:
+			PAINTSTRUCT ps;
 
-			return MESSAGE_HANDLED;
+			BeginPaint(hWnd, &ps);
+			EndPaint(hWnd, &ps);
+
+			break;
+		case WM_DESTROY:
+			PostQuitMessage(MESSAGE_HANDLED);
+			break;
+		default:
+			return DefWindowProcW(hWnd, msg, wp, lp);
 		}
 
-		return DefWindowProcW(hWnd, msg, wp, lp);
+		return MESSAGE_HANDLED;
 	}
 
 	static LRESULT CALLBACK HandleWindowsMessage(const HWND hWnd, const UINT message, const WPARAM wParam,
