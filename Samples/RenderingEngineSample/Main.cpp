@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include <vector>
 #include <Windows.h>
@@ -15,17 +16,17 @@ using namespace std;
 using namespace DirectX;
 
 int APIENTRY _tWinMain(const HINSTANCE hInstance,
-                       HINSTANCE,
-                       LPTSTR,
-                       int)
+	HINSTANCE,
+	LPTSTR,
+	int)
 {
-	WindowsApplication application{hInstance, L"RenderingEngineSample", L"RenderingEngineSampleClass"};
+	WindowsApplication application{ hInstance, L"RenderingEngineSample", L"RenderingEngineSampleClass" };
 
 	if (!application.Init())
 		return EXIT_FAILURE;
 
-	const auto dispositif = new Device{Device::CDS_FENETRE, application.GetMainWindow()};
-	RenderingEngine renderingEngine{dispositif, {WindowsApplication::ProcessWindowMessages}};
+	const auto device = new Device{ Device::CDS_FENETRE, application.GetMainWindow() };
+	RenderingEngine renderingEngine{ device, {WindowsApplication::ProcessWindowMessages} };
 
 	const auto wallMat = XMMatrixTranslation(0.0f, 0.0f, 0.0f);
 

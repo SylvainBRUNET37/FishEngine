@@ -23,4 +23,10 @@
 #pragma comment(lib, "d3dcompiler.lib")
 #pragma comment(lib, "DXGI.lib")
 
+#ifdef _DEBUG
+	#pragma comment(lib, "assimp-vc143-mtd.lib")
+#else
+	#pragma comment(lib, "assimp-vc143-mt.lib")
+#endif
+
 #endif
