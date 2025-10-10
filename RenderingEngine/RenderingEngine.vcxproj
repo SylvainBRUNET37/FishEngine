@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="include\rendering\application\WindowsApplication.h" />
     <ClInclude Include="include\rendering\device\Device.h" />
+    <ClInclude Include="include\rendering\device\InfoDispositif.h" />
     <ClInclude Include="include\rendering\RenderingEngine.h" />
     <ClInclude Include="include\rendering\shapes\Bloc.h" />
     <ClInclude Include="include\rendering\shapes\Objet3D.h" />
@@ -40,6 +41,7 @@
     </ClCompile>
     <ClCompile Include="src\rendering\application\WindowsApplication.cpp" />
     <ClCompile Include="src\rendering\device\Device.cpp" />
+    <ClCompile Include="src\rendering\device\InfoDispositif.cpp" />
     <ClCompile Include="src\rendering\RenderingEngine.cpp" />
     <ClCompile Include="src\rendering\shapes\Bloc.cpp" />
     <ClCompile Include="src\rendering\shapes\SommetBloc.cpp" />
