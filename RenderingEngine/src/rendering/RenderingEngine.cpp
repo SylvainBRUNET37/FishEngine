@@ -23,7 +23,7 @@ void RenderingEngine::InitScene()
 	matView = XMMatrixLookAtLH(eyePosition, focusPoint, upDirection);
 
 	constexpr float fieldOfView = XM_PI / 4.0f; // 45 degrees
-	constexpr float aspectRatio = 1.0f; // TODO: replace with actual viewport ratio
+	const float aspectRatio = device->GetLargeur() / device->GetHauteur();
 	constexpr float nearPlane = 2.0f;
 	constexpr float farPlane = 20.0f;
 
@@ -67,10 +67,10 @@ void RenderingEngine::UpdateScene()
 
 	if (elapsedTime > DELTA_TIME)
 	{
-		//device->Present();
-
 		AnimeScene(elapsedTime);
 		RenderScene();
+
+		device->Present();
 
 		previousTimeCount = currentTimeCount;
 	}
@@ -86,17 +86,25 @@ void RenderingEngine::RenderScene()
 {
 	ID3D11DeviceContext* pImmediateContext = device->GetImmediateContext();
 	ID3D11RenderTargetView* pRenderTargetView = device->GetRenderTargetView();
+	ID3D11DepthStencilView* pDepthStencilView = device->GetDepthStencilView();
 
-	constexpr float backgroundColor[4] = {0.0f, 0.5f, 0.0f, 1.0f}; // green
+	constexpr float backgroundColor[4] = { 0.0f, 0.5f, 0.0f, 1.0f }; // green
 	pImmediateContext->ClearRenderTargetView(pRenderTargetView, backgroundColor);
 
-	// Prepare matrices
+	// Clear both depth and stencil
+	pImmediateContext->ClearDepthStencilView(pDepthStencilView,
+		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+	// Bind render target AND depth stencil view (was passing nullptr)
+	ID3D11RenderTargetView* rtvs[] = { pRenderTargetView };
+	pImmediateContext->OMSetRenderTargets(1, rtvs, pDepthStencilView);
+
+	// Prepare matrices (you may want to use the matrices computed in InitScene instead of hardcoded values)
 	XMMATRIX world = XMMatrixRotationY(static_cast<float>(GetTickCount64()) / 2000.0f);
 	XMMATRIX view = XMMatrixLookAtLH(
-		XMVectorSet(0, 2.0f, -4, 0),  // higher Y = camera is above
-		XMVectorSet(0, 1.0f, 0, 0),   // look a bit higher (instead of 0)
+		XMVectorSet(0, 2.0f, -4, 0),
+		XMVectorSet(0, 1.0f, 0, 0),
 		XMVectorSet(0, 1, 0, 0));
-
 	XMMATRIX proj = XMMatrixPerspectiveFovLH(XM_PIDIV4, 800.0f / 600.0f, 0.1f, 100.0f);
 
 	// Light & camera
@@ -106,11 +114,7 @@ void RenderingEngine::RenderScene()
 	auto vDEcl = XMFLOAT4(1, 1, 1, 1);
 	auto vSEcl = XMFLOAT4(1, 1, 1, 1);
 
-	ID3D11RenderTargetView* rtvs[] = {pRenderTargetView};
-	pImmediateContext->OMSetRenderTargets(1, rtvs, nullptr);
-
 	for (auto& object : scene)
 		object.Draw(pImmediateContext, world, view, proj, lightPos, cameraPos, vAEcl, vDEcl, vSEcl);
-
-	device->GetSwapChain()->Present(1, 0);
 }
+
