@@ -7,14 +7,14 @@
 
 using namespace DirectX;
 
-Texture::Texture(std::wstring filename, const Device* device)
+Texture::Texture(std::wstring filename_, const Device* device)
 
-	: fileName(std::move(filename))
+	: fileName(std::move(filename_))
 {
 	ID3D11Device* pDevice = device->GetD3DDevice();
 
 	DXEssayer(CreateDDSTextureFromFile(pDevice,
-	                                            fileName.c_str(),
-	                                            nullptr,
-	                                            &texture), DXE_FICHIERTEXTUREINTROUVABLE);
+		fileName.c_str(),
+		nullptr,
+		&texture), DXE_FICHIERTEXTUREINTROUVABLE);
 }

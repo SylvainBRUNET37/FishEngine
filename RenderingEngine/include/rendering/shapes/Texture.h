@@ -7,7 +7,7 @@
 class Texture
 {
 public:
-	explicit Texture(std::wstring filename, const Device* device);
+	explicit Texture(std::wstring filename_, const Device* device);
 
 	[[nodiscard]] const std::wstring& GetFilename() const { return fileName; }
 	[[nodiscard]] ComPtr<ID3D11ShaderResourceView> GetTexture() const { return texture; }

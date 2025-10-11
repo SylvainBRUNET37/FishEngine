@@ -1,8 +1,6 @@
 #include "pch.h"
 #include "rendering/shapes/Model.h"
 
-#include "rendering/utils/Util.h"
-
 using namespace DirectX;
 
 struct alignas(16) CBParam
@@ -50,7 +48,7 @@ void Model::Draw(ID3D11DeviceContext* ctx,
     // Prepare CB once for each mesh (here per-mesh since material differs)
     for (size_t i = 0; i < meshes.size(); ++i)
     {
-        auto& mat = materials[i % materials.size()];
+        auto& mat = materials[meshes[i].GetMaterialIndex()];
 
         D3D11_MAPPED_SUBRESOURCE mapped;
         const HRESULT hr = ctx->Map(cbParam, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
@@ -66,11 +64,11 @@ void Model::Draw(ID3D11DeviceContext* ctx,
         cb->vAEcl = vAEcl;
         cb->vDEcl = vDEcl;
         cb->vSEcl = vSEcl;
-        //cb->vAMat = mat.vAMat;
-        //cb->vDMat = mat.vDMat;
-        //cb->vSMat = mat.vSMat;
-        //cb->puissance = mat.puissance;
-        //cb->bTex = mat.hasTexture ? 1 : 0;
+        cb->vAMat = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f); // TODO: delete constantes
+        cb->vDMat = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
+        cb->vSMat = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+        cb->puissance = 32.0f;
+        cb->bTex = true;
         cb->remplissage = XMFLOAT2(0, 0);
 
         ctx->Unmap(cbParam, 0);

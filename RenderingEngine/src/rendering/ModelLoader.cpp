@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "rendering/ModelLoader.h"
 
+#include <filesystem>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -20,8 +21,8 @@ Model ModelLoader::LoadModel(const std::string& filename, Device* device, Textur
     const aiScene* scene = importer.ReadFile(
         filename,
         aiProcess_Triangulate |
-        aiProcess_ConvertToLeftHanded |
         aiProcess_GenSmoothNormals |
+        aiProcess_ConvertToLeftHanded |
         aiProcess_CalcTangentSpace |
         aiProcess_JoinIdenticalVertices
     );
@@ -72,7 +73,9 @@ void ModelLoader::ProcessMesh(const aiMesh* mesh, const Device* device)
             indices.push_back(face.mIndices[j]);
     }
 
-    meshes.push_back(Mesh(std::move(vertices), std::move(indices)));
+    UINT materialIndex = mesh->mMaterialIndex;
+
+    meshes.push_back(Mesh(std::move(vertices), std::move(indices), materialIndex));
 }
 
 void ModelLoader::ProcessMaterial(const aiMaterial* material, const Device* device, TextureManager* textureManager)
@@ -91,17 +94,26 @@ void ModelLoader::ProcessMaterial(const aiMaterial* material, const Device* devi
     if (AI_SUCCESS == aiGetMaterialFloat(material, AI_MATKEY_SHININESS, &shininess))
         mat.shininess = shininess;
 
-	/*
+    std::filesystem::path modelPath = "assets\\Jin/chateau.obj"; // TODO
+    std::filesystem::path modelDir = modelPath.parent_path();
+
     aiString texturePath;
     if (material->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == AI_SUCCESS)
     {
-        mat->textureFileName = texturePath.C_Str();
+        std::string texName = texturePath.C_Str();
 
-        const std::wstring wideFilename(mat->textureFileName.begin(), mat->textureFileName.end());
+        // Combine folder + filename
+        std::filesystem::path fullPath = modelDir / texName;
+
+        mat.textureFileName = fullPath.string();
+
+        // Convert to wide string
+        const std::wstring wideFilename(fullPath.wstring());
+
         if (const Texture* tex = textureManager->GetNewTexture(wideFilename, device))
-            mat->texture = tex->GetTexture();
+            mat.texture = tex->GetTexture();
     }
-	*/
+
 
     materials.push_back(std::move(mat));
 }

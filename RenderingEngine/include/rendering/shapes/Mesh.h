@@ -7,12 +7,14 @@
 class Mesh
 {
 public:
-	explicit Mesh(std::vector<Vertex>&& vertices, std::vector<UINT>&& indices)
+	explicit Mesh(std::vector<Vertex>&& vertices, std::vector<UINT>&& indices, UINT materialIndex_)
 		: vertices{std::move(vertices)},
-		  indices{std::move(indices)}
-			
+		  indices{std::move(indices)},
+			materialIndex{ materialIndex_ }
 	{
 	}
+
+    UINT GetMaterialIndex() const { return materialIndex; }
 
     void Initialize(ID3D11Device* device)
     {
@@ -54,6 +56,8 @@ public:
 private:
 	std::vector<Vertex> vertices;
 	std::vector<UINT> indices;
+
+    UINT materialIndex;
 
 	ComPtr<ID3D11Buffer> vertexBuffer;
 	ComPtr<ID3D11Buffer> indexBuffer;

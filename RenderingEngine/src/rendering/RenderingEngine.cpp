@@ -91,9 +91,12 @@ void RenderingEngine::RenderScene()
 	pImmediateContext->ClearRenderTargetView(pRenderTargetView, backgroundColor);
 
 	// Prepare matrices
-	//XMMATRIX world = XMMatrixRotationY(static_cast<float>(GetTickCount64()) / 2000.0f);
-	XMMATRIX world = XMMatrixIdentity();
-	XMMATRIX view = XMMatrixLookAtLH(XMVectorSet(0, 1.5f, -4, 0), XMVectorSet(0, 0, 0, 0), XMVectorSet(0, 1, 0, 0));
+	XMMATRIX world = XMMatrixRotationY(static_cast<float>(GetTickCount64()) / 2000.0f);
+	XMMATRIX view = XMMatrixLookAtLH(
+		XMVectorSet(0, 2.0f, -4, 0),  // higher Y = camera is above
+		XMVectorSet(0, 1.0f, 0, 0),   // look a bit higher (instead of 0)
+		XMVectorSet(0, 1, 0, 0));
+
 	XMMATRIX proj = XMMatrixPerspectiveFovLH(XM_PIDIV4, 800.0f / 600.0f, 0.1f, 100.0f);
 
 	// Light & camera
