@@ -64,10 +64,10 @@ void Model::Draw(ID3D11DeviceContext* ctx,
         cb->vAEcl = vAEcl;
         cb->vDEcl = vDEcl;
         cb->vSEcl = vSEcl;
-        cb->vAMat = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f); // TODO: delete constantes
-        cb->vDMat = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
-        cb->vSMat = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-        cb->puissance = 32.0f;
+        cb->vAMat = mat.ambient;
+        cb->vDMat = mat.diffuse;
+        cb->vSMat = mat.specular;
+        cb->puissance = mat.shininess;
         cb->bTex = true;
         cb->remplissage = XMFLOAT2(0, 0);
 
