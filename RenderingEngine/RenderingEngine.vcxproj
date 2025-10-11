@@ -22,13 +22,22 @@
     <ClInclude Include="include\rendering\application\WindowsApplication.h" />
     <ClInclude Include="include\rendering\device\Device.h" />
     <ClInclude Include="include\rendering\device\InfoDispositif.h" />
+    <ClInclude Include="include\rendering\ModelLoader.h" />
     <ClInclude Include="include\rendering\RenderingEngine.h" />
     <ClInclude Include="include\rendering\shapes\Bloc.h" />
+    <ClInclude Include="include\rendering\shapes\Material.h" />
+    <ClInclude Include="include\rendering\shapes\Mesh.h" />
+    <ClInclude Include="include\rendering\shapes\Model.h" />
     <ClInclude Include="include\rendering\shapes\Objet3D.h" />
     <ClInclude Include="include\rendering\shapes\SommetBloc.h" />
+    <ClInclude Include="include\rendering\shapes\Texture.h" />
+    <ClInclude Include="include\rendering\shapes\Vertex.h" />
+    <ClInclude Include="include\rendering\TextureManager.h" />
     <ClInclude Include="include\rendering\utils\ComPtr.h" />
     <ClInclude Include="include\rendering\utils\Clock.h" />
+    <ClInclude Include="include\rendering\utils\DDSTextureLoader.h" />
     <ClInclude Include="include\rendering\utils\Util.h" />
+    <ClInclude Include="include\rendering\utils\VerboseAssertion.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="resources\resource.h" />
   </ItemGroup>
@@ -42,10 +51,15 @@
     <ClCompile Include="src\rendering\application\WindowsApplication.cpp" />
     <ClCompile Include="src\rendering\device\Device.cpp" />
     <ClCompile Include="src\rendering\device\InfoDispositif.cpp" />
+    <ClCompile Include="src\rendering\ModelLoader.cpp" />
     <ClCompile Include="src\rendering\RenderingEngine.cpp" />
     <ClCompile Include="src\rendering\shapes\Bloc.cpp" />
+    <ClCompile Include="src\rendering\shapes\Mesh.cpp" />
     <ClCompile Include="src\rendering\shapes\SommetBloc.cpp" />
+    <ClCompile Include="src\rendering\shapes\Texture.cpp" />
+    <ClCompile Include="src\rendering\TextureManager.cpp" />
     <ClCompile Include="src\rendering\utils\Clock.cpp" />
+    <ClCompile Include="src\rendering\utils\DDSTextureLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

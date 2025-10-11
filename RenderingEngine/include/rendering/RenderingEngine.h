@@ -7,7 +7,6 @@
 #include "device/Device.h"
 #include "shapes/Bloc.h"
 #include "shapes/Objet3D.h"
-#include "utils/Clock.h"
 
 class RenderingEngine
 {
@@ -24,6 +23,11 @@ public:
 	void AddObjectToScene(const DirectX::XMMATRIX& pos, const float dx, const float dy, const float dz)
 	{
 		scene.emplace_back(std::make_unique<CBloc>(pos, dx, dy, dz, device));
+	}
+
+	void AddObjectToScene(std::unique_ptr<CObjet3D> object)
+	{
+		scene.emplace_back(std::move(object));
 	}
 
 	void Run();

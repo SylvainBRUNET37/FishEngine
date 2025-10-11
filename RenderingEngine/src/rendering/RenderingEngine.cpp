@@ -1,7 +1,10 @@
 #include "pch.h"
 #include "rendering/RenderingEngine.h"
 
+#include "rendering/utils/Clock.h"
+
 using namespace std;
+using namespace DirectX;
 
 void RenderingEngine::InitAnimation()
 {
@@ -11,18 +14,18 @@ void RenderingEngine::InitAnimation()
 
 void RenderingEngine::InitScene()
 {
-	const DirectX::XMVECTOR eyePosition = DirectX::XMVectorSet(0.0f, 0.0f, -10.0f, 1.0f);
-	const DirectX::XMVECTOR focusPoint = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
-	const DirectX::XMVECTOR upDirection = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f);
+	const XMVECTOR eyePosition = XMVectorSet(0.0f, 0.0f, -10.0f, 1.0f);
+	const XMVECTOR focusPoint = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+	const XMVECTOR upDirection = XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f);
 
-	matView = DirectX::XMMatrixLookAtLH(eyePosition, focusPoint, upDirection);
+	matView = XMMatrixLookAtLH(eyePosition, focusPoint, upDirection);
 
-	constexpr float fieldOfView = DirectX::XM_PI / 4.0f; // 45 degrees
+	constexpr float fieldOfView = XM_PI / 4.0f; // 45 degrees
 	constexpr float aspectRatio = 1.0f; // TODO: replace with actual viewport ratio
 	constexpr float nearPlane = 2.0f;
 	constexpr float farPlane = 20.0f;
 
-	matProj = DirectX::XMMatrixPerspectiveFovLH(fieldOfView, aspectRatio, nearPlane, farPlane);
+	matProj = XMMatrixPerspectiveFovLH(fieldOfView, aspectRatio, nearPlane, farPlane);
 	matViewProj = matView * matProj;
 }
 
