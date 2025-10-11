@@ -179,6 +179,19 @@ xcopy "$(ProjectDir)assets\*.*"  "$(OutDir)assets\"  /E /Y</Command>
       <FileType>Document</FileType>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\MiniPhong.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\MiniPhongPS.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="shaders\MiniPhongVS.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

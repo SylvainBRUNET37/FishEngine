@@ -4,9 +4,9 @@
 #include <algorithm>
 #include <functional>
 
+#include "TextureManager.h"
 #include "device/Device.h"
-#include "shapes/Bloc.h"
-#include "shapes/Objet3D.h"
+#include "shapes/Model.h"
 
 class RenderingEngine
 {
@@ -14,20 +14,10 @@ public:
 	using MainLoopCallback = std::function<bool()>;
 
 	explicit RenderingEngine(Device* device, const std::initializer_list<MainLoopCallback> callbacks)
-		: mainLoopCallbacks{ callbacks }, device{ device }
+		: mainLoopCallbacks{ callbacks }, device{ device }, textureMaanger{new TextureManager{}}
 	{
 		InitScene();
 		InitAnimation();
-	}
-
-	void AddObjectToScene(const DirectX::XMMATRIX& pos, const float dx, const float dy, const float dz)
-	{
-		scene.emplace_back(std::make_unique<CBloc>(pos, dx, dy, dz, device));
-	}
-
-	void AddObjectToScene(std::unique_ptr<CObjet3D> object)
-	{
-		scene.emplace_back(std::move(object));
 	}
 
 	void Run();
@@ -38,17 +28,20 @@ private:
 	DirectX::XMMATRIX matView{};
 	DirectX::XMMATRIX matProj{};
 	DirectX::XMMATRIX matViewProj{};
-	Device* device;
 
-	std::vector<std::unique_ptr<CObjet3D>> scene;
+	Device* device; // TODO: use unique ptr
+	TextureManager* textureMaanger;
+
+	std::vector<Model> scene;
 
 	int64_t previousTimeCount{};
 
 	void InitAnimation();
 	void InitScene();
+	void InitObjects();
 
 	void AnimeScene(double elapsedTime) const;
-	void RenderScene() const;
+	void RenderScene();
 	void UpdateScene();
 };
 

@@ -1,26 +1,24 @@
 #ifndef MESH_LOADER_H
 #define MESH_LOADER_H
 
-#include <assimp/mesh.h>
+#include <assimp/scene.h>
 
+#include "TextureManager.h"
 #include "shapes/Model.h"
 
 class ModelLoader
 {
 public:
-	[[nodiscard]] Model LoadModel(const std::string& filename);
+	[[nodiscard]] Model LoadModel(const std::string& filename, Device* device,
+	                                                      TextureManager* textureManager);
 
 private:
-	using MeshData = aiMesh*;
+	std::vector<Mesh> meshes;
+	std::vector<Material> materials;
 
-	MeshData meshData = nullptr;
-
-	std::vector<Vertex> vertices;
-	std::vector<UINT> indices;
-
-	void LoadVertices();
-	void LoadIndices();
-	void LoadMeshData(const std::string& filename);
+	void ProcessMesh(const aiMesh* mesh, const Device* device);
+	void ProcessMaterial(const aiMaterial* material, const Device* device,
+	                            TextureManager* textureManager);
 };
 
 #endif

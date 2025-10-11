@@ -8,7 +8,7 @@
 #include <cstdlib>
 #include <minwindef.h>
 
-#include "rendering/MeshLoader.h"
+#include "rendering/ModelLoader.h"
 #include "rendering/RenderingEngine.h"
 #include "rendering/application/WindowsApplication.h"
 #include "rendering/device/Device.h"
@@ -31,11 +31,7 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 
 	const auto wallMat = XMMatrixTranslation(0.0f, 0.0f, 0.0f);
 
-	//MeshLoader meshLoader;
-	//Mesh mesh = meshLoader.LoadMesh("assets/Jin/jin.obj");
-
 	//renderingEngine.AddObjectToScene(wallMat, 2.0f, 2.0f, 2.0f);
-	//renderingEngine.AddObjectToScene(make_unique<Mesh>(mesh));
 	renderingEngine.Run();
 
 	return EXIT_SUCCESS;

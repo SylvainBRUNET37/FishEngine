@@ -10,7 +10,7 @@ public:
 	explicit Texture(std::wstring filename, const Device* device);
 
 	[[nodiscard]] const std::wstring& GetFilename() const { return fileName; }
-	[[nodiscard]] ID3D11ShaderResourceView* GetTexture() const { return texture; }
+	[[nodiscard]] ComPtr<ID3D11ShaderResourceView> GetTexture() const { return texture; }
 
 private:
 	std::wstring fileName;

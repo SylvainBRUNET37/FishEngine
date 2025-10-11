@@ -5,70 +5,103 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+#include "rendering/ShaderManager.h"
+#include "rendering/TextureManager.h"
+#include "rendering/device/Device.h"
 #include "rendering/utils/VerboseAssertion.h"
 #include "rendering/shapes/Mesh.h"
 
 using namespace std;
 using namespace DirectX;
 
-Model ModelLoader::LoadModel(const std::string& filename)
+Model ModelLoader::LoadModel(const std::string& filename, Device* device, TextureManager* textureManager)
 {
-	LoadMeshData(filename);
-	LoadVertices();
-	LoadIndices();
+    Assimp::Importer importer;
+    const aiScene* scene = importer.ReadFile(
+        filename,
+        aiProcess_Triangulate |
+        aiProcess_ConvertToLeftHanded |
+        aiProcess_GenSmoothNormals |
+        aiProcess_CalcTangentSpace |
+        aiProcess_JoinIdenticalVertices
+    );
 
-	//return Mesh{std::move(vertices), std::move(indices)};
+    vassert(scene && scene->mRootNode, "Could not load mesh: " + filename);
 
-	return Model{}; // TODO
+    for (unsigned int i = 0; i < scene->mNumMeshes; i++)
+        ProcessMesh(scene->mMeshes[i], device);
+
+    for (unsigned int i = 0; i < scene->mNumMaterials; i++)
+        ProcessMaterial(scene->mMaterials[i], device, textureManager);
+
+    const ShaderProgram shaderProgram = ShaderManager::CreateShader(device->GetD3DDevice());
+
+    return Model{std::move(meshes), std::move(materials), device, shaderProgram };
 }
 
-void ModelLoader::LoadMeshData(const std::string& filename)
+void ModelLoader::ProcessMesh(const aiMesh* mesh, const Device* device)
 {
-	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(
-		filename,
-		aiProcess_Triangulate |
-		aiProcess_ConvertToLeftHanded |
-		aiProcess_GenSmoothNormals |
-		aiProcess_CalcTangentSpace |
-		aiProcess_JoinIdenticalVertices
-	);
+    std::vector<Vertex> vertices;
+    std::vector<UINT> indices;
 
-	vassert(scene && scene->mRootNode, "Could not load mesh: " + filename);
+    // Process vertices
+    vertices.reserve(mesh->mNumVertices);
+    for (unsigned int i = 0; i < mesh->mNumVertices; i++)
+    {
+        Vertex vertex{};
+        vertex.position = XMFLOAT3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
 
-	// Load only the first mesh
-	meshData = scene->mMeshes[0];
+        if (mesh->HasNormals())
+            vertex.normal = XMFLOAT3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
+
+        if (mesh->mTextureCoords[0])
+            vertex.textureCoord = XMFLOAT2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y);
+        else
+            vertex.textureCoord = XMFLOAT2(0.0f, 0.0f);
+
+        vertices.push_back(vertex);
+    }
+
+    // Process indices
+    constexpr unsigned int TRIANGLE_SIDE_NUMBER = 3;
+    indices.reserve(mesh->mNumFaces * TRIANGLE_SIDE_NUMBER);
+    for (unsigned int i = 0; i < mesh->mNumFaces; i++)
+    {
+        const aiFace face = mesh->mFaces[i];
+        for (unsigned int j = 0; j < face.mNumIndices; j++)
+            indices.push_back(face.mIndices[j]);
+    }
+
+    meshes.push_back(Mesh(std::move(vertices), std::move(indices)));
 }
 
-void ModelLoader::LoadVertices()
+void ModelLoader::ProcessMaterial(const aiMaterial* material, const Device* device, TextureManager* textureManager)
 {
-	vertices.reserve(meshData->mNumVertices);
+    Material mat;
 
-	for (unsigned int i = 0; i < meshData->mNumVertices; i++)
-	{
-		XMFLOAT3 position(meshData->mVertices[i].x, meshData->mVertices[i].y, meshData->mVertices[i].z);
+    aiColor4D color;
+    if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_AMBIENT, &color))
+        mat.ambient = XMFLOAT4(color.r, color.g, color.b, color.a);
+    if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &color))
+        mat.diffuse = XMFLOAT4(color.r, color.g, color.b, color.a);
+    if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_SPECULAR, &color))
+        mat.specular = XMFLOAT4(color.r, color.g, color.b, color.a);
 
-		XMFLOAT3 normal(0, 0, 0);
-		if (meshData->HasNormals())
-			normal = XMFLOAT3(meshData->mNormals[i].x, meshData->mNormals[i].y, meshData->mNormals[i].z);
+    float shininess = 0.0f;
+    if (AI_SUCCESS == aiGetMaterialFloat(material, AI_MATKEY_SHININESS, &shininess))
+        mat.shininess = shininess;
 
-		XMFLOAT2 texCoord(0, 0);
-		if (meshData->HasTextureCoords(0))
-			texCoord = XMFLOAT2(meshData->mTextureCoords[0][i].x, meshData->mTextureCoords[0][i].y);
+	/*
+    aiString texturePath;
+    if (material->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == AI_SUCCESS)
+    {
+        mat->textureFileName = texturePath.C_Str();
 
-		vertices.emplace_back(position, normal, texCoord);
-	}
-}
+        const std::wstring wideFilename(mat->textureFileName.begin(), mat->textureFileName.end());
+        if (const Texture* tex = textureManager->GetNewTexture(wideFilename, device))
+            mat->texture = tex->GetTexture();
+    }
+	*/
 
-void ModelLoader::LoadIndices()
-{
-	constexpr unsigned int TRIANGLE_SIDE_NUMBER = 3;
-	indices.reserve(meshData->mNumFaces * TRIANGLE_SIDE_NUMBER);
-
-	for (unsigned int i = 0; i < meshData->mNumFaces; i++)
-	{
-		const aiFace& face = meshData->mFaces[i];
-		for (unsigned int j = 0; j < face.mNumIndices; j++)
-			indices.push_back(face.mIndices[j]);
-	}
+    materials.push_back(std::move(mat));
 }

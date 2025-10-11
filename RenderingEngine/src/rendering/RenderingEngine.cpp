@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "rendering/RenderingEngine.h"
 
+#include "rendering/ModelLoader.h"
+#include "rendering/shapes/Model.h"
 #include "rendering/utils/Clock.h"
 
 using namespace std;
@@ -27,6 +29,16 @@ void RenderingEngine::InitScene()
 
 	matProj = XMMatrixPerspectiveFovLH(fieldOfView, aspectRatio, nearPlane, farPlane);
 	matViewProj = matView * matProj;
+
+	InitObjects();
+}
+
+void RenderingEngine::InitObjects()
+{
+	ModelLoader modelLoader;
+	auto model = modelLoader.LoadModel("assets/Jin/jin.obj", device, textureMaanger);
+
+	scene.emplace_back(std::move(model));
 }
 
 void RenderingEngine::Run()
@@ -55,7 +67,7 @@ void RenderingEngine::UpdateScene()
 
 	if (elapsedTime > DELTA_TIME)
 	{
-		device->Present();
+		//device->Present();
 
 		AnimeScene(elapsedTime);
 		RenderScene();
@@ -67,10 +79,10 @@ void RenderingEngine::UpdateScene()
 void RenderingEngine::AnimeScene(const double elapsedTime) const
 {
 	for (const auto& object : scene)
-		object->Anime(elapsedTime);
+		object.Anime(elapsedTime);
 }
 
-void RenderingEngine::RenderScene() const
+void RenderingEngine::RenderScene()
 {
 	ID3D11DeviceContext* pImmediateContext = device->GetImmediateContext();
 	ID3D11RenderTargetView* pRenderTargetView = device->GetRenderTargetView();
@@ -78,6 +90,24 @@ void RenderingEngine::RenderScene() const
 	constexpr float backgroundColor[4] = {0.0f, 0.5f, 0.0f, 1.0f}; // green
 	pImmediateContext->ClearRenderTargetView(pRenderTargetView, backgroundColor);
 
-	for (const auto& object : scene)
-		object->Draw(matViewProj);
+	// Prepare matrices
+	//XMMATRIX world = XMMatrixRotationY(static_cast<float>(GetTickCount64()) / 2000.0f);
+	XMMATRIX world = XMMatrixIdentity();
+	XMMATRIX view = XMMatrixLookAtLH(XMVectorSet(0, 1.5f, -4, 0), XMVectorSet(0, 0, 0, 0), XMVectorSet(0, 1, 0, 0));
+	XMMATRIX proj = XMMatrixPerspectiveFovLH(XM_PIDIV4, 800.0f / 600.0f, 0.1f, 100.0f);
+
+	// Light & camera
+	auto lightPos = XMFLOAT4(2, 2, -2, 1);
+	auto cameraPos = XMFLOAT4(0, 1.5f, -4, 1);
+	auto vAEcl = XMFLOAT4(0.2f, 0.2f, 0.2f, 1);
+	auto vDEcl = XMFLOAT4(1, 1, 1, 1);
+	auto vSEcl = XMFLOAT4(1, 1, 1, 1);
+
+	ID3D11RenderTargetView* rtvs[] = {pRenderTargetView};
+	pImmediateContext->OMSetRenderTargets(1, rtvs, nullptr);
+
+	for (auto& object : scene)
+		object.Draw(pImmediateContext, world, view, proj, lightPos, cameraPos, vAEcl, vDEcl, vSEcl);
+
+	device->GetSwapChain()->Present(1, 0);
 }

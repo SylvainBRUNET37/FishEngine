@@ -22,5 +22,8 @@
   <ItemGroup>
     <None Include="shaders\PS1.hlsl" />
     <None Include="shaders\VS1.hlsl" />
+    <None Include="shaders\MiniPhong.hlsl" />
+    <None Include="shaders\MiniPhongPS.hlsl" />
+    <None Include="shaders\MiniPhongVS.hlsl" />
   </ItemGroup>
 </Project>

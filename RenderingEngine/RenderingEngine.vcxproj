@@ -24,6 +24,8 @@
     <ClInclude Include="include\rendering\device\InfoDispositif.h" />
     <ClInclude Include="include\rendering\ModelLoader.h" />
     <ClInclude Include="include\rendering\RenderingEngine.h" />
+    <ClInclude Include="include\rendering\ShaderManager.h" />
+    <ClInclude Include="include\rendering\ShaderProgram.h" />
     <ClInclude Include="include\rendering\shapes\Bloc.h" />
     <ClInclude Include="include\rendering\shapes\Material.h" />
     <ClInclude Include="include\rendering\shapes\Mesh.h" />
@@ -54,7 +56,7 @@
     <ClCompile Include="src\rendering\ModelLoader.cpp" />
     <ClCompile Include="src\rendering\RenderingEngine.cpp" />
     <ClCompile Include="src\rendering\shapes\Bloc.cpp" />
-    <ClCompile Include="src\rendering\shapes\Mesh.cpp" />
+    <ClCompile Include="src\rendering\shapes\Model.cpp" />
     <ClCompile Include="src\rendering\shapes\SommetBloc.cpp" />
     <ClCompile Include="src\rendering\shapes\Texture.cpp" />
     <ClCompile Include="src\rendering\TextureManager.cpp" />
