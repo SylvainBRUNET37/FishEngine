@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "rendering/RenderingEngine.h"
 
+#include <filesystem>
+
 #include "rendering/ModelLoader.h"
 #include "rendering/shapes/Model.h"
 #include "rendering/utils/Clock.h"
@@ -35,8 +37,10 @@ void RenderingEngine::InitScene()
 
 void RenderingEngine::InitObjects()
 {
+	const filesystem::path filePath = "assets\\Jin\\jin.obj";
+
 	ModelLoader modelLoader;
-	auto model = modelLoader.LoadModel("assets/Jin/jin.obj", device, textureMaanger);
+	auto model = modelLoader.LoadModel(filePath, device, textureMaanger);
 
 	scene.emplace_back(std::move(model));
 }
@@ -82,7 +86,7 @@ void RenderingEngine::AnimeScene(const double elapsedTime) const
 		object.Anime(elapsedTime);
 }
 
-void RenderingEngine::RenderScene()
+void RenderingEngine::RenderScene() // TODO: refactor
 {
 	ID3D11DeviceContext* pImmediateContext = device->GetImmediateContext();
 	ID3D11RenderTargetView* pRenderTargetView = device->GetRenderTargetView();
@@ -99,7 +103,7 @@ void RenderingEngine::RenderScene()
 	ID3D11RenderTargetView* rtvs[] = {pRenderTargetView};
 	pImmediateContext->OMSetRenderTargets(1, rtvs, pDepthStencilView);
 
-	// Prepare matrices (you may want to use the matrices computed in InitScene instead of hardcoded values)
+	// Prepare matrices (use the matrices computed in InitScene instead of hardcoded values)
 	const XMMATRIX world = XMMatrixRotationY(static_cast<float>(GetTickCount64()) / 2000.0f);
 	const XMMATRIX view = XMMatrixLookAtLH(
 		XMVectorSet(0, 2.0f, -4, 0),

@@ -15,11 +15,12 @@
 using namespace std;
 using namespace DirectX;
 
-Model ModelLoader::LoadModel(const std::string& filename, GraphicsDevice* device, TextureManager* textureManager)
+Model ModelLoader::LoadModel(const filesystem::path& filePath, const GraphicsDevice* graphicsDevice, TextureManager* textureManager)
 {
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(
-		filename,
+	const aiScene* scene = importer.ReadFile
+	(
+		filePath.string(),
 		aiProcess_Triangulate |
 		aiProcess_GenSmoothNormals |
 		aiProcess_ConvertToLeftHanded |
@@ -27,17 +28,22 @@ Model ModelLoader::LoadModel(const std::string& filename, GraphicsDevice* device
 		aiProcess_JoinIdenticalVertices
 	);
 
-	vassert(scene && scene->mRootNode, "Could not load mesh: " + filename);
+	vassert(scene && scene->mRootNode, "Could not load mesh: " + filePath.string());
 
 	for (unsigned int i = 0; i < scene->mNumMeshes; i++)
-		ProcessMesh(scene->mMeshes[i], device);
+		ProcessMesh(scene->mMeshes[i], graphicsDevice);
 
 	for (unsigned int i = 0; i < scene->mNumMaterials; i++)
-		ProcessMaterial(scene->mMaterials[i], device, textureManager);
+		ProcessMaterial(filePath.parent_path(), scene->mMaterials[i], graphicsDevice, textureManager);
 
-	ShaderProgram shaderProgram = ShaderManager::CreateShader(device->GetD3DDevice());
+	ShaderProgram shaderProgram = ShaderManager::CreateShader(graphicsDevice->GetD3DDevice());
 
-	return Model{std::move(meshes), std::move(materials), device->GetD3DDevice(), std::move(shaderProgram)};
+	auto model = Model{std::move(meshes), std::move(materials), graphicsDevice->GetD3DDevice(), std::move(shaderProgram)};
+
+	meshes.clear();
+	materials.clear();
+
+	return model;
 }
 
 void ModelLoader::ProcessMesh(const aiMesh* mesh, const GraphicsDevice* device)
@@ -78,7 +84,7 @@ void ModelLoader::ProcessMesh(const aiMesh* mesh, const GraphicsDevice* device)
 	meshes.push_back(Mesh(std::move(vertices), std::move(indices), materialIndex, device->GetD3DDevice()));
 }
 
-void ModelLoader::ProcessMaterial(const aiMaterial* material, const GraphicsDevice* device, TextureManager* textureManager)
+void ModelLoader::ProcessMaterial(const filesystem::path& materialPath, const aiMaterial* material, const GraphicsDevice* device, TextureManager* textureManager)
 {
 	Material mat;
 
@@ -94,16 +100,13 @@ void ModelLoader::ProcessMaterial(const aiMaterial* material, const GraphicsDevi
 	if (AI_SUCCESS == aiGetMaterialFloat(material, AI_MATKEY_SHININESS, &shininess))
 		mat.shininess = shininess;
 
-	std::filesystem::path modelPath = "assets\\Jin/chateau.obj"; // TODO
-	std::filesystem::path modelDir = modelPath.parent_path();
-
 	aiString texturePath;
 	if (material->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == AI_SUCCESS)
 	{
-		std::string texName = texturePath.C_Str();
+		const std::string texName = texturePath.C_Str();
 
 		// Combine folder + filename
-		std::filesystem::path fullPath = modelDir / texName;
+		const std::filesystem::path fullPath = materialPath / texName;
 
 		mat.textureFileName = fullPath.string();
 
@@ -113,7 +116,6 @@ void ModelLoader::ProcessMaterial(const aiMaterial* material, const GraphicsDevi
 		if (const Texture* tex = textureManager->GetNewTexture(wideFilename, device))
 			mat.texture = tex->GetTexture();
 	}
-
 
 	materials.push_back(std::move(mat));
 }
