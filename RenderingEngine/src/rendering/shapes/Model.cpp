@@ -90,9 +90,6 @@ void Model::Draw(ID3D11DeviceContext* ctx,
 
 void Model::Init()
 {
-    for (auto& mesh : this->meshes)
-        mesh.Init(device->GetD3DDevice());
-
     // Create constant buffer
     D3D11_BUFFER_DESC cbd = {};
     cbd.Usage = D3D11_USAGE_DYNAMIC;

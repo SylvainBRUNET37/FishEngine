@@ -23,6 +23,7 @@
     <ClInclude Include="include\rendering\device\GraphicsDevice.h" />
     <ClInclude Include="include\rendering\device\InfoDispositif.h" />
     <ClInclude Include="include\rendering\graphics\Buffer.h" />
+    <ClInclude Include="include\rendering\graphics\IndexBuffer.h" />
     <ClInclude Include="include\rendering\graphics\VertexBuffer.h" />
     <ClInclude Include="include\rendering\ModelLoader.h" />
     <ClInclude Include="include\rendering\RenderingEngine.h" />
