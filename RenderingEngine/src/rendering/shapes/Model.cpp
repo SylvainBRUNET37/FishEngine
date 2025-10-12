@@ -31,14 +31,8 @@ Model::Model(std::vector<Mesh>&& meshes, std::vector<Material>&& materials, ID3D
 }
 
 void Model::Draw(ID3D11DeviceContext* ctx,
-                 const XMMATRIX& world,
-                 const XMMATRIX& view,
-                 const XMMATRIX& proj,
-                 const XMFLOAT4& lightPos,
-                 const XMFLOAT4& cameraPos,
-                 const XMFLOAT4& vAEcl,
-                 const XMFLOAT4& vDEcl,
-                 const XMFLOAT4& vSEcl)
+                 const Transform& transform,
+                 const SceneData& scene)
 {
 	shaderProgram.Bind(ctx);
 
@@ -48,7 +42,7 @@ void Model::Draw(ID3D11DeviceContext* ctx,
 		auto& mat = materials[meshes[i].GetMaterialIndex()];
 
 		ConstantBufferParams params = BuildPerMeshParams(
-			mat, world, view, proj, lightPos, cameraPos, vAEcl, vDEcl, vSEcl);
+			mat, transform, scene);
 
 		constantBuffer.Update(ctx, params);
 		constantBuffer.Bind(ctx);
@@ -59,31 +53,25 @@ void Model::Draw(ID3D11DeviceContext* ctx,
 	}
 }
 
-auto Model::BuildPerMeshParams(
-	const Material& mat,
-	const XMMATRIX& world,
-	const XMMATRIX& view,
-	const XMMATRIX& proj,
-	const XMFLOAT4& lightPos,
-	const XMFLOAT4& cameraPos,
-	const XMFLOAT4& vAEcl,
-	const XMFLOAT4& vDEcl,
-	const XMFLOAT4& vSEcl) -> ConstantBufferParams
+Model::ConstantBufferParams Model::BuildPerMeshParams(
+	const Material& material,
+	const Transform& transform,
+	const SceneData& scene)
 {
 	ConstantBufferParams params;
 
-	params.matWorld = XMMatrixTranspose(world);
-	params.matWorldViewProj = XMMatrixTranspose(world * view * proj);
-	params.vLumiere = lightPos;
-	params.vCamera = cameraPos;
-	params.vAEcl = vAEcl;
-	params.vDEcl = vDEcl;
-	params.vSEcl = vSEcl;
-	params.vAMat = mat.ambient;
-	params.vDMat = mat.diffuse;
-	params.vSMat = mat.specular;
-	params.puissance = mat.shininess;
-	params.bTex = mat.texture != nullptr;
+	params.matWorld = XMMatrixTranspose(transform.world);
+	params.matWorldViewProj = XMMatrixTranspose(transform.world * transform.view * transform.proj);
+	params.vLumiere = scene.lightPosition;
+	params.vCamera = scene.cameraPosition;
+	params.vAEcl = scene.vAEcl;
+	params.vDEcl = scene.vDEcl;
+	params.vSEcl = scene.vSEcl;
+	params.vAMat = material.ambient;
+	params.vDMat = material.diffuse;
+	params.vSMat = material.specular;
+	params.puissance = material.shininess;
+	params.bTex = (material.texture != nullptr);
 	params.remplissage = XMFLOAT2(0, 0);
 
 	return params;

@@ -4,6 +4,8 @@
 #include "Material.h"
 #include "Mesh.h"
 #include "rendering/ShaderProgram.h"
+#include "rendering/core/SceneData.h"
+#include "rendering/core/Transform.h"
 #include "rendering/graphics/ConstantBuffer.h"
 
 class Model
@@ -17,14 +19,8 @@ public:
 	}
 
 	void Draw(ID3D11DeviceContext* ctx,
-	          const DirectX::XMMATRIX& world,
-	          const DirectX::XMMATRIX& view,
-	          const DirectX::XMMATRIX& proj,
-	          const DirectX::XMFLOAT4& lightPos,
-	          const DirectX::XMFLOAT4& cameraPos,
-	          const DirectX::XMFLOAT4& vAEcl,
-	          const DirectX::XMFLOAT4& vDEcl,
-	          const DirectX::XMFLOAT4& vSEcl);
+	          const Transform& transform,
+	          const SceneData& scene);
 
 private:
 	struct alignas(16) ConstantBufferParams;
@@ -36,15 +32,9 @@ private:
 	std::vector<Material> materials;
 
 	static ConstantBufferParams BuildPerMeshParams(
-		const Material& mat,
-		const DirectX::XMMATRIX& world,
-		const DirectX::XMMATRIX& view,
-		const DirectX::XMMATRIX& proj,
-		const DirectX::XMFLOAT4& lightPos,
-		const DirectX::XMFLOAT4& cameraPos,
-		const DirectX::XMFLOAT4& vAEcl,
-		const DirectX::XMFLOAT4& vDEcl,
-		const DirectX::XMFLOAT4& vSEcl);
+		const Material& material,
+		const Transform& transform,
+		const SceneData& scene);
 };
 
 #endif

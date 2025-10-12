@@ -20,6 +20,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\rendering\application\WindowsApplication.h" />
+    <ClInclude Include="include\rendering\core\SceneData.h" />
+    <ClInclude Include="include\rendering\core\Transform.h" />
     <ClInclude Include="include\rendering\device\GraphicsDevice.h" />
     <ClInclude Include="include\rendering\device\InfoDispositif.h" />
     <ClInclude Include="include\rendering\graphics\Buffer.h" />
