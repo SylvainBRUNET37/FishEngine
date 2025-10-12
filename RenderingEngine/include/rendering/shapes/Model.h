@@ -4,12 +4,12 @@
 #include "Material.h"
 #include "Mesh.h"
 #include "rendering/ShaderProgram.h"
-#include "rendering/device/Device.h"
+#include "rendering/device/GraphicsDevice.h"
 
 class Model
 {
 public:
-	explicit Model(std::vector<Mesh>&& meshes, std::vector<Material>&& materials, Device* device, const ShaderProgram& shaderProgram);
+	explicit Model(std::vector<Mesh>&& meshes, std::vector<Material>&& materials, GraphicsDevice* device, const ShaderProgram& shaderProgram);
 
 	static void Anime(float)
 	{
@@ -31,7 +31,7 @@ private:
 
 	DirectX::XMMATRIX matWorld;
 
-	Device* device;
+	GraphicsDevice* device;
 
 	ComPtr<ID3D11Buffer> cbParam;
 	ComPtr<ID3D11VertexShader> vertexShader;

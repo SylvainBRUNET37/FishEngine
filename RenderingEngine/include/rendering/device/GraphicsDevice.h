@@ -3,7 +3,7 @@
 
 #include "rendering/utils/ComPtr.h"
 
-class Device
+class GraphicsDevice
 {
 public:
 	enum CDS_MODE : uint8_t
@@ -12,7 +12,7 @@ public:
 		CDS_PLEIN_ECRAN
 	};
 
-	explicit Device(CDS_MODE cdsMode, HWND hWnd);
+	explicit GraphicsDevice(CDS_MODE cdsMode, HWND hWnd);
 
 	void Present() const;
 

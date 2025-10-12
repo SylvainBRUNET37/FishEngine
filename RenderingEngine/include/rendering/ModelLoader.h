@@ -9,15 +9,15 @@
 class ModelLoader
 {
 public:
-	[[nodiscard]] Model LoadModel(const std::string& filename, Device* device,
+	[[nodiscard]] Model LoadModel(const std::string& filename, GraphicsDevice* device,
 	                                                      TextureManager* textureManager);
 
 private:
 	std::vector<Mesh> meshes;
 	std::vector<Material> materials;
 
-	void ProcessMesh(const aiMesh* mesh, const Device* device);
-	void ProcessMaterial(const aiMaterial* material, const Device* device,
+	void ProcessMesh(const aiMesh* mesh, const GraphicsDevice* device);
+	void ProcessMaterial(const aiMaterial* material, const GraphicsDevice* device,
 	                            TextureManager* textureManager);
 };
 

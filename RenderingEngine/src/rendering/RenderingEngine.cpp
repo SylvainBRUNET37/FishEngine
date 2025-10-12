@@ -23,7 +23,7 @@ void RenderingEngine::InitScene()
 	matView = XMMatrixLookAtLH(eyePosition, focusPoint, upDirection);
 
 	constexpr float fieldOfView = XM_PI / 4.0f; // 45 degrees
-	const float aspectRatio = device->GetLargeur() / device->GetHauteur();
+	const float aspectRatio = static_cast<float>(device->GetLargeur()) / static_cast<float>(device->GetHauteur());
 	constexpr float nearPlane = 2.0f;
 	constexpr float farPlane = 20.0f;
 
@@ -88,15 +88,15 @@ void RenderingEngine::RenderScene()
 	ID3D11RenderTargetView* pRenderTargetView = device->GetRenderTargetView();
 	ID3D11DepthStencilView* pDepthStencilView = device->GetDepthStencilView();
 
-	constexpr float backgroundColor[4] = { 0.0f, 0.5f, 0.0f, 1.0f }; // green
+	constexpr float backgroundColor[4] = {0.0f, 0.5f, 0.0f, 1.0f}; // green
 	pImmediateContext->ClearRenderTargetView(pRenderTargetView, backgroundColor);
 
 	// Clear both depth and stencil
 	pImmediateContext->ClearDepthStencilView(pDepthStencilView,
-		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	                                         D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	// Bind render target AND depth stencil view (was passing nullptr)
-	ID3D11RenderTargetView* rtvs[] = { pRenderTargetView };
+	ID3D11RenderTargetView* rtvs[] = {pRenderTargetView};
 	pImmediateContext->OMSetRenderTargets(1, rtvs, pDepthStencilView);
 
 	// Prepare matrices (you may want to use the matrices computed in InitScene instead of hardcoded values)
@@ -117,4 +117,3 @@ void RenderingEngine::RenderScene()
 	for (auto& object : scene)
 		object.Draw(pImmediateContext, world, view, proj, lightPos, cameraPos, vAEcl, vDEcl, vSEcl);
 }
-

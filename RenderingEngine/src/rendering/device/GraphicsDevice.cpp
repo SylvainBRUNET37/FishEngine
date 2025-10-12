@@ -1,11 +1,11 @@
 #include "pch.h"
-#include "rendering/device/Device.h"
+#include "rendering/device/GraphicsDevice.h"
 
 #include "rendering/device/InfoDispositif.h"
 #include "rendering/utils/Util.h"
 #include "resources/resource.h"
 
-Device::Device(const CDS_MODE cdsMode,
+GraphicsDevice::GraphicsDevice(const CDS_MODE cdsMode,
                const HWND hWnd)
 {
 	UINT largeur;
@@ -119,12 +119,12 @@ Device::Device(const CDS_MODE cdsMode,
 	pImmediateContext->RSSetState(rasterState);
 }
 
-void Device::Present() const
+void GraphicsDevice::Present() const
 {
 	pSwapChain->Present(0, 0);
 }
 
-void Device::InitDepthBuffer()
+void GraphicsDevice::InitDepthBuffer()
 {
 	D3D11_TEXTURE2D_DESC depthTextureDesc;
 	ZeroMemory(&depthTextureDesc, sizeof(depthTextureDesc));
@@ -156,7 +156,7 @@ void Device::InitDepthBuffer()
 		DXE_ERREURCREATIONDEPTHSTENCILTARGET);
 }
 
-void Device::InitBlendStates()
+void GraphicsDevice::InitBlendStates()
 {
 	D3D11_BLEND_DESC blendDesc;
 	// Effacer la description

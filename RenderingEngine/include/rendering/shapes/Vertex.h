@@ -6,7 +6,7 @@ struct Vertex
 	Vertex() = default;
 
 	Vertex(const DirectX::XMFLOAT3 position, const DirectX::XMFLOAT3 normal,
-	       const DirectX::XMFLOAT2 textureCoord = DirectX::XMFLOAT2(0, 0))
+	       const DirectX::XMFLOAT2 textureCoord)
 		: position(position), normal(normal), textureCoord(textureCoord)
 	{
 	}

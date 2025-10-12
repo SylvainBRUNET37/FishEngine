@@ -7,7 +7,7 @@
 
 using namespace DirectX;
 
-Texture::Texture(std::wstring filename_, const Device* device)
+Texture::Texture(std::wstring filename_, const GraphicsDevice* device)
 
 	: fileName(std::move(filename_))
 {

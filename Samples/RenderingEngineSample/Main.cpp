@@ -11,7 +11,7 @@
 #include "rendering/ModelLoader.h"
 #include "rendering/RenderingEngine.h"
 #include "rendering/application/WindowsApplication.h"
-#include "rendering/device/Device.h"
+#include "rendering/device/GraphicsDevice.h"
 
 using namespace std;
 using namespace DirectX;
@@ -26,7 +26,7 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 	if (!application.Init())
 		return EXIT_FAILURE;
 
-	const auto device = new Device{ Device::CDS_FENETRE, application.GetMainWindow() };
+	const auto device = new GraphicsDevice{ GraphicsDevice::CDS_FENETRE, application.GetMainWindow() };
 	RenderingEngine renderingEngine{ device, {WindowsApplication::ProcessWindowMessages} };
 
 	const auto wallMat = XMMatrixTranslation(0.0f, 0.0f, 0.0f);

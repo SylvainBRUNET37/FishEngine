@@ -5,7 +5,7 @@
 
 using namespace std;
 
-Texture* TextureManager::GetNewTexture(const wstring& filename, const Device* device)
+Texture* TextureManager::GetNewTexture(const wstring& filename, const GraphicsDevice* device)
 {
     if (auto* existingTexture = GetTexture(filename))
         return existingTexture;

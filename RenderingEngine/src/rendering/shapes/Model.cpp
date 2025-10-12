@@ -21,7 +21,7 @@ struct alignas(16) CBParam
 };
 
 
-Model::Model(std::vector<Mesh>&& meshes, std::vector<Material>&& materials, Device* device, const ShaderProgram& shaderProgram)
+Model::Model(std::vector<Mesh>&& meshes, std::vector<Material>&& materials, GraphicsDevice* device, const ShaderProgram& shaderProgram)
 	: meshes{std::move(meshes)}, materials{std::move(materials)}, matWorld(), device{device}
 {
     inputLayout = shaderProgram.inputLayout;
@@ -91,7 +91,7 @@ void Model::Draw(ID3D11DeviceContext* ctx,
 void Model::Init()
 {
     for (auto& mesh : this->meshes)
-        mesh.Initialize(device->GetD3DDevice());
+        mesh.Init(device->GetD3DDevice());
 
     // Create constant buffer
     D3D11_BUFFER_DESC cbd = {};

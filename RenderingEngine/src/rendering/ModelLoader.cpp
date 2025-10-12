@@ -8,14 +8,14 @@
 
 #include "rendering/ShaderManager.h"
 #include "rendering/TextureManager.h"
-#include "rendering/device/Device.h"
+#include "rendering/device/GraphicsDevice.h"
 #include "rendering/utils/VerboseAssertion.h"
 #include "rendering/shapes/Mesh.h"
 
 using namespace std;
 using namespace DirectX;
 
-Model ModelLoader::LoadModel(const std::string& filename, Device* device, TextureManager* textureManager)
+Model ModelLoader::LoadModel(const std::string& filename, GraphicsDevice* device, TextureManager* textureManager)
 {
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(
@@ -40,7 +40,7 @@ Model ModelLoader::LoadModel(const std::string& filename, Device* device, Textur
 	return Model{std::move(meshes), std::move(materials), device, shaderProgram};
 }
 
-void ModelLoader::ProcessMesh(const aiMesh* mesh, const Device* device)
+void ModelLoader::ProcessMesh(const aiMesh* mesh, const GraphicsDevice* device)
 {
 	std::vector<Vertex> vertices;
 	std::vector<UINT> indices;
@@ -75,10 +75,10 @@ void ModelLoader::ProcessMesh(const aiMesh* mesh, const Device* device)
 
 	UINT materialIndex = mesh->mMaterialIndex;
 
-	meshes.push_back(Mesh(std::move(vertices), std::move(indices), materialIndex));
+	meshes.push_back(Mesh(std::move(vertices), std::move(indices), materialIndex, device->GetD3DDevice()));
 }
 
-void ModelLoader::ProcessMaterial(const aiMaterial* material, const Device* device, TextureManager* textureManager)
+void ModelLoader::ProcessMaterial(const aiMaterial* material, const GraphicsDevice* device, TextureManager* textureManager)
 {
 	Material mat;
 
