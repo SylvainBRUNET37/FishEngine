@@ -3,7 +3,7 @@
 
 using namespace DirectX;
 
-struct alignas(16) CBParam
+struct alignas(16) Model::ConstantBufferParams
 {
 	XMMATRIX matWorldViewProj;
 	XMMATRIX matWorld;
@@ -21,14 +21,10 @@ struct alignas(16) CBParam
 };
 
 
-Model::Model(std::vector<Mesh>&& meshes, std::vector<Material>&& materials, GraphicsDevice* device, const ShaderProgram& shaderProgram)
-	: meshes{std::move(meshes)}, materials{std::move(materials)}, matWorld(), device{device}
+Model::Model(std::vector<Mesh>&& meshes, std::vector<Material>&& materials, GraphicsDevice* device, ShaderProgram&& shaderProgram)
+	: meshes{std::move(meshes)}, materials{std::move(materials)}, matWorld(), device{device}, constantBuffer{ device->GetD3DDevice() }, shaderProgram{std::move(shaderProgram)}
 {
-    inputLayout = shaderProgram.inputLayout;
-    vertexShader = shaderProgram.vertexShader;
-    pixelShader = shaderProgram.pixelShader;
 
-    Init();
 }
 
 void Model::Draw(ID3D11DeviceContext* ctx,
@@ -41,9 +37,9 @@ void Model::Draw(ID3D11DeviceContext* ctx,
     const XMFLOAT4& vDEcl,
     const XMFLOAT4& vSEcl)
 {
-    ctx->VSSetShader(vertexShader, nullptr, 0);
-    ctx->PSSetShader(pixelShader, nullptr, 0);
-    ctx->IASetInputLayout(inputLayout);
+    ctx->VSSetShader(shaderProgram.vertexShader, nullptr, 0);
+    ctx->PSSetShader(shaderProgram.pixelShader, nullptr, 0);
+    ctx->IASetInputLayout(shaderProgram.inputLayout);
 
     // Prepare CB once for each mesh (here per-mesh since material differs)
     for (size_t i = 0; i < meshes.size(); ++i)
@@ -51,9 +47,9 @@ void Model::Draw(ID3D11DeviceContext* ctx,
         auto& mat = materials[meshes[i].GetMaterialIndex()];
 
         D3D11_MAPPED_SUBRESOURCE mapped;
-        const HRESULT hr = ctx->Map(cbParam, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+        const HRESULT hr = ctx->Map(constantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
         assert(SUCCEEDED(hr));
-        const auto cb = static_cast<CBParam*>(mapped.pData);
+        const auto cb = static_cast<ConstantBufferParams*>(mapped.pData);
 
         XMMATRIX w = world;
         const XMMATRIX wvp = XMMatrixTranspose(w * view * proj);
@@ -71,10 +67,10 @@ void Model::Draw(ID3D11DeviceContext* ctx,
         cb->bTex = true;
         cb->remplissage = XMFLOAT2(0, 0);
 
-        ctx->Unmap(cbParam, 0);
+        ctx->Unmap(constantBuffer.Get(), 0);
 
-        ctx->VSSetConstantBuffers(0, 1, &cbParam);
-        ctx->PSSetConstantBuffers(0, 1, &cbParam);
+        ctx->VSSetConstantBuffers(0, 1, &constantBuffer.Get());
+        ctx->PSSetConstantBuffers(0, 1, &constantBuffer.Get());
 
         if (mat.texture)
             ctx->PSSetShaderResources(0, 1, &mat.texture);
@@ -86,16 +82,4 @@ void Model::Draw(ID3D11DeviceContext* ctx,
 
         meshes[i].Draw(ctx);
     }
-}
-
-void Model::Init()
-{
-    // Create constant buffer
-    D3D11_BUFFER_DESC cbd = {};
-    cbd.Usage = D3D11_USAGE_DYNAMIC;
-    cbd.ByteWidth = sizeof(CBParam);
-    cbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-    cbd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-    const HRESULT hr = device->GetD3DDevice()->CreateBuffer(&cbd, nullptr, &cbParam);
-    assert(SUCCEEDED(hr));
 }

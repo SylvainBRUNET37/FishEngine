@@ -35,9 +35,9 @@ Model ModelLoader::LoadModel(const std::string& filename, GraphicsDevice* device
 	for (unsigned int i = 0; i < scene->mNumMaterials; i++)
 		ProcessMaterial(scene->mMaterials[i], device, textureManager);
 
-	const ShaderProgram shaderProgram = ShaderManager::CreateShader(device->GetD3DDevice());
+	ShaderProgram shaderProgram = ShaderManager::CreateShader(device->GetD3DDevice());
 
-	return Model{std::move(meshes), std::move(materials), device, shaderProgram};
+	return Model{std::move(meshes), std::move(materials), device, std::move(shaderProgram)};
 }
 
 void ModelLoader::ProcessMesh(const aiMesh* mesh, const GraphicsDevice* device)

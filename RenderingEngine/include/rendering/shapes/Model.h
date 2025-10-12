@@ -5,11 +5,12 @@
 #include "Mesh.h"
 #include "rendering/ShaderProgram.h"
 #include "rendering/device/GraphicsDevice.h"
+#include "rendering/graphics/ConstantBuffer.h"
 
 class Model
 {
 public:
-	explicit Model(std::vector<Mesh>&& meshes, std::vector<Material>&& materials, GraphicsDevice* device, const ShaderProgram& shaderProgram);
+	explicit Model(std::vector<Mesh>&& meshes, std::vector<Material>&& materials, GraphicsDevice* device, ShaderProgram&& shaderProgram);
 
 	static void Anime(float)
 	{
@@ -33,12 +34,10 @@ private:
 
 	GraphicsDevice* device;
 
-	ComPtr<ID3D11Buffer> cbParam;
-	ComPtr<ID3D11VertexShader> vertexShader;
-	ComPtr<ID3D11PixelShader> pixelShader;
-	ComPtr<ID3D11InputLayout> inputLayout;
+	struct alignas(16) ConstantBufferParams;
+	ConstantBuffer<ConstantBufferParams> constantBuffer;
 
-	void Init();
+	ShaderProgram shaderProgram;
 };
 
 #endif
