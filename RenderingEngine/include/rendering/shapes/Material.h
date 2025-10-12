@@ -15,6 +15,11 @@ struct Material
 		textureFileName = "";
 	}
 
+	void Bind(ID3D11DeviceContext* context)
+	{
+		context->PSSetShaderResources(0, 1, &texture);
+	}
+
 	std::string textureFileName;
 	std::string materialName;
 

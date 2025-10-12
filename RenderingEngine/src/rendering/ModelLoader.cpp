@@ -37,7 +37,7 @@ Model ModelLoader::LoadModel(const std::string& filename, GraphicsDevice* device
 
 	ShaderProgram shaderProgram = ShaderManager::CreateShader(device->GetD3DDevice());
 
-	return Model{std::move(meshes), std::move(materials), device, std::move(shaderProgram)};
+	return Model{std::move(meshes), std::move(materials), device->GetD3DDevice(), std::move(shaderProgram)};
 }
 
 void ModelLoader::ProcessMesh(const aiMesh* mesh, const GraphicsDevice* device)
@@ -73,7 +73,7 @@ void ModelLoader::ProcessMesh(const aiMesh* mesh, const GraphicsDevice* device)
 			indices.push_back(face.mIndices[j]);
 	}
 
-	UINT materialIndex = mesh->mMaterialIndex;
+	const UINT materialIndex = mesh->mMaterialIndex;
 
 	meshes.push_back(Mesh(std::move(vertices), std::move(indices), materialIndex, device->GetD3DDevice()));
 }

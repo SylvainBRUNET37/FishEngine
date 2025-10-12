@@ -19,6 +19,23 @@ public:
         const HRESULT hr = device->CreateBuffer(&constantBufferData, nullptr, &buffer);
         assert(SUCCEEDED(hr));
     }
+
+    void Update(ID3D11DeviceContext* context, const Param& data)
+    {
+        D3D11_MAPPED_SUBRESOURCE mapped{};
+        const HRESULT hr = context->Map(buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+
+        assert(SUCCEEDED(hr));
+        std::memcpy(mapped.pData, &data, sizeof(Param));
+
+        context->Unmap(buffer, 0);
+    }
+
+    void Bind(ID3D11DeviceContext* context)
+    {
+        context->VSSetConstantBuffers(0, 1, &buffer);
+        context->PSSetConstantBuffers(0, 1, &buffer);
+    }
 };
 
 #endif

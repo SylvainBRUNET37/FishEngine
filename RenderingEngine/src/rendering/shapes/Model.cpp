@@ -21,65 +21,70 @@ struct alignas(16) Model::ConstantBufferParams
 };
 
 
-Model::Model(std::vector<Mesh>&& meshes, std::vector<Material>&& materials, GraphicsDevice* device, ShaderProgram&& shaderProgram)
-	: meshes{std::move(meshes)}, materials{std::move(materials)}, matWorld(), device{device}, constantBuffer{ device->GetD3DDevice() }, shaderProgram{std::move(shaderProgram)}
+Model::Model(std::vector<Mesh>&& meshes, std::vector<Material>&& materials, ID3D11Device* device,
+             ShaderProgram&& shaderProgram)
+	: constantBuffer{device},
+	  shaderProgram{std::move(shaderProgram)},
+	  meshes{std::move(meshes)},
+	  materials{std::move(materials)}
 {
-
 }
 
 void Model::Draw(ID3D11DeviceContext* ctx,
-    const XMMATRIX& world,
-    const XMMATRIX& view,
-    const XMMATRIX& proj,
-    const XMFLOAT4& lightPos,
-    const XMFLOAT4& cameraPos,
-    const XMFLOAT4& vAEcl,
-    const XMFLOAT4& vDEcl,
-    const XMFLOAT4& vSEcl)
+                 const XMMATRIX& world,
+                 const XMMATRIX& view,
+                 const XMMATRIX& proj,
+                 const XMFLOAT4& lightPos,
+                 const XMFLOAT4& cameraPos,
+                 const XMFLOAT4& vAEcl,
+                 const XMFLOAT4& vDEcl,
+                 const XMFLOAT4& vSEcl)
 {
-    ctx->VSSetShader(shaderProgram.vertexShader, nullptr, 0);
-    ctx->PSSetShader(shaderProgram.pixelShader, nullptr, 0);
-    ctx->IASetInputLayout(shaderProgram.inputLayout);
+	shaderProgram.Bind(ctx);
 
-    // Prepare CB once for each mesh (here per-mesh since material differs)
-    for (size_t i = 0; i < meshes.size(); ++i)
-    {
-        auto& mat = materials[meshes[i].GetMaterialIndex()];
+	// Prepare CB once for each mesh (here per-mesh since material differs)
+	for (size_t i = 0; i < meshes.size(); ++i)
+	{
+		auto& mat = materials[meshes[i].GetMaterialIndex()];
 
-        D3D11_MAPPED_SUBRESOURCE mapped;
-        const HRESULT hr = ctx->Map(constantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
-        assert(SUCCEEDED(hr));
-        const auto cb = static_cast<ConstantBufferParams*>(mapped.pData);
+		ConstantBufferParams params = BuildPerMeshParams(
+			mat, world, view, proj, lightPos, cameraPos, vAEcl, vDEcl, vSEcl);
 
-        XMMATRIX w = world;
-        const XMMATRIX wvp = XMMatrixTranspose(w * view * proj);
-        cb->matWorldViewProj = wvp;
-        cb->matWorld = XMMatrixTranspose(w);
-        cb->vLumiere = lightPos;
-        cb->vCamera = cameraPos;
-        cb->vAEcl = vAEcl;
-        cb->vDEcl = vDEcl;
-        cb->vSEcl = vSEcl;
-        cb->vAMat = mat.ambient;
-        cb->vDMat = mat.diffuse;
-        cb->vSMat = mat.specular;
-        cb->puissance = mat.shininess;
-        cb->bTex = true;
-        cb->remplissage = XMFLOAT2(0, 0);
+		constantBuffer.Update(ctx, params);
+		constantBuffer.Bind(ctx);
 
-        ctx->Unmap(constantBuffer.Get(), 0);
+		mat.Bind(ctx);
 
-        ctx->VSSetConstantBuffers(0, 1, &constantBuffer.Get());
-        ctx->PSSetConstantBuffers(0, 1, &constantBuffer.Get());
+		meshes[i].Draw(ctx);
+	}
+}
 
-        if (mat.texture)
-            ctx->PSSetShaderResources(0, 1, &mat.texture);
-        else
-        {
-            ID3D11ShaderResourceView* nullSRV[1] = { nullptr };
-            ctx->PSSetShaderResources(0, 1, nullSRV);
-        }
+auto Model::BuildPerMeshParams(
+	const Material& mat,
+	const XMMATRIX& world,
+	const XMMATRIX& view,
+	const XMMATRIX& proj,
+	const XMFLOAT4& lightPos,
+	const XMFLOAT4& cameraPos,
+	const XMFLOAT4& vAEcl,
+	const XMFLOAT4& vDEcl,
+	const XMFLOAT4& vSEcl) -> ConstantBufferParams
+{
+	ConstantBufferParams params;
 
-        meshes[i].Draw(ctx);
-    }
+	params.matWorld = XMMatrixTranspose(world);
+	params.matWorldViewProj = XMMatrixTranspose(world * view * proj);
+	params.vLumiere = lightPos;
+	params.vCamera = cameraPos;
+	params.vAEcl = vAEcl;
+	params.vDEcl = vDEcl;
+	params.vSEcl = vSEcl;
+	params.vAMat = mat.ambient;
+	params.vDMat = mat.diffuse;
+	params.vSMat = mat.specular;
+	params.puissance = mat.shininess;
+	params.bTex = mat.texture != nullptr;
+	params.remplissage = XMFLOAT2(0, 0);
+
+	return params;
 }
