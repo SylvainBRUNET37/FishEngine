@@ -6,7 +6,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-#include "rendering/shaders/ShaderManager.h"
+#include "rendering/shaders/ShaderBuilder.h"
 #include "rendering/TextureManager.h"
 #include "rendering/device/GraphicsDevice.h"
 #include "rendering/utils/VerboseAssertion.h"
@@ -15,7 +15,7 @@
 using namespace std;
 using namespace DirectX;
 
-Model ModelLoader::LoadModel(const filesystem::path& filePath, const GraphicsDevice* graphicsDevice, TextureManager* textureManager)
+Model ModelLoader::LoadModel(const filesystem::path& filePath, const GraphicsDevice* graphicsDevice, const ShaderProgramDesc& shaderProgramDesc)
 {
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile
@@ -34,24 +34,13 @@ Model ModelLoader::LoadModel(const filesystem::path& filePath, const GraphicsDev
 		ProcessMesh(scene->mMeshes[i], graphicsDevice);
 
 	for (unsigned int i = 0; i < scene->mNumMaterials; i++)
-		ProcessMaterial(filePath.parent_path(), scene->mMaterials[i], graphicsDevice, textureManager);
+		ProcessMaterial(filePath.parent_path(), scene->mMaterials[i], graphicsDevice);
 
-	const std::vector<D3D11_INPUT_ELEMENT_DESC> layoutDesc =
-	{
-		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0},
+	ShaderProgram shaderProgram = ShaderBuilder::CreateShaderProgram(graphicsDevice->GetD3DDevice(), shaderProgramDesc);
+
+	auto model = Model{
+		std::move(meshes), std::move(materials), graphicsDevice->GetD3DDevice(), std::move(shaderProgram)
 	};
-
-	const unordered_set<ShaderDesc> shaderDescs =
-	{
-		{"shaders/MiniPhongVS.hlsl", "MiniPhongVS", "vs_5_0", ShaderStage::Vertex},
-		{"shaders/MiniPhongPS.hlsl", "MiniPhongPS", "ps_5_0", ShaderStage::Pixel},
-	};
-
-	ShaderProgram shaderProgram = ShaderManager::CreateShaderProgram(graphicsDevice->GetD3DDevice(), shaderDescs, layoutDesc);
-
-	auto model = Model{std::move(meshes), std::move(materials), graphicsDevice->GetD3DDevice(), std::move(shaderProgram)};
 
 	meshes.clear();
 	materials.clear();
@@ -97,7 +86,8 @@ void ModelLoader::ProcessMesh(const aiMesh* mesh, const GraphicsDevice* device)
 	meshes.push_back(Mesh(std::move(vertices), std::move(indices), materialIndex, device->GetD3DDevice()));
 }
 
-void ModelLoader::ProcessMaterial(const filesystem::path& materialPath, const aiMaterial* material, const GraphicsDevice* device, TextureManager* textureManager)
+void ModelLoader::ProcessMaterial(const filesystem::path& materialPath, const aiMaterial* material,
+                                  const GraphicsDevice* device)
 {
 	Material mat;
 
@@ -126,7 +116,7 @@ void ModelLoader::ProcessMaterial(const filesystem::path& materialPath, const ai
 		// Convert to wide string
 		const std::wstring wideFilename(fullPath.wstring());
 
-		if (const Texture* tex = textureManager->GetNewTexture(wideFilename, device))
+		if (const Texture* tex = textureManager.GetNewTexture(wideFilename, device))
 			mat.texture = tex->GetTexture();
 	}
 

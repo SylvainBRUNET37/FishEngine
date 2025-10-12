@@ -4,7 +4,6 @@
 #include <algorithm>
 #include <functional>
 
-#include "TextureManager.h"
 #include "device/GraphicsDevice.h"
 #include "shapes/Model.h"
 
@@ -14,7 +13,7 @@ public:
 	using MainLoopCallback = std::function<bool()>;
 
 	explicit RenderingEngine(GraphicsDevice* device, const std::initializer_list<MainLoopCallback> callbacks)
-		: mainLoopCallbacks{ callbacks }, device{ device }, textureMaanger{new TextureManager{}}
+		: mainLoopCallbacks{ callbacks }, device{ device }
 	{
 		InitScene();
 		InitAnimation();
@@ -30,7 +29,6 @@ private:
 	DirectX::XMMATRIX matViewProj{};
 
 	GraphicsDevice* device; // TODO: use unique ptr
-	TextureManager* textureMaanger;
 
 	std::vector<Model> scene;
 

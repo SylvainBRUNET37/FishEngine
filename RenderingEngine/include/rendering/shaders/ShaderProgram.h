@@ -1,5 +1,5 @@
-#ifndef SHADER_PROGRAM
-#define SHADER_PROGRAM
+#ifndef SHADER_PROGRAM_H
+#define SHADER_PROGRAM_H
 
 #include "rendering/utils/ComPtr.h"
 

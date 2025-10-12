@@ -7,7 +7,6 @@ class TextureManager
 {
 public:
 	[[nodiscard]] Texture* GetNewTexture(const std::wstring& filename, const GraphicsDevice* device);
-
 	[[nodiscard]] Texture* GetTexture(const std::wstring& filename) const;
 
 private:

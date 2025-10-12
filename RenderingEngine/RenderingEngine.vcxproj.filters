@@ -69,7 +69,7 @@
     <ClInclude Include="include\rendering\shapes\Model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\rendering\shaders\ShaderManager.h">
+    <ClInclude Include="include\rendering\shaders\ShaderBuilder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\rendering\shaders\ShaderProgram.h">
@@ -94,6 +94,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\rendering\shaders\ShaderDesc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\rendering\shaders\ShaderStage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\rendering\shaders\ShaderProgramDesc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -134,7 +140,7 @@
     <ClCompile Include="src\rendering\shapes\Mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\rendering\shaders\ShaderManager.cpp">
+    <ClCompile Include="src\rendering\shaders\ShaderBuilder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

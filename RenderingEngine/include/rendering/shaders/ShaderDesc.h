@@ -3,15 +3,7 @@
 
 #include <filesystem>
 
-enum class ShaderStage : uint8_t
-{
-	Vertex,
-	Pixel,
-	Geometry,
-	Hull,
-	Domain,
-	Compute
-};
+#include "ShaderStage.h"
 
 struct ShaderDesc
 {

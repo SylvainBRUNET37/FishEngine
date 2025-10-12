@@ -1,12 +1,11 @@
 #include "pch.h"
-#include "rendering/shaders/ShaderManager.h"
+#include "rendering/shaders/ShaderBuilder.h"
 
-ShaderProgram ShaderManager::CreateShaderProgram(ID3D11Device* device,
-	const std::unordered_set<ShaderDesc>& shaderDescs, const std::vector<D3D11_INPUT_ELEMENT_DESC>& layoutDesc)
+ShaderProgram ShaderBuilder::CreateShaderProgram(ID3D11Device* device, const ShaderProgramDesc& shaderProgramDesc)
 {
 	ShaderProgram shaderProgram;
 
-	for (auto& shaderDesc : shaderDescs)
+	for (auto& shaderDesc : shaderProgramDesc.shaderDescs)
 	{
 		HRESULT result;
 		const auto shaderBlob = CompileShader(shaderDesc.path, shaderDesc.entryPoint, shaderDesc.profile);
@@ -20,7 +19,7 @@ ShaderProgram ShaderManager::CreateShaderProgram(ID3D11Device* device,
 				&shaderProgram.vertexShader);
 			assert(SUCCEEDED(result));
 
-			result = device->CreateInputLayout(layoutDesc.data(), layoutDesc.size(),
+			result = device->CreateInputLayout(shaderProgramDesc.layoutDesc.data(), shaderProgramDesc.layoutDesc.size(),
 				shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(),
 				&shaderProgram.inputLayout);
 
@@ -39,7 +38,7 @@ ShaderProgram ShaderManager::CreateShaderProgram(ID3D11Device* device,
 	return shaderProgram;
 }
 
-ComPtr<ID3DBlob> ShaderManager::CompileShader(const std::wstring& filePath,
+ComPtr<ID3DBlob> ShaderBuilder::CompileShader(const std::wstring& filePath,
                                               const std::string& entry,
                                               const std::string& profile)
 {
