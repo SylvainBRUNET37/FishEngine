@@ -69,10 +69,10 @@
     <ClInclude Include="include\rendering\shapes\Model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\rendering\ShaderManager.h">
+    <ClInclude Include="include\rendering\shaders\ShaderManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\rendering\ShaderProgram.h">
+    <ClInclude Include="include\rendering\shaders\ShaderProgram.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\rendering\graphics\VertexBuffer.h">
@@ -91,6 +91,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\rendering\core\SceneData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\rendering\shaders\ShaderDesc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -129,6 +132,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\rendering\shapes\Mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\rendering\shaders\ShaderManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

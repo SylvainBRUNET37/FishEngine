@@ -1,7 +1,7 @@
 #ifndef SHADER_PROGRAM
 #define SHADER_PROGRAM
 
-#include "utils/ComPtr.h"
+#include "rendering/utils/ComPtr.h"
 
 struct ShaderProgram
 {

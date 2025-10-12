@@ -6,7 +6,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-#include "rendering/ShaderManager.h"
+#include "rendering/shaders/ShaderManager.h"
 #include "rendering/TextureManager.h"
 #include "rendering/device/GraphicsDevice.h"
 #include "rendering/utils/VerboseAssertion.h"
@@ -36,7 +36,20 @@ Model ModelLoader::LoadModel(const filesystem::path& filePath, const GraphicsDev
 	for (unsigned int i = 0; i < scene->mNumMaterials; i++)
 		ProcessMaterial(filePath.parent_path(), scene->mMaterials[i], graphicsDevice, textureManager);
 
-	ShaderProgram shaderProgram = ShaderManager::CreateShader(graphicsDevice->GetD3DDevice());
+	const std::vector<D3D11_INPUT_ELEMENT_DESC> layoutDesc =
+	{
+		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0},
+	};
+
+	const unordered_set<ShaderDesc> shaderDescs =
+	{
+		{"shaders/MiniPhongVS.hlsl", "MiniPhongVS", "vs_5_0", ShaderStage::Vertex},
+		{"shaders/MiniPhongPS.hlsl", "MiniPhongPS", "ps_5_0", ShaderStage::Pixel},
+	};
+
+	ShaderProgram shaderProgram = ShaderManager::CreateShaderProgram(graphicsDevice->GetD3DDevice(), shaderDescs, layoutDesc);
 
 	auto model = Model{std::move(meshes), std::move(materials), graphicsDevice->GetD3DDevice(), std::move(shaderProgram)};
 

@@ -30,8 +30,9 @@
     <ClInclude Include="include\rendering\graphics\VertexBuffer.h" />
     <ClInclude Include="include\rendering\ModelLoader.h" />
     <ClInclude Include="include\rendering\RenderingEngine.h" />
-    <ClInclude Include="include\rendering\ShaderManager.h" />
-    <ClInclude Include="include\rendering\ShaderProgram.h" />
+    <ClInclude Include="include\rendering\shaders\ShaderDesc.h" />
+    <ClInclude Include="include\rendering\shaders\ShaderManager.h" />
+    <ClInclude Include="include\rendering\shaders\ShaderProgram.h" />
     <ClInclude Include="include\rendering\shapes\Material.h" />
     <ClInclude Include="include\rendering\shapes\Mesh.h" />
     <ClInclude Include="include\rendering\shapes\Model.h" />
@@ -58,6 +59,7 @@
     <ClCompile Include="src\rendering\device\InfoDispositif.cpp" />
     <ClCompile Include="src\rendering\ModelLoader.cpp" />
     <ClCompile Include="src\rendering\RenderingEngine.cpp" />
+    <ClCompile Include="src\rendering\shaders\ShaderManager.cpp" />
     <ClCompile Include="src\rendering\shapes\Mesh.cpp" />
     <ClCompile Include="src\rendering\shapes\Model.cpp" />
     <ClCompile Include="src\rendering\shapes\Texture.cpp" />

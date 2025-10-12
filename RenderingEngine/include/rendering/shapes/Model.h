@@ -3,7 +3,7 @@
 
 #include "Material.h"
 #include "Mesh.h"
-#include "rendering/ShaderProgram.h"
+#include "rendering/shaders/ShaderProgram.h"
 #include "rendering/core/SceneData.h"
 #include "rendering/core/Transform.h"
 #include "rendering/graphics/ConstantBuffer.h"
