@@ -11,7 +11,8 @@
 #include "rendering/RenderingEngine.h"
 #include "rendering/application/WindowsApplication.h"
 #include "rendering/device/GraphicsDevice.h"
-#include <rendering/shaders/ShaderProgramDesc.h>
+#include "rendering/shaders/ShaderProgramDesc.h"
+#include "rendering/shaders/ShaderFactory.h"
 
 using namespace std;
 using namespace DirectX;
@@ -22,8 +23,8 @@ namespace
 	{
 		ShaderProgramDesc<VertexShader, PixelShader> desc;
 
-		desc.AddShader<VertexShader>("shaders/MiniPhongVS.hlsl", "MiniPhongVS", "vs_5_0")
-		    .AddShader<PixelShader>("shaders/MiniPhongPS.hlsl", "MiniPhongPS", "ps_5_0");
+		desc.AddDesc<VertexShader>("shaders/MiniPhongVS.hlsl", "MiniPhongVS", "vs_5_0")
+		    .AddDesc<PixelShader>("shaders/MiniPhongPS.hlsl", "MiniPhongPS", "ps_5_0");
 
 		ShaderFactory<VertexShader, PixelShader> shaderFactory;
 		auto shaderBank = shaderFactory.CreateShaderBank(desc, device);

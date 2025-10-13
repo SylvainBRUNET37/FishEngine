@@ -5,6 +5,7 @@
 #include <functional>
 
 #include "device/GraphicsDevice.h"
+#include "shaders/ShaderBank.h"
 #include "shaders/ShaderProgramDesc.h"
 #include "shapes/Model.h"
 
