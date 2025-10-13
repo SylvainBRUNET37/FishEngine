@@ -4,7 +4,6 @@
 #include <filesystem>
 
 #include "rendering/ModelLoader.h"
-#include "rendering/shaders/ShaderBuilder.h"
 #include "rendering/shapes/Model.h"
 #include "rendering/utils/Clock.h"
 
@@ -49,13 +48,11 @@ void RenderingEngine::InitObjects()
 		}
 	);
 
-	auto shaders = ShaderBuilder::CreateShaderProgram(device->GetD3DDevice());
-
 	ShaderProgram shaderProgram
 	{
 		device->GetD3DDevice(),
-		shaders.Get<VertexShader>("shaders/MiniPhongVS.hlsl"),
-		shaders.Get<PixelShader>("shaders/MiniPhongPS.hlsl"),
+		shaderBank.Get<VertexShader>("shaders/MiniPhongVS.hlsl"),
+		shaderBank.Get<PixelShader>("shaders/MiniPhongPS.hlsl"),
 		layouts.Get("MiniPhong")
 	};
 

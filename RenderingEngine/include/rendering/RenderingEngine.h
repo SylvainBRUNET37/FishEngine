@@ -5,6 +5,7 @@
 #include <functional>
 
 #include "device/GraphicsDevice.h"
+#include "shaders/ShaderProgramDesc.h"
 #include "shapes/Model.h"
 
 class RenderingEngine
@@ -12,8 +13,8 @@ class RenderingEngine
 public:
 	using MainLoopCallback = std::function<bool()>;
 
-	explicit RenderingEngine(GraphicsDevice* device, const std::initializer_list<MainLoopCallback> callbacks)
-		: mainLoopCallbacks{ callbacks }, device{ device }
+	explicit RenderingEngine(GraphicsDevice* device, ShaderBank&& shaderBank_, const std::initializer_list<MainLoopCallback> callbacks)
+		: shaderBank{ shaderBank_ }, mainLoopCallbacks{ callbacks }, device{ device }
 	{
 		InitScene();
 		InitAnimation();
@@ -22,6 +23,7 @@ public:
 	void Run();
 
 private:
+	ShaderBank shaderBank;
 	std::vector<MainLoopCallback> mainLoopCallbacks;
 
 	DirectX::XMMATRIX matView{};

@@ -7,6 +7,11 @@
 #include "ShaderDesc.h"
 #include "ShaderUtils.h"
 
+class ShaderSystem
+{
+	
+};
+
 class LayoutDescBank
 {
 public:
@@ -33,24 +38,24 @@ class ShaderBank
 {
 public:
 	template <typename Shader>
-	Shader Get(const std::string& path) const
+	[[nodiscard]] Shader Get(const std::string& path) const
 	{
 		if constexpr (std::is_same_v<Shader, VertexShader>)
 		{
 			if (const auto it = vertexShaders.find(path); it != vertexShaders.end())
 				return it->second;
-
-			throw std::runtime_error("");
 		}
 		else if constexpr (std::is_same_v<Shader, PixelShader>)
 		{
 			if (const auto it = pixelShaders.find(path); it != pixelShaders.end())
 				return it->second;
-
-			throw std::runtime_error("");
+		}
+		else
+		{
+			static_assert(false, "Unsupported shader type in ShaderBank::Get()");
 		}
 
-		throw std::runtime_error("");
+		throw std::runtime_error("Shader not found: " + path);
 	}
 
 	template <typename Shader>
@@ -63,6 +68,10 @@ public:
 		else if constexpr (std::is_same_v<Shader, PixelShader>)
 		{
 			pixelShaders.emplace(path, std::move(shader));
+		}
+		else
+		{
+			static_assert(false, "Unsupported shader type in ShaderBank::Set()");
 		}
 	}
 
@@ -88,28 +97,30 @@ struct ShaderProgramDesc
 };
 
 template <class... Shaders>
-class ShaderTest
+class ShaderFactory
 {
 public:
-	void Compile(const ShaderProgramDesc<Shaders...>& descs, ID3D11Device* device)
+	[[nodiscard]] ShaderBank CreateShaderBank(const ShaderProgramDesc<Shaders...>& shaderDescs, ID3D11Device* device)
 	{
-		std::apply([&](auto&... shaderVectors)
+		std::apply([&](auto&... shaders)
 		{
-			(..., ProcessShaderVector(shaderVectors, device));
-		}, descs.shaderDescs);
+			(..., ProcessShaders(shaders, device));
+		}, shaderDescs.shaderDescs);
+
+		return std::move(shaderBank);
 	}
 
+private:
 	ShaderBank shaderBank;
 
-private:
 	template <typename ShaderContainer>
-	void ProcessShaderVector(ShaderContainer& container, ID3D11Device* device)
+	void ProcessShaders(ShaderContainer& shaders, ID3D11Device* device)
 	{
 		using ShaderType = ShaderContainer::value_type::ShaderType;
 
-		for (auto& shader : container)
+		for (auto& shader : shaders)
 		{
-			auto bytecode = ShaderUtils::CompileShader
+			auto bytecode = ShaderUtils::Compile
 			(
 				shader.path.wstring(),
 				shader.entryPoint,
@@ -133,6 +144,10 @@ private:
 				assert(SUCCEEDED(result));
 
 				shaderBank.Set<PixelShader>(shader.path.string(), PixelShader{ ps, bytecode });
+			}
+			else
+			{
+				static_assert(false, "Unsupported shader type in ShaderFactory");
 			}
 		}
 	}

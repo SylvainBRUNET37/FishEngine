@@ -6,7 +6,6 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-#include "rendering/shaders/ShaderBuilder.h"
 #include "rendering/TextureManager.h"
 #include "rendering/device/GraphicsDevice.h"
 #include "rendering/utils/VerboseAssertion.h"
