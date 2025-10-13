@@ -9,7 +9,7 @@
 #include "rendering/texture/TextureManager.h"
 #include "rendering/device/GraphicsDevice.h"
 #include "rendering/utils/VerboseAssertion.h"
-#include "rendering/shapes/Mesh.h"
+#include "rendering/graphics/Mesh.h"
 
 using namespace std;
 using namespace DirectX;

@@ -2,7 +2,7 @@
 #define VERTEX_BUFFER
 
 #include "Buffer.h"
-#include "rendering/shapes/Vertex.h"
+#include "rendering/graphics/Vertex.h"
 
 class VertexBuffer : public Buffer
 {

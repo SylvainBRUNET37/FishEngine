@@ -45,16 +45,16 @@
     <ClInclude Include="include\rendering\ModelLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\rendering\shapes\Mesh.h">
+    <ClInclude Include="include\rendering\graphics\Mesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\rendering\shapes\Vertex.h">
+    <ClInclude Include="include\rendering\graphics\Vertex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\rendering\utils\VerboseAssertion.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\rendering\shapes\Material.h">
+    <ClInclude Include="include\rendering\graphics\Material.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\rendering\texture\TextureManager.h">
@@ -66,7 +66,7 @@
     <ClInclude Include="include\rendering\utils\DDSTextureLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\rendering\shapes\Model.h">
+    <ClInclude Include="include\rendering\graphics\Model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\rendering\shaders\ShaderProgram.h">

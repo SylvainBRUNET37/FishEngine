@@ -6,7 +6,7 @@
 
 #include "device/GraphicsDevice.h"
 #include "texture/TextureManager.h"
-#include "shapes/Model.h"
+#include "graphics/Model.h"
 
 class ModelLoader
 {

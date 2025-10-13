@@ -37,11 +37,11 @@
     <ClInclude Include="include\rendering\shaders\ShaderProgram.h" />
     <ClInclude Include="include\rendering\shaders\ShaderProgramDesc.h" />
     <ClInclude Include="include\rendering\shaders\ShaderUtils.h" />
-    <ClInclude Include="include\rendering\shapes\Material.h" />
-    <ClInclude Include="include\rendering\shapes\Mesh.h" />
-    <ClInclude Include="include\rendering\shapes\Model.h" />
+    <ClInclude Include="include\rendering\graphics\Material.h" />
+    <ClInclude Include="include\rendering\graphics\Mesh.h" />
+    <ClInclude Include="include\rendering\graphics\Model.h" />
     <ClInclude Include="include\rendering\texture\Texture.h" />
-    <ClInclude Include="include\rendering\shapes\Vertex.h" />
+    <ClInclude Include="include\rendering\graphics\Vertex.h" />
     <ClInclude Include="include\rendering\texture\TextureManager.h" />
     <ClInclude Include="include\rendering\utils\ComPtr.h" />
     <ClInclude Include="include\rendering\utils\Clock.h" />

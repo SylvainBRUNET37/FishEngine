@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "rendering/shapes/Model.h"
+#include "rendering/graphics/Model.h"
 
 using namespace DirectX;
 

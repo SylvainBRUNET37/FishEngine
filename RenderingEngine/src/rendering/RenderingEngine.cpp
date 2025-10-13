@@ -4,7 +4,7 @@
 #include <filesystem>
 
 #include "rendering/ModelLoader.h"
-#include "rendering/shapes/Model.h"
+#include "rendering/graphics/Model.h"
 #include "rendering/utils/Clock.h"
 
 using namespace std;

@@ -7,7 +7,7 @@
 #include "device/GraphicsDevice.h"
 #include "shaders/ShaderBank.h"
 #include "shaders/ShaderProgramDesc.h"
-#include "shapes/Model.h"
+#include "graphics/Model.h"
 
 class RenderingEngine
 {

@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "rendering/shapes/Mesh.h"
+#include "rendering/graphics/Mesh.h"
 
 void Mesh::Draw(ID3D11DeviceContext* ctx) const
 {
