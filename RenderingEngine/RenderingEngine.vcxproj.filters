@@ -72,16 +72,16 @@
     <ClInclude Include="include\rendering\shaders\ShaderProgram.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\rendering\graphics\VertexBuffer.h">
+    <ClInclude Include="include\rendering\buffers\VertexBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\rendering\graphics\Buffer.h">
+    <ClInclude Include="include\rendering\buffers\Buffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\rendering\graphics\IndexBuffer.h">
+    <ClInclude Include="include\rendering\buffers\IndexBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\rendering\graphics\ConstantBuffer.h">
+    <ClInclude Include="include\rendering\buffers\ConstantBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\rendering\core\Transform.h">

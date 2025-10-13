@@ -2,8 +2,8 @@
 #define MESH_H
 
 #include "Vertex.h"
-#include "rendering/graphics/IndexBuffer.h"
-#include "rendering/graphics/VertexBuffer.h"
+#include "rendering/buffers/IndexBuffer.h"
+#include "rendering/buffers/VertexBuffer.h"
 
 class Mesh
 {

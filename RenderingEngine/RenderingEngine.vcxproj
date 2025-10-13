@@ -24,10 +24,10 @@
     <ClInclude Include="include\rendering\core\Transform.h" />
     <ClInclude Include="include\rendering\device\GraphicsDevice.h" />
     <ClInclude Include="include\rendering\device\InfoDispositif.h" />
-    <ClInclude Include="include\rendering\graphics\Buffer.h" />
-    <ClInclude Include="include\rendering\graphics\ConstantBuffer.h" />
-    <ClInclude Include="include\rendering\graphics\IndexBuffer.h" />
-    <ClInclude Include="include\rendering\graphics\VertexBuffer.h" />
+    <ClInclude Include="include\rendering\buffers\Buffer.h" />
+    <ClInclude Include="include\rendering\buffers\ConstantBuffer.h" />
+    <ClInclude Include="include\rendering\buffers\IndexBuffer.h" />
+    <ClInclude Include="include\rendering\buffers\VertexBuffer.h" />
     <ClInclude Include="include\rendering\ModelLoader.h" />
     <ClInclude Include="include\rendering\RenderingEngine.h" />
     <ClInclude Include="include\rendering\shaders\Shader.h" />
