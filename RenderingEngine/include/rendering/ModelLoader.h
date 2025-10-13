@@ -4,13 +4,13 @@
 #include <filesystem>
 #include <assimp/scene.h>
 
-#include "TextureManager.h"
+#include "device/GraphicsDevice.h"
+#include "texture/TextureManager.h"
 #include "shapes/Model.h"
 
 class ModelLoader
 {
 public:
-	// TODO: clear after loading of something
 	[[nodiscard]] Model LoadModel(const std::filesystem::path& filePath,
 		const GraphicsDevice* graphicsDevice, ShaderProgram&& shaderProgram);
 

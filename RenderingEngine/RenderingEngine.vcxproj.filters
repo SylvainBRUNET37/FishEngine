@@ -57,10 +57,10 @@
     <ClInclude Include="include\rendering\shapes\Material.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\rendering\TextureManager.h">
+    <ClInclude Include="include\rendering\texture\TextureManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\rendering\shapes\Texture.h">
+    <ClInclude Include="include\rendering\texture\Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\rendering\utils\DDSTextureLoader.h">

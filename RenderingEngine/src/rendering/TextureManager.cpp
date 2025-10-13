@@ -1,23 +1,24 @@
 #include "pch.h"
-#include "rendering/TextureManager.h"
+#include "rendering/texture/TextureManager.h"
 
+#include "rendering/texture/Texture.h"
 #include "rendering/utils/VerboseAssertion.h"
 
 using namespace std;
 
 Texture* TextureManager::GetNewTexture(const wstring& filename, const GraphicsDevice* device)
 {
-    if (auto* existingTexture = GetTexture(filename))
-        return existingTexture;
+	if (auto* existingTexture = GetTexture(filename))
+		return existingTexture;
 
-    auto newTexture = make_unique<Texture>(filename, device);
-    Texture* texture = newTexture.get();
+	auto newTexture = make_unique<Texture>(filename, device);
+	Texture* texture = newTexture.get();
 
-    vassert(texture, "Failed to create texture for file: " + string(filename.begin(), filename.end()));
+	vassert(texture, "Failed to create texture for file: " + string(filename.begin(), filename.end()));
 
-    textures.push_back(std::move(newTexture));
+	textures.push_back(std::move(newTexture));
 
-    return texture;
+	return texture;
 }
 
 Texture* TextureManager::GetTexture(const wstring& filename) const

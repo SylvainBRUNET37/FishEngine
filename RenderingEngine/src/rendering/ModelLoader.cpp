@@ -6,7 +6,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-#include "rendering/TextureManager.h"
+#include "rendering/texture/TextureManager.h"
 #include "rendering/device/GraphicsDevice.h"
 #include "rendering/utils/VerboseAssertion.h"
 #include "rendering/shapes/Mesh.h"

@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "rendering/shapes/Texture.h"
+#include "rendering/texture/Texture.h"
 
 #include "rendering/utils/DDSTextureLoader.h"
 #include "rendering/utils/Util.h"

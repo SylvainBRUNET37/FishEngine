@@ -40,9 +40,9 @@
     <ClInclude Include="include\rendering\shapes\Material.h" />
     <ClInclude Include="include\rendering\shapes\Mesh.h" />
     <ClInclude Include="include\rendering\shapes\Model.h" />
-    <ClInclude Include="include\rendering\shapes\Texture.h" />
+    <ClInclude Include="include\rendering\texture\Texture.h" />
     <ClInclude Include="include\rendering\shapes\Vertex.h" />
-    <ClInclude Include="include\rendering\TextureManager.h" />
+    <ClInclude Include="include\rendering\texture\TextureManager.h" />
     <ClInclude Include="include\rendering\utils\ComPtr.h" />
     <ClInclude Include="include\rendering\utils\Clock.h" />
     <ClInclude Include="include\rendering\utils\DDSTextureLoader.h" />
