@@ -5,7 +5,6 @@
 #include <assimp/scene.h>
 
 #include "TextureManager.h"
-#include "shaders/ShaderProgramDesc.h"
 #include "shapes/Model.h"
 
 class ModelLoader
@@ -13,7 +12,7 @@ class ModelLoader
 public:
 	// TODO: clear after loading of something
 	[[nodiscard]] Model LoadModel(const std::filesystem::path& filePath,
-		const GraphicsDevice* graphicsDevice, const ShaderProgramDesc& shaderProgramDesc);
+		const GraphicsDevice* graphicsDevice, ShaderProgram&& shaderProgram);
 
 private:
 	TextureManager textureManager{};

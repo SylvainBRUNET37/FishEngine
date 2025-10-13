@@ -15,7 +15,7 @@
 using namespace std;
 using namespace DirectX;
 
-Model ModelLoader::LoadModel(const filesystem::path& filePath, const GraphicsDevice* graphicsDevice, const ShaderProgramDesc& shaderProgramDesc)
+Model ModelLoader::LoadModel(const filesystem::path& filePath, const GraphicsDevice* graphicsDevice, ShaderProgram&& shaderProgram)
 {
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile
@@ -35,8 +35,6 @@ Model ModelLoader::LoadModel(const filesystem::path& filePath, const GraphicsDev
 
 	for (unsigned int i = 0; i < scene->mNumMaterials; i++)
 		ProcessMaterial(filePath.parent_path(), scene->mMaterials[i], graphicsDevice);
-
-	ShaderProgram shaderProgram = ShaderBuilder::CreateShaderProgram(graphicsDevice->GetD3DDevice(), shaderProgramDesc);
 
 	auto model = Model{
 		std::move(meshes), std::move(materials), graphicsDevice->GetD3DDevice(), std::move(shaderProgram)

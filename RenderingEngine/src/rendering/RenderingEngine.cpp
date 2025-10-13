@@ -4,6 +4,7 @@
 #include <filesystem>
 
 #include "rendering/ModelLoader.h"
+#include "rendering/shaders/ShaderBuilder.h"
 #include "rendering/shapes/Model.h"
 #include "rendering/utils/Clock.h"
 
@@ -37,25 +38,31 @@ void RenderingEngine::InitScene()
 
 void RenderingEngine::InitObjects()
 {
-	const filesystem::path filePath = "assets\\Jin\\jin.obj";
-
-	const ShaderProgramDesc shaderProgramDesc =
-	{
-		.layoutDesc =
+	LayoutDescBank layouts;
+	layouts.Set
+	(
+		"MiniPhong",
 		{
 			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
 			{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
-			{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		},
-		.shaderDescs =
-		{
-			{"shaders/MiniPhongVS.hlsl", "MiniPhongVS", "vs_5_0", ShaderStage::Vertex},
-			{"shaders/MiniPhongPS.hlsl", "MiniPhongPS", "ps_5_0", ShaderStage::Pixel},
+			{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0}
 		}
+	);
+
+	auto shaders = ShaderBuilder::CreateShaderProgram(device->GetD3DDevice());
+
+	ShaderProgram shaderProgram
+	{
+		device->GetD3DDevice(),
+		shaders.Get<VertexShader>("shaders/MiniPhongVS.hlsl"),
+		shaders.Get<PixelShader>("shaders/MiniPhongPS.hlsl"),
+		layouts.Get("MiniPhong")
 	};
 
+	const filesystem::path filePath = "assets\\Jin\\jin.obj";
+
 	ModelLoader modelLoader;
-	auto model = modelLoader.LoadModel(filePath, device, shaderProgramDesc);
+	auto model = modelLoader.LoadModel(filePath, device, std::move(shaderProgram));
 
 	scene.emplace_back(std::move(model));
 }
