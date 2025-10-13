@@ -22,6 +22,10 @@ public:
 	}
 
 	void Run();
+	void AddObjectToScene(Model&& model)
+	{
+		scene.push_back(model);
+	}
 
 private:
 	ShaderBank shaderBank;
@@ -31,7 +35,7 @@ private:
 	DirectX::XMMATRIX matProj{};
 	DirectX::XMMATRIX matViewProj{};
 
-	GraphicsDevice* device; // TODO: use unique ptr
+	GraphicsDevice* device; // TODO: use unique ptr ?
 
 	std::vector<Model> scene;
 

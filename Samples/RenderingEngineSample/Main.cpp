@@ -47,6 +47,22 @@ namespace
 
 		return std::move(shaderBank);
 	}
+
+	Model CreateHumanModel(const GraphicsDevice* device, const ShaderBank& shaderBank)
+	{
+		ShaderProgram shaderProgram
+		{
+			device->GetD3DDevice(),
+			shaderBank.Get<VertexShader>("shaders/MiniPhongVS.hlsl"),
+			shaderBank.Get<PixelShader>("shaders/MiniPhongPS.hlsl"),
+			shaderBank.Get<ShaderBank::Layout>("MiniPhong")
+		};
+
+		const filesystem::path filePath = "assets\\Jin\\jin.obj";
+
+		ModelLoader modelLoader;
+		return modelLoader.LoadModel(filePath, device, std::move(shaderProgram));
+	}
 }
 
 int APIENTRY _tWinMain(const HINSTANCE hInstance,
@@ -63,10 +79,7 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 	auto shaderBank = CreateShaderBank(device->GetD3DDevice());
 	RenderingEngine renderingEngine{device, std::move(shaderBank), {WindowsApplication::ProcessWindowMessages}};
 
-	//const auto wallMat = XMMatrixTranslation(0.0f, 0.0f, 0.0f);
-	//renderingEngine.AddObjectToScene(wallMat, 2.0f, 2.0f, 2.0f);
-
-
+	renderingEngine.AddObjectToScene(CreateHumanModel(device, shaderBank));
 	renderingEngine.Run();
 
 	return EXIT_SUCCESS;

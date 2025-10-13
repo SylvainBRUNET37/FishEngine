@@ -31,26 +31,6 @@ void RenderingEngine::InitScene()
 
 	matProj = XMMatrixPerspectiveFovLH(fieldOfView, aspectRatio, nearPlane, farPlane);
 	matViewProj = matView * matProj;
-
-	InitObjects();
-}
-
-void RenderingEngine::InitObjects()
-{
-	ShaderProgram shaderProgram
-	{
-		device->GetD3DDevice(),
-		shaderBank.Get<VertexShader>("shaders/MiniPhongVS.hlsl"),
-		shaderBank.Get<PixelShader>("shaders/MiniPhongPS.hlsl"),
-		shaderBank.Get<ShaderBank::Layout>("MiniPhong")
-	};
-
-	const filesystem::path filePath = "assets\\Jin\\jin.obj";
-
-	ModelLoader modelLoader;
-	auto model = modelLoader.LoadModel(filePath, device, std::move(shaderProgram));
-
-	scene.emplace_back(std::move(model));
 }
 
 void RenderingEngine::Run()
