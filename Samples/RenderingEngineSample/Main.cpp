@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include <vector>
 #include <Windows.h>
@@ -24,28 +23,44 @@ namespace
 		ShaderProgramDesc<VertexShader, PixelShader> desc;
 
 		desc.AddShader<VertexShader>("shaders/MiniPhongVS.hlsl", "MiniPhongVS", "vs_5_0")
-			.AddShader<PixelShader>("shaders/MiniPhongPS.hlsl", "MiniPhongPS", "ps_5_0");
+		    .AddShader<PixelShader>("shaders/MiniPhongPS.hlsl", "MiniPhongPS", "ps_5_0");
 
 		ShaderFactory<VertexShader, PixelShader> shaderFactory;
-		auto shaderBank = shaderFactory.Compile(desc, device);
+		auto shaderBank = shaderFactory.CreateShaderBank(desc, device);
+
+		shaderBank.Set<ShaderBank::Layout>("MiniPhong",
+		                                   {
+			                                   {
+				                                   "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,
+				                                   D3D11_INPUT_PER_VERTEX_DATA, 0
+			                                   },
+			                                   {
+				                                   "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12,
+				                                   D3D11_INPUT_PER_VERTEX_DATA, 0
+			                                   },
+			                                   {
+				                                   "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24,
+				                                   D3D11_INPUT_PER_VERTEX_DATA, 0
+			                                   }
+		                                   });
 
 		return std::move(shaderBank);
 	}
 }
 
 int APIENTRY _tWinMain(const HINSTANCE hInstance,
-	HINSTANCE,
-	LPTSTR,
-	int)
+                       HINSTANCE,
+                       LPTSTR,
+                       int)
 {
-	WindowsApplication application{ hInstance, L"RenderingEngineSample", L"RenderingEngineSampleClass" };
+	WindowsApplication application{hInstance, L"RenderingEngineSample", L"RenderingEngineSampleClass"};
 
 	if (!application.Init())
 		return EXIT_FAILURE;
 
-	const auto device = new GraphicsDevice{ GraphicsDevice::CDS_FENETRE, application.GetMainWindow() };
+	const auto device = new GraphicsDevice{GraphicsDevice::CDS_FENETRE, application.GetMainWindow()};
 	auto shaderBank = CreateShaderBank(device->GetD3DDevice());
-	RenderingEngine renderingEngine{ device, std::move(shaderBank), {WindowsApplication::ProcessWindowMessages} };
+	RenderingEngine renderingEngine{device, std::move(shaderBank), {WindowsApplication::ProcessWindowMessages}};
 
 	//const auto wallMat = XMMatrixTranslation(0.0f, 0.0f, 0.0f);
 	//renderingEngine.AddObjectToScene(wallMat, 2.0f, 2.0f, 2.0f);

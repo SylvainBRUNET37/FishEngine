@@ -7,78 +7,115 @@
 #include "ShaderDesc.h"
 #include "ShaderUtils.h"
 
-class ShaderSystem
-{
-	
-};
+#include <string>
+#include <vector>
+#include <stdexcept>
+#include <utility>
+#include <type_traits>
+#include <d3d11.h>
 
-class LayoutDescBank
-{
-public:
-	void Set(const std::string& name, const std::vector<D3D11_INPUT_ELEMENT_DESC>& layout)
-	{
-		layouts.emplace(name, layout);
-	}
-
-	[[nodiscard]] std::vector<D3D11_INPUT_ELEMENT_DESC> Get(const std::string& name)
-	{
-		const auto layoutit = layouts.find(name);
-
-		if (layoutit != layouts.end())
-			return layoutit->second;
-
-		throw std::runtime_error("Could not get layout with name :" + name);
-	}
-
-private:
-	std::unordered_map<std::string, std::vector<D3D11_INPUT_ELEMENT_DESC>> layouts;
-};
-
-class ShaderBank
+class ShaderBank // Contains shaders AND layouts
 {
 public:
-	template <typename Shader>
-	[[nodiscard]] Shader Get(const std::string& path) const
-	{
-		if constexpr (std::is_same_v<Shader, VertexShader>)
-		{
-			if (const auto it = vertexShaders.find(path); it != vertexShaders.end())
-				return it->second;
-		}
-		else if constexpr (std::is_same_v<Shader, PixelShader>)
-		{
-			if (const auto it = pixelShaders.find(path); it != pixelShaders.end())
-				return it->second;
-		}
-		else
-		{
-			static_assert(false, "Unsupported shader type in ShaderBank::Get()");
-		}
+    using Layout = std::vector<D3D11_INPUT_ELEMENT_DESC>;
 
-		throw std::runtime_error("Shader not found: " + path);
-	}
+    template <typename Shader>
+    [[nodiscard]] Shader Get(const std::string& path) const
+    {
+        return ShaderBankAccessor<Shader>::Get(*this, path);
+    }
 
-	template <typename Shader>
-	void Set(const std::string& path, Shader&& shader)
-	{
-		if constexpr (std::is_same_v<Shader, VertexShader>)
-		{
-			vertexShaders.emplace(path, std::move(shader));
-		}
-		else if constexpr (std::is_same_v<Shader, PixelShader>)
-		{
-			pixelShaders.emplace(path, std::move(shader));
-		}
-		else
-		{
-			static_assert(false, "Unsupported shader type in ShaderBank::Set()");
-		}
-	}
+    template <typename Shader>
+    void Set(const std::string& path, Shader&& shader)
+    {
+        ShaderBankAccessor<Shader>::Set(*this, path, std::forward<Shader>(shader));
+    }
 
 private:
-	std::unordered_map<std::string, VertexShader> vertexShaders;
-	std::unordered_map<std::string, PixelShader> pixelShaders;
+    std::unordered_map<std::string, Layout> layouts;
+    std::unordered_map<std::string, VertexShader> vertexShaders;
+    std::unordered_map<std::string, PixelShader> pixelShaders;
+
+    // Friend the accessors so they can touch the private maps
+    template <typename> friend struct ShaderBankAccessor;
 };
+
+// ======================================================
+// Accessor helper (primary template — undefined)
+// ======================================================
+template <typename Shader>
+struct ShaderBankAccessor
+{
+    [[nodiscard]] static Shader Get(const ShaderBank&, const std::string&)
+    {
+        static_assert(sizeof(Shader) == 0, "Unsupported shader type in ShaderBank::Get()");
+        return {};
+    }
+
+    static void Set(ShaderBank&, const std::string&, Shader&&)
+    {
+        static_assert(sizeof(Shader) == 0, "Unsupported shader type in ShaderBank::Set()");
+    }
+};
+
+// ======================================================
+// Specialization for VertexShader
+// ======================================================
+template <>
+struct ShaderBankAccessor<VertexShader>
+{
+    [[nodiscard]] static VertexShader Get(const ShaderBank& bank, const std::string& path)
+    {
+        if (const auto it = bank.vertexShaders.find(path); it != bank.vertexShaders.end())
+            return it->second;
+        throw std::runtime_error("VertexShader not found: " + path);
+    }
+
+    static void Set(ShaderBank& bank, const std::string& path, VertexShader&& shader)
+    {
+        bank.vertexShaders.emplace(path, std::move(shader));
+    }
+};
+
+// ======================================================
+// Specialization for PixelShader
+// ======================================================
+template <>
+struct ShaderBankAccessor<PixelShader>
+{
+    [[nodiscard]] static PixelShader Get(const ShaderBank& bank, const std::string& path)
+    {
+        if (const auto it = bank.pixelShaders.find(path); it != bank.pixelShaders.end())
+            return it->second;
+        throw std::runtime_error("PixelShader not found: " + path);
+    }
+
+    static void Set(ShaderBank& bank, const std::string& path, PixelShader&& shader)
+    {
+        bank.pixelShaders.emplace(path, std::move(shader));
+    }
+};
+
+// ======================================================
+// Specialization for Layout
+// ======================================================
+template <>
+struct ShaderBankAccessor<ShaderBank::Layout>
+{
+    [[nodiscard]] static ShaderBank::Layout Get(const ShaderBank& bank, const std::string& path)
+    {
+        if (const auto it = bank.layouts.find(path); it != bank.layouts.end())
+            return it->second;
+        throw std::runtime_error("Layout not found: " + path);
+    }
+
+    static void Set(ShaderBank& bank, const std::string& path, ShaderBank::Layout&& layout)
+    {
+        bank.layouts.emplace(path, std::move(layout));
+    }
+};
+
+//
 
 template <class... Shaders>
 struct ShaderProgramDesc
