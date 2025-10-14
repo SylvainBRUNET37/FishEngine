@@ -87,12 +87,12 @@ void RenderingEngine::RenderScene() // TODO: refactor
 	pImmediateContext->ClearDepthStencilView(pDepthStencilView,
 	                                         D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-	// Bind render target AND depth stencil view (was passing nullptr)
+	// Bind render target AND depth stencil view
 	ID3D11RenderTargetView* rtvs[] = {pRenderTargetView};
 	pImmediateContext->OMSetRenderTargets(1, rtvs, pDepthStencilView);
 
 	// Prepare matrices (use the matrices computed in InitScene instead of hardcoded values)
-	const XMMATRIX world = XMMatrixRotationY(static_cast<float>(GetTickCount64()) / 2000.0f);
+	const XMMATRIX world = XMMatrixRotationY(static_cast<float>(GetTickCount64()) / 5000.0f);
 	const XMMATRIX view = XMMatrixLookAtLH(
 		XMVectorSet(0, 2.0f, -4, 0),
 		XMVectorSet(0, 1.0f, 0, 0),

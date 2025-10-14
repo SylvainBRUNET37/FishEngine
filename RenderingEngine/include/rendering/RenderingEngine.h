@@ -43,7 +43,6 @@ private:
 
 	void InitAnimation();
 	void InitScene();
-	void InitObjects();
 
 	void AnimeScene(double elapsedTime) const;
 	void RenderScene();

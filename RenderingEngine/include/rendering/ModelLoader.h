@@ -1,8 +1,10 @@
-#ifndef MESH_LOADER_H
-#define MESH_LOADER_H
+#ifndef MODEL_LOADER_H
+#define MODEL_LOADER_H
 
 #include <filesystem>
+#include <vector>
 #include <assimp/scene.h>
+#include <DirectXMath.h>
 
 #include "device/GraphicsDevice.h"
 #include "texture/TextureManager.h"
@@ -11,17 +13,18 @@
 class ModelLoader
 {
 public:
-	[[nodiscard]] Model LoadModel(const std::filesystem::path& filePath,
-		const GraphicsDevice* graphicsDevice, ShaderProgram&& shaderProgram);
+    [[nodiscard]] Model LoadModel(
+        const std::filesystem::path& filePath,
+        const GraphicsDevice* graphicsDevice,
+        ShaderProgram&& shaderProgram);
 
 private:
-	TextureManager textureManager{};
+    TextureManager textureManager{};
+    void ProcessNode(const aiNode* node, const aiScene* scene, const GraphicsDevice* device, std::vector<Mesh>& meshesOut);
 
-	std::vector<Mesh> meshes;
-	std::vector<Material> materials;
+    static Mesh ProcessMesh(const aiMesh* mesh, const GraphicsDevice* device, const DirectX::XMMATRIX& transform);
 
-	void ProcessMesh(const aiMesh* mesh, const GraphicsDevice* device);
-	void ProcessMaterial(const std::filesystem::path& materialPath, const aiMaterial* material, const GraphicsDevice* device);
+    Material ProcessMaterial(const std::filesystem::path& materialPath, const aiMaterial* material, const GraphicsDevice* device);
 };
 
-#endif
+#endif // MODEL_LOADER_H

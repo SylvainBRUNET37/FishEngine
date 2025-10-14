@@ -5,7 +5,8 @@
 
 #include "Shader.h"
 
-class ShaderBank // Contains shaders AND layouts
+// Contains shaders AND layouts
+class ShaderBank
 {
 public:
 	using Layout = std::vector<D3D11_INPUT_ELEMENT_DESC>;
@@ -32,7 +33,7 @@ private:
 };
 
 // ======================================================
-// Accessor helper (primary template — undefined)
+// Accessor helper (base template is undefined)
 // ======================================================
 template <typename Shader>
 struct ShaderBankAccessor

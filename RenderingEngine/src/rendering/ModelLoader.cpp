@@ -14,108 +14,141 @@
 using namespace std;
 using namespace DirectX;
 
+namespace
+{
+    XMMATRIX AiToXMMatrix(const aiMatrix4x4& m)
+    {
+        return XMMATRIX(
+            m.a1, m.b1, m.c1, m.d1,
+            m.a2, m.b2, m.c2, m.d2,
+            m.a3, m.b3, m.c3, m.d3,
+            m.a4, m.b4, m.c4, m.d4
+        );
+    }
+}
+
 Model ModelLoader::LoadModel(const filesystem::path& filePath, const GraphicsDevice* graphicsDevice, ShaderProgram&& shaderProgram)
 {
-	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile
-	(
-		filePath.string(),
-		aiProcess_Triangulate |
-		aiProcess_GenSmoothNormals |
-		aiProcess_ConvertToLeftHanded |
-		aiProcess_CalcTangentSpace |
-		aiProcess_JoinIdenticalVertices
-	);
+    Assimp::Importer importer;
+    const aiScene* scene = importer.ReadFile
+    (
+        filePath.string(),
+        aiProcess_Triangulate |
+        aiProcess_GenSmoothNormals |
+        aiProcess_ConvertToLeftHanded |
+        aiProcess_CalcTangentSpace |
+        aiProcess_JoinIdenticalVertices
+    );
 
-	vassert(scene && scene->mRootNode, "Could not load mesh: " + filePath.string());
+    vassert(scene && scene->mRootNode, "Could not load mesh: " + filePath.string());
 
-	for (unsigned int i = 0; i < scene->mNumMeshes; i++)
-		ProcessMesh(scene->mMeshes[i], graphicsDevice);
+    std::vector<Mesh> meshes;
+    std::vector<Material> materials;
+    for (unsigned int i = 0; i < scene->mNumMaterials; i++)
+        materials.push_back(ProcessMaterial(filePath.parent_path(), scene->mMaterials[i], graphicsDevice));
 
-	for (unsigned int i = 0; i < scene->mNumMaterials; i++)
-		ProcessMaterial(filePath.parent_path(), scene->mMaterials[i], graphicsDevice);
+    ProcessNode(scene->mRootNode, scene, graphicsDevice, meshes);
 
-	auto model = Model{
-		std::move(meshes), std::move(materials), graphicsDevice->GetD3DDevice(), std::move(shaderProgram)
-	};
-
-	meshes.clear();
-	materials.clear();
-
-	return model;
+    Model model{ std::move(meshes), std::move(materials), graphicsDevice->GetD3DDevice(), std::move(shaderProgram) };
+    return model;
 }
 
-void ModelLoader::ProcessMesh(const aiMesh* mesh, const GraphicsDevice* device)
+void ModelLoader::ProcessNode(const aiNode* node, const aiScene* scene, const GraphicsDevice* device, std::vector<Mesh>& meshesOut)
 {
-	std::vector<Vertex> vertices;
-	std::vector<UINT> indices;
+    const XMMATRIX transform = AiToXMMatrix(node->mTransformation);
 
-	// Process vertices
-	vertices.reserve(mesh->mNumVertices);
-	for (unsigned int i = 0; i < mesh->mNumVertices; i++)
-	{
-		Vertex vertex{};
-		vertex.position = XMFLOAT3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
+    for (unsigned int i = 0; i < node->mNumMeshes; i++)
+    {
+        const aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+        meshesOut.push_back(ProcessMesh(mesh, device, transform));
+    }
 
-		if (mesh->HasNormals())
-			vertex.normal = XMFLOAT3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
-
-		if (mesh->mTextureCoords[0])
-			vertex.textureCoord = XMFLOAT2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y);
-		else
-			vertex.textureCoord = XMFLOAT2(0.0f, 0.0f);
-
-		vertices.push_back(vertex);
-	}
-
-	// Process indices
-	constexpr unsigned int TRIANGLE_SIDE_NUMBER = 3;
-	indices.reserve(mesh->mNumFaces * TRIANGLE_SIDE_NUMBER);
-	for (unsigned int i = 0; i < mesh->mNumFaces; i++)
-	{
-		const aiFace face = mesh->mFaces[i];
-		for (unsigned int j = 0; j < face.mNumIndices; j++)
-			indices.push_back(face.mIndices[j]);
-	}
-
-	const UINT materialIndex = mesh->mMaterialIndex;
-
-	meshes.push_back(Mesh(std::move(vertices), std::move(indices), materialIndex, device->GetD3DDevice()));
+    for (unsigned int i = 0; i < node->mNumChildren; i++)
+    {
+        ProcessNode(node->mChildren[i], scene, device, meshesOut);
+    }
 }
 
-void ModelLoader::ProcessMaterial(const filesystem::path& materialPath, const aiMaterial* material,
-                                  const GraphicsDevice* device)
+Mesh ModelLoader::ProcessMesh(const aiMesh* mesh, const GraphicsDevice* device, const XMMATRIX& transform)
 {
-	Material mat;
+    std::vector<Vertex> vertices;
+    std::vector<UINT> indices;
 
-	aiColor4D color;
-	if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_AMBIENT, &color))
-		mat.ambient = XMFLOAT4(color.r, color.g, color.b, color.a);
-	if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &color))
-		mat.diffuse = XMFLOAT4(color.r, color.g, color.b, color.a);
-	if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_SPECULAR, &color))
-		mat.specular = XMFLOAT4(color.r, color.g, color.b, color.a);
+    vertices.reserve(mesh->mNumVertices);
 
-	float shininess = 0.0f;
-	if (AI_SUCCESS == aiGetMaterialFloat(material, AI_MATKEY_SHININESS, &shininess))
-		mat.shininess = shininess;
+    for (unsigned int i = 0; i < mesh->mNumVertices; i++)
+    {
+        Vertex vertex{};
 
-	aiString texturePath;
-	if (material->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == AI_SUCCESS)
-	{
-		const std::string texName = texturePath.C_Str();
+        XMVECTOR pos = XMVectorSet(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z, 1.0f);
+        pos = XMVector3Transform(pos, transform);
+        XMStoreFloat3(&vertex.position, pos);
 
-		// Combine folder + filename
-		const std::filesystem::path fullPath = materialPath / texName;
+        if (mesh->HasNormals())
+        {
+            XMVECTOR normal = XMVectorSet(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z, 0.0f);
+            normal = XMVector3TransformNormal(normal, transform);
+            XMStoreFloat3(&vertex.normal, normal);
+        }
 
-		mat.textureFileName = fullPath.string();
+        if (mesh->mTextureCoords[0])
+            vertex.textureCoord = XMFLOAT2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y);
+        else
+            vertex.textureCoord = XMFLOAT2(0.0f, 0.0f);
 
-		// Convert to wide string
-		const std::wstring wideFilename(fullPath.wstring());
+        // tangents are not handled
+        /*
+        if (mesh->HasTangentsAndBitangents())
+        {
+            vertex.tangent = XMFLOAT3(mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z);
+            vertex.bitangent = XMFLOAT3(mesh->mBitangents[i].x, mesh->mBitangents[i].y, mesh->mBitangents[i].z);
+        }
+		*/
 
-		if (const Texture* tex = textureManager.GetNewTexture(wideFilename, device))
-			mat.texture = tex->GetTexture();
-	}
+        vertices.push_back(vertex);
+    }
 
-	materials.push_back(std::move(mat));
+    for (unsigned int i = 0; i < mesh->mNumFaces; i++)
+    {
+        const aiFace& face = mesh->mFaces[i];
+        for (unsigned int j = 0; j < face.mNumIndices; j++)
+            indices.push_back(face.mIndices[j]);
+    }
+
+    const UINT materialIndex = mesh->mMaterialIndex;
+
+    return Mesh(std::move(vertices), std::move(indices), materialIndex, device->GetD3DDevice());
+}
+
+Material ModelLoader::ProcessMaterial(const filesystem::path& materialPath, const aiMaterial* material, const GraphicsDevice* device)
+{
+    Material mat;
+
+    aiColor4D color;
+    if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_AMBIENT, &color))
+        mat.ambient = XMFLOAT4(color.r, color.g, color.b, color.a);
+    if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &color))
+        mat.diffuse = XMFLOAT4(color.r, color.g, color.b, color.a);
+    if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_SPECULAR, &color))
+        mat.specular = XMFLOAT4(color.r, color.g, color.b, color.a);
+
+    float shininess = 0.0f;
+    if (AI_SUCCESS == aiGetMaterialFloat(material, AI_MATKEY_SHININESS, &shininess))
+        mat.shininess = shininess;
+
+    aiString texturePath;
+    if (material->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == AI_SUCCESS)
+    {
+        std::filesystem::path texPath = texturePath.C_Str();
+        if (!texPath.is_absolute())
+            texPath = materialPath / texPath;
+
+        mat.textureFileName = texPath.string();
+
+        const std::wstring wideFilename(texPath.wstring());
+        if (const Texture* tex = textureManager.GetNewTexture(wideFilename, device))
+            mat.texture = tex->GetTexture();
+    }
+
+    return mat;
 }

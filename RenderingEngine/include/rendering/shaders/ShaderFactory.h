@@ -27,7 +27,7 @@ class ShaderFactory
 public:
 	[[nodiscard]] ShaderBank CreateShaderBank(const ShaderProgramDesc<Shaders...>& shaderDescs, ID3D11Device* device)
 	{
-		// Process (compile + create) every shader of the given descriptions
+		// Process (compile + create) every shader for the given descriptions
 		std::apply([&](auto&... shaders)
 		{
 			(..., ProcessShaders(shaders, device)); 
@@ -79,11 +79,11 @@ struct ShaderFactoryProcessor<PixelShader>
 	template <typename ShaderBankType, typename ShaderDesc, typename BytecodeType>
 	static void Create(ShaderBankType& bank, ShaderDesc& shader, ID3D11Device* device, BytecodeType& bytecode)
 	{
-		ComPtr<ID3D11PixelShader> ps;
-		auto result = device->CreatePixelShader(bytecode->GetBufferPointer(), bytecode->GetBufferSize(), nullptr, &ps);
+		ComPtr<ID3D11PixelShader> pixelShader;
+		auto result = device->CreatePixelShader(bytecode->GetBufferPointer(), bytecode->GetBufferSize(), nullptr, &pixelShader);
 		assert(SUCCEEDED(result));
 
-		bank.template Set<PixelShader>(shader.path.string(), PixelShader{ps, bytecode});
+		bank.template Set<PixelShader>(shader.path.string(), PixelShader{pixelShader, bytecode});
 	}
 };
 
