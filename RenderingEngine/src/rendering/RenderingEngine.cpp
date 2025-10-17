@@ -27,7 +27,7 @@ void RenderingEngine::InitScene()
 	constexpr float fieldOfView = XM_PI / 4.0f; // 45 degrees
 	const float aspectRatio = static_cast<float>(device->GetLargeur()) / static_cast<float>(device->GetHauteur());
 	constexpr float nearPlane = 2.0f;
-	constexpr float farPlane = 20.0f;
+	constexpr float farPlane = 50.0f;
 
 	matProj = XMMatrixPerspectiveFovLH(fieldOfView, aspectRatio, nearPlane, farPlane);
 	matViewProj = matView * matProj;
@@ -94,13 +94,13 @@ void RenderingEngine::RenderScene() // TODO: refactor
 	// Prepare matrices (use the matrices computed in InitScene instead of hardcoded values)
 	const XMMATRIX world = XMMatrixRotationY(static_cast<float>(GetTickCount64()) / 5000.0f);
 	const XMMATRIX view = XMMatrixLookAtLH(
-		XMVectorSet(0, 2.0f, -10, 0),
+		XMVectorSet(0, 2.0f, -20, 0),
 		XMVectorSet(0, 1.0f, 0, 0),
 		XMVectorSet(0, 1, 0, 0));
 	const XMMATRIX proj = XMMatrixPerspectiveFovLH(XM_PIDIV4, 800.0f / 600.0f, 0.1f, 100.0f);
 
 	// Light & camera
-	constexpr auto lightPos = XMFLOAT4(2, 2, -2, 1);
+	constexpr auto lightPos = XMFLOAT4(2, 2, -20, 1);
 	constexpr auto cameraPos = XMFLOAT4(0, 2.0f, -4, 0);
 	constexpr auto vAEcl = XMFLOAT4(0.2f, 0.2f, 0.2f, 1);
 	constexpr auto vDEcl = XMFLOAT4(1, 1, 1, 1);

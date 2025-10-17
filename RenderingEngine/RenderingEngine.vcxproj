@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="external\stb_image.h" />
     <ClInclude Include="include\rendering\application\WindowsApplication.h" />
     <ClInclude Include="include\rendering\core\SceneData.h" />
     <ClInclude Include="include\rendering\core\SceneNode.h" />
@@ -41,8 +42,8 @@
     <ClInclude Include="include\rendering\graphics\Material.h" />
     <ClInclude Include="include\rendering\graphics\Mesh.h" />
     <ClInclude Include="include\rendering\graphics\Model.h" />
-    <ClInclude Include="include\rendering\texture\Texture.h" />
     <ClInclude Include="include\rendering\graphics\Vertex.h" />
+    <ClInclude Include="include\rendering\texture\TextureLoader.h" />
     <ClInclude Include="include\rendering\texture\TextureManager.h" />
     <ClInclude Include="include\rendering\utils\ComPtr.h" />
     <ClInclude Include="include\rendering\utils\Clock.h" />
@@ -68,8 +69,8 @@
     <ClCompile Include="src\rendering\shaders\ShaderUtils.cpp" />
     <ClCompile Include="src\rendering\shapes\Mesh.cpp" />
     <ClCompile Include="src\rendering\shapes\Model.cpp" />
-    <ClCompile Include="src\rendering\shapes\Texture.cpp" />
-    <ClCompile Include="src\rendering\TextureManager.cpp" />
+    <ClCompile Include="src\rendering\texture\TextureLoader.cpp" />
+    <ClCompile Include="src\rendering\texture\TextureManager.cpp" />
     <ClCompile Include="src\rendering\utils\Clock.cpp" />
     <ClCompile Include="src\rendering\utils\DDSTextureLoader.cpp" />
   </ItemGroup>

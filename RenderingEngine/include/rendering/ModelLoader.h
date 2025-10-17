@@ -20,11 +20,12 @@ public:
 
 private:
     TextureManager textureManager{};
-    void ProcessNode(const aiNode* node, const aiScene* scene, const GraphicsDevice* device, std::vector<Mesh>& meshesOut);
+    static void ProcessNode(const aiNode* node, const aiScene* scene, const GraphicsDevice* device, std::vector<Mesh>& meshesOut);
 
     static Mesh ProcessMesh(const aiMesh* mesh, const GraphicsDevice* device, const DirectX::XMMATRIX& transform);
 
-    Material ProcessMaterial(const std::filesystem::path& materialPath, const aiMaterial* material, const GraphicsDevice* device);
+    Material ProcessMaterial(const std::filesystem::path& materialPath, const aiScene* scene, const aiMaterial* material, const GraphicsDevice* device);
+	ComPtr<ID3D11ShaderResourceView> ProcessEmbededTexture(const aiTexture* embeddedTex, const GraphicsDevice* device);
 };
 
-#endif // MODEL_LOADER_H
+#endif

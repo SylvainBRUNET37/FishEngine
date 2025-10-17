@@ -16,140 +16,177 @@ using namespace DirectX;
 
 namespace
 {
-    XMMATRIX AiToXMMatrix(const aiMatrix4x4& m)
-    {
-        return XMMATRIX(
-            m.a1, m.b1, m.c1, m.d1,
-            m.a2, m.b2, m.c2, m.d2,
-            m.a3, m.b3, m.c3, m.d3,
-            m.a4, m.b4, m.c4, m.d4
-        );
-    }
+	XMMATRIX AiToXMMatrix(const aiMatrix4x4& aiMatrix)
+	{
+		return XMMATRIX(
+			aiMatrix.a1, aiMatrix.b1, aiMatrix.c1, aiMatrix.d1,
+			aiMatrix.a2, aiMatrix.b2, aiMatrix.c2, aiMatrix.d2,
+			aiMatrix.a3, aiMatrix.b3, aiMatrix.c3, aiMatrix.d3,
+			aiMatrix.a4, aiMatrix.b4, aiMatrix.c4, aiMatrix.d4
+		);
+	}
 }
 
-Model ModelLoader::LoadModel(const filesystem::path& filePath, const GraphicsDevice* graphicsDevice, ShaderProgram&& shaderProgram)
+Model ModelLoader::LoadModel(const filesystem::path& filePath, const GraphicsDevice* graphicsDevice,
+                             ShaderProgram&& shaderProgram)
 {
-    Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFile
-    (
-        filePath.string(),
-        aiProcess_Triangulate |
-        aiProcess_GenSmoothNormals |
-        aiProcess_ConvertToLeftHanded |
-        aiProcess_CalcTangentSpace |
-        aiProcess_JoinIdenticalVertices |
-        aiProcess_FlipWindingOrder
-    );
+	Assimp::Importer importer;
+	const aiScene* scene = importer.ReadFile
+	(
+		filePath.string(),
+		aiProcess_Triangulate |
+		aiProcess_GenSmoothNormals |
+		aiProcess_ConvertToLeftHanded |
+		aiProcess_CalcTangentSpace |
+		aiProcess_JoinIdenticalVertices |
+		aiProcess_FlipWindingOrder
+	);
 
-    vassert(scene && scene->mRootNode, "Could not load mesh: " + filePath.string());
+	vassert(scene && scene->mRootNode, "Could not load mesh: " + filePath.string());
 
-    std::vector<Mesh> meshes;
-    std::vector<Material> materials;
-    for (unsigned int i = 0; i < scene->mNumMaterials; i++)
-        materials.push_back(ProcessMaterial(filePath.parent_path(), scene->mMaterials[i], graphicsDevice));
+	std::vector<Mesh> meshes;
+	std::vector<Material> materials;
+	for (unsigned int i = 0; i < scene->mNumMaterials; i++)
+		materials.push_back(ProcessMaterial(filePath.parent_path(), scene, scene->mMaterials[i], graphicsDevice));
 
-    ProcessNode(scene->mRootNode, scene, graphicsDevice, meshes);
+	ProcessNode(scene->mRootNode, scene, graphicsDevice, meshes);
 
-    Model model{ std::move(meshes), std::move(materials), graphicsDevice->GetD3DDevice(), std::move(shaderProgram) };
-    return model;
+	Model model{std::move(meshes), std::move(materials), graphicsDevice->GetD3DDevice(), std::move(shaderProgram)};
+	return model;
 }
 
-void ModelLoader::ProcessNode(const aiNode* node, const aiScene* scene, const GraphicsDevice* device, std::vector<Mesh>& meshesOut)
+void ModelLoader::ProcessNode(const aiNode* node, const aiScene* scene, const GraphicsDevice* device,
+                              std::vector<Mesh>& meshesOut)
 {
-    const XMMATRIX transform = AiToXMMatrix(node->mTransformation);
+	const XMMATRIX transform = AiToXMMatrix(node->mTransformation);
 
-    for (unsigned int i = 0; i < node->mNumMeshes; i++)
-    {
-        const aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-        meshesOut.push_back(ProcessMesh(mesh, device, transform));
-    }
+	for (unsigned int i = 0; i < node->mNumMeshes; i++)
+	{
+		const aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+		meshesOut.push_back(ProcessMesh(mesh, device, transform));
+	}
 
-    for (unsigned int i = 0; i < node->mNumChildren; i++)
-    {
-        ProcessNode(node->mChildren[i], scene, device, meshesOut);
-    }
+	for (unsigned int i = 0; i < node->mNumChildren; i++)
+	{
+		ProcessNode(node->mChildren[i], scene, device, meshesOut);
+	}
 }
 
 Mesh ModelLoader::ProcessMesh(const aiMesh* mesh, const GraphicsDevice* device, const XMMATRIX& transform)
 {
-    std::vector<Vertex> vertices;
-    std::vector<UINT> indices;
+	std::vector<Vertex> vertices;
+	std::vector<UINT> indices;
 
-    vertices.reserve(mesh->mNumVertices);
+	vertices.reserve(mesh->mNumVertices);
 
-    for (unsigned int i = 0; i < mesh->mNumVertices; i++)
-    {
-        Vertex vertex{};
+	for (unsigned int i = 0; i < mesh->mNumVertices; i++)
+	{
+		Vertex vertex{};
 
-        XMVECTOR pos = XMVectorSet(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z, 1.0f);
-        pos = XMVector3Transform(pos, transform);
-        XMStoreFloat3(&vertex.position, pos);
+		XMVECTOR pos = XMVectorSet(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z, 1.0f);
+		pos = XMVector3Transform(pos, transform);
+		XMStoreFloat3(&vertex.position, pos);
 
-        if (mesh->HasNormals())
-        {
-            XMVECTOR normal = XMVectorSet(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z, 0.0f);
-            normal = XMVector3TransformNormal(normal, transform);
-            XMStoreFloat3(&vertex.normal, normal);
-        }
+		if (mesh->HasNormals())
+		{
+			XMVECTOR normal = XMVectorSet(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z, 0.0f);
+			normal = XMVector3TransformNormal(normal, transform);
+			XMStoreFloat3(&vertex.normal, normal);
+		}
 
-        if (mesh->mTextureCoords[0])
-            vertex.textureCoord = XMFLOAT2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y);
-        else
-            vertex.textureCoord = XMFLOAT2(0.0f, 0.0f);
+		if (mesh->mTextureCoords[0])
+			vertex.textureCoord = XMFLOAT2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y);
+		else
+			vertex.textureCoord = XMFLOAT2(0.0f, 0.0f);
 
-        // tangents are not handled
-        /*
-        if (mesh->HasTangentsAndBitangents())
-        {
-            vertex.tangent = XMFLOAT3(mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z);
-            vertex.bitangent = XMFLOAT3(mesh->mBitangents[i].x, mesh->mBitangents[i].y, mesh->mBitangents[i].z);
-        }
+		// tangents are not handled
+		/*
+		if (mesh->HasTangentsAndBitangents())
+		{
+		    vertex.tangent = XMFLOAT3(mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z);
+		    vertex.bitangent = XMFLOAT3(mesh->mBitangents[i].x, mesh->mBitangents[i].y, mesh->mBitangents[i].z);
+		}
 		*/
 
-        vertices.push_back(vertex);
-    }
+		vertices.push_back(vertex);
+	}
 
-    for (unsigned int i = 0; i < mesh->mNumFaces; i++)
-    {
-        const aiFace& face = mesh->mFaces[i];
-        for (unsigned int j = 0; j < face.mNumIndices; j++)
-            indices.push_back(face.mIndices[j]);
-    }
+	for (unsigned int i = 0; i < mesh->mNumFaces; i++)
+	{
+		const aiFace& face = mesh->mFaces[i];
+		for (unsigned int j = 0; j < face.mNumIndices; j++)
+			indices.push_back(face.mIndices[j]);
+	}
 
-    const UINT materialIndex = mesh->mMaterialIndex;
+	const UINT materialIndex = mesh->mMaterialIndex;
 
-    return Mesh(std::move(vertices), std::move(indices), materialIndex, device->GetD3DDevice());
+	return Mesh(std::move(vertices), std::move(indices), materialIndex, device->GetD3DDevice());
 }
 
-Material ModelLoader::ProcessMaterial(const filesystem::path& materialPath, const aiMaterial* material, const GraphicsDevice* device)
+Material ModelLoader::ProcessMaterial(const filesystem::path& materialPath, const aiScene* scene,
+                                      const aiMaterial* material, const GraphicsDevice* device)
 {
-    Material mat;
+	Material mat;
 
-    aiColor4D color;
-    if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_AMBIENT, &color))
-        mat.ambient = XMFLOAT4(color.r, color.g, color.b, color.a);
-    if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &color))
-        mat.diffuse = XMFLOAT4(color.r, color.g, color.b, color.a);
-    if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_SPECULAR, &color))
-        mat.specular = XMFLOAT4(color.r, color.g, color.b, color.a);
+	aiColor4D color;
+	if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_AMBIENT, &color))
+		mat.ambient = XMFLOAT4(color.r, color.g, color.b, color.a);
+	if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &color))
+		mat.diffuse = XMFLOAT4(color.r, color.g, color.b, color.a);
+	if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_SPECULAR, &color))
+		mat.specular = XMFLOAT4(color.r, color.g, color.b, color.a);
 
-    float shininess = 0.0f;
-    if (AI_SUCCESS == aiGetMaterialFloat(material, AI_MATKEY_SHININESS, &shininess))
-        mat.shininess = shininess;
+	float shininess = 0.0f;
+	if (AI_SUCCESS == aiGetMaterialFloat(material, AI_MATKEY_SHININESS, &shininess))
+		mat.shininess = shininess;
 
-    aiString texturePath;
-    if (material->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == AI_SUCCESS)
-    {
-        std::filesystem::path texPath = texturePath.C_Str();
-        if (!texPath.is_absolute())
-            texPath = materialPath / texPath;
+	// Process diffuse texture
+	aiString texturePath;
+	if (material->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == AI_SUCCESS)
+	{
+		if (const aiTexture* embeddedTex = scene->GetEmbeddedTexture(texturePath.C_Str()))
+		{
+			// Process embeded texture
+			const auto shaderRessouceView = ProcessEmbededTexture(embeddedTex, device);
+			mat.texture = shaderRessouceView;
+			mat.textureFileName = texturePath.C_Str();
+		}
+		else
+		{
+			// Process texture file
+			filesystem::path absoluteTexturePath = texturePath.C_Str();
+			if (!absoluteTexturePath.is_absolute())
+				absoluteTexturePath = materialPath / absoluteTexturePath;
 
-        mat.textureFileName = texPath.string();
+			mat.textureFileName = absoluteTexturePath.string();
+			mat.texture = textureManager.GetOrLoadFromFile(absoluteTexturePath.string(), device->GetD3DDevice());
+		}
+	}
 
-        const std::wstring wideFilename(texPath.wstring());
-        if (const Texture* tex = textureManager.GetNewTexture(wideFilename, device))
-            mat.texture = tex->GetTexture();
-    }
+	return mat;
+}
 
-    return mat;
+ComPtr<ID3D11ShaderResourceView> ModelLoader::ProcessEmbededTexture(const aiTexture* embeddedTex, const GraphicsDevice* device)
+{
+	ComPtr<ID3D11ShaderResourceView> shaderRessouceView;
+
+	if (embeddedTex->mHeight == 0)
+	{
+		// Compressed data
+		shaderRessouceView = textureManager.GetOrLoadFromMemory(
+			reinterpret_cast<const unsigned char*>(embeddedTex->pcData),
+			embeddedTex->mWidth,
+			device->GetD3DDevice());
+	}
+	else
+	{
+		// Non compressed data
+		const size_t size = static_cast<size_t>(embeddedTex->mWidth) * embeddedTex->mHeight * 4;
+		shaderRessouceView = textureManager.GetOrLoadFromMemory(
+			reinterpret_cast<const unsigned char*>(embeddedTex->pcData),
+			size,
+			device->GetD3DDevice());
+	}
+
+	return shaderRessouceView;
 }

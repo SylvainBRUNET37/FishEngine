@@ -58,9 +58,8 @@ namespace
 			shaderBank.Get<ShaderBank::Layout>("MiniPhong")
 		};
 
-		const filesystem::path filePath = "assets\\Jin\\jin.obj";
-		//const filesystem::path filePath = "assets\\TestBlenderScene.glb";
-		//const filesystem::path filePath = "assets\\Wolf.glb";
+		//const filesystem::path filePath = "assets\\Jin\\jin.obj";
+		const filesystem::path filePath = "assets\\fiat.glb";
 
 		ModelLoader modelLoader;
 		return modelLoader.LoadModel(filePath, device, std::move(shaderProgram));

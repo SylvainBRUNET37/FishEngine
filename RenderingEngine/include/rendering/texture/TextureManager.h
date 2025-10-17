@@ -1,16 +1,24 @@
 #ifndef TEXTURE_MANAGER_H
 #define TEXTURE_MANAGER_H
 
-#include "Texture.h"
+#include <unordered_map>
+
+#include "rendering/device/GraphicsDevice.h"
 
 class TextureManager
 {
 public:
-	[[nodiscard]] Texture* GetNewTexture(const std::wstring& filename, const GraphicsDevice* device);
-	[[nodiscard]] Texture* GetTexture(const std::wstring& filename) const;
+    [[nodiscard]] ComPtr<ID3D11ShaderResourceView>
+        GetOrLoadFromFile(const std::string& filePath, ID3D11Device* device);
+
+    [[nodiscard]] ComPtr<ID3D11ShaderResourceView>
+        GetOrLoadFromMemory(const unsigned char* data, size_t size, ID3D11Device* device);
 
 private:
-	std::vector<std::unique_ptr<Texture>> textures;
+	std::unordered_map<std::string, ComPtr<ID3D11ShaderResourceView>> fileTextureCache;
+	std::unordered_map<size_t, ComPtr<ID3D11ShaderResourceView>> memeoryTextureCache;
+
+	static size_t HashMemory(const unsigned char* data, size_t size);
 };
 
 #endif
