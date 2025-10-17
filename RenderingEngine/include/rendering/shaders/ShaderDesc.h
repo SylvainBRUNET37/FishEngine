@@ -3,6 +3,7 @@
 
 #include <filesystem>
 
+// Describe the shader file
 template <typename Shader>
 struct ShaderDesc
 {

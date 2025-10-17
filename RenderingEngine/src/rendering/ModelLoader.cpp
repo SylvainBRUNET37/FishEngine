@@ -37,7 +37,8 @@ Model ModelLoader::LoadModel(const filesystem::path& filePath, const GraphicsDev
         aiProcess_GenSmoothNormals |
         aiProcess_ConvertToLeftHanded |
         aiProcess_CalcTangentSpace |
-        aiProcess_JoinIdenticalVertices
+        aiProcess_JoinIdenticalVertices |
+        aiProcess_FlipWindingOrder
     );
 
     vassert(scene && scene->mRootNode, "Could not load mesh: " + filePath.string());

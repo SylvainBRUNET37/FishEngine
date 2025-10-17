@@ -59,6 +59,8 @@ namespace
 		};
 
 		const filesystem::path filePath = "assets\\Jin\\jin.obj";
+		//const filesystem::path filePath = "assets\\TestBlenderScene.glb";
+		//const filesystem::path filePath = "assets\\Wolf.glb";
 
 		ModelLoader modelLoader;
 		return modelLoader.LoadModel(filePath, device, std::move(shaderProgram));
