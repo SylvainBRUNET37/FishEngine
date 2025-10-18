@@ -59,7 +59,7 @@ namespace
 		};
 
 		//const filesystem::path filePath = "assets\\Jin\\jin.obj";
-		const filesystem::path filePath = "assets\\fiat.glb";
+		const filesystem::path filePath = "assets\\terrain.glb";
 
 		ModelLoader modelLoader;
 		return modelLoader.LoadModel(filePath, device, std::move(shaderProgram));

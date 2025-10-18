@@ -92,7 +92,7 @@ void RenderingEngine::RenderScene() // TODO: refactor
 	pImmediateContext->OMSetRenderTargets(1, rtvs, pDepthStencilView);
 
 	// Prepare matrices (use the matrices computed in InitScene instead of hardcoded values)
-	const XMMATRIX world = XMMatrixRotationY(static_cast<float>(GetTickCount64()) / 5000.0f);
+	const XMMATRIX world = XMMatrixIdentity();
 	const XMMATRIX view = XMMatrixLookAtLH(
 		XMVectorSet(0, 2.0f, -20, 0),
 		XMVectorSet(0, 1.0f, 0, 0),
