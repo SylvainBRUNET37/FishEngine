@@ -49,11 +49,11 @@ namespace
 		return std::move(shaderBank);
 	}
 
-	Model CreateHumanModel(const RenderContext* device, const ShaderBank& shaderBank)
+	Model CreateHumanModel(ID3D11Device* device, const ShaderBank& shaderBank)
 	{
 		ShaderProgram shaderProgram
 		{
-			device->GetDevice(),
+			device,
 			shaderBank.Get<VertexShader>("shaders/MiniPhongVS.hlsl"),
 			shaderBank.Get<PixelShader>("shaders/MiniPhongPS.hlsl"),
 			shaderBank.Get<ShaderBank::Layout>("MiniPhong")
@@ -77,11 +77,11 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 	if (!application.Init())
 		return EXIT_FAILURE;
 
-	auto device = DeviceBuilder::CreateDevice(application.GetMainWindow(), RenderContext::WINDOWED);
-	auto shaderBank = CreateShaderBank(device.GetDevice());
-	RenderingEngine renderingEngine{&device, std::move(shaderBank), {WindowsApplication::ProcessWindowMessages}};
+	auto renderContext = DeviceBuilder::CreateRenderContext(application.GetMainWindow(), RenderContext::WINDOWED);
+	auto shaderBank = CreateShaderBank(renderContext.GetDevice());
+	RenderingEngine renderingEngine{&renderContext, std::move(shaderBank), {WindowsApplication::ProcessWindowMessages}};
 
-	renderingEngine.AddObjectToScene(CreateHumanModel(&device, shaderBank));
+	renderingEngine.AddObjectToScene(CreateHumanModel(renderContext.GetDevice(), shaderBank));
 	renderingEngine.Run();
 
 	return EXIT_SUCCESS;

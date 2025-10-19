@@ -42,7 +42,7 @@ CInfoDispositif::CInfoDispositif(DXGI_MODE_DESC modeDesc)
 	IDXGIAdapter* pAdapter;
 	std::vector<IDXGIAdapter*> vAdapters;
 	for (UINT i = 0;
-		pFactory->EnumAdapters(i, &pAdapter) != DXGI_ERROR_NOT_FOUND; ++i)
+	     pFactory->EnumAdapters(i, &pAdapter) != DXGI_ERROR_NOT_FOUND; ++i)
 	{
 		vAdapters.push_back(pAdapter);
 	}

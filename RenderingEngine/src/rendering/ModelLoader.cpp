@@ -27,7 +27,7 @@ namespace
 	}
 }
 
-Model ModelLoader::LoadModel(const filesystem::path& filePath, const RenderContext* graphicsDevice,
+Model ModelLoader::LoadModel(const filesystem::path& filePath, ID3D11Device* device,
                              ShaderProgram&& shaderProgram)
 {
 	Assimp::Importer importer;
@@ -47,15 +47,15 @@ Model ModelLoader::LoadModel(const filesystem::path& filePath, const RenderConte
 	std::vector<Mesh> meshes;
 	std::vector<Material> materials;
 	for (unsigned int i = 0; i < scene->mNumMaterials; i++)
-		materials.push_back(ProcessMaterial(filePath.parent_path(), scene, scene->mMaterials[i], graphicsDevice));
+		materials.push_back(ProcessMaterial(filePath.parent_path(), scene, scene->mMaterials[i], device));
 
-	ProcessNode(scene->mRootNode, scene, graphicsDevice, meshes);
+	ProcessNode(scene->mRootNode, scene, device, meshes);
 
-	Model model{std::move(meshes), std::move(materials), graphicsDevice->GetDevice(), std::move(shaderProgram)};
+	Model model{std::move(meshes), std::move(materials), device, std::move(shaderProgram)};
 	return model;
 }
 
-void ModelLoader::ProcessNode(const aiNode* node, const aiScene* scene, const RenderContext* device,
+void ModelLoader::ProcessNode(const aiNode* node, const aiScene* scene, ID3D11Device* device,
                               std::vector<Mesh>& meshesOut)
 {
 	const XMMATRIX transform = AiToXMMatrix(node->mTransformation);
@@ -72,7 +72,7 @@ void ModelLoader::ProcessNode(const aiNode* node, const aiScene* scene, const Re
 	}
 }
 
-Mesh ModelLoader::ProcessMesh(const aiMesh* mesh, const RenderContext* device, const XMMATRIX& transform)
+Mesh ModelLoader::ProcessMesh(const aiMesh* mesh, ID3D11Device* device, const XMMATRIX& transform)
 {
 	std::vector<Vertex> vertices;
 	std::vector<UINT> indices;
@@ -120,11 +120,11 @@ Mesh ModelLoader::ProcessMesh(const aiMesh* mesh, const RenderContext* device, c
 
 	const UINT materialIndex = mesh->mMaterialIndex;
 
-	return Mesh(std::move(vertices), std::move(indices), materialIndex, device->GetDevice());
+	return Mesh(std::move(vertices), std::move(indices), materialIndex, device);
 }
 
 Material ModelLoader::ProcessMaterial(const filesystem::path& materialPath, const aiScene* scene,
-                                      const aiMaterial* material, const RenderContext* device)
+                                      const aiMaterial* material, ID3D11Device* device)
 {
 	Material mat;
 
@@ -159,14 +159,14 @@ Material ModelLoader::ProcessMaterial(const filesystem::path& materialPath, cons
 				absoluteTexturePath = materialPath / absoluteTexturePath;
 
 			mat.textureFileName = absoluteTexturePath.string();
-			mat.texture = textureManager.GetOrLoadFromFile(absoluteTexturePath.string(), device->GetDevice());
+			mat.texture = textureManager.GetOrLoadFromFile(absoluteTexturePath.string(), device);
 		}
 	}
 
 	return mat;
 }
 
-ComPtr<ID3D11ShaderResourceView> ModelLoader::ProcessEmbededTexture(const aiTexture* embeddedTex, const RenderContext* device)
+ComPtr<ID3D11ShaderResourceView> ModelLoader::ProcessEmbededTexture(const aiTexture* embeddedTex, ID3D11Device* device)
 {
 	ComPtr<ID3D11ShaderResourceView> shaderRessouceView;
 
@@ -176,7 +176,7 @@ ComPtr<ID3D11ShaderResourceView> ModelLoader::ProcessEmbededTexture(const aiText
 		shaderRessouceView = textureManager.GetOrLoadFromMemory(
 			reinterpret_cast<const unsigned char*>(embeddedTex->pcData),
 			embeddedTex->mWidth,
-			device->GetDevice());
+			device);
 	}
 	else
 	{
@@ -185,7 +185,7 @@ ComPtr<ID3D11ShaderResourceView> ModelLoader::ProcessEmbededTexture(const aiText
 		shaderRessouceView = textureManager.GetOrLoadFromMemory(
 			reinterpret_cast<const unsigned char*>(embeddedTex->pcData),
 			size,
-			device->GetDevice());
+			device);
 	}
 
 	return shaderRessouceView;

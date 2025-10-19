@@ -25,7 +25,7 @@ void RenderingEngine::InitScene()
 	matView = XMMatrixLookAtLH(eyePosition, focusPoint, upDirection);
 
 	constexpr float fieldOfView = XM_PI / 4.0f; // 45 degrees
-	const float aspectRatio = static_cast<float>(device->GetScreenWidth()) / static_cast<float>(device->GetScreenHeight());
+	const float aspectRatio = static_cast<float>(renderContext->GetScreenWidth()) / static_cast<float>(renderContext->GetScreenHeight());
 	constexpr float nearPlane = 2.0f;
 	constexpr float farPlane = 50.0f;
 
@@ -62,7 +62,7 @@ void RenderingEngine::UpdateScene()
 		AnimeScene(elapsedTime);
 		RenderScene();
 
-		device->Present();
+		renderContext->Present();
 
 		previousTimeCount = currentTimeCount;
 	}
@@ -76,9 +76,9 @@ void RenderingEngine::AnimeScene(const double elapsedTime) const
 
 void RenderingEngine::RenderScene() // TODO: refactor
 {
-	ID3D11DeviceContext* pImmediateContext = device->GetContext();
-	ID3D11RenderTargetView* pRenderTargetView = device->GetRenderTargetView();
-	ID3D11DepthStencilView* pDepthStencilView = device->GetDepthStencilView();
+	ID3D11DeviceContext* pImmediateContext = renderContext->GetContext();
+	ID3D11RenderTargetView* pRenderTargetView = renderContext->GetRenderTargetView();
+	ID3D11DepthStencilView* pDepthStencilView = renderContext->GetDepthStencilView();
 
 	constexpr float backgroundColor[4] = {0.0f, 0.5f, 0.0f, 1.0f}; // green
 	pImmediateContext->ClearRenderTargetView(pRenderTargetView, backgroundColor);

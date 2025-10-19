@@ -4,7 +4,7 @@
 #include "rendering/utils/Util.h"
 #include "resources/resource.h"
 
-RenderContext DeviceBuilder::CreateDevice(const HWND hwnd, const RenderContext::DisplayMode mode)
+RenderContext DeviceBuilder::CreateRenderContext(const HWND hwnd, const RenderContext::DisplayMode mode)
 {
 	UINT createDeviceFlags = 0;
 #ifdef _DEBUG
@@ -35,11 +35,11 @@ RenderContext DeviceBuilder::CreateDevice(const HWND hwnd, const RenderContext::
 		DXE_ERREURCREATIONDEVICE
 	);
 
-	return RenderContext{ device, context, swapChain, width, height };
+	return RenderContext{device, context, swapChain, width, height};
 }
 
 DXGI_SWAP_CHAIN_DESC DeviceBuilder::CreateSwapChainDesc(const HWND hwnd, const RenderContext::DisplayMode mode,
-	const UINT width, const UINT height)
+                                                        const UINT width, const UINT height)
 {
 	DXGI_SWAP_CHAIN_DESC desc{};
 

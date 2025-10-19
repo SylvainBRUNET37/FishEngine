@@ -26,6 +26,7 @@ inline void VerboseAssertion(const bool expr, const char* exprStr,
 		msg += ":";
 		msg += std::to_string(location.line());
 
+		// Create a window that displays the message and abort the program
 		MessageBoxA(nullptr, msg.c_str(), "Assertion Failed", MB_ICONERROR | MB_OK);
 		std::abort();
 	}

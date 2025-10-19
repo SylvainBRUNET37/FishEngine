@@ -6,7 +6,7 @@
 class Buffer
 {
 public:
-	[[nodiscard]] ComPtr<ID3D11Buffer> Get() const { return buffer; }
+	[[nodiscard]] ID3D11Buffer* Get() const { return buffer; }
 
 protected:
 	ComPtr<ID3D11Buffer> buffer;

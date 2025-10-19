@@ -31,7 +31,7 @@ private:
 	std::vector<Mesh> meshes;
 	std::vector<Material> materials;
 
-	static ConstantBufferParams BuildPerMeshParams(
+	static ConstantBufferParams BuildMeshConstantBufferParams(
 		const Material& material,
 		const Transform& transform,
 		const SceneData& scene);

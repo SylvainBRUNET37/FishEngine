@@ -14,8 +14,8 @@ class RenderingEngine
 public:
 	using MainLoopCallback = std::function<bool()>;
 
-	explicit RenderingEngine(RenderContext* device, ShaderBank&& shaderBank_, const std::initializer_list<MainLoopCallback> callbacks)
-		: shaderBank{ shaderBank_ }, mainLoopCallbacks{ callbacks }, device{ device }
+	explicit RenderingEngine(RenderContext* renderContext, ShaderBank&& shaderBank_, const std::initializer_list<MainLoopCallback> callbacks)
+		: shaderBank{ shaderBank_ }, mainLoopCallbacks{ callbacks }, renderContext{ renderContext }
 	{
 		InitScene();
 		InitAnimation();
@@ -35,7 +35,7 @@ private:
 	DirectX::XMMATRIX matProj{};
 	DirectX::XMMATRIX matViewProj{};
 
-	RenderContext* device; // TODO: use unique ptr ?
+	RenderContext* renderContext; // TODO: use unique ptr ?
 
 	std::vector<Model> scene;
 

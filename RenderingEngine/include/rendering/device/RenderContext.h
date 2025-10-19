@@ -17,8 +17,10 @@ public:
 	};
 
 	explicit RenderContext(const ComPtr<ID3D11Device>& device,
-	                        const ComPtr<ID3D11DeviceContext>& context,
-	                        const ComPtr<IDXGISwapChain>& swapChain, UINT width, UINT height);
+	                       const ComPtr<ID3D11DeviceContext>& context,
+	                       const ComPtr<IDXGISwapChain>& swapChain,
+	                       UINT width,
+	                       UINT height);
 
 	void Present() const;
 

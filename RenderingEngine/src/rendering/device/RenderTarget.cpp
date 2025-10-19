@@ -6,8 +6,8 @@
 
 RenderTarget::RenderTarget(const ComPtr<ID3D11Device>& device, const ComPtr<IDXGISwapChain>& swapChain)
 {
-    ComPtr<ID3D11Texture2D> backBuffer;
+	ComPtr<ID3D11Texture2D> backBuffer;
 
-    DXEssayer(swapChain->GetBuffer(0, IID_PPV_ARGS(&backBuffer)), DXE_ERREUROBTENTIONBUFFER);
-    DXEssayer(device->CreateRenderTargetView(backBuffer, nullptr, &renderTargetView), DXE_ERREURCREATIONRENDERTARGET);
+	DXEssayer(swapChain->GetBuffer(0, IID_PPV_ARGS(&backBuffer)), DXE_ERREUROBTENTIONBUFFER);
+	DXEssayer(device->CreateRenderTargetView(backBuffer, nullptr, &renderTargetView), DXE_ERREURCREATIONRENDERTARGET);
 }

@@ -41,7 +41,7 @@ void Model::Draw(ID3D11DeviceContext* ctx,
 	{
 		auto& mat = materials[meshes[i].GetMaterialIndex()];
 
-		ConstantBufferParams params = BuildPerMeshParams(
+		ConstantBufferParams params = BuildMeshConstantBufferParams(
 			mat, transform, scene);
 
 		constantBuffer.Update(ctx, params);
@@ -53,7 +53,7 @@ void Model::Draw(ID3D11DeviceContext* ctx,
 	}
 }
 
-Model::ConstantBufferParams Model::BuildPerMeshParams(
+Model::ConstantBufferParams Model::BuildMeshConstantBufferParams(
 	const Material& material,
 	const Transform& transform,
 	const SceneData& scene)
