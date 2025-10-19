@@ -18,7 +18,7 @@
     <ClInclude Include="include\rendering\application\WindowsApplication.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\rendering\device\GraphicsDevice.h">
+    <ClInclude Include="include\rendering\device\RenderContext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\rendering\utils\ComPtr.h">
@@ -131,7 +131,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\rendering\device\GraphicsDevice.cpp">
+    <ClCompile Include="src\rendering\device\RenderContext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp">

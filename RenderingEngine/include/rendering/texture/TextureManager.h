@@ -3,7 +3,7 @@
 
 #include <unordered_map>
 
-#include "rendering/device/GraphicsDevice.h"
+#include "rendering/device/RenderContext.h"
 
 class TextureManager
 {

@@ -8,7 +8,7 @@ class RenderTarget
 public:
     RenderTarget(const ComPtr<ID3D11Device>& device, const ComPtr<IDXGISwapChain>& swapChain);
 
-    [[nodiscard]] ComPtr<ID3D11RenderTargetView> GetRenderTargetView() const { return renderTargetView; }
+    [[nodiscard]] ID3D11RenderTargetView* GetRenderTargetView() const { return renderTargetView; }
 
 private:
     ComPtr<ID3D11RenderTargetView> renderTargetView;

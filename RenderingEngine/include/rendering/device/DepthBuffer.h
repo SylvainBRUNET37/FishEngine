@@ -6,7 +6,7 @@ class DepthBuffer
 {
 public:
     DepthBuffer(const ComPtr<ID3D11Device>& device, UINT width, UINT height);
-    [[nodiscard]] ComPtr<ID3D11DepthStencilView> GetStencilView() const { return depthStencilView; }
+    [[nodiscard]] ID3D11DepthStencilView* GetStencilView() const { return depthStencilView; }
 
 private:
     ComPtr<ID3D11Texture2D> texture;

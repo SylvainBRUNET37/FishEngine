@@ -11,7 +11,7 @@
 #include "rendering/RenderingEngine.h"
 #include "rendering/application/WindowsApplication.h"
 #include "rendering/device/DeviceBuilder.h"
-#include "rendering/device/GraphicsDevice.h"
+#include "rendering/device/RenderContext.h"
 #include "rendering/shaders/ShaderProgramDesc.h"
 #include "rendering/shaders/ShaderFactory.h"
 
@@ -49,7 +49,7 @@ namespace
 		return std::move(shaderBank);
 	}
 
-	Model CreateHumanModel(const GraphicsDevice* device, const ShaderBank& shaderBank)
+	Model CreateHumanModel(const RenderContext* device, const ShaderBank& shaderBank)
 	{
 		ShaderProgram shaderProgram
 		{
@@ -77,7 +77,7 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 	if (!application.Init())
 		return EXIT_FAILURE;
 
-	auto device = DeviceBuilder::CreateDevice(application.GetMainWindow(), GraphicsDevice::WINDOWED);
+	auto device = DeviceBuilder::CreateDevice(application.GetMainWindow(), RenderContext::WINDOWED);
 	auto shaderBank = CreateShaderBank(device.GetDevice());
 	RenderingEngine renderingEngine{&device, std::move(shaderBank), {WindowsApplication::ProcessWindowMessages}};
 

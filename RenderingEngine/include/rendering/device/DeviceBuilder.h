@@ -1,15 +1,15 @@
 #ifndef DEVICE_BUILDER_H
 #define DEVICE_BUILDER_H
-#include "GraphicsDevice.h"
+#include "RenderContext.h"
 
 class DeviceBuilder
 {
 public:
-    [[nodiscard]] static GraphicsDevice CreateDevice(HWND hwnd, GraphicsDevice::DisplayMode mode);
+    [[nodiscard]] static RenderContext CreateDevice(HWND hwnd, RenderContext::DisplayMode mode);
 
 private:
     [[nodiscard]] static DXGI_SWAP_CHAIN_DESC CreateSwapChainDesc(HWND hwnd,
-        GraphicsDevice::DisplayMode mode, UINT width, UINT height);
+        RenderContext::DisplayMode mode, UINT width, UINT height);
 };
 
 #endif

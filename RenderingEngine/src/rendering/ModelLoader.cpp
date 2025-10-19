@@ -7,7 +7,7 @@
 #include <assimp/postprocess.h>
 
 #include "rendering/texture/TextureManager.h"
-#include "rendering/device/GraphicsDevice.h"
+#include "rendering/device/RenderContext.h"
 #include "rendering/utils/VerboseAssertion.h"
 #include "rendering/graphics/Mesh.h"
 
@@ -27,7 +27,7 @@ namespace
 	}
 }
 
-Model ModelLoader::LoadModel(const filesystem::path& filePath, const GraphicsDevice* graphicsDevice,
+Model ModelLoader::LoadModel(const filesystem::path& filePath, const RenderContext* graphicsDevice,
                              ShaderProgram&& shaderProgram)
 {
 	Assimp::Importer importer;
@@ -55,7 +55,7 @@ Model ModelLoader::LoadModel(const filesystem::path& filePath, const GraphicsDev
 	return model;
 }
 
-void ModelLoader::ProcessNode(const aiNode* node, const aiScene* scene, const GraphicsDevice* device,
+void ModelLoader::ProcessNode(const aiNode* node, const aiScene* scene, const RenderContext* device,
                               std::vector<Mesh>& meshesOut)
 {
 	const XMMATRIX transform = AiToXMMatrix(node->mTransformation);
@@ -72,7 +72,7 @@ void ModelLoader::ProcessNode(const aiNode* node, const aiScene* scene, const Gr
 	}
 }
 
-Mesh ModelLoader::ProcessMesh(const aiMesh* mesh, const GraphicsDevice* device, const XMMATRIX& transform)
+Mesh ModelLoader::ProcessMesh(const aiMesh* mesh, const RenderContext* device, const XMMATRIX& transform)
 {
 	std::vector<Vertex> vertices;
 	std::vector<UINT> indices;
@@ -124,7 +124,7 @@ Mesh ModelLoader::ProcessMesh(const aiMesh* mesh, const GraphicsDevice* device, 
 }
 
 Material ModelLoader::ProcessMaterial(const filesystem::path& materialPath, const aiScene* scene,
-                                      const aiMaterial* material, const GraphicsDevice* device)
+                                      const aiMaterial* material, const RenderContext* device)
 {
 	Material mat;
 
@@ -166,7 +166,7 @@ Material ModelLoader::ProcessMaterial(const filesystem::path& materialPath, cons
 	return mat;
 }
 
-ComPtr<ID3D11ShaderResourceView> ModelLoader::ProcessEmbededTexture(const aiTexture* embeddedTex, const GraphicsDevice* device)
+ComPtr<ID3D11ShaderResourceView> ModelLoader::ProcessEmbededTexture(const aiTexture* embeddedTex, const RenderContext* device)
 {
 	ComPtr<ID3D11ShaderResourceView> shaderRessouceView;
 

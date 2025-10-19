@@ -7,8 +7,8 @@ class BlendState {
 public:
 	explicit BlendState(const ComPtr<ID3D11Device>& device);
 
-	[[nodiscard]] ComPtr<ID3D11BlendState> GetAlphaBlendEnabled() const { return alphaBlendEnable; }
-    [[nodiscard]] ComPtr<ID3D11BlendState> GetAlphaBlendDisabled() const { return alphaBlendDisable; }
+	[[nodiscard]] ID3D11BlendState* GetAlphaBlendEnabled() const { return alphaBlendEnable; }
+    [[nodiscard]] ID3D11BlendState* GetAlphaBlendDisabled() const { return alphaBlendDisable; }
 
 private:
     ComPtr<ID3D11BlendState> alphaBlendEnable;

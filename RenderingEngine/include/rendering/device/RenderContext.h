@@ -7,7 +7,7 @@
 #include "RenderTarget.h"
 #include "rendering/utils/ComPtr.h"
 
-class GraphicsDevice
+class RenderContext
 {
 public:
 	enum DisplayMode : uint8_t
@@ -16,7 +16,7 @@ public:
 		FULLSCREEN
 	};
 
-	explicit GraphicsDevice(const ComPtr<ID3D11Device>& device,
+	explicit RenderContext(const ComPtr<ID3D11Device>& device,
 	                        const ComPtr<ID3D11DeviceContext>& context,
 	                        const ComPtr<IDXGISwapChain>& swapChain, UINT width, UINT height);
 

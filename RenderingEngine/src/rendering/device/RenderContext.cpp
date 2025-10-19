@@ -1,9 +1,9 @@
 #include "pch.h"
-#include "rendering/device/GraphicsDevice.h"
+#include "rendering/device/RenderContext.h"
 
 #include "rendering/utils/Util.h"
 
-GraphicsDevice::GraphicsDevice(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context,
+RenderContext::RenderContext(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context,
                                const ComPtr<IDXGISwapChain>& swapChain, const UINT width, const UINT height)
 	: screenWidth(width),
 	  screenHeight(height),
@@ -19,12 +19,12 @@ GraphicsDevice::GraphicsDevice(const ComPtr<ID3D11Device>& device, const ComPtr<
     SetupViewPort();
 }
 
-void GraphicsDevice::Present() const
+void RenderContext::Present() const
 {
 	DXEssayer(swapChain->Present(0, 0));
 }
 
-void GraphicsDevice::SetRenderTarget() const
+void RenderContext::SetRenderTarget() const
 {
     auto renderTargetView = renderTarget.GetRenderTargetView();
     const auto depthStencilView = depthBuffer.GetStencilView();
@@ -32,7 +32,7 @@ void GraphicsDevice::SetRenderTarget() const
     context->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
 }
 
-void GraphicsDevice::SetupViewPort() const
+void RenderContext::SetupViewPort() const
 {
     D3D11_VIEWPORT viewPort{};
 

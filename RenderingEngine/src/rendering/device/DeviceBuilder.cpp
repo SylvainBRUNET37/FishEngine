@@ -4,7 +4,7 @@
 #include "rendering/utils/Util.h"
 #include "resources/resource.h"
 
-GraphicsDevice DeviceBuilder::CreateDevice(const HWND hwnd, const GraphicsDevice::DisplayMode mode)
+RenderContext DeviceBuilder::CreateDevice(const HWND hwnd, const RenderContext::DisplayMode mode)
 {
 	UINT createDeviceFlags = 0;
 #ifdef _DEBUG
@@ -35,10 +35,10 @@ GraphicsDevice DeviceBuilder::CreateDevice(const HWND hwnd, const GraphicsDevice
 		DXE_ERREURCREATIONDEVICE
 	);
 
-	return GraphicsDevice{ device, context, swapChain, width, height };
+	return RenderContext{ device, context, swapChain, width, height };
 }
 
-DXGI_SWAP_CHAIN_DESC DeviceBuilder::CreateSwapChainDesc(const HWND hwnd, const GraphicsDevice::DisplayMode mode,
+DXGI_SWAP_CHAIN_DESC DeviceBuilder::CreateSwapChainDesc(const HWND hwnd, const RenderContext::DisplayMode mode,
 	const UINT width, const UINT height)
 {
 	DXGI_SWAP_CHAIN_DESC desc{};
@@ -53,7 +53,7 @@ DXGI_SWAP_CHAIN_DESC DeviceBuilder::CreateSwapChainDesc(const HWND hwnd, const G
 	desc.OutputWindow = hwnd;
 	desc.SampleDesc.Count = 1;
 	desc.SampleDesc.Quality = 0;
-	desc.Windowed = mode == GraphicsDevice::WINDOWED;
+	desc.Windowed = mode == RenderContext::WINDOWED;
 	desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
 	return desc;

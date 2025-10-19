@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <functional>
 
-#include "device/GraphicsDevice.h"
+#include "device/RenderContext.h"
 #include "shaders/ShaderBank.h"
 #include "shaders/ShaderProgramDesc.h"
 #include "graphics/Model.h"
@@ -14,7 +14,7 @@ class RenderingEngine
 public:
 	using MainLoopCallback = std::function<bool()>;
 
-	explicit RenderingEngine(GraphicsDevice* device, ShaderBank&& shaderBank_, const std::initializer_list<MainLoopCallback> callbacks)
+	explicit RenderingEngine(RenderContext* device, ShaderBank&& shaderBank_, const std::initializer_list<MainLoopCallback> callbacks)
 		: shaderBank{ shaderBank_ }, mainLoopCallbacks{ callbacks }, device{ device }
 	{
 		InitScene();
@@ -35,7 +35,7 @@ private:
 	DirectX::XMMATRIX matProj{};
 	DirectX::XMMATRIX matViewProj{};
 
-	GraphicsDevice* device; // TODO: use unique ptr ?
+	RenderContext* device; // TODO: use unique ptr ?
 
 	std::vector<Model> scene;
 
