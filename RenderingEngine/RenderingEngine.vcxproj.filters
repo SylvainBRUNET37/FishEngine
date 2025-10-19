@@ -39,7 +39,7 @@
     <ClInclude Include="include\rendering\RenderingEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\rendering\ModelLoader.h">
+    <ClInclude Include="include\rendering\SceneLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\rendering\graphics\Mesh.h">
@@ -146,7 +146,7 @@
     <ClCompile Include="src\rendering\application\WindowsApplication.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\rendering\ModelLoader.cpp">
+    <ClCompile Include="src\rendering\SceneLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\rendering\utils\DDSTextureLoader.cpp">

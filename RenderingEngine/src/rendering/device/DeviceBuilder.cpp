@@ -43,8 +43,8 @@ DXGI_SWAP_CHAIN_DESC DeviceBuilder::CreateSwapChainDesc(const HWND hwnd, const W
 	DXGI_SWAP_CHAIN_DESC desc{};
 
 	desc.BufferCount = 2;
-	desc.BufferDesc.Width = windowData.screenWidth;
-	desc.BufferDesc.Height = windowData.screenHeight;
+	desc.BufferDesc.Width = static_cast<UINT>(windowData.screenWidth);
+	desc.BufferDesc.Height = static_cast<UINT>(windowData.screenHeight);
 	desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	desc.BufferDesc.RefreshRate.Numerator = 60;
 	desc.BufferDesc.RefreshRate.Denominator = 1;

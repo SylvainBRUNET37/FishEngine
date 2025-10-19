@@ -7,7 +7,7 @@
 #include <cstdlib>
 #include <minwindef.h>
 
-#include "rendering/ModelLoader.h"
+#include "rendering/SceneLoader.h"
 #include "rendering/RenderingEngine.h"
 #include "rendering/application/WindowsApplication.h"
 #include "rendering/device/DeviceBuilder.h"
@@ -62,8 +62,8 @@ namespace
 		//const filesystem::path filePath = "assets\\Jin\\jin.obj";
 		const filesystem::path filePath = "assets\\terrain.glb";
 
-		ModelLoader modelLoader;
-		return modelLoader.LoadModel(filePath, device, std::move(shaderProgram));
+		SceneLoader modelLoader;
+		return modelLoader.LoadScene(filePath, device, std::move(shaderProgram));
 	}
 }
 

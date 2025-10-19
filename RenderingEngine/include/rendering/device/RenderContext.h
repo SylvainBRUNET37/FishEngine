@@ -27,8 +27,8 @@ public:
 
 	[[nodiscard]] ID3D11DepthStencilView* GetDepthStencilView() const noexcept { return depthBuffer.GetStencilView(); }
 
-	[[nodiscard]] uint32_t GetScreenWidth() const noexcept { return screenWidth; }
-	[[nodiscard]] uint32_t GetScreenHeight() const noexcept { return screenHeight; }
+	[[nodiscard]] size_t GetScreenWidth() const noexcept { return screenWidth; }
+	[[nodiscard]] size_t GetScreenHeight() const noexcept { return screenHeight; }
 
 	void EnableAlphaBlending() const
 	{

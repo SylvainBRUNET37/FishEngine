@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "rendering/ModelLoader.h"
+#include "rendering/SceneLoader.h"
 
 #include <filesystem>
 #include <assimp/Importer.hpp>
@@ -27,7 +27,7 @@ namespace
 	}
 }
 
-Model ModelLoader::LoadModel(const filesystem::path& filePath, ID3D11Device* device,
+Model SceneLoader::LoadScene(const filesystem::path& filePath, ID3D11Device* device,
                              ShaderProgram&& shaderProgram)
 {
 	Assimp::Importer importer;
@@ -42,7 +42,8 @@ Model ModelLoader::LoadModel(const filesystem::path& filePath, ID3D11Device* dev
 		aiProcess_FlipWindingOrder
 	);
 
-	vassert(scene && scene->mRootNode, "Could not load mesh: " + filePath.string());
+	if (not scene or not scene->mRootNode)
+		throw runtime_error("Could not load scene: " + filePath.string());
 
 	std::vector<Mesh> meshes;
 	std::vector<Material> materials;
@@ -55,7 +56,7 @@ Model ModelLoader::LoadModel(const filesystem::path& filePath, ID3D11Device* dev
 	return model;
 }
 
-void ModelLoader::ProcessNode(const aiNode* node, const aiScene* scene, ID3D11Device* device,
+void SceneLoader::ProcessNode(const aiNode* node, const aiScene* scene, ID3D11Device* device,
                               std::vector<Mesh>& meshesOut)
 {
 	const XMMATRIX transform = AiToXMMatrix(node->mTransformation);
@@ -72,7 +73,7 @@ void ModelLoader::ProcessNode(const aiNode* node, const aiScene* scene, ID3D11De
 	}
 }
 
-Mesh ModelLoader::ProcessMesh(const aiMesh* mesh, ID3D11Device* device, const XMMATRIX& transform)
+Mesh SceneLoader::ProcessMesh(const aiMesh* mesh, ID3D11Device* device, const XMMATRIX& transform)
 {
 	std::vector<Vertex> vertices;
 	std::vector<UINT> indices;
@@ -123,7 +124,7 @@ Mesh ModelLoader::ProcessMesh(const aiMesh* mesh, ID3D11Device* device, const XM
 	return Mesh(std::move(vertices), std::move(indices), materialIndex, device);
 }
 
-Material ModelLoader::ProcessMaterial(const filesystem::path& materialPath, const aiScene* scene,
+Material SceneLoader::ProcessMaterial(const filesystem::path& materialPath, const aiScene* scene,
                                       const aiMaterial* material, ID3D11Device* device)
 {
 	Material mat;
@@ -166,7 +167,7 @@ Material ModelLoader::ProcessMaterial(const filesystem::path& materialPath, cons
 	return mat;
 }
 
-ComPtr<ID3D11ShaderResourceView> ModelLoader::ProcessEmbededTexture(const aiTexture* embeddedTex, ID3D11Device* device)
+ComPtr<ID3D11ShaderResourceView> SceneLoader::ProcessEmbededTexture(const aiTexture* embeddedTex, ID3D11Device* device)
 {
 	ComPtr<ID3D11ShaderResourceView> shaderRessouceView;
 

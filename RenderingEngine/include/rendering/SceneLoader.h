@@ -10,10 +10,10 @@
 #include "texture/TextureManager.h"
 #include "graphics/Model.h"
 
-class ModelLoader
+class SceneLoader
 {
 public:
-    [[nodiscard]] Model LoadModel(
+    [[nodiscard]] Model LoadScene(
         const std::filesystem::path& filePath,
         ID3D11Device* device,
         ShaderProgram&& shaderProgram);

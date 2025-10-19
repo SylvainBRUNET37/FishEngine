@@ -33,6 +33,5 @@ inline void VerboseAssertion(const bool expr, const char* exprStr,
 }
 
 #define vassert(expr, msg) VerboseAssertion((expr), #expr, (msg))
-#define vassert(expr) VerboseAssertion((expr), #expr, (""))
 
 #endif

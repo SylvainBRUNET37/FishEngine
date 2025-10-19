@@ -3,7 +3,7 @@
 
 #include <filesystem>
 
-#include "rendering/ModelLoader.h"
+#include "rendering/SceneLoader.h"
 #include "rendering/graphics/Model.h"
 #include "rendering/utils/Clock.h"
 

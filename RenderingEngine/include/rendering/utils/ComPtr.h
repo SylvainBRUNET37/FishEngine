@@ -8,13 +8,11 @@ public:
 	ComPtr()
 		: m_ptr(nullptr)
 	{
-
 	}
 
 	explicit ComPtr(PtrType* ptr)
 		: m_ptr(ptr)
 	{
-
 	}
 
 	ComPtr(const ComPtr& rhs)
@@ -34,12 +32,12 @@ public:
 		Reset();
 	}
 
-	operator PtrType* ()
+	operator PtrType*()
 	{
 		return m_ptr;
 	}
 
-	operator PtrType* () const
+	operator PtrType*() const
 	{
 		return m_ptr;
 	}
@@ -54,19 +52,19 @@ public:
 		return (*this);
 	}
 
-	ComPtr& operator =(ComPtr&& rhs)
+	ComPtr& operator=(ComPtr&& rhs) noexcept
 	{
 		Reset();
 		MoveFrom(std::move(rhs));
 		return (*this);
 	}
 
-	PtrType* operator ->() const
+	PtrType* operator->() const
 	{
 		return m_ptr;
 	}
 
-	PtrType** operator &()
+	PtrType** operator&()
 	{
 		return &m_ptr;
 	}

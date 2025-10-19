@@ -35,7 +35,7 @@
     <ClInclude Include="include\rendering\buffers\VertexBuffer.h" />
     <ClInclude Include="include\rendering\device\Rasterizer.h" />
     <ClInclude Include="include\rendering\device\RenderTarget.h" />
-    <ClInclude Include="include\rendering\ModelLoader.h" />
+    <ClInclude Include="include\rendering\SceneLoader.h" />
     <ClInclude Include="include\rendering\RenderingEngine.h" />
     <ClInclude Include="include\rendering\shaders\Shader.h" />
     <ClInclude Include="include\rendering\shaders\ShaderBank.h" />
@@ -72,7 +72,7 @@
     <ClCompile Include="src\rendering\device\RenderContext.cpp" />
     <ClCompile Include="src\rendering\device\RenderTarget.cpp" />
     <ClCompile Include="src\rendering\device\Rasterizer.cpp" />
-    <ClCompile Include="src\rendering\ModelLoader.cpp" />
+    <ClCompile Include="src\rendering\SceneLoader.cpp" />
     <ClCompile Include="src\rendering\RenderingEngine.cpp" />
     <ClCompile Include="src\rendering\shaders\ShaderProgram.cpp" />
     <ClCompile Include="src\rendering\shaders\ShaderUtils.cpp" />
@@ -138,6 +138,18 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IntDir>$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IntDir>$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
