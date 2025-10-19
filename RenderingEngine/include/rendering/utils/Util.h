@@ -4,7 +4,7 @@
 template <class Type>
 void DXEssayer(const Type& Resultat)
 {
-	if (Resultat != S_OK)
+	if (Resultat != S_OK) [[unlikely]]
 	{
 		throw Resultat;
 	}
@@ -13,7 +13,7 @@ void DXEssayer(const Type& Resultat)
 template <class Type1, class Type2>
 void DXEssayer(const Type1& Resultat, const Type2& unCode)
 {
-	if (Resultat != S_OK)
+	if (Resultat != S_OK) [[unlikely]]
 	{
 		throw unCode;
 	}
@@ -22,7 +22,7 @@ void DXEssayer(const Type1& Resultat, const Type2& unCode)
 template <class Type>
 void DXValider(const void* UnPointeur, const Type& unCode)
 {
-	if (UnPointeur == nullptr)
+	if (UnPointeur == nullptr) [[unlikely]]
 	{
 		throw unCode;
 	}
@@ -31,7 +31,7 @@ void DXValider(const void* UnPointeur, const Type& unCode)
 template <class Type>
 void DXRelacher(Type& UnPointeur)
 {
-	if (UnPointeur != nullptr)
+	if (UnPointeur != nullptr) [[likely]]
 	{
 		UnPointeur->Release();
 		UnPointeur = nullptr;

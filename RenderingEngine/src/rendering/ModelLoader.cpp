@@ -51,7 +51,7 @@ Model ModelLoader::LoadModel(const filesystem::path& filePath, const GraphicsDev
 
 	ProcessNode(scene->mRootNode, scene, graphicsDevice, meshes);
 
-	Model model{std::move(meshes), std::move(materials), graphicsDevice->GetD3DDevice(), std::move(shaderProgram)};
+	Model model{std::move(meshes), std::move(materials), graphicsDevice->GetDevice(), std::move(shaderProgram)};
 	return model;
 }
 
@@ -120,7 +120,7 @@ Mesh ModelLoader::ProcessMesh(const aiMesh* mesh, const GraphicsDevice* device, 
 
 	const UINT materialIndex = mesh->mMaterialIndex;
 
-	return Mesh(std::move(vertices), std::move(indices), materialIndex, device->GetD3DDevice());
+	return Mesh(std::move(vertices), std::move(indices), materialIndex, device->GetDevice());
 }
 
 Material ModelLoader::ProcessMaterial(const filesystem::path& materialPath, const aiScene* scene,
@@ -159,7 +159,7 @@ Material ModelLoader::ProcessMaterial(const filesystem::path& materialPath, cons
 				absoluteTexturePath = materialPath / absoluteTexturePath;
 
 			mat.textureFileName = absoluteTexturePath.string();
-			mat.texture = textureManager.GetOrLoadFromFile(absoluteTexturePath.string(), device->GetD3DDevice());
+			mat.texture = textureManager.GetOrLoadFromFile(absoluteTexturePath.string(), device->GetDevice());
 		}
 	}
 
@@ -176,7 +176,7 @@ ComPtr<ID3D11ShaderResourceView> ModelLoader::ProcessEmbededTexture(const aiText
 		shaderRessouceView = textureManager.GetOrLoadFromMemory(
 			reinterpret_cast<const unsigned char*>(embeddedTex->pcData),
 			embeddedTex->mWidth,
-			device->GetD3DDevice());
+			device->GetDevice());
 	}
 	else
 	{
@@ -185,7 +185,7 @@ ComPtr<ID3D11ShaderResourceView> ModelLoader::ProcessEmbededTexture(const aiText
 		shaderRessouceView = textureManager.GetOrLoadFromMemory(
 			reinterpret_cast<const unsigned char*>(embeddedTex->pcData),
 			size,
-			device->GetD3DDevice());
+			device->GetDevice());
 	}
 
 	return shaderRessouceView;

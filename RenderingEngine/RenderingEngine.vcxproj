@@ -24,12 +24,17 @@
     <ClInclude Include="include\rendering\core\SceneData.h" />
     <ClInclude Include="include\rendering\core\SceneNode.h" />
     <ClInclude Include="include\rendering\core\Transform.h" />
+    <ClInclude Include="include\rendering\device\BlendState.h" />
+    <ClInclude Include="include\rendering\device\DepthBuffer.h" />
+    <ClInclude Include="include\rendering\device\DeviceBuilder.h" />
     <ClInclude Include="include\rendering\device\GraphicsDevice.h" />
     <ClInclude Include="include\rendering\device\InfoDispositif.h" />
     <ClInclude Include="include\rendering\buffers\Buffer.h" />
     <ClInclude Include="include\rendering\buffers\ConstantBuffer.h" />
     <ClInclude Include="include\rendering\buffers\IndexBuffer.h" />
     <ClInclude Include="include\rendering\buffers\VertexBuffer.h" />
+    <ClInclude Include="include\rendering\device\Rasterizer.h" />
+    <ClInclude Include="include\rendering\device\RenderTarget.h" />
     <ClInclude Include="include\rendering\ModelLoader.h" />
     <ClInclude Include="include\rendering\RenderingEngine.h" />
     <ClInclude Include="include\rendering\shaders\Shader.h" />
@@ -61,8 +66,13 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="src\rendering\application\WindowsApplication.cpp" />
+    <ClCompile Include="src\rendering\device\BlendState.cpp" />
+    <ClCompile Include="src\rendering\device\DepthBuffer.cpp" />
+    <ClCompile Include="src\rendering\device\DeviceBuilder.cpp" />
     <ClCompile Include="src\rendering\device\GraphicsDevice.cpp" />
     <ClCompile Include="src\rendering\device\InfoDispositif.cpp" />
+    <ClCompile Include="src\rendering\device\RenderTarget.cpp" />
+    <ClCompile Include="src\rendering\device\Rasterizer.cpp" />
     <ClCompile Include="src\rendering\ModelLoader.cpp" />
     <ClCompile Include="src\rendering\RenderingEngine.cpp" />
     <ClCompile Include="src\rendering\shaders\ShaderProgram.cpp" />

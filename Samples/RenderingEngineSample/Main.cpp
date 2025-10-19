@@ -10,6 +10,7 @@
 #include "rendering/ModelLoader.h"
 #include "rendering/RenderingEngine.h"
 #include "rendering/application/WindowsApplication.h"
+#include "rendering/device/DeviceBuilder.h"
 #include "rendering/device/GraphicsDevice.h"
 #include "rendering/shaders/ShaderProgramDesc.h"
 #include "rendering/shaders/ShaderFactory.h"
@@ -52,7 +53,7 @@ namespace
 	{
 		ShaderProgram shaderProgram
 		{
-			device->GetD3DDevice(),
+			device->GetDevice(),
 			shaderBank.Get<VertexShader>("shaders/MiniPhongVS.hlsl"),
 			shaderBank.Get<PixelShader>("shaders/MiniPhongPS.hlsl"),
 			shaderBank.Get<ShaderBank::Layout>("MiniPhong")
@@ -76,11 +77,11 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 	if (!application.Init())
 		return EXIT_FAILURE;
 
-	const auto device = new GraphicsDevice{GraphicsDevice::CDS_FENETRE, application.GetMainWindow()};
-	auto shaderBank = CreateShaderBank(device->GetD3DDevice());
-	RenderingEngine renderingEngine{device, std::move(shaderBank), {WindowsApplication::ProcessWindowMessages}};
+	auto device = DeviceBuilder::CreateDevice(application.GetMainWindow(), GraphicsDevice::WINDOWED);
+	auto shaderBank = CreateShaderBank(device.GetDevice());
+	RenderingEngine renderingEngine{&device, std::move(shaderBank), {WindowsApplication::ProcessWindowMessages}};
 
-	renderingEngine.AddObjectToScene(CreateHumanModel(device, shaderBank));
+	renderingEngine.AddObjectToScene(CreateHumanModel(&device, shaderBank));
 	renderingEngine.Run();
 
 	return EXIT_SUCCESS;

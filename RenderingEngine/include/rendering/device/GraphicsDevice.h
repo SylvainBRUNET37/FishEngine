@@ -1,60 +1,66 @@
 #ifndef DEVICE_H
 #define DEVICE_H
 
+#include "BlendState.h"
+#include "DepthBuffer.h"
+#include "Rasterizer.h"
+#include "RenderTarget.h"
 #include "rendering/utils/ComPtr.h"
 
 class GraphicsDevice
 {
 public:
-	enum CDS_MODE : uint8_t
+	enum DisplayMode : uint8_t
 	{
-		CDS_FENETRE,
-		CDS_PLEIN_ECRAN
+		WINDOWED,
+		FULLSCREEN
 	};
 
-	explicit GraphicsDevice(CDS_MODE cdsMode, HWND hWnd);
+	explicit GraphicsDevice(const ComPtr<ID3D11Device>& device,
+	                        const ComPtr<ID3D11DeviceContext>& context,
+	                        const ComPtr<IDXGISwapChain>& swapChain, UINT width, UINT height);
 
 	void Present() const;
 
-	[[nodiscard]] ID3D11Device* GetD3DDevice() const noexcept { return pD3DDevice; }
-	[[nodiscard]] ID3D11DeviceContext* GetImmediateContext() const noexcept { return pImmediateContext; }
-	[[nodiscard]] IDXGISwapChain* GetSwapChain() const noexcept { return pSwapChain; }
-	[[nodiscard]] ID3D11RenderTargetView* GetRenderTargetView() const noexcept { return pRenderTargetView; }
-	[[nodiscard]] ID3D11DepthStencilView* GetDepthStencilView() const { return pDepthStencilView; }
+	[[nodiscard]] ID3D11Device* GetDevice() const noexcept { return device; }
+	[[nodiscard]] ID3D11DeviceContext* GetContext() const noexcept { return context; }
+	[[nodiscard]] IDXGISwapChain* GetSwapChain() const noexcept { return swapChain; }
 
-	uint32_t GetLargeur() const { return largeurEcran; }
-	uint32_t GetHauteur() const { return hauteurEcran; }
-
-	void ActiverMelangeAlpha() const
+	[[nodiscard]] ID3D11RenderTargetView* GetRenderTargetView() const noexcept
 	{
-		pImmediateContext->OMSetBlendState(alphaBlendEnable, nullptr, 0xffffffff);
+		return renderTarget.GetRenderTargetView();
 	}
 
-	void DesactiverMelangeAlpha() const
+	[[nodiscard]] ID3D11DepthStencilView* GetDepthStencilView() const noexcept { return depthBuffer.GetStencilView(); }
+
+	[[nodiscard]] uint32_t GetScreenWidth() const noexcept { return screenWidth; }
+	[[nodiscard]] uint32_t GetScreenHeight() const noexcept { return screenHeight; }
+
+	void EnableAlphaBlending() const
 	{
-		pImmediateContext->OMSetBlendState(alphaBlendDisable, nullptr, 0xffffffff);
+		context->OMSetBlendState(blendState.GetAlphaBlendEnabled(), nullptr, 0xffffffff);
+	}
+
+	void DisableAlphaBlending() const
+	{
+		context->OMSetBlendState(blendState.GetAlphaBlendDisabled(), nullptr, 0xffffffff);
 	}
 
 private:
-	uint32_t largeurEcran;
-	uint32_t hauteurEcran;
+	uint32_t screenWidth;
+	uint32_t screenHeight;
 
-	ComPtr<ID3D11Device> pD3DDevice{};
-	ComPtr<ID3D11DeviceContext> pImmediateContext{};
-	ComPtr<IDXGISwapChain> pSwapChain{};
-	ComPtr<ID3D11RenderTargetView> pRenderTargetView{};
+	ComPtr<ID3D11Device> device;
+	ComPtr<ID3D11DeviceContext> context;
+	ComPtr<IDXGISwapChain> swapChain;
 
-	ID3D11Texture2D* pDepthTexture;
-	ID3D11DepthStencilView* pDepthStencilView;
+	Rasterizer rasterizer;
+	RenderTarget renderTarget;
+	DepthBuffer depthBuffer;
+	BlendState blendState;
 
-	// Pour le mélange alpha (transparence)
-	ID3D11BlendState* alphaBlendEnable;
-	ID3D11BlendState* alphaBlendDisable;
-
-	ID3D11RasterizerState* mSolidCullBackRS;
-
-	void InitDepthBuffer();
-	void InitBlendStates();
+	void SetRenderTarget() const;
+	void SetupViewPort() const;
 };
 
 #endif

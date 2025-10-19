@@ -25,7 +25,7 @@ void RenderingEngine::InitScene()
 	matView = XMMatrixLookAtLH(eyePosition, focusPoint, upDirection);
 
 	constexpr float fieldOfView = XM_PI / 4.0f; // 45 degrees
-	const float aspectRatio = static_cast<float>(device->GetLargeur()) / static_cast<float>(device->GetHauteur());
+	const float aspectRatio = static_cast<float>(device->GetScreenWidth()) / static_cast<float>(device->GetScreenHeight());
 	constexpr float nearPlane = 2.0f;
 	constexpr float farPlane = 50.0f;
 
@@ -76,7 +76,7 @@ void RenderingEngine::AnimeScene(const double elapsedTime) const
 
 void RenderingEngine::RenderScene() // TODO: refactor
 {
-	ID3D11DeviceContext* pImmediateContext = device->GetImmediateContext();
+	ID3D11DeviceContext* pImmediateContext = device->GetContext();
 	ID3D11RenderTargetView* pRenderTargetView = device->GetRenderTargetView();
 	ID3D11DepthStencilView* pDepthStencilView = device->GetDepthStencilView();
 
