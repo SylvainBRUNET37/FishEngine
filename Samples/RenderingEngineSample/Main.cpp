@@ -46,7 +46,7 @@ namespace
 			                                   }
 		                                   });
 
-		return std::move(shaderBank);
+		return shaderBank;
 	}
 
 	Model CreateHumanModel(ID3D11Device* device, const ShaderBank& shaderBank)
@@ -77,11 +77,13 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 	if (!application.Init())
 		return EXIT_FAILURE;
 
-	auto renderContext = DeviceBuilder::CreateRenderContext(application.GetMainWindow(), RenderContext::WINDOWED);
+	const auto windowData = application.GetWindowData();
+
+	auto renderContext = DeviceBuilder::CreateRenderContext(application.GetMainWindow(), windowData);
 	auto shaderBank = CreateShaderBank(renderContext.GetDevice());
 	RenderingEngine renderingEngine{&renderContext, std::move(shaderBank), {WindowsApplication::ProcessWindowMessages}};
 
-	renderingEngine.AddObjectToScene(CreateHumanModel(renderContext.GetDevice(), shaderBank));
+	renderingEngine.AddObjectToScene(CreateHumanModel(renderContext.GetDevice(), std::move(shaderBank)));
 	renderingEngine.Run();
 
 	return EXIT_SUCCESS;

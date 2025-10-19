@@ -2,16 +2,15 @@
 #define DEVICE_BUILDER_H
 
 #include "RenderContext.h"
+#include "rendering/core/WindowData.h"
 
 class DeviceBuilder
 {
 public:
-	[[nodiscard]] static RenderContext CreateRenderContext(HWND hwnd, RenderContext::DisplayMode mode);
+	[[nodiscard]] static RenderContext CreateRenderContext(HWND hwnd, const WindowData& windowData);
 
 private:
-	[[nodiscard]] static DXGI_SWAP_CHAIN_DESC CreateSwapChainDesc(HWND hwnd,
-	                                                              RenderContext::DisplayMode mode, UINT width,
-	                                                              UINT height);
+	[[nodiscard]] static DXGI_SWAP_CHAIN_DESC CreateSwapChainDesc(HWND hwnd, const WindowData& windowData);
 };
 
 #endif

@@ -10,17 +10,9 @@
 class RenderContext
 {
 public:
-	enum DisplayMode : uint8_t
-	{
-		WINDOWED,
-		FULLSCREEN
-	};
-
 	explicit RenderContext(const ComPtr<ID3D11Device>& device,
 	                       const ComPtr<ID3D11DeviceContext>& context,
-	                       const ComPtr<IDXGISwapChain>& swapChain,
-	                       UINT width,
-	                       UINT height);
+	                       const ComPtr<IDXGISwapChain>& swapChain, const WindowData& windowData);
 
 	void Present() const;
 
@@ -49,8 +41,8 @@ public:
 	}
 
 private:
-	uint32_t screenWidth;
-	uint32_t screenHeight;
+	size_t screenWidth;
+	size_t screenHeight;
 
 	ComPtr<ID3D11Device> device;
 	ComPtr<ID3D11DeviceContext> context;

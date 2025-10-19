@@ -4,7 +4,7 @@
 #include "rendering/utils/Util.h"
 #include "resources/resource.h"
 
-RenderContext DeviceBuilder::CreateRenderContext(const HWND hwnd, const RenderContext::DisplayMode mode)
+RenderContext DeviceBuilder::CreateRenderContext(const HWND hwnd, const WindowData& windowData)
 {
 	UINT createDeviceFlags = 0;
 #ifdef _DEBUG
@@ -21,7 +21,7 @@ RenderContext DeviceBuilder::CreateRenderContext(const HWND hwnd, const RenderCo
 	constexpr size_t width = 1920; // TODO: find these values
 	constexpr size_t height = 1080;
 
-	const auto swapChainDesc = CreateSwapChainDesc(hwnd, mode, width, height);
+	const auto swapChainDesc = CreateSwapChainDesc(hwnd, windowData);
 
 	ComPtr<ID3D11Device> device;
 	ComPtr<ID3D11DeviceContext> context;
@@ -35,17 +35,16 @@ RenderContext DeviceBuilder::CreateRenderContext(const HWND hwnd, const RenderCo
 		DXE_ERREURCREATIONDEVICE
 	);
 
-	return RenderContext{device, context, swapChain, width, height};
+	return RenderContext{device, context, swapChain, windowData};
 }
 
-DXGI_SWAP_CHAIN_DESC DeviceBuilder::CreateSwapChainDesc(const HWND hwnd, const RenderContext::DisplayMode mode,
-                                                        const UINT width, const UINT height)
+DXGI_SWAP_CHAIN_DESC DeviceBuilder::CreateSwapChainDesc(const HWND hwnd, const WindowData& windowData)
 {
 	DXGI_SWAP_CHAIN_DESC desc{};
 
 	desc.BufferCount = 2;
-	desc.BufferDesc.Width = width;
-	desc.BufferDesc.Height = height;
+	desc.BufferDesc.Width = windowData.screenWidth;
+	desc.BufferDesc.Height = windowData.screenHeight;
 	desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	desc.BufferDesc.RefreshRate.Numerator = 60;
 	desc.BufferDesc.RefreshRate.Denominator = 1;
@@ -53,7 +52,7 @@ DXGI_SWAP_CHAIN_DESC DeviceBuilder::CreateSwapChainDesc(const HWND hwnd, const R
 	desc.OutputWindow = hwnd;
 	desc.SampleDesc.Count = 1;
 	desc.SampleDesc.Quality = 0;
-	desc.Windowed = mode == RenderContext::WINDOWED;
+	desc.Windowed = windowData.displayMode == DisplayMode::WINDOWED;
 	desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
 	return desc;

@@ -1,5 +1,6 @@
 #ifndef WINDOWS_APPLICATION_H
 #define WINDOWS_APPLICATION_H
+#include "rendering/core/WindowData.h"
 
 class WindowsApplication
 {
@@ -13,11 +14,15 @@ public:
 	explicit WindowsApplication(const HINSTANCE hInstance, const LPCWSTR windowTitle, const LPCWSTR className)
 		: instance(hInstance), className(className), windowTitle(windowTitle)
 	{
+		windowData.screenWidth = GetSystemMetrics(SM_CXSCREEN);
+		windowData.screenHeight = GetSystemMetrics(SM_CYSCREEN);
+		windowData.displayMode = DisplayMode::WINDOWED; // Windowed by default but should be a setting
 	}
 
 	bool Init();
 
 	[[nodiscard]] HWND& GetMainWindow() { return mainWindow; }
+	[[nodiscard]] WindowData GetWindowData() const noexcept { return windowData; }
 
 	[[nodiscard]] static bool ProcessWindowMessages();
 
@@ -27,6 +32,8 @@ private:
 
 	LPCWSTR className{};
 	LPCWSTR windowTitle{};
+
+	WindowData windowData{};
 
 	[[nodiscard]] bool CreateMainWindow();
 	[[nodiscard]] ATOM RegisterWindowClass() const;

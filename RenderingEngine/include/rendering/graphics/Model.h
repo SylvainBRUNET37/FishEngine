@@ -14,7 +14,7 @@ public:
 	explicit Model(std::vector<Mesh>&& meshes, std::vector<Material>&& materials, ID3D11Device* device,
 	               ShaderProgram&& shaderProgram);
 
-	static void Anime(float)
+	static void Anime(double)
 	{
 	}
 

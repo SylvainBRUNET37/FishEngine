@@ -23,7 +23,7 @@ public:
 		CopyFrom(rhs);
 	}
 
-	ComPtr(ComPtr&& rhs)
+	ComPtr(ComPtr&& rhs) noexcept
 		: m_ptr(nullptr)
 	{
 		MoveFrom(std::move(rhs));

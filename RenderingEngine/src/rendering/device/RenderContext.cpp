@@ -1,18 +1,16 @@
 #include "pch.h"
 #include "rendering/device/RenderContext.h"
 
-#include "rendering/utils/Util.h"
-
 RenderContext::RenderContext(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context,
-                             const ComPtr<IDXGISwapChain>& swapChain, const UINT width, const UINT height)
-	: screenWidth(width),
-	  screenHeight(height),
+                             const ComPtr<IDXGISwapChain>& swapChain, const WindowData& windowData)
+	: screenWidth(windowData.screenWidth),
+	  screenHeight(windowData.screenHeight),
 	  device(device),
 	  context(context),
 	  swapChain(swapChain),
 	  rasterizer(device, context),
 	  renderTarget(device, swapChain),
-	  depthBuffer(device, width, height),
+	  depthBuffer(device, windowData),
 	  blendState(device)
 {
 	SetRenderTarget();
@@ -21,12 +19,14 @@ RenderContext::RenderContext(const ComPtr<ID3D11Device>& device, const ComPtr<ID
 
 void RenderContext::Present() const
 {
-	DXEssayer(swapChain->Present(0, 0));
+	// The result is an error if the user leave the window
+	[[maybe_unused]]
+	const auto result = swapChain->Present(0, 0);
 }
 
 void RenderContext::SetRenderTarget() const
 {
-	auto renderTargetView = renderTarget.GetRenderTargetView();
+	const auto renderTargetView = renderTarget.GetRenderTargetView();
 	const auto depthStencilView = depthBuffer.GetStencilView();
 
 	context->OMSetRenderTargets(1, &renderTargetView, depthStencilView);

@@ -24,11 +24,11 @@
     <ClInclude Include="include\rendering\core\SceneData.h" />
     <ClInclude Include="include\rendering\core\SceneNode.h" />
     <ClInclude Include="include\rendering\core\Transform.h" />
+    <ClInclude Include="include\rendering\core\WindowData.h" />
     <ClInclude Include="include\rendering\device\BlendState.h" />
     <ClInclude Include="include\rendering\device\DepthBuffer.h" />
     <ClInclude Include="include\rendering\device\DeviceBuilder.h" />
     <ClInclude Include="include\rendering\device\RenderContext.h" />
-    <ClInclude Include="include\rendering\device\InfoDispositif.h" />
     <ClInclude Include="include\rendering\buffers\Buffer.h" />
     <ClInclude Include="include\rendering\buffers\ConstantBuffer.h" />
     <ClInclude Include="include\rendering\buffers\IndexBuffer.h" />
@@ -70,7 +70,6 @@
     <ClCompile Include="src\rendering\device\DepthBuffer.cpp" />
     <ClCompile Include="src\rendering\device\DeviceBuilder.cpp" />
     <ClCompile Include="src\rendering\device\RenderContext.cpp" />
-    <ClCompile Include="src\rendering\device\InfoDispositif.cpp" />
     <ClCompile Include="src\rendering\device\RenderTarget.cpp" />
     <ClCompile Include="src\rendering\device\Rasterizer.cpp" />
     <ClCompile Include="src\rendering\ModelLoader.cpp" />

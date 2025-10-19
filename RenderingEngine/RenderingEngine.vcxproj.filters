@@ -39,9 +39,6 @@
     <ClInclude Include="include\rendering\RenderingEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\rendering\device\InfoDispositif.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\rendering\ModelLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -129,6 +126,9 @@
     <ClInclude Include="include\rendering\device\DeviceBuilder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\rendering\core\WindowData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\rendering\device\RenderContext.cpp">
@@ -144,9 +144,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\rendering\application\WindowsApplication.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\rendering\device\InfoDispositif.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\rendering\ModelLoader.cpp">

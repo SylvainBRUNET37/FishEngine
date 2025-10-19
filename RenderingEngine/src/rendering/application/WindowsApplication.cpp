@@ -40,7 +40,7 @@ bool WindowsApplication::CreateMainWindow()
 		windowTitle,
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, CW_USEDEFAULT,
-		CW_USEDEFAULT, CW_USEDEFAULT,
+		windowData.screenWidth, windowData.screenHeight,
 		nullptr,
 		nullptr,
 		instance,
