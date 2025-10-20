@@ -150,7 +150,6 @@ Material SceneLoader::ProcessMaterial(const filesystem::path& materialPath, cons
 			// Process embeded texture
 			const auto shaderRessouceView = ProcessEmbededTexture(embeddedTex, device);
 			mat.texture = shaderRessouceView;
-			mat.textureFileName = texturePath.C_Str();
 		}
 		else
 		{
@@ -159,7 +158,6 @@ Material SceneLoader::ProcessMaterial(const filesystem::path& materialPath, cons
 			if (!absoluteTexturePath.is_absolute())
 				absoluteTexturePath = materialPath / absoluteTexturePath;
 
-			mat.textureFileName = absoluteTexturePath.string();
 			mat.texture = textureManager.GetOrLoadFromFile(absoluteTexturePath.string(), device);
 		}
 	}

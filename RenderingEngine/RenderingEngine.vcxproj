@@ -78,7 +78,6 @@
     <ClCompile Include="src\rendering\RenderingEngine.cpp" />
     <ClCompile Include="src\rendering\shaders\ShaderProgram.cpp" />
     <ClCompile Include="src\rendering\shaders\ShaderUtils.cpp" />
-    <ClCompile Include="src\rendering\graphics\Mesh.cpp" />
     <ClCompile Include="src\rendering\graphics\Model.cpp" />
     <ClCompile Include="src\rendering\texture\TextureLoader.cpp" />
     <ClCompile Include="src\rendering\texture\TextureManager.cpp" />

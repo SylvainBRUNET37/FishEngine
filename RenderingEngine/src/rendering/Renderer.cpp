@@ -27,21 +27,36 @@ void Renderer::Draw(Model& model, ID3D11DeviceContext* context, const Transform&
 	// Prepare constant buffer once for each mesh
 	for (size_t i = 0; i < model.meshes.size(); ++i)
 	{
-		auto& mat = model.materials[model.meshes[i].GetMaterialIndex()];
+		auto& mat = model.materials[model.meshes[i].materialIndex];
 
 		Model::ConstantBufferParams params = BuildMeshConstantBufferParams(mat, transform, scene);
 
 		model.constantBuffer.Update(context, params);
 		model.constantBuffer.Bind(context);
 
-		mat.Bind(context);
+		// Bind material's texture of the mesh
+		context->PSSetShaderResources(0, 1, &mat.texture);
 
-		model.meshes[i].Draw(context);
+		Draw(model.meshes[i], context);
 	}
 }
 
+void Renderer::Draw(const Mesh& mesh, ID3D11DeviceContext* context)
+{
+	constexpr UINT stride = sizeof(Vertex);
+	constexpr UINT offset = 0;
+
+	const auto rawVertexBuffer = mesh.vertexBuffer.Get();
+
+	// Bind vertex buffer
+	context->IASetVertexBuffers(0, 1, &rawVertexBuffer, &stride, &offset);
+	context->IASetIndexBuffer(mesh.indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	context->DrawIndexed(static_cast<UINT>(mesh.indices.size()), 0, 0);
+}
+
 Model::ConstantBufferParams Renderer::BuildMeshConstantBufferParams(const Material& material,
-	const Transform& transform, const SceneData& scene)
+                                                                    const Transform& transform, const SceneData& scene)
 {
 	Model::ConstantBufferParams params;
 
@@ -56,7 +71,7 @@ Model::ConstantBufferParams Renderer::BuildMeshConstantBufferParams(const Materi
 	params.vDMat = material.diffuse;
 	params.vSMat = material.specular;
 	params.puissance = material.shininess;
-	params.bTex = (material.texture != nullptr);
+	params.bTex = material.texture != nullptr;
 	params.remplissage = XMFLOAT2(0, 0);
 
 	return params;

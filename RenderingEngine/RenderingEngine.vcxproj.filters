@@ -161,9 +161,6 @@
     <ClCompile Include="src\rendering\graphics\Model.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\rendering\graphics\Mesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\rendering\shaders\ShaderUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

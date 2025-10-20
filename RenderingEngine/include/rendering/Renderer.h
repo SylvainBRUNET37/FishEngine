@@ -12,13 +12,13 @@ public:
 	                 const Transform& transform,
 	                 const SceneData& scene);
 
+private:
+	static void Draw(const Mesh& mesh, ID3D11DeviceContext* context);
+
 	static Model::ConstantBufferParams BuildMeshConstantBufferParams(
 		const Material& material,
 		const Transform& transform,
 		const SceneData& scene);
-
-private:
-
 };
 
 #endif
