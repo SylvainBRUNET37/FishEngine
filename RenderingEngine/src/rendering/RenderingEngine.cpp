@@ -3,7 +3,10 @@
 
 #include <filesystem>
 
+#include "rendering/Renderer.h"
 #include "rendering/SceneLoader.h"
+#include "rendering/core/SceneData.h"
+#include "rendering/core/Transform.h"
 #include "rendering/graphics/Model.h"
 #include "rendering/utils/Clock.h"
 
@@ -68,10 +71,9 @@ void RenderingEngine::UpdateScene()
 	}
 }
 
-void RenderingEngine::AnimeScene(const double elapsedTime) const
+void RenderingEngine::AnimeScene(const double elapsedTime)
 {
-	for (const auto& object : scene)
-		object.Anime(elapsedTime);
+	
 }
 
 void RenderingEngine::RenderScene() // TODO: refactor
@@ -114,5 +116,5 @@ void RenderingEngine::RenderScene() // TODO: refactor
 	};
 
 	for (auto& object : scene)
-		object.Draw(pImmediateContext, transform, sceneData);
+		Renderer::Draw(object, pImmediateContext, transform, sceneData);
 }
