@@ -44,6 +44,7 @@
     <ClInclude Include="include\rendering\shaders\ShaderFactory.h" />
     <ClInclude Include="include\rendering\shaders\ShaderProgram.h" />
     <ClInclude Include="include\rendering\shaders\ShaderProgramDesc.h" />
+    <ClInclude Include="include\rendering\shaders\ShaderReflector.h" />
     <ClInclude Include="include\rendering\shaders\ShaderUtils.h" />
     <ClInclude Include="include\rendering\graphics\Material.h" />
     <ClInclude Include="include\rendering\graphics\Mesh.h" />
@@ -77,6 +78,7 @@
     <ClCompile Include="src\rendering\SceneLoader.cpp" />
     <ClCompile Include="src\rendering\RenderingEngine.cpp" />
     <ClCompile Include="src\rendering\shaders\ShaderProgram.cpp" />
+    <ClCompile Include="src\rendering\shaders\ShaderReflector.cpp" />
     <ClCompile Include="src\rendering\shaders\ShaderUtils.cpp" />
     <ClCompile Include="src\rendering\graphics\Model.cpp" />
     <ClCompile Include="src\rendering\texture\TextureLoader.cpp" />
