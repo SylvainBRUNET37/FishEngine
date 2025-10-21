@@ -31,7 +31,7 @@ void Renderer::Draw(Model& model, ID3D11DeviceContext* context, const Transform&
 
 		Model::ConstantBufferParams params = BuildMeshConstantBufferParams(mat, transform, scene);
 
-		model.constantBuffer.Update(context, params);
+		model.constantBuffer.Update(context, sizeof(Model::ConstantBufferParams), &params);
 		model.constantBuffer.Bind(context);
 
 		// Bind material's texture of the mesh

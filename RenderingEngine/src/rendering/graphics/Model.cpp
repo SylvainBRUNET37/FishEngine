@@ -23,7 +23,7 @@ struct alignas(16) Model::ConstantBufferParams
 
 Model::Model(std::vector<Mesh>&& meshes, std::vector<Material>&& materials, ID3D11Device* device,
              ShaderProgram&& shaderProgram)
-	: constantBuffer{device},
+	: constantBuffer{device, sizeof(ConstantBufferParams)},
 	  shaderProgram{std::move(shaderProgram)},
 	  meshes{std::move(meshes)},
 	  materials{std::move(materials)}

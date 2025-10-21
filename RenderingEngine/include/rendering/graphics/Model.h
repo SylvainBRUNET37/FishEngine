@@ -13,7 +13,7 @@ struct Model
 
 	struct alignas(16) ConstantBufferParams;
 
-	ConstantBuffer<ConstantBufferParams> constantBuffer;
+	ConstantBuffer constantBuffer;
 	ShaderProgram shaderProgram;
 
 	std::vector<Mesh> meshes;
