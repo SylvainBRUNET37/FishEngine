@@ -3,36 +3,18 @@
 
 using namespace DirectX;
 
-struct alignas(16) Model::ConstantBufferParams
-{
-	XMMATRIX matWorldViewProj;
-	XMMATRIX matWorld;
-	XMFLOAT4 vLumiere;
-	XMFLOAT4 vCamera;
-	XMFLOAT4 vAEcl;
-	XMFLOAT4 vAMat;
-	XMFLOAT4 vDEcl;
-	XMFLOAT4 vDMat;
-	XMFLOAT4 vSEcl;
-	XMFLOAT4 vSMat;
-	float puissance;
-	int bTex;
-	XMFLOAT2 remplissage;
-};
-
 void Renderer::Draw(Model& model, ID3D11DeviceContext* context, const Transform& transform, const SceneData& scene)
 {
-	model.shaderProgram.Bind(context);
-
 	// Prepare constant buffer once for each mesh
 	for (size_t i = 0; i < model.meshes.size(); ++i)
 	{
 		auto& mat = model.materials[model.meshes[i].materialIndex];
+		auto& mesh = model.meshes[i];
+		auto params = BuildMeshConstantBufferParams(mat, transform, scene);
 
-		Model::ConstantBufferParams params = BuildMeshConstantBufferParams(mat, transform, scene);
-
-		model.constantBuffer.Update(context, sizeof(Model::ConstantBufferParams), &params);
-		model.constantBuffer.Bind(context);
+		mesh.shaderProgram.Bind(context);
+		mesh.constantBuffer.Update(context, sizeof(decltype(params)), &params);
+		mesh.constantBuffer.Bind(context);
 
 		// Bind material's texture of the mesh
 		context->PSSetShaderResources(0, 1, &mat.texture);
@@ -55,10 +37,10 @@ void Renderer::Draw(const Mesh& mesh, ID3D11DeviceContext* context)
 	context->DrawIndexed(static_cast<UINT>(mesh.indices.size()), 0, 0);
 }
 
-Model::ConstantBufferParams Renderer::BuildMeshConstantBufferParams(const Material& material,
+Mesh::ConstantBufferParams Renderer::BuildMeshConstantBufferParams(const Material& material,
                                                                     const Transform& transform, const SceneData& scene)
 {
-	Model::ConstantBufferParams params;
+	Mesh::ConstantBufferParams params;
 
 	params.matWorld = XMMatrixTranspose(transform.world);
 	params.matWorldViewProj = XMMatrixTranspose(transform.world * transform.view * transform.proj);

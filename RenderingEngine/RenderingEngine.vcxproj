@@ -74,6 +74,7 @@
     <ClCompile Include="src\rendering\device\RenderContext.cpp" />
     <ClCompile Include="src\rendering\device\RenderTarget.cpp" />
     <ClCompile Include="src\rendering\device\Rasterizer.cpp" />
+    <ClCompile Include="src\rendering\graphics\Mesh.cpp" />
     <ClCompile Include="src\rendering\Renderer.cpp" />
     <ClCompile Include="src\rendering\SceneLoader.cpp" />
     <ClCompile Include="src\rendering\RenderingEngine.cpp" />

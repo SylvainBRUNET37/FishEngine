@@ -35,7 +35,7 @@ namespace
 
 	Model CreateHumanModel(ID3D11Device* device, const ShaderBank& shaderBank)
 	{
-		ShaderProgram shaderProgram
+		const ShaderProgram shaderProgram
 		{
 			device,
 			shaderBank.Get<VertexShader>("shaders/MiniPhongVS.hlsl"),
@@ -45,8 +45,8 @@ namespace
 		//const filesystem::path filePath = "assets\\Jin\\jin.obj";
 		const filesystem::path filePath = "assets\\terrain.glb";
 
-		SceneLoader modelLoader;
-		return modelLoader.LoadScene(filePath, device, std::move(shaderProgram));
+		SceneLoader modelLoader{ shaderProgram };
+		return modelLoader.LoadScene(filePath, device);
 	}
 }
 

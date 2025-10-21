@@ -15,7 +15,7 @@ public:
 private:
 	static void Draw(const Mesh& mesh, ID3D11DeviceContext* context);
 
-	static Model::ConstantBufferParams BuildMeshConstantBufferParams(
+	static Mesh::ConstantBufferParams BuildMeshConstantBufferParams(
 		const Material& material,
 		const Transform& transform,
 		const SceneData& scene);

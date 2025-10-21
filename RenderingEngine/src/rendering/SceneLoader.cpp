@@ -27,8 +27,7 @@ namespace
 	}
 }
 
-Model SceneLoader::LoadScene(const filesystem::path& filePath, ID3D11Device* device,
-                             ShaderProgram&& shaderProgram)
+Model SceneLoader::LoadScene(const filesystem::path& filePath, ID3D11Device* device)
 {
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile
@@ -52,12 +51,11 @@ Model SceneLoader::LoadScene(const filesystem::path& filePath, ID3D11Device* dev
 
 	ProcessNode(scene->mRootNode, scene, device, meshes);
 
-	Model model{std::move(meshes), std::move(materials), device, std::move(shaderProgram)};
+	Model model{std::move(meshes), std::move(materials)};
 	return model;
 }
 
-void SceneLoader::ProcessNode(const aiNode* node, const aiScene* scene, ID3D11Device* device,
-                              std::vector<Mesh>& meshesOut)
+void SceneLoader::ProcessNode(const aiNode* node, const aiScene* scene, ID3D11Device* device, vector<Mesh>& meshesOut) const
 {
 	const XMMATRIX transform = AiToXMMatrix(node->mTransformation);
 
@@ -73,7 +71,7 @@ void SceneLoader::ProcessNode(const aiNode* node, const aiScene* scene, ID3D11De
 	}
 }
 
-Mesh SceneLoader::ProcessMesh(const aiMesh* mesh, ID3D11Device* device, const XMMATRIX& transform)
+Mesh SceneLoader::ProcessMesh(const aiMesh* mesh, ID3D11Device* device, const XMMATRIX& transform) const
 {
 	std::vector<Vertex> vertices;
 	std::vector<UINT> indices;
@@ -121,7 +119,7 @@ Mesh SceneLoader::ProcessMesh(const aiMesh* mesh, ID3D11Device* device, const XM
 
 	const UINT materialIndex = mesh->mMaterialIndex;
 
-	return Mesh(std::move(vertices), std::move(indices), materialIndex, device);
+	return Mesh(std::move(vertices), std::move(indices), materialIndex, device, shaderProgram);
 }
 
 Material SceneLoader::ProcessMaterial(const filesystem::path& materialPath, const aiScene* scene,
