@@ -90,13 +90,13 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>include;$(SolutionDir)RenderingEngine\include;$(SolutionDir)assimp\build\include;$(SolutionDir)assimp\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;$(SolutionDir)RenderingEngine\include;$(SolutionDir)extern\assimp\build\include;$(SolutionDir)extern\assimp\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>dxguid.lib;winmm.lib;d3d11.lib;d3dcompiler.lib;DXGI.lib;dinput8.lib;assimp-vc143-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)assimp\build\lib\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)extern\assimp\build\lib\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)shaders\*.*"  "$(OutDir)shaders\"  /E /Y
@@ -114,13 +114,13 @@ xcopy "$(ProjectDir)assets\*.*"  "$(OutDir)assets\"  /E /Y</Command>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>include;$(SolutionDir)RenderingEngine\include;$(SolutionDir)assimp\build\include;$(SolutionDir)assimp\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;$(SolutionDir)RenderingEngine\include;$(SolutionDir)extern\assimp\build\include;$(SolutionDir)extern\assimp\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>dxguid.lib;winmm.lib;d3d11.lib;d3dcompiler.lib;DXGI.lib;dinput8.lib;assimp-vc143-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)assimp\build\lib\Release</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)extern\assimp\build\lib\Release</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)shaders\*.*"  "$(OutDir)shaders\"  /E /Y
@@ -136,13 +136,13 @@ xcopy "$(ProjectDir)assets\*.*"  "$(OutDir)assets\"  /E /Y</Command>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>include;$(SolutionDir)RenderingEngine\include;$(SolutionDir)assimp\build\include;$(SolutionDir)assimp\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;$(SolutionDir)RenderingEngine\include;$(SolutionDir)extern\assimp\build\include;$(SolutionDir)extern\assimp\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>dxguid.lib;winmm.lib;d3d11.lib;d3dcompiler.lib;DXGI.lib;dinput8.lib;assimp-vc143-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)assimp\build\lib\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)extern\assimp\build\lib\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)shaders\*.*"  "$(OutDir)shaders\"  /E /Y
@@ -160,13 +160,13 @@ xcopy "$(ProjectDir)assets\*.*"  "$(OutDir)assets\"  /E /Y</Command>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>include;$(SolutionDir)RenderingEngine\include;$(SolutionDir)assimp\build\include;$(SolutionDir)assimp\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;$(SolutionDir)RenderingEngine\include;$(SolutionDir)extern\assimp\build\include;$(SolutionDir)extern\assimp\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>dxguid.lib;winmm.lib;d3d11.lib;d3dcompiler.lib;DXGI.lib;dinput8.lib;assimp-vc143-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)assimp\build\lib\Release</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)extern\assimp\build\lib\Release</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)shaders\*.*"  "$(OutDir)shaders\"  /E /Y
