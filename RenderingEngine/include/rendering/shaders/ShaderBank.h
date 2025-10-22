@@ -5,12 +5,10 @@
 
 #include "Shader.h"
 
-// Contains shaders AND layouts
+// TODO: Avoid copies ? Shaders contains ComPtr so idk
 class ShaderBank
 {
 public:
-	using Layout = std::vector<D3D11_INPUT_ELEMENT_DESC>;
-
 	template <typename Shader>
 	[[nodiscard]] Shader Get(const std::string& path) const
 	{
@@ -18,13 +16,12 @@ public:
 	}
 
 	template <typename Shader>
-	void Set(const std::string& path, Shader&& shader)
+	void Set(const std::string& path, Shader&& shader) // NOLINT(cppcoreguidelines-missing-std-forward)
 	{
 		ShaderBankAccessor<Shader>::Set(*this, path, std::forward<Shader>(shader));
 	}
 
 private:
-	std::unordered_map<std::string, Layout> layouts;
 	std::unordered_map<std::string, VertexShader> vertexShaders;
 	std::unordered_map<std::string, PixelShader> pixelShaders;
 
@@ -85,25 +82,6 @@ struct ShaderBankAccessor<PixelShader>
 	static void Set(ShaderBank& bank, const std::string& path, PixelShader&& shader)
 	{
 		bank.pixelShaders.emplace(path, std::move(shader));
-	}
-};
-
-// ======================================================
-// Specialization for Layout
-// ======================================================
-template <>
-struct ShaderBankAccessor<ShaderBank::Layout>
-{
-	[[nodiscard]] static ShaderBank::Layout Get(const ShaderBank& bank, const std::string& path)
-	{
-		if (const auto layoutIt = bank.layouts.find(path); layoutIt != bank.layouts.end())
-			return layoutIt->second;
-		throw std::runtime_error("Layout not found: " + path);
-	}
-
-	static void Set(ShaderBank& bank, const std::string& path, ShaderBank::Layout&& layout)
-	{
-		bank.layouts.emplace(path, std::move(layout));
 	}
 };
 

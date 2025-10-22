@@ -30,40 +30,23 @@ namespace
 		ShaderFactory<VertexShader, PixelShader> shaderFactory;
 		auto shaderBank = shaderFactory.CreateShaderBank(desc, device);
 
-		shaderBank.Set<ShaderBank::Layout>("MiniPhong",
-		                                   {
-			                                   {
-				                                   "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,
-				                                   D3D11_INPUT_PER_VERTEX_DATA, 0
-			                                   },
-			                                   {
-				                                   "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12,
-				                                   D3D11_INPUT_PER_VERTEX_DATA, 0
-			                                   },
-			                                   {
-				                                   "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24,
-				                                   D3D11_INPUT_PER_VERTEX_DATA, 0
-			                                   }
-		                                   });
-
 		return shaderBank;
 	}
 
 	Model CreateHumanModel(ID3D11Device* device, const ShaderBank& shaderBank)
 	{
-		ShaderProgram shaderProgram
+		const ShaderProgram shaderProgram
 		{
 			device,
 			shaderBank.Get<VertexShader>("shaders/MiniPhongVS.hlsl"),
 			shaderBank.Get<PixelShader>("shaders/MiniPhongPS.hlsl"),
-			shaderBank.Get<ShaderBank::Layout>("MiniPhong")
 		};
 
 		//const filesystem::path filePath = "assets\\Jin\\jin.obj";
 		const filesystem::path filePath = "assets\\terrain.glb";
 
-		SceneLoader modelLoader;
-		return modelLoader.LoadScene(filePath, device, std::move(shaderProgram));
+		SceneLoader modelLoader{ shaderProgram };
+		return modelLoader.LoadScene(filePath, device);
 	}
 }
 
