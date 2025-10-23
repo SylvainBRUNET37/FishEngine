@@ -163,7 +163,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>include;$(SolutionDir)extern\assimp\include;$(ProjectDir);$(SolutionDir)extern\assimp\build\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;$(SolutionDir)extern\assimp\include;$(ProjectDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -185,7 +185,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>include;$(SolutionDir)extern\assimp\include;$(ProjectDir);$(SolutionDir)extern\assimp\build\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;$(SolutionDir)extern\assimp\include;$(ProjectDir)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -207,7 +207,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>include;$(SolutionDir)extern\assimp\include;$(ProjectDir);$(SolutionDir)extern\assimp\build\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;$(SolutionDir)extern\assimp\include;$(ProjectDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -229,7 +229,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>include;$(SolutionDir)extern\assimp\include;$(ProjectDir);$(SolutionDir)extern\assimp\build\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;$(SolutionDir)extern\assimp\include;$(ProjectDir)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
