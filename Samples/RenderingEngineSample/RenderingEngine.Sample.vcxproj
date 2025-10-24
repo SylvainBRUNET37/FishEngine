@@ -137,6 +137,7 @@ xcopy "$(ProjectDir)assets\*.*"  "$(OutDir)assets\"  /E /Y</Command>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>include;$(SolutionDir)RenderingEngine\include;$(SolutionDir)extern\assimp\include</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -161,6 +162,7 @@ xcopy "$(ProjectDir)assets\*.*"  "$(OutDir)assets\"  /E /Y</Command>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>include;$(SolutionDir)RenderingEngine\include;$(SolutionDir)extern\assimp\include</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

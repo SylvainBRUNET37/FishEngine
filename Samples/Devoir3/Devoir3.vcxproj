@@ -100,16 +100,17 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;JPH_DEBUG_RENDERER;JPH_FLOATING_POINT_EXCEPTIONS_ENABLED;JPH_PROFILE_ENABLED;JPH_OBJECT_STREAM;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)RenderingEngine\include;$(SolutionDir)extern\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)RenderingEngine\include;$(SolutionDir)extern\assimp\include;%(AdditionalIncludeDirectories);$(SolutionDir)extern\JoltPhysics</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)extern\assimp\lib\Debug</AdditionalLibraryDirectories>
-      <AdditionalDependencies>dxguid.lib;winmm.lib;d3d11.lib;d3dcompiler.lib;DXGI.lib;dinput8.lib;assimp-vc143-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)extern\assimp\lib\Debug;$(SolutionDir)extern\\JoltPhysics\Build\VS2022_CL\Debug</AdditionalLibraryDirectories>
+      <AdditionalDependencies>dxguid.lib;winmm.lib;d3d11.lib;d3dcompiler.lib;DXGI.lib;dinput8.lib;assimp-vc143-mtd.lib;$(SolutionDir)extern\JoltPhysics\Build\VS2022_CL\Debug\Jolt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -118,16 +119,17 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;JPH_DEBUG_RENDERER;JPH_FLOATING_POINT_EXCEPTIONS_ENABLED;JPH_PROFILE_ENABLED;JPH_OBJECT_STREAM;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)RenderingEngine\include;$(SolutionDir)extern\assimp\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)RenderingEngine\include;$(SolutionDir)extern\assimp\include;$(SolutionDir)extern\JoltPhysics</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)extern\assimp\lib\Release</AdditionalLibraryDirectories>
-      <AdditionalDependencies>dxguid.lib;winmm.lib;d3d11.lib;d3dcompiler.lib;DXGI.lib;dinput8.lib;assimp-vc143-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)extern\assimp\lib\Release;$(SolutionDir)extern\\JoltPhysics\Build\VS2022_CL\Release</AdditionalLibraryDirectories>
+      <AdditionalDependencies>dxguid.lib;winmm.lib;d3d11.lib;d3dcompiler.lib;DXGI.lib;dinput8.lib;assimp-vc143-mt.lib;$(SolutionDir)extern\JoltPhysics\Build\VS2022_CL\Release\Jolt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
