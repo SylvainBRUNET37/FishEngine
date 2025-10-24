@@ -43,7 +43,6 @@ void RenderingEngine::InitScene()
 	constexpr float nearPlane = 2.0f;
 	constexpr float farPlane = 50.0f;
 
-	matProj = XMMatrixPerspectiveFovLH(fieldOfView, aspectRatio, nearPlane, farPlane);
 	matViewProj = matView * matProj;
 }
 

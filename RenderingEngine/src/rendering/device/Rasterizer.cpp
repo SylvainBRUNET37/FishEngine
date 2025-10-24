@@ -8,7 +8,7 @@ D3D11_RASTERIZER_DESC Rasterizer::CreateRasterizeDesc()
 	D3D11_RASTERIZER_DESC desc{};
 
 	desc.FillMode = D3D11_FILL_SOLID;
-	desc.CullMode = D3D11_CULL_BACK;
+	desc.CullMode = D3D11_CULL_FRONT;
 	desc.FrontCounterClockwise = FALSE;
 	desc.DepthClipEnable = TRUE;
 

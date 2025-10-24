@@ -39,13 +39,13 @@ public:
 	{
 		this->aspectRatio = viewWidth / viewHeight;
 
-		this->matView = XMMatrixLookAtLH(
+		this->matView = XMMatrixLookAtRH(
 			position,
 			focus,
 			up
 		);
 
-		this->matProj = XMMatrixPerspectiveFovLH(
+		this->matProj = XMMatrixPerspectiveFovRH(
 			this->fov,
 			this->aspectRatio,
 			this->nearPlane,
@@ -122,6 +122,6 @@ public:
 
 private:
 	void UpdateMatView() noexcept {
-		matView = XMMatrixLookAtLH(position, focus, up);
+		matView = XMMatrixLookAtRH(position, focus, up);
 	}
 };
