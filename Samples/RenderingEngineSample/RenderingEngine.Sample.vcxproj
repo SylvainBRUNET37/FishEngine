@@ -100,7 +100,7 @@
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)shaders\*.*"  "$(OutDir)shaders\"  /E /Y
-xcopy /Y /D "$(SolutionDir)assimp\build\bin\Debug\*.dll" "$(TargetDir)"
+xcopy /Y /D "$(SolutionDir)extern\assimp\build\bin\Debug\*.dll" "$(TargetDir)"
 
 xcopy "$(ProjectDir)assets\*.*"  "$(OutDir)assets\"  /E /Y</Command>
     </PostBuildEvent>
@@ -124,7 +124,7 @@ xcopy "$(ProjectDir)assets\*.*"  "$(OutDir)assets\"  /E /Y</Command>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)shaders\*.*"  "$(OutDir)shaders\"  /E /Y
-xcopy /Y /D "$(SolutionDir)assimp\build\bin\Release\*.dll" "$(TargetDir)"
+xcopy /Y /D "$(SolutionDir)extern\assimp\build\bin\Release\*.dll" "$(TargetDir)"
 
 xcopy "$(ProjectDir)assets\*.*"  "$(OutDir)assets\"  /E /Y</Command>
     </PostBuildEvent>
@@ -146,7 +146,7 @@ xcopy "$(ProjectDir)assets\*.*"  "$(OutDir)assets\"  /E /Y</Command>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)shaders\*.*"  "$(OutDir)shaders\"  /E /Y
-xcopy /Y /D "$(SolutionDir)assimp\build\bin\Debug\*.dll" "$(TargetDir)"
+xcopy /Y /D "$(SolutionDir)extern\assimp\build\bin\Debug\*.dll" "$(TargetDir)"
 
 xcopy "$(ProjectDir)assets\*.*"  "$(OutDir)assets\"  /E /Y</Command>
     </PostBuildEvent>
@@ -170,7 +170,7 @@ xcopy "$(ProjectDir)assets\*.*"  "$(OutDir)assets\"  /E /Y</Command>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)shaders\*.*"  "$(OutDir)shaders\"  /E /Y
-xcopy /Y /D "$(SolutionDir)assimp\build\bin\Release\*.dll" "$(TargetDir)"
+xcopy /Y /D "$(SolutionDir)extern\assimp\build\bin\Release\*.dll" "$(TargetDir)"
 
 xcopy "$(ProjectDir)assets\*.*"  "$(OutDir)assets\"  /E /Y</Command>
     </PostBuildEvent>
