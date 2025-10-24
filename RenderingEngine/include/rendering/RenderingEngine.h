@@ -8,6 +8,7 @@
 #include "shaders/ShaderBank.h"
 #include "shaders/ShaderProgramDesc.h"
 #include "graphics/Model.h"
+#include "graphics/Camera.h"
 
 class RenderingEngine
 {
@@ -41,10 +42,16 @@ private:
 
 	int64_t previousTimeCount{};
 
+	// TODO : reusinage
+	float cameraSpeed = 50.0f; // Vitesse de déplacement à utiliser // A dégager
+	POINT cursorCoordinates; // Structure to store the cursor's coordinates TODO: a dégager
+	std::unique_ptr<Camera> firstPersonCamera;
+	// END TODO
+
 	void InitAnimation();
 	void InitScene();
 
-	static void AnimeScene(double elapsedTime);
+	void AnimeScene(double elapsedTime);
 	void RenderScene();
 	void UpdateScene();
 };
