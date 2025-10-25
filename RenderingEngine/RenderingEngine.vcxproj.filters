@@ -135,6 +135,15 @@
     <ClInclude Include="include\rendering\shaders\ShaderReflector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\rendering\ecs\ComponentPool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\rendering\ecs\Entity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\rendering\ecs\EntityManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\rendering\device\RenderContext.cpp">
