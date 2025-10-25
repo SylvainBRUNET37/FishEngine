@@ -166,13 +166,15 @@ void RenderingEngine::RenderScene() // TODO: refactor
 
 	// Light & camera
 	constexpr auto lightPos = XMFLOAT4(2, 2, -20, 1);
-	constexpr auto cameraPos = XMFLOAT4(0, 2.0f, -4, 0);
+	XMFLOAT4 cameraPos;
+	XMStoreFloat4(&cameraPos, this->firstPersonCamera->GetPosition());
+	//constexpr auto cameraPos = XMFLOAT4(0, 2.0f, -4, 0);
 	constexpr auto vAEcl = XMFLOAT4(0.2f, 0.2f, 0.2f, 1);
 	constexpr auto vDEcl = XMFLOAT4(1, 1, 1, 1);
 	constexpr auto vSEcl = XMFLOAT4(1, 1, 1, 1);
 
 	const Transform transform{.world = world, .view = view, .proj = proj};
-	constexpr SceneData sceneData
+	SceneData sceneData
 	{
 		.lightPosition = lightPos, .cameraPosition = cameraPos, .vAEcl = vAEcl, .vDEcl = vDEcl,
 		.vSEcl = vSEcl
