@@ -137,8 +137,6 @@
   <ItemGroup>
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\ResourceManager.cpp" />
-    <ClCompile Include="src\Main.cpp" />
-    <ClCompile Include="src\ResourceManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\RenderingEngine\RenderingEngine.vcxproj">
@@ -146,7 +144,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Components.h" />
     <ClInclude Include="include\Components.h" />
     <ClInclude Include="include\ResourceManager.h" />
     <ClInclude Include="include\Scene.h" />
