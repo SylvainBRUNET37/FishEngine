@@ -29,7 +29,6 @@ private:
 	TextureManager textureManager{};
 	static void ProcessNodeHierarchy(const aiNode* aiNode,
 		const aiScene* scene,
-		const DirectX::XMMATRIX& parentTransform,
 		uint32_t parentIndex,
 		SceneResource& sceneRes);
 

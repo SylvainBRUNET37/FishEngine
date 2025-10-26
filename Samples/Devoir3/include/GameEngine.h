@@ -24,6 +24,7 @@ private:
 	EntityManager entityManager;
 
 	static void UpdatePhysics();
+	static Transform UpdateTransform();
 
 	static void WaitBeforeNextFrame(DWORD frameStartTime);
 };

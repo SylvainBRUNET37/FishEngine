@@ -60,7 +60,7 @@ SceneResource SceneLoader::LoadScene(const filesystem::path& filePath, ID3D11Dev
 
 	// Build node hierarchy
 	sceneRes.nodes.reserve(scene->mNumMeshes); // rough estimate
-	ProcessNodeHierarchy(scene->mRootNode, scene, XMMatrixIdentity(), UINT32_MAX, sceneRes);
+	ProcessNodeHierarchy(scene->mRootNode, scene, UINT32_MAX, sceneRes);
 
 	return sceneRes;
 }
@@ -68,14 +68,26 @@ SceneResource SceneLoader::LoadScene(const filesystem::path& filePath, ID3D11Dev
 void SceneLoader::ProcessNodeHierarchy(
 	const aiNode* aiNode,
 	const aiScene* scene,
-	const XMMATRIX& parentTransform,
 	const uint32_t parentIndex,
 	SceneResource& sceneRes)
 {
 	Node node;
-	node.name = aiNode->mName.C_Str();
+	Transform transform;
+	const XMMATRIX nodeMatrix = AiToXMMatrix(aiNode->mTransformation);
+
+	// Decompose the matrix
+	XMVECTOR scale, rotationQuat, translation;
+	if (XMMatrixDecompose(&scale, &rotationQuat, &translation, nodeMatrix))
+	{
+		// Store decomposed components
+		XMStoreFloat3(&transform.scale, scale);
+		XMStoreFloat4(&transform.rotation, rotationQuat);
+		XMStoreFloat3(&transform.position, translation);
+	}
+
 	node.parentIndex = parentIndex;
-	node.transform = XMMatrixMultiply(AiToXMMatrix(aiNode->mTransformation), parentTransform);
+	node.name = aiNode->mName.C_Str();
+	node.transform = transform;
 
 	// If this node has a mesh, store its index
 	if (aiNode->mNumMeshes > 0)
@@ -91,7 +103,7 @@ void SceneLoader::ProcessNodeHierarchy(
 	for (unsigned int i = 0; i < aiNode->mNumChildren; i++)
 	{
 		uint32_t childIndexBefore = static_cast<uint32_t>(sceneRes.nodes.size());
-		ProcessNodeHierarchy(aiNode->mChildren[i], scene, node.transform, currentIndex, sceneRes);
+		ProcessNodeHierarchy(aiNode->mChildren[i], scene, currentIndex, sceneRes);
 		sceneRes.nodes[currentIndex].children.push_back(childIndexBefore);
 	}
 }

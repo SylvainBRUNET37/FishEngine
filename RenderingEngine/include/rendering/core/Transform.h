@@ -5,7 +5,10 @@
 
 struct Transform
 {
-	DirectX::XMMATRIX world;
+    DirectX::XMMATRIX world = DirectX::XMMatrixIdentity();
+    DirectX::XMFLOAT3 position{ 0, 0, 0 };
+    DirectX::XMFLOAT4 rotation{ 0, 0, 0, 1 };
+    DirectX::XMFLOAT3 scale{ 1, 1, 1 };
 };
 
 #endif

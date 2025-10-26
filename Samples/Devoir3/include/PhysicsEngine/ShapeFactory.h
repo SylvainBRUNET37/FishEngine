@@ -4,10 +4,12 @@
 #include <Jolt/Jolt.h>
 #include <Jolt/Physics/Body/Body.h>
 
+#include "rendering/core/Transform.h"
+
 namespace ShapeFactory
 {
-	[[nodiscard]] JPH::Body* CreateCube();
-	[[nodiscard]] JPH::Body* CreatePlane();
+	[[nodiscard]] JPH::Body* CreateCube(const Transform& transform);
+	[[nodiscard]] JPH::Body* CreatePlane(const Transform& transform);
 }
 
 #endif

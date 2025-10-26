@@ -11,37 +11,52 @@
 using namespace JPH;
 using namespace JPH::literals;
 
-Body* ShapeFactory::CreateCube()
+Body* ShapeFactory::CreateCube(const Transform& transform)
 {
-	const BodyCreationSettings boxSettings
-	(
-		new BoxShape(Vec3(10.0f, 10.0f, 10.0f)),
-		RVec3(5, 50, 0),
-		Quat::sIdentity(),
-		EMotionType::Dynamic,
-		Layers::MOVING
-	);
+    // Apply scale to the box half-extents
+    auto halfExtents = Vec3(0.5f, 0.5f, 0.5f);
+    halfExtents *= Vec3(transform.scale.x, transform.scale.y, transform.scale.z);
 
-	BodyInterface& bodyInterface = JoltSystem::GetBodyInterface();
-	Body* body = bodyInterface.CreateBody(boxSettings);
-	bodyInterface.AddBody(body->GetID(), EActivation::Activate);
+    const RefConst shape = new BoxShape(halfExtents);
 
-	return body;
+    // Convert mesh type of position and rotation to jolt's ones
+    const RVec3 position(transform.position.x, transform.position.y, transform.position.z);
+    const Quat rotation(transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w);
+
+    const BodyCreationSettings boxSettings(
+        shape,
+        position,
+        rotation,
+        EMotionType::Dynamic,
+        Layers::MOVING
+    );
+
+    BodyInterface& bodyInterface = JoltSystem::GetBodyInterface();
+    Body* body = bodyInterface.CreateBody(boxSettings);
+    bodyInterface.AddBody(body->GetID(), EActivation::Activate);
+
+    return body;
 }
 
-Body* ShapeFactory::CreatePlane()
+Body* ShapeFactory::CreatePlane(const Transform& transform)
 {
-	const auto planeScale = Vec3(500.0f, 1.0f, 500.0f);
-	const Ref planeShape = new BoxShape(planeScale);
+    // Apply scale to the box half-extents
+	auto halfExtents = Vec3(0.5f, 0.05f, 0.5f);
+    halfExtents *= Vec3(transform.scale.x, transform.scale.y, transform.scale.z);
 
-	const BodyCreationSettings planeSettings
-	(
-		planeShape,
-		RVec3(0, -5, 0),
-		Quat::sIdentity(),
-		EMotionType::Static,
-		Layers::NON_MOVING
-	);
+	const RefConst shape = new BoxShape(halfExtents);
+
+    // Convert mesh type of position and rotation to jolt's ones
+    const RVec3 position(transform.position.x, transform.position.y, transform.position.z);
+    const Quat rotation(transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w);
+
+    const BodyCreationSettings planeSettings(
+        shape,
+        position,
+        rotation,
+        EMotionType::Static,
+        Layers::NON_MOVING
+    );
 
 	BodyInterface& bodyInterface = JoltSystem::GetBodyInterface();
 	Body* body = bodyInterface.CreateBody(planeSettings);

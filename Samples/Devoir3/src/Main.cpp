@@ -81,15 +81,18 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 
 	// Create the scene
 
-	Body* planeBody = ShapeFactory::CreatePlane();
-	Body* cubeBody = ShapeFactory::CreateCube();
-
 	for (const auto& [entity, name] : entityManager.View<Name>())
 	{
 		if (name.name == "Cube")
-			entityManager.AddComponent<RigidBody>(entity, cubeBody);
+		{
+			const auto transform = entityManager.Get<Transform>(entity);
+			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCube(transform));
+		}
 		else if (name.name == "Plane")
-			entityManager.AddComponent<RigidBody>(entity, planeBody);
+		{
+			const auto transform = entityManager.Get<Transform>(entity);
+			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreatePlane(transform));
+		}
 	}
 
 	GameEngine gameEngine{ std::move(renderSystem), std::move(entityManager) };

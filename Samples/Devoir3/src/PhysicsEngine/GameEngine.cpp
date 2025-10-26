@@ -46,8 +46,20 @@ void GameEngine::Run()
 
 		for (const auto& [entity, transform, rigidBody] : entityManager.View<Transform, RigidBody>())
 		{
-			const auto a = rigidBody.body->GetWorldTransform();
-			transform.world = ToXMMATRIX(a);
+			// Uses Jolt position and rotation and keep the orginal scale of the transform
+			const JPH::RMat44& joltTransform = rigidBody.body->GetWorldTransform();
+			const JPH::Vec3 joltPos = joltTransform.GetTranslation();
+			const JPH::Quat joltRot = joltTransform.GetQuaternion();
+
+			transform.position = { joltPos.GetX(), joltPos.GetY(), joltPos.GetZ() };
+			transform.rotation = { joltRot.GetX(), joltRot.GetY(), joltRot.GetZ(), joltRot.GetW() };
+
+			const auto scaleMatrix = XMMatrixScaling(transform.scale.x, transform.scale.y, transform.scale.z);
+			const auto rotationMatrix = XMMatrixRotationQuaternion(XMLoadFloat4(&transform.rotation));
+			const auto translationMatrix = XMMatrixTranslation(transform.position.x, transform.position.y,
+				transform.position.z);
+
+			transform.world = scaleMatrix * rotationMatrix * translationMatrix;
 		}
 
 		for (const auto& [entity, transform, mesh] : entityManager.View<Transform, Mesh>())
@@ -79,7 +91,7 @@ void GameEngine::UpdatePhysics()
 void GameEngine::WaitBeforeNextFrame(const DWORD frameStartTime)
 
 {
-	static constexpr double TARGET_FPS = 60.0;
+	static constexpr double TARGET_FPS = 120.0;
 	static constexpr double FRAME_TIME = 1000.0 / TARGET_FPS;
 
 	const DWORD frameEnd = GetTickCount();

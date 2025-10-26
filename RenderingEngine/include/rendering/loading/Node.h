@@ -3,8 +3,8 @@
 
 #include <string>
 #include <vector>
-#include <DirectXMath.h>
 
+#include "rendering/core/Transform.h"
 #include "rendering/graphics/Material.h"
 #include "rendering/graphics/Mesh.h"
 
@@ -15,7 +15,7 @@ struct Node
     uint32_t parentIndex = UINT32_MAX;
     std::vector<uint32_t> children;
 
-    DirectX::XMMATRIX transform;
+    Transform transform;
 };
 
 struct SceneResource

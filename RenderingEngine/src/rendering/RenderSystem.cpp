@@ -9,7 +9,7 @@ RenderSystem::RenderSystem(RenderContext* renderContext, std::vector<Material>&&
                                                            renderContext{renderContext}, cursorCoordinates{}
 
 {
-	const XMVECTOR eyePosition = XMVectorSet(0.0f, 0.0f, -4.0f, 1.0f);
+	const XMVECTOR eyePosition = XMVectorSet(0.0f, 5.0f, -4.0f, 1.0f);
 	const XMVECTOR focusPoint = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
 	const XMVECTOR upDirection = XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f);
 
