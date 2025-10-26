@@ -3,7 +3,8 @@
 
 #include "core/SceneData.h"
 #include "core/Transform.h"
-#include "graphics/Model.h"
+#include "graphics/Material.h"
+#include "graphics/Mesh.h"
 
 class Renderer
 {

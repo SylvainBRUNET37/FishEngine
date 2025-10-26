@@ -53,7 +53,6 @@
     <ClInclude Include="include\rendering\shaders\ShaderUtils.h" />
     <ClInclude Include="include\rendering\graphics\Material.h" />
     <ClInclude Include="include\rendering\graphics\Mesh.h" />
-    <ClInclude Include="include\rendering\graphics\Model.h" />
     <ClInclude Include="include\rendering\graphics\Vertex.h" />
     <ClInclude Include="include\rendering\texture\TextureLoader.h" />
     <ClInclude Include="include\rendering\texture\TextureManager.h" />
@@ -86,7 +85,6 @@
     <ClCompile Include="src\rendering\shaders\ShaderProgram.cpp" />
     <ClCompile Include="src\rendering\shaders\ShaderReflector.cpp" />
     <ClCompile Include="src\rendering\shaders\ShaderUtils.cpp" />
-    <ClCompile Include="src\rendering\graphics\Model.cpp" />
     <ClCompile Include="src\rendering\texture\TextureLoader.cpp" />
     <ClCompile Include="src\rendering\texture\TextureManager.cpp" />
     <ClCompile Include="src\rendering\utils\Clock.cpp" />
