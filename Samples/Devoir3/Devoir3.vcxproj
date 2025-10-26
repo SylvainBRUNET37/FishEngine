@@ -138,6 +138,7 @@
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\PhysicsEngine\listeners\ContactListenerImpl.cpp" />
     <ClCompile Include="src\PhysicsEngine\pch.cpp" />
+    <ClCompile Include="src\PhysicsEngine\Scene.cpp" />
     <ClCompile Include="src\PhysicsEngine\systems\JoltSystem.cpp" />
     <ClCompile Include="src\ResourceManager.cpp" />
   </ItemGroup>

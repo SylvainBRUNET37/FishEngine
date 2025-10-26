@@ -3,12 +3,20 @@
 
 #include <vector>
 
+#include <Jolt/Jolt.h>
+#include <Jolt/Physics/Body/Body.h>
+
 #include "rendering/ecs/Entity.h"
 
 struct Hierarchy
 {
 	Entity parent = INVALID_ENTITY;
 	std::vector<Entity> children{};
+};
+
+struct RigidBody
+{
+	JPH::Body* body;
 };
 
 #endif

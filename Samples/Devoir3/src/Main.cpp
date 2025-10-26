@@ -6,8 +6,14 @@
 #include <cstdlib>
 #include <minwindef.h>
 
+#include <Jolt/Jolt.h>
+#include <Jolt/Physics/Body/BodyCreationSettings.h>
+#include <Jolt/Physics/Collision/Shape/BoxShape.h>
+#include <Jolt/Math/Quat.h>
+#include <Jolt/Math/Vec3.h>
+#include <Jolt/Math/Mat44.h>
+
 #include "Components.h"
-#include "PhysicsEngine/pch.h"
 #include "PhysicsEngine/layers/BroadPhaseLayerInterfaceImpl.h"
 #include "PhysicsEngine/layers/BroadPhaseLayers.h"
 #include "PhysicsEngine/layers/ObjectLayerPairFilterImpl.h"
@@ -15,7 +21,6 @@
 #include "PhysicsEngine/listeners/BodyActivationListenerLogger.h"
 #include "PhysicsEngine/listeners/ContactListenerImpl.h"
 #include "PhysicsEngine/systems/JoltSystem.h"
-#include "PhysicsEngine/utils/Utils.h"
 #include "rendering/SceneLoader.h"
 #include "rendering/application/WindowsApplication.h"
 #include "rendering/device/DeviceBuilder.h"
@@ -25,6 +30,7 @@
 #include "ResourceManager.h"
 
 #include "EntityManagerFactory.h"
+#include "Scene.h"
 
 using namespace JPH;
 using namespace JPH::literals;
@@ -33,6 +39,26 @@ using namespace DirectX;
 
 namespace
 {
+	XMMATRIX ToXMMATRIX(const RMat44& transform)
+	{
+		// Extract Jolt basis vectors and translation
+		const Vec3 x = transform.GetAxisX();
+		const Vec3 y = transform.GetAxisY();
+		const Vec3 z = transform.GetAxisZ();
+		const RVec3 p = transform.GetTranslation();
+
+		// Construct a DirectX right-handed matrix
+		return XMMatrixSet(
+			x.GetX(), x.GetY(), x.GetZ(), 0.0f,
+			y.GetX(), y.GetY(), y.GetZ(), 0.0f,
+			z.GetX(), z.GetY(), z.GetZ(), 0.0f,
+			p.GetX(),
+			p.GetY(),
+			p.GetZ(),
+			1.0f
+		);
+	}
+
 	void WaitBeforeNextFrame(const DWORD frameStartTime)
 	{
 		static constexpr double TARGET_FPS = 60.0;
@@ -60,12 +86,12 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 
 	auto renderContext = DeviceBuilder::CreateRenderContext(application.GetMainWindow(), windowData);
 
-	ResourceManager resourceManager{ renderContext.GetDevice() };
+	ResourceManager resourceManager{renderContext.GetDevice()};
 	auto sceneResources = resourceManager.LoadScene();
 
-	RenderSystem renderSystem{ &renderContext, std::move(sceneResources.materials) };
+	RenderSystem renderSystem{&renderContext, std::move(sceneResources.materials)};
 
-	EntityManagerFactory<Transform, Mesh, Hierarchy> entityManagerFactory;
+	EntityManagerFactory<Transform, Mesh, Hierarchy, RigidBody> entityManagerFactory;
 	auto entityManager = entityManagerFactory.Create(sceneResources);
 
 	/////	Physics System	 /////
@@ -76,12 +102,11 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 	const ObjectVsBroadPhaseLayerFilterImpl objectVsBroadPhaseLayerFilter;
 	const ObjectLayerPairFilterImpl objectLayerPairFilter;
 	physicsSystem.Init(1024, 0, 1024, 1024,
-		broadPhaseLayerInterface, objectVsBroadPhaseLayerFilter, objectLayerPairFilter);
+	                   broadPhaseLayerInterface, objectVsBroadPhaseLayerFilter, objectLayerPairFilter);
 
 	PhysicsSettings settings = physicsSystem.GetPhysicsSettings();
 	settings.mMinVelocityForRestitution = 0.01f;
 	physicsSystem.SetPhysicsSettings(settings);
-	physicsSystem.SetGravity(Vec3::sZero());
 
 	BodyActivationListenerLogger bodyActivationListener;
 	physicsSystem.SetBodyActivationListener(&bodyActivationListener);
@@ -90,6 +115,27 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 	physicsSystem.SetContactListener(&contactListener);
 	//////////////////////////////
 
+	// CREATE CUBE
+
+	BodyCreationSettings boxSettings(
+		new BoxShape(Vec3(1.0f, 1.0f, 1.0f)),
+		RVec3(0, 0, 0),
+		Quat::sIdentity(),
+		EMotionType::Dynamic,
+		Layers::MOVING
+	);
+
+	BodyInterface& bodyInterface = physicsSystem.GetBodyInterface();
+	Body* body = bodyInterface.CreateBody(boxSettings);
+	bodyInterface.AddBody(body->GetID(), EActivation::Activate);
+
+	// TODO: delete
+	Entity cubeEntity = { .index = 1, .generation = 1 };
+	entityManager.AddComponent<RigidBody>(cubeEntity, body);
+
+	//
+
+	Scene scene;
 
 	DWORD prevTime = GetTickCount();
 
@@ -103,14 +149,18 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 		if (not WindowsApplication::ProcessWindowMessages())
 			break;
 
-		// TODO:
-		// scene.update(); // update physics
+		scene.update(); // update physics
 
 		renderSystem.UpdateScene(elapsedTime);
 
 		for (const auto& [transform, mesh] : entityManager.View<Transform, Mesh>())
 		{
 			renderSystem.Render(mesh, transform);
+		}
+
+		for (const auto& [transform, rigidBody] : entityManager.View<Transform, RigidBody>())
+		{
+			transform.world = ToXMMATRIX(rigidBody.body->GetWorldTransform());
 		}
 
 		renderSystem.Render();

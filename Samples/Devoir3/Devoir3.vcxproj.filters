@@ -1,111 +1,28 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Fichiers sources">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Fichiers d%27en-tête">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
-    <Filter Include="Fichiers de ressources">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
-    <Filter Include="Fichiers d%27en-tête\PhysicsEngine">
-      <UniqueIdentifier>{93ba28d2-97d9-410c-a458-2d6915df0b14}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Fichiers d%27en-tête\PhysicsEngine\layers">
-      <UniqueIdentifier>{9cead488-3df2-44ee-827a-59a07844d635}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Fichiers d%27en-tête\PhysicsEngine\listeners">
-      <UniqueIdentifier>{273d3d5a-984b-4b79-b9b1-121485b951d4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Fichiers d%27en-tête\PhysicsEngine\systems">
-      <UniqueIdentifier>{24202ff2-9255-483b-82d7-b526db94d4fe}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Fichiers d%27en-tête\PhysicsEngine\utils">
-      <UniqueIdentifier>{22a05438-5ed0-4c23-92a9-e314f093ebea}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Fichiers sources\PhysicsEngine">
-      <UniqueIdentifier>{d1b3c8f5-eab6-4137-a700-108db6a54bfd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Fichiers sources\PhysicsEngine\sytems">
-      <UniqueIdentifier>{6681c707-364f-4732-bec8-b1224c6cbc41}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Fichiers sources\PhysicsEngine\listeners">
-      <UniqueIdentifier>{50a0014d-9502-49ea-a74c-3860a5dde441}</UniqueIdentifier>
-    </Filter>
+    <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\PhysicsEngine\listeners\ContactListenerImpl.cpp" />
+    <ClCompile Include="src\PhysicsEngine\pch.cpp" />
+    <ClCompile Include="src\PhysicsEngine\systems\JoltSystem.cpp" />
+    <ClCompile Include="src\ResourceManager.cpp" />
+    <ClCompile Include="src\PhysicsEngine\Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Main.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ResourceManager.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Main.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ResourceManager.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PhysicsEngine\systems\JoltSystem.cpp">
-      <Filter>Fichiers sources\PhysicsEngine\sytems</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PhysicsEngine\listeners\ContactListenerImpl.cpp">
-      <Filter>Fichiers sources\PhysicsEngine\listeners</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PhysicsEngine\pch.cpp">
-      <Filter>Fichiers sources\PhysicsEngine</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="include\Scene.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Components.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ResourceManager.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Components.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="include\PhysicsEngine\layers\BroadPhaseLayerInterfaceImpl.h">
-      <Filter>Fichiers d%27en-tête\PhysicsEngine\layers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\PhysicsEngine\layers\BroadPhaseLayers.h">
-      <Filter>Fichiers d%27en-tête\PhysicsEngine\layers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\PhysicsEngine\layers\Layers.h">
-      <Filter>Fichiers d%27en-tête\PhysicsEngine\layers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\PhysicsEngine\layers\ObjectLayerPairFilterImpl.h">
-      <Filter>Fichiers d%27en-tête\PhysicsEngine\layers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\PhysicsEngine\layers\ObjectVsBroadPhaseLayerFilterImpl.h">
-      <Filter>Fichiers d%27en-tête\PhysicsEngine\layers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\PhysicsEngine\listeners\BodyActivationListenerLogger.h">
-      <Filter>Fichiers d%27en-tête\PhysicsEngine\listeners</Filter>
-    </ClInclude>
-    <ClInclude Include="include\PhysicsEngine\listeners\ContactListenerImpl.h">
-      <Filter>Fichiers d%27en-tête\PhysicsEngine\listeners</Filter>
-    </ClInclude>
-    <ClInclude Include="include\PhysicsEngine\utils\Utils.h">
-      <Filter>Fichiers d%27en-tête\PhysicsEngine\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="include\PhysicsEngine\systems\JoltSystem.h">
-      <Filter>Fichiers d%27en-tête\PhysicsEngine\systems</Filter>
-    </ClInclude>
-    <ClInclude Include="include\PhysicsEngine\pch.h">
-      <Filter>Fichiers d%27en-tête\PhysicsEngine</Filter>
-    <ClInclude Include="include\EntityManagerFactory.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
+    <ClInclude Include="include\Components.h" />
+    <ClInclude Include="include\PhysicsEngine\layers\BroadPhaseLayerInterfaceImpl.h" />
+    <ClInclude Include="include\PhysicsEngine\layers\BroadPhaseLayers.h" />
+    <ClInclude Include="include\PhysicsEngine\layers\Layers.h" />
+    <ClInclude Include="include\PhysicsEngine\layers\ObjectLayerPairFilterImpl.h" />
+    <ClInclude Include="include\PhysicsEngine\layers\ObjectVsBroadPhaseLayerFilterImpl.h" />
+    <ClInclude Include="include\PhysicsEngine\listeners\BodyActivationListenerLogger.h" />
+    <ClInclude Include="include\PhysicsEngine\listeners\ContactListenerImpl.h" />
+    <ClInclude Include="include\PhysicsEngine\pch.h" />
+    <ClInclude Include="include\PhysicsEngine\systems\JoltSystem.h" />
+    <ClInclude Include="include\PhysicsEngine\utils\Utils.h" />
+    <ClInclude Include="include\EntityManagerFactory.h" />
+    <ClInclude Include="include\ResourceManager.h" />
+    <ClInclude Include="include\Scene.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\MiniPhongPS.hlsl" />
