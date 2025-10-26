@@ -1,5 +1,4 @@
 #include <iostream>
-#include <vector>
 #include <Windows.h>
 #include <tchar.h>
 #include <d3d11.h>
@@ -8,7 +7,6 @@
 #include <minwindef.h>
 
 #include "rendering/SceneLoader.h"
-#include "rendering/RenderingEngine.h"
 #include "rendering/application/WindowsApplication.h"
 #include "rendering/device/DeviceBuilder.h"
 #include "rendering/device/RenderContext.h"
