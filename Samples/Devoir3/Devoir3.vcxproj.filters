@@ -7,6 +7,7 @@
     <ClCompile Include="src\PhysicsEngine\systems\JoltSystem.cpp" />
     <ClCompile Include="src\ResourceManager.cpp" />
     <ClCompile Include="src\PhysicsEngine\GameEngine.cpp" />
+    <ClCompile Include="src\PhysicsEngine\ShapeFactory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\CC.h" />
@@ -28,6 +29,7 @@
     <ClInclude Include="include\ecs\EntityManager.h" />
     <ClInclude Include="include\ecs\Components.h" />
     <ClInclude Include="include\ecs\ComponentUtils.h" />
+    <ClInclude Include="include\PhysicsEngine\ShapeFactory.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\MiniPhongPS.hlsl" />

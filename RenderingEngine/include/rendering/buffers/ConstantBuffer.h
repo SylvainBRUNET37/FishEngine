@@ -2,6 +2,7 @@
 #define CONSTANT_BUFFER
 
 #include "Buffer.h"
+#include "rendering/utils/Util.h"
 
 template <typename Params>
 class ConstantBuffer : public Buffer
@@ -16,16 +17,14 @@ public:
 		constantBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 		constantBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
-		const HRESULT hr = device->CreateBuffer(&constantBufferDesc, nullptr, &buffer);
-		assert(SUCCEEDED(hr));
+		DXEssayer(device->CreateBuffer(&constantBufferDesc, nullptr, &buffer));
 	}
 
 	void Update(ID3D11DeviceContext* context, const Params& params)
 	{
 		D3D11_MAPPED_SUBRESOURCE mapped{};
-		const HRESULT hr = context->Map(buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+		DXEssayer(context->Map(buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped));
 
-		assert(SUCCEEDED(hr));
 		std::memcpy(mapped.pData, &params, sizeof(Params));
 
 		context->Unmap(buffer, 0);

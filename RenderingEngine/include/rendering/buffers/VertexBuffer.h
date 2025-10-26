@@ -18,8 +18,7 @@ public:
         D3D11_SUBRESOURCE_DATA vertexData{};
         vertexData.pSysMem = vertices.data();
 
-        const HRESULT hr = device->CreateBuffer(&vertexBufferDesc, &vertexData, &buffer);
-        assert(SUCCEEDED(hr));
+        DXEssayer(device->CreateBuffer(&vertexBufferDesc, &vertexData, &buffer));
 	}
 };
 

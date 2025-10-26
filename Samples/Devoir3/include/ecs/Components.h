@@ -3,6 +3,7 @@
 
 #include <tuple>
 #include <vector>
+#include <string>
 
 #include <Jolt/Jolt.h>
 #include <Jolt/Physics/Body/Body.h>
@@ -11,6 +12,12 @@
 #include "ecs/Entity.h"
 #include "rendering/core/Transform.h"
 #include "rendering/graphics/Mesh.h"
+
+// TODO: temporary component for Devoir3
+struct Name
+{
+	std::string name;
+};
 
 struct Hierarchy
 {
@@ -29,7 +36,8 @@ using Components = std::tuple
 	Mesh,
 	RigidBody,
 	Transform,
-	Hierarchy
+	Hierarchy,
+	Name
 >;
 
 #endif

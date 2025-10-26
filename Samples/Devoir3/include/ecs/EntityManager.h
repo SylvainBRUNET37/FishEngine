@@ -89,16 +89,16 @@ public:
 	template <typename... QueryComponents>
 	struct ComponentView
 	{
-		EntityManager* registry;
+		EntityManager* entityManager;
 
 		struct iterator
 		{
-			EntityManager* registry;
+			EntityManager* entityManager;
 			Entity::Index currentEntityIndex;
 			size_t nbEntity;
 
 			iterator(EntityManager* reg, const Entity::Index start)
-				: registry{reg}, currentEntityIndex{start}, nbEntity{reg->generations.size()}
+				: entityManager{reg}, currentEntityIndex{start}, nbEntity{reg->generations.size()}
 			{
 				SkipWhileNotValid();
 			}
@@ -116,8 +116,8 @@ public:
 
 			[[nodiscard]] bool HasEveryQueryComponent(const Entity::Index entityIndex) const
 			{
-				return entityIndex < registry->generations.size() and
-					(std::get<ComponentPool<QueryComponents>>(registry->componentPools).Has(entityIndex) && ...);
+				return entityIndex < entityManager->generations.size() and
+					(std::get<ComponentPool<QueryComponents>>(entityManager->componentPools).Has(entityIndex) && ...);
 			}
 
 			iterator& operator++()
@@ -131,29 +131,30 @@ public:
 
 			bool operator!=(const iterator& other) const noexcept
 			{
-				return currentEntityIndex != other.currentEntityIndex or registry != other.registry;
+				return currentEntityIndex != other.currentEntityIndex or entityManager != other.entityManager;
 			}
 
-			auto operator*()
+			std::tuple<Entity, QueryComponents&...> operator*()
 			{
 				Entity entity
 				{
 					.index = currentEntityIndex,
-					.generation = registry->generations[currentEntityIndex]
+					.generation = entityManager->generations[currentEntityIndex]
 				};
 
-				return std::forward_as_tuple
-				(
-					registry->Get<QueryComponents>(entity)...
+				// Construct a tuple with entity and it's components
+				return std::tuple<Entity, QueryComponents&...>(
+					entity,
+					entityManager->Get<QueryComponents>(entity)...
 				);
 			}
 		};
 
-		[[nodiscard]] iterator begin() const { return iterator(registry, 0); }
+		[[nodiscard]] iterator begin() const { return iterator(entityManager, 0); }
 
 		[[nodiscard]] iterator end() const
 		{
-			return iterator(registry, static_cast<Entity::Index>(registry->generations.size()));
+			return iterator(entityManager, static_cast<Entity::Index>(entityManager->generations.size()));
 		}
 	};
 

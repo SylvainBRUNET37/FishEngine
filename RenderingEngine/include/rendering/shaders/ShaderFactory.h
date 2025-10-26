@@ -63,8 +63,7 @@ struct ShaderFactoryProcessor<VertexShader>
 	static void Create(ShaderBankType& bank, ShaderDesc& shader, ID3D11Device* device, BytecodeType& bytecode)
 	{
 		ComPtr<ID3D11VertexShader> vs;
-		auto result = device->CreateVertexShader(bytecode->GetBufferPointer(), bytecode->GetBufferSize(), nullptr, &vs);
-		assert(SUCCEEDED(result));
+		DXEssayer(device->CreateVertexShader(bytecode->GetBufferPointer(), bytecode->GetBufferSize(), nullptr, &vs));
 
 		bank.template Set<VertexShader>(shader.path.string(), VertexShader{vs, bytecode});
 	}
@@ -80,8 +79,7 @@ struct ShaderFactoryProcessor<PixelShader>
 	static void Create(ShaderBankType& bank, ShaderDesc& shader, ID3D11Device* device, BytecodeType& bytecode)
 	{
 		ComPtr<ID3D11PixelShader> pixelShader;
-		auto result = device->CreatePixelShader(bytecode->GetBufferPointer(), bytecode->GetBufferSize(), nullptr, &pixelShader);
-		assert(SUCCEEDED(result));
+		DXEssayer(device->CreatePixelShader(bytecode->GetBufferPointer(), bytecode->GetBufferSize(), nullptr, &pixelShader));
 
 		bank.template Set<PixelShader>(shader.path.string(), PixelShader{pixelShader, bytecode});
 	}

@@ -31,6 +31,7 @@
 
 #include "ecs/EntityManagerFactory.h"
 #include "GameEngine.h"
+#include "PhysicsEngine/ShapeFactory.h"
 
 using namespace JPH;
 using namespace JPH::literals;
@@ -78,25 +79,18 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 	physicsSystem.SetContactListener(&contactListener);
 	//////////////////////////////
 
-	// CREATE CUBE
+	// Create the scene
 
-	BodyCreationSettings boxSettings(
-		new BoxShape(Vec3(1.0f, 1.0f, 1.0f)),
-		RVec3(0, 0, 0),
-		Quat::sIdentity(),
-		EMotionType::Dynamic,
-		Layers::MOVING
-	);
+	Body* planeBody = ShapeFactory::CreatePlane();
+	Body* cubeBody = ShapeFactory::CreateCube();
 
-	BodyInterface& bodyInterface = physicsSystem.GetBodyInterface();
-	Body* body = bodyInterface.CreateBody(boxSettings);
-	bodyInterface.AddBody(body->GetID(), EActivation::Activate);
-
-	// TODO: used for testing, it's not a generic way of doing it
-	Entity cubeEntity = { .index = 1, .generation = 1 };
-	entityManager.AddComponent<RigidBody>(cubeEntity, body);
-
-	//
+	for (const auto& [entity, name] : entityManager.View<Name>())
+	{
+		if (name.name == "Cube")
+			entityManager.AddComponent<RigidBody>(entity, cubeBody);
+		else if (name.name == "Plane")
+			entityManager.AddComponent<RigidBody>(entity, planeBody);
+	}
 
 	GameEngine gameEngine{ std::move(renderSystem), std::move(entityManager) };
 	gameEngine.Run();

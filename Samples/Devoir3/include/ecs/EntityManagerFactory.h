@@ -36,6 +36,7 @@ public:
 			const auto entity = entities[i];
 
 			entityManager.AddComponent<Transform>(entity, node.transform);
+			entityManager.AddComponent<Name>(entity, node.name);
 
 			if (node.meshIndex != UINT32_MAX)
 				entityManager.AddComponent<Mesh>(entity, sceneResource.meshes[node.meshIndex]);

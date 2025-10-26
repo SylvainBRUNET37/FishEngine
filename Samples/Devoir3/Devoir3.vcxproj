@@ -139,6 +139,7 @@
     <ClCompile Include="src\PhysicsEngine\listeners\ContactListenerImpl.cpp" />
     <ClCompile Include="src\PhysicsEngine\pch.cpp" />
     <ClCompile Include="src\PhysicsEngine\GameEngine.cpp" />
+    <ClCompile Include="src\PhysicsEngine\ShapeFactory.cpp" />
     <ClCompile Include="src\PhysicsEngine\systems\JoltSystem.cpp" />
     <ClCompile Include="src\ResourceManager.cpp" />
   </ItemGroup>
@@ -162,6 +163,7 @@
     <ClInclude Include="include\PhysicsEngine\listeners\BodyActivationListenerLogger.h" />
     <ClInclude Include="include\PhysicsEngine\listeners\ContactListenerImpl.h" />
     <ClInclude Include="include\PhysicsEngine\pch.h" />
+    <ClInclude Include="include\PhysicsEngine\ShapeFactory.h" />
     <ClInclude Include="include\PhysicsEngine\systems\JoltSystem.h" />
     <ClInclude Include="include\PhysicsEngine\utils\Utils.h" />
     <ClInclude Include="include\ecs\EntityManagerFactory.h" />

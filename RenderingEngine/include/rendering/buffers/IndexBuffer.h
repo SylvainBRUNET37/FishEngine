@@ -2,6 +2,7 @@
 #define INDEX_BUFFER
 
 #include "Buffer.h"
+#include <rendering/utils/Util.h>
 
 class IndexBuffer : public Buffer
 {
@@ -17,8 +18,7 @@ public:
         D3D11_SUBRESOURCE_DATA indexData{};
         indexData.pSysMem = indices.data();
 
-        const HRESULT hr = device->CreateBuffer(&indexBufferDesc, &indexData, &buffer);
-        assert(SUCCEEDED(hr));
+        DXEssayer(device->CreateBuffer(&indexBufferDesc, &indexData, &buffer));
     }
 };
 

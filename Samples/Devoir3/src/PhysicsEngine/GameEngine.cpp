@@ -42,17 +42,17 @@ void GameEngine::Run()
 		shouldContinue = WindowsApplication::ProcessWindowMessages();
 
 		UpdatePhysics();
-
 		renderSystem.UpdateScene(elapsedTime);
 
-		for (const auto& [transform, mesh] : entityManager.View<Transform, Mesh>())
+		for (const auto& [entity, transform, rigidBody] : entityManager.View<Transform, RigidBody>())
 		{
-			renderSystem.Render(mesh, transform);
+			const auto a = rigidBody.body->GetWorldTransform();
+			transform.world = ToXMMATRIX(a);
 		}
 
-		for (const auto& [transform, rigidBody] : entityManager.View<Transform, RigidBody>())
+		for (const auto& [entity, transform, mesh] : entityManager.View<Transform, Mesh>())
 		{
-			transform.world = ToXMMATRIX(rigidBody.body->GetWorldTransform());
+			renderSystem.Render(mesh, transform);
 		}
 
 		renderSystem.Render();
