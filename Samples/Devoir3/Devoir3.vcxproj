@@ -138,7 +138,7 @@
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\PhysicsEngine\listeners\ContactListenerImpl.cpp" />
     <ClCompile Include="src\PhysicsEngine\pch.cpp" />
-    <ClCompile Include="src\PhysicsEngine\Scene.cpp" />
+    <ClCompile Include="src\PhysicsEngine\GameEngine.cpp" />
     <ClCompile Include="src\PhysicsEngine\systems\JoltSystem.cpp" />
     <ClCompile Include="src\ResourceManager.cpp" />
   </ItemGroup>
@@ -148,7 +148,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Components.h" />
+    <ClInclude Include="include\CC.h" />
+    <ClInclude Include="include\ecs\Components.h" />
+    <ClInclude Include="include\ecs\ComponentPool.h" />
+    <ClInclude Include="include\ecs\Entity.h" />
+    <ClInclude Include="include\ecs\EntityManager.h" />
     <ClInclude Include="include\PhysicsEngine\layers\BroadPhaseLayerInterfaceImpl.h" />
     <ClInclude Include="include\PhysicsEngine\layers\BroadPhaseLayers.h" />
     <ClInclude Include="include\PhysicsEngine\layers\Layers.h" />
@@ -161,7 +165,7 @@
     <ClInclude Include="include\PhysicsEngine\utils\Utils.h" />
     <ClInclude Include="include\EntityManagerFactory.h" />
     <ClInclude Include="include\ResourceManager.h" />
-    <ClInclude Include="include\Scene.h" />
+    <ClInclude Include="include\GameEngine.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\MiniPhongPS.hlsl">

@@ -13,7 +13,7 @@
 #include <Jolt/Math/Vec3.h>
 #include <Jolt/Math/Mat44.h>
 
-#include "Components.h"
+#include "ecs/Components.h"
 #include "PhysicsEngine/layers/BroadPhaseLayerInterfaceImpl.h"
 #include "PhysicsEngine/layers/BroadPhaseLayers.h"
 #include "PhysicsEngine/layers/ObjectLayerPairFilterImpl.h"
@@ -30,47 +30,12 @@
 #include "ResourceManager.h"
 
 #include "EntityManagerFactory.h"
-#include "Scene.h"
+#include "GameEngine.h"
 
 using namespace JPH;
 using namespace JPH::literals;
 using namespace std;
 using namespace DirectX;
-
-namespace
-{
-	XMMATRIX ToXMMATRIX(const RMat44& transform)
-	{
-		// Extract Jolt basis vectors and translation
-		const Vec3 x = transform.GetAxisX();
-		const Vec3 y = transform.GetAxisY();
-		const Vec3 z = transform.GetAxisZ();
-		const RVec3 p = transform.GetTranslation();
-
-		// Construct a DirectX right-handed matrix
-		return XMMatrixSet(
-			x.GetX(), x.GetY(), x.GetZ(), 0.0f,
-			y.GetX(), y.GetY(), y.GetZ(), 0.0f,
-			z.GetX(), z.GetY(), z.GetZ(), 0.0f,
-			p.GetX(),
-			p.GetY(),
-			p.GetZ(),
-			1.0f
-		);
-	}
-
-	void WaitBeforeNextFrame(const DWORD frameStartTime)
-	{
-		static constexpr double TARGET_FPS = 60.0;
-		static constexpr double FRAME_TIME = 1000.0 / TARGET_FPS;
-
-		const DWORD frameEnd = GetTickCount();
-		const DWORD frameDuration = frameEnd - frameStartTime;
-
-		if (frameDuration < FRAME_TIME)
-			Sleep(static_cast<DWORD>(FRAME_TIME - frameDuration));
-	}
-}
 
 int APIENTRY _tWinMain(const HINSTANCE hInstance,
                        HINSTANCE,
@@ -129,44 +94,42 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 	Body* body = bodyInterface.CreateBody(boxSettings);
 	bodyInterface.AddBody(body->GetID(), EActivation::Activate);
 
-	// TODO: delete
+	// TODO: used for testing, it's not a generic way of doing it
 	Entity cubeEntity = { .index = 1, .generation = 1 };
 	entityManager.AddComponent<RigidBody>(cubeEntity, body);
 
 	//
 
-	Scene scene;
+	//DWORD prevTime = GetTickCount();
 
-	DWORD prevTime = GetTickCount();
+	//while (true)
+	//{
+	//	const DWORD frameStartTime = GetTickCount();
 
-	while (true)
-	{
-		const DWORD frameStartTime = GetTickCount();
+	//	double elapsedTime = (frameStartTime - prevTime) / 1000.0f;
+	//	prevTime = frameStartTime;
 
-		double elapsedTime = (frameStartTime - prevTime) / 1000.0f;
-		prevTime = frameStartTime;
+	//	if (not WindowsApplication::ProcessWindowMessages())
+	//		break;
 
-		if (not WindowsApplication::ProcessWindowMessages())
-			break;
+	//	GameEngine::UpdatePhysics(); // UpdatePhysics physics
 
-		scene.update(); // update physics
+	//	renderSystem.UpdateScene(elapsedTime);
 
-		renderSystem.UpdateScene(elapsedTime);
+	//	for (const auto& [transform, mesh] : entityManager.View<Transform, Mesh>())
+	//	{
+	//		renderSystem.Render(mesh, transform);
+	//	}
 
-		for (const auto& [transform, mesh] : entityManager.View<Transform, Mesh>())
-		{
-			renderSystem.Render(mesh, transform);
-		}
+	//	for (const auto& [transform, rigidBody] : entityManager.View<Transform, RigidBody>())
+	//	{
+	//		transform.world = ToXMMATRIX(rigidBody.body->GetWorldTransform());
+	//	}
 
-		for (const auto& [transform, rigidBody] : entityManager.View<Transform, RigidBody>())
-		{
-			transform.world = ToXMMATRIX(rigidBody.body->GetWorldTransform());
-		}
+	//	renderSystem.Render();
 
-		renderSystem.Render();
-
-		WaitBeforeNextFrame(frameStartTime);
-	}
+	//	WaitBeforeNextFrame(frameStartTime);
+	//}
 
 	return EXIT_SUCCESS;
 }

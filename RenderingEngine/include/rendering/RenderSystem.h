@@ -1,6 +1,8 @@
 #ifndef RENDER_SYSTEM_H
 #define RENDER_SYSTEM_H
 
+#include <memory>
+
 #include "Renderer.h"
 #include "core/SceneData.h"
 #include "device/RenderContext.h"

@@ -1,6 +1,8 @@
 #ifndef SCENE_DATA_H
 #define SCENE_DATA_H
 
+#include <DirectXMath.h>
+
 struct SceneData
 {
 	DirectX::XMMATRIX matViewProj;

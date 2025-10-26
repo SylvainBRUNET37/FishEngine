@@ -35,9 +35,6 @@
     <ClInclude Include="include\rendering\buffers\VertexBuffer.h" />
     <ClInclude Include="include\rendering\device\Rasterizer.h" />
     <ClInclude Include="include\rendering\device\RenderTarget.h" />
-    <ClInclude Include="include\rendering\ecs\ComponentPool.h" />
-    <ClInclude Include="include\rendering\ecs\Entity.h" />
-    <ClInclude Include="include\rendering\ecs\EntityManager.h" />
     <ClInclude Include="include\rendering\graphics\Camera.h" />
     <ClInclude Include="include\rendering\loading\Node.h" />
     <ClInclude Include="include\rendering\RenderSystem.h" />

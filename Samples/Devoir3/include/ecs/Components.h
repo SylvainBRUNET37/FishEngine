@@ -6,7 +6,7 @@
 #include <Jolt/Jolt.h>
 #include <Jolt/Physics/Body/Body.h>
 
-#include "rendering/ecs/Entity.h"
+#include "ecs/Entity.h"
 
 struct Hierarchy
 {

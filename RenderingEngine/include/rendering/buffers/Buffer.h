@@ -3,6 +3,8 @@
 
 #include "rendering/utils/ComPtr.h"
 
+#include <d3d11.h>
+
 class Buffer
 {
 public:
