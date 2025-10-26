@@ -1,6 +1,8 @@
 #ifndef DEPTH_BUFFER_H
 #define DEPTH_BUFFER_H
 
+#include <d3d11.h>
+
 #include "rendering/core/WindowData.h"
 #include "rendering/utils/ComPtr.h"
 

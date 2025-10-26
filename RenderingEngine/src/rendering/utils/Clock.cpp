@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "rendering/utils/Clock.h"
 
+#include "rendering/device/BlendState.h"
+
 double Clock::secPerCount = []
 {
 	LARGE_INTEGER frequency;

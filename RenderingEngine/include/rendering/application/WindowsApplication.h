@@ -1,6 +1,8 @@
 #ifndef WINDOWS_APPLICATION_H
 #define WINDOWS_APPLICATION_H
+
 #include "rendering/core/WindowData.h"
+#include "rendering/device/BlendState.h"
 
 class WindowsApplication
 {

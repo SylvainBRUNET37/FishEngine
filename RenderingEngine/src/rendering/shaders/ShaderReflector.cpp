@@ -1,6 +1,9 @@
 #include "pch.h"
 #include "rendering/shaders/ShaderReflector.h"
 
+#include <d3dcompiler.h>
+#include <vector>
+
 #include "rendering/utils/ComPtr.h"
 #include "rendering/utils/Util.h"
 

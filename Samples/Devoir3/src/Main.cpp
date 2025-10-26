@@ -56,7 +56,7 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 
 	RenderSystem renderSystem{&renderContext, std::move(sceneResources.materials)};
 
-	EntityManagerFactory<Transform, Mesh, Hierarchy, RigidBody> entityManagerFactory;
+	EntityManagerFactory entityManagerFactory;
 	auto entityManager = entityManagerFactory.Create(sceneResources);
 
 	/////	Physics System	 /////

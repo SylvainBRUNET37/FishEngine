@@ -1,6 +1,9 @@
 #ifndef TEXTURE_LOADER_H
 #define TEXTURE_LOADER_H
 
+#include <d3d11.h>
+#include <string>
+
 #include "rendering/utils/ComPtr.h"
 
 class TextureLoader

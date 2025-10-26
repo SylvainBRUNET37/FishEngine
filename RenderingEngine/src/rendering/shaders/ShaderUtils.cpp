@@ -1,8 +1,12 @@
 #include "pch.h"
 #include "rendering/shaders/ShaderUtils.h"
 
+#include <cassert>
+#include <d3dcompiler.h>
+#include <string>
+
 ComPtr<ID3DBlob> ShaderUtils::Compile(const std::wstring& filePath, const std::string& entry,
-	const std::string& profile)
+                                      const std::string& profile)
 {
 	UINT flags = D3DCOMPILE_ENABLE_STRICTNESS;
 #if defined( _DEBUG )

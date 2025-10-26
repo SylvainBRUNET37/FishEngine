@@ -6,6 +6,7 @@
 #include "rendering/core/Transform.h"
 #include "rendering/graphics/Mesh.h"
 
+// TODO: put it elsewhere
 XMMATRIX ToXMMATRIX(const JPH::RMat44& transform)
 {
 	// Extract Jolt basis vectors and translation
@@ -44,15 +45,15 @@ void GameEngine::Run()
 
 		renderSystem.UpdateScene(elapsedTime);
 
-		//for (const auto& [transform, mesh] : entityManager.View<Transform, Mesh>())
-		//{
-		//	renderSystem.Render(mesh, transform);
-		//}
+		for (const auto& [transform, mesh] : entityManager.View<Transform, Mesh>())
+		{
+			renderSystem.Render(mesh, transform);
+		}
 
-		//for (const auto& [transform, rigidBody] : entityManager.View<Transform, RigidBody>())
-		//{
-		//	transform.world = ToXMMATRIX(rigidBody.body->GetWorldTransform());
-		//}
+		for (const auto& [transform, rigidBody] : entityManager.View<Transform, RigidBody>())
+		{
+			transform.world = ToXMMATRIX(rigidBody.body->GetWorldTransform());
+		}
 
 		renderSystem.Render();
 

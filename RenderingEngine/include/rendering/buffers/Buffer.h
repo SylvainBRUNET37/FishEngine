@@ -1,9 +1,9 @@
 #ifndef BUFFER_H
 #define BUFFER_H
 
-#include "rendering/utils/ComPtr.h"
-
 #include <d3d11.h>
+
+#include "rendering/utils/ComPtr.h"
 
 class Buffer
 {

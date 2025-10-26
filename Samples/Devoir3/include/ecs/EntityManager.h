@@ -3,12 +3,8 @@
 
 #include "Entity.h"
 #include "ComponentPool.h"
+#include "Components.h"
 
-// Check if a type is in a type list
-template <typename Type, typename... TypeList>
-concept OneOf = (std::same_as<Type, TypeList> || ...);
-
-template <typename... Components>
 class EntityManager
 {
 public:
@@ -26,7 +22,11 @@ public:
 			return;
 
 		// Erase the enttiy from every component pool
-		(std::get<ComponentPool<Components>>(components).RemoveComponentOf(entity.index), ...);
+		std::apply
+		(
+			[&](auto&... pools) { (pools.RemoveComponentOf(entity.index), ...); },
+			componentPools
+		);
 
 		// Entity is dead so we can reuse it's index and increment the generation
 		freeIndices.push_back(entity.index);
@@ -40,48 +40,48 @@ public:
 	}
 
 	template <typename Component, typename... ComponentArgs>
-		requires OneOf<Component, Components...>
+		requires OneOf<Component>
 	Component& AddComponent(const Entity entity, ComponentArgs&&... args)
 	{
 		if (not IsAlive(entity))
 			throw std::runtime_error("Invalid entity");
 
-		auto& componentPool = std::get<ComponentPool<Component>>(components);
+		auto& componentPool = std::get<ComponentPool<Component>>(componentPools);
 
 		componentPool.ResizeIfOutOfBound(entity.index + 1);
 		return componentPool.Emplace(entity.index, std::forward<ComponentArgs>(args)...);
 	}
 
 	template <typename Component>
-		requires OneOf<Component, Components...>
+		requires OneOf<Component>
 	[[nodiscard]] bool HasComponent(const Entity entity) const noexcept
 	{
 		if (not IsAlive(entity))
 			return false;
 
-		const auto& componentPool = std::get<ComponentPool<Component>>(components);
+		const auto& componentPool = std::get<ComponentPool<Component>>(componentPools);
 		return componentPool.Has(entity.index);
 	}
 
 	template <typename Component>
-		requires OneOf<Component, Components...>
+		requires OneOf<Component>
 	[[nodiscard]] Component& Get(const Entity entity)
 	{
 		if (not IsAlive(entity))
 			throw std::runtime_error("Invalid entity");
 
-		auto& componentPool = std::get<ComponentPool<Component>>(components);
+		auto& componentPool = std::get<ComponentPool<Component>>(componentPools);
 		return componentPool.Get(entity.index);
 	}
 
 	template <typename Component>
-		requires OneOf<Component, Components...>
+		requires OneOf<Component>
 	[[nodiscard]] const Component& Get(const Entity entity) const
 	{
 		if (not IsAlive(entity))
 			throw std::runtime_error("Invalid entity");
 
-		const auto& componentPool = std::get<ComponentPool<Component>>(components);
+		const auto& componentPool = std::get<ComponentPool<Component>>(componentPools);
 		return componentPool.Get(entity.index);
 	}
 
@@ -115,8 +115,8 @@ public:
 
 			[[nodiscard]] bool HasEveryQueryComponent(const Entity::Index entityIndex) const
 			{
-				return not(entityIndex >= registry->generations.size()) and
-					(std::get<ComponentPool<QueryComponents>>(registry->components).Has(entityIndex) && ...);
+				return entityIndex < registry->generations.size() and
+					(std::get<ComponentPool<QueryComponents>>(registry->componentPools).Has(entityIndex) && ...);
 			}
 
 			iterator& operator++()
@@ -166,7 +166,7 @@ private:
 	std::vector<uint32_t> freeIndices; // Indices of dead entities (can be reused with generation + 1)
 	std::vector<uint32_t> generations; // Generation of each indices
 
-	std::tuple<ComponentPool<Components>...> components;
+	ComponentPools componentPools;
 
 	[[nodiscard]] bool IsFromCurrentGeneration(const Entity entity) const
 	{
@@ -188,7 +188,12 @@ private:
 
 		generations.push_back(1); // Add the generation of the new entity
 
-		(std::get<ComponentPool<Components>>(components).ResizeIfOutOfBound(index + 1), ...);
+		// Resize every component pools to include the new entity
+		std::apply
+		(
+			[&](auto&... pools) { (pools.ResizeIfOutOfBound(index + 1), ...); },
+			componentPools
+		);
 
 		return index;
 	}

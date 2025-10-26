@@ -1,6 +1,11 @@
 #ifndef SHADER_REFLECTOR_H
 #define SHADER_REFLECTOR_H
 
+#include <d3d11shader.h>
+#include <dxgiformat.h>
+
+#include "rendering/device/DeviceBuilder.h"
+
 class ShaderReflector
 {
 public:

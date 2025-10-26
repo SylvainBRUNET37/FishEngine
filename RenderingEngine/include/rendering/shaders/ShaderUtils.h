@@ -1,6 +1,8 @@
 #ifndef SHADER_UTILS_H
 #define SHADER_UTILS_H
 
+#include <string>
+
 #include "rendering/utils/ComPtr.h"
 #include "rendering/utils/DDSTextureLoader.h"
 

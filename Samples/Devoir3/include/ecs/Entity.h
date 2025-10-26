@@ -1,6 +1,8 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
+#include <cstdint>
+
 struct Entity
 {
 	using Index = uint32_t;

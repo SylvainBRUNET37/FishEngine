@@ -1,6 +1,8 @@
 #ifndef RENDER_TARGET_H
 #define RENDER_TARGET_H
 
+#include <d3d11.h>
+
 #include "rendering/utils/ComPtr.h"
 
 class RenderTarget

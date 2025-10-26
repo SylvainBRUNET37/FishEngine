@@ -1,6 +1,7 @@
 #ifndef TEXTURE_MANAGER_H
 #define TEXTURE_MANAGER_H
 
+#include <string>
 #include <unordered_map>
 
 #include "rendering/device/RenderContext.h"

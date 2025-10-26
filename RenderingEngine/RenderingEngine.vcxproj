@@ -22,7 +22,6 @@
     <ClInclude Include="external\stb_image.h" />
     <ClInclude Include="include\rendering\application\WindowsApplication.h" />
     <ClInclude Include="include\rendering\core\SceneData.h" />
-    <ClInclude Include="include\rendering\core\SceneNode.h" />
     <ClInclude Include="include\rendering\core\Transform.h" />
     <ClInclude Include="include\rendering\core\WindowData.h" />
     <ClInclude Include="include\rendering\device\BlendState.h" />

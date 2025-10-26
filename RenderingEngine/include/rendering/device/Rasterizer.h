@@ -1,6 +1,8 @@
 #ifndef RESTERIZER_H
 #define RESTERIZER_H
 
+#include <d3d11.h>
+
 #include "rendering/utils/ComPtr.h"
 
 class Rasterizer

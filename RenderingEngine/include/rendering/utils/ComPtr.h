@@ -1,6 +1,9 @@
 #ifndef COM_PTR_H
 #define COM_PTR_H
 
+#include <utility>
+#include <cassert>
+
 template <typename PtrType>
 class ComPtr
 {
