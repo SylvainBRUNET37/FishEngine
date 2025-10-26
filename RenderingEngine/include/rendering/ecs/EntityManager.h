@@ -12,7 +12,7 @@ template <typename... Components>
 class EntityManager
 {
 public:
-	[[nodiscard]] Entity Create()
+	[[nodiscard]] Entity CreateEntity()
 	{
 		const auto index = freeIndices.empty() ? CreateNewIndex() : UseFreeIndex();
 		const auto generation = generations[index];

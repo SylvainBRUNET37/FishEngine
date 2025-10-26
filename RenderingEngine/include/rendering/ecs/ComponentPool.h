@@ -3,6 +3,7 @@
 
 #include <utility>
 #include <vector>
+#include <optional>
 
 #include "Entity.h"
 
@@ -10,48 +11,50 @@ template <typename Component>
 class ComponentPool
 {
 public:
-	void ResizeIfOutOfBound(const Entity::Index entityIndex)
-	{
-		// Resize the container of components (+ presence) if their is a new entity index
-		if (components.size() < entityIndex)
-		{
-			components.resize(entityIndex);
-			present.resize(entityIndex, false);
-		}
-	}
+    void ResizeIfOutOfBound(const Entity::Index entityIndex)
+    {
+        // Expand the vector if needed
+        if (components.size() < entityIndex)
+        {
+            components.resize(entityIndex);
+        }
+    }
 
-	[[nodiscard]] bool Has(const Entity::Index entityIndex) const noexcept
-	{
-		return entityIndex < present.size() && present[entityIndex];
-	}
+    [[nodiscard]] bool Has(const Entity::Index entityIndex) const noexcept
+    {
+        return entityIndex < components.size() && components[entityIndex].has_value();
+    }
 
-	template <typename... ComponentArgs>
-	Component& Emplace(const Entity::Index entityIndex, ComponentArgs&&... componentArgs)
-	{
-		ResizeIfOutOfBound(entityIndex + 1);
+    template <typename... ComponentArgs>
+    Component& Emplace(const Entity::Index entityIndex, ComponentArgs&&... componentArgs)
+    {
+        ResizeIfOutOfBound(entityIndex + 1);
 
-		// Create the component with the given args at the entity position in the container
-		components[entityIndex] = Component{std::forward<ComponentArgs>(componentArgs)...};
-		present[entityIndex] = true;
+        // Construct the component with given args
+        components[entityIndex].emplace(std::forward<ComponentArgs>(componentArgs)...);
+        return *components[entityIndex];
+    }
 
-		return components[entityIndex];
-	}
+    void RemoveComponentOf(const Entity::Index entityIndex)
+    {
+        if (entityIndex < components.size())
+        {
+            components[entityIndex].reset(); // destroy the component if it exists
+        }
+    }
 
-	void RemoveComponentOf(const Entity::Index entityIndex)
-	{
-		if (entityIndex < present.size())
-		{
-			components[entityIndex] = Component{};
-			present[entityIndex] = false;
-		}
-	}
+    [[nodiscard]] Component& Get(const Entity::Index entityIndex)
+    {
+        return *components[entityIndex];
+    }
 
-	[[nodiscard]] Component& Get(const Entity::Index entityIndex) { return components[entityIndex]; }
-	[[nodiscard]] const Component& Get(const Entity::Index entityIndex) const { return components[entityIndex]; }
+    [[nodiscard]] const Component& Get(const Entity::Index entityIndex) const
+    {
+        return *components[entityIndex];
+    }
 
 private:
-	std::vector<Component> components; // The container of component. The index is the entity which hold the component
-	std::vector<bool> present; // Indicate if enties 0..n has this component
+    std::vector<std::optional<Component>> components;
 };
 
 #endif

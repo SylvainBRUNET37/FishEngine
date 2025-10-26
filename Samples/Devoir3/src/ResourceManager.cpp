@@ -21,7 +21,7 @@ void ResourceManager::InitShaderBank()
 	shaderBank = shaderFactory.CreateShaderBank(desc, device);
 } 
 
-Model ResourceManager::CreateFiatModel() const
+SceneResource ResourceManager::LoadScene() const
 {
 	const ShaderProgram shaderProgram
 	{

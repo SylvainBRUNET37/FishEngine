@@ -8,18 +8,18 @@
 
 #include "device/RenderContext.h"
 #include "texture/TextureManager.h"
-#include "graphics/Model.h"
+#include "loading/Node.h"
 
 class SceneLoader
 {
 public:
 	// TODO: Link shader program to mesh.
-	// This method is a temporary solution, every mesh will be rendered with the same shader
+	// This method is a temporary solution, every mesh will be rendered using same shaders
 	explicit SceneLoader(const ShaderProgram& shaderProgram) : shaderProgram{shaderProgram}
 	{
 	}
 
-	[[nodiscard]] Model LoadScene(
+	[[nodiscard]] SceneResource LoadScene(
 		const std::filesystem::path& filePath,
 		ID3D11Device* device
 	);
@@ -27,10 +27,13 @@ public:
 private:
 	ShaderProgram shaderProgram;
 	TextureManager textureManager{};
-	void ProcessNode(const aiNode* node, const aiScene* scene, ID3D11Device* device,
-	                 std::vector<Mesh>& meshesOut) const;
+	static void ProcessNodeHierarchy(const aiNode* aiNode,
+		const aiScene* scene,
+		const DirectX::XMMATRIX& parentTransform,
+		uint32_t parentIndex,
+		SceneResource& sceneRes);
 
-	Mesh ProcessMesh(const aiMesh* mesh, ID3D11Device* device, const DirectX::XMMATRIX& transform) const;
+	static Mesh ProcessMesh(const aiMesh* mesh, ID3D11Device* device, const DirectX::XMMATRIX& transform);
 
 	Material ProcessMaterial(const std::filesystem::path& materialPath, const aiScene* scene,
 	                         const aiMaterial* material, ID3D11Device* device);

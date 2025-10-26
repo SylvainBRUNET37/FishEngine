@@ -9,10 +9,10 @@
 class RenderSystem
 {
 public:
-	explicit RenderSystem(RenderContext* renderContext);
+	explicit RenderSystem(RenderContext* renderContext, std::vector<Material>&& materials);
 
 	void UpdateScene(double elapsedTime);
-	void Draw(Model& model, const Transform& transform);
+	void Render(const Mesh& mesh, const Transform& transform);
 	void Render() const { renderContext->Present(); }
 
 private:

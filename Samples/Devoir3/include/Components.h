@@ -1,11 +1,14 @@
 #ifndef COMPONENTS_H
 #define COMPONENTS_H
 
-#include "rendering/graphics/Model.h"
+#include <vector>
 
-struct Renderable
+#include "rendering/ecs/Entity.h"
+
+struct Hierarchy
 {
-	Model model;
+	Entity parent = INVALID_ENTITY;
+	std::vector<Entity> children{};
 };
 
 #endif

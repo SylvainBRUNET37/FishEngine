@@ -10,6 +10,8 @@
 #include "rendering/device/RenderContext.h"
 #include "rendering/utils/VerboseAssertion.h"
 #include "rendering/graphics/Mesh.h"
+#include "rendering/graphics/Material.h"
+#include "rendering/loading/Node.h"
 
 using namespace std;
 using namespace DirectX;
@@ -27,11 +29,10 @@ namespace
 	}
 }
 
-Model SceneLoader::LoadScene(const filesystem::path& filePath, ID3D11Device* device)
+SceneResource SceneLoader::LoadScene(const filesystem::path& filePath, ID3D11Device* device)
 {
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile
-	(
+	const aiScene* scene = importer.ReadFile(
 		filePath.string(),
 		aiProcess_Triangulate |
 		aiProcess_GenSmoothNormals |
@@ -41,41 +42,64 @@ Model SceneLoader::LoadScene(const filesystem::path& filePath, ID3D11Device* dev
 		aiProcess_FlipWindingOrder
 	);
 
-	if (not scene or not scene->mRootNode)
+	if (!scene || !scene->mRootNode)
 		throw runtime_error("Could not load scene: " + filePath.string());
 
-	std::vector<Mesh> meshes;
-	std::vector<Material> materials;
+	SceneResource sceneRes;
+	sceneRes.name = filePath.stem().string();
+
+	// Load materials
+	sceneRes.materials.reserve(scene->mNumMaterials);
 	for (unsigned int i = 0; i < scene->mNumMaterials; i++)
-		materials.push_back(ProcessMaterial(filePath.parent_path(), scene, scene->mMaterials[i], device));
+		sceneRes.materials.push_back(ProcessMaterial(filePath.parent_path(), scene, scene->mMaterials[i], device));
 
-	ProcessNode(scene->mRootNode, scene, device, meshes);
+	// Load meshes
+	sceneRes.meshes.reserve(scene->mNumMeshes);
+	for (unsigned int i = 0; i < scene->mNumMeshes; i++)
+		sceneRes.meshes.push_back(ProcessMesh(scene->mMeshes[i], device, XMMatrixIdentity()));
 
-	Model model{std::move(meshes), std::move(materials)};
-	return model;
+	// Build node hierarchy
+	sceneRes.nodes.reserve(scene->mNumMeshes); // rough estimate
+	ProcessNodeHierarchy(scene->mRootNode, scene, XMMatrixIdentity(), UINT32_MAX, sceneRes);
+
+	return sceneRes;
 }
 
-void SceneLoader::ProcessNode(const aiNode* node, const aiScene* scene, ID3D11Device* device, vector<Mesh>& meshesOut) const
+void SceneLoader::ProcessNodeHierarchy(
+	const aiNode* aiNode,
+	const aiScene* scene,
+	const XMMATRIX& parentTransform,
+	const uint32_t parentIndex,
+	SceneResource& sceneRes)
 {
-	const XMMATRIX transform = AiToXMMatrix(node->mTransformation);
+	Node node;
+	node.name = aiNode->mName.C_Str();
+	node.parentIndex = parentIndex;
+	node.transform = XMMatrixMultiply(AiToXMMatrix(aiNode->mTransformation), parentTransform);
 
-	for (unsigned int i = 0; i < node->mNumMeshes; i++)
-	{
-		const aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-		meshesOut.push_back(ProcessMesh(mesh, device, transform));
-	}
+	// If this node has a mesh, store its index
+	if (aiNode->mNumMeshes > 0)
+		node.meshIndex = aiNode->mMeshes[0]; // assuming one mesh per node
+	else
+		node.meshIndex = UINT32_MAX;
 
-	for (unsigned int i = 0; i < node->mNumChildren; i++)
+	// Add this node to scene and get its index
+	const uint32_t currentIndex = static_cast<uint32_t>(sceneRes.nodes.size());
+	sceneRes.nodes.push_back(node);
+
+	// Recursively process children
+	for (unsigned int i = 0; i < aiNode->mNumChildren; i++)
 	{
-		ProcessNode(node->mChildren[i], scene, device, meshesOut);
+		uint32_t childIndexBefore = static_cast<uint32_t>(sceneRes.nodes.size());
+		ProcessNodeHierarchy(aiNode->mChildren[i], scene, node.transform, currentIndex, sceneRes);
+		sceneRes.nodes[currentIndex].children.push_back(childIndexBefore);
 	}
 }
 
-Mesh SceneLoader::ProcessMesh(const aiMesh* mesh, ID3D11Device* device, const XMMATRIX& transform) const
+Mesh SceneLoader::ProcessMesh(const aiMesh* mesh, ID3D11Device* device, const XMMATRIX& transform)
 {
 	std::vector<Vertex> vertices;
 	std::vector<UINT> indices;
-
 	vertices.reserve(mesh->mNumVertices);
 
 	for (unsigned int i = 0; i < mesh->mNumVertices; i++)
@@ -98,15 +122,6 @@ Mesh SceneLoader::ProcessMesh(const aiMesh* mesh, ID3D11Device* device, const XM
 		else
 			vertex.textureCoord = XMFLOAT2(0.0f, 0.0f);
 
-		// tangents are not handled
-		/*
-		if (mesh->HasTangentsAndBitangents())
-		{
-		    vertex.tangent = XMFLOAT3(mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z);
-		    vertex.bitangent = XMFLOAT3(mesh->mBitangents[i].x, mesh->mBitangents[i].y, mesh->mBitangents[i].z);
-		}
-		*/
-
 		vertices.push_back(vertex);
 	}
 
@@ -122,11 +137,14 @@ Mesh SceneLoader::ProcessMesh(const aiMesh* mesh, ID3D11Device* device, const XM
 	return Mesh(std::move(vertices), std::move(indices), materialIndex, device);
 }
 
-Material SceneLoader::ProcessMaterial(const filesystem::path& materialPath, const aiScene* scene,
-                                      const aiMaterial* material, ID3D11Device* device)
+Material SceneLoader::ProcessMaterial(
+	const filesystem::path& materialPath,
+	const aiScene* scene,
+	const aiMaterial* material,
+	ID3D11Device* device)
 {
 	static constexpr int materialCbRegisterNumber = 2;
-	Material mat{device, shaderProgram, materialCbRegisterNumber };
+	Material mat{ device, shaderProgram, materialCbRegisterNumber };
 
 	aiColor4D color;
 	if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_AMBIENT, &color))
@@ -140,19 +158,15 @@ Material SceneLoader::ProcessMaterial(const filesystem::path& materialPath, cons
 	if (AI_SUCCESS == aiGetMaterialFloat(material, AI_MATKEY_SHININESS, &shininess))
 		mat.shininess = shininess;
 
-	// Process diffuse texture
 	aiString texturePath;
 	if (material->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == AI_SUCCESS)
 	{
 		if (const aiTexture* embeddedTex = scene->GetEmbeddedTexture(texturePath.C_Str()))
 		{
-			// Process embeded texture
-			const auto shaderRessouceView = ProcessEmbededTexture(embeddedTex, device);
-			mat.texture = shaderRessouceView;
+			mat.texture = ProcessEmbededTexture(embeddedTex, device);
 		}
 		else
 		{
-			// Process texture file
 			filesystem::path absoluteTexturePath = texturePath.C_Str();
 			if (!absoluteTexturePath.is_absolute())
 				absoluteTexturePath = materialPath / absoluteTexturePath;
@@ -170,7 +184,6 @@ ComPtr<ID3D11ShaderResourceView> SceneLoader::ProcessEmbededTexture(const aiText
 
 	if (embeddedTex->mHeight == 0)
 	{
-		// Compressed data
 		shaderRessouceView = textureManager.GetOrLoadFromMemory(
 			reinterpret_cast<const unsigned char*>(embeddedTex->pcData),
 			embeddedTex->mWidth,
@@ -178,7 +191,6 @@ ComPtr<ID3D11ShaderResourceView> SceneLoader::ProcessEmbededTexture(const aiText
 	}
 	else
 	{
-		// Non compressed data
 		const size_t size = static_cast<size_t>(embeddedTex->mWidth) * embeddedTex->mHeight * 4;
 		shaderRessouceView = textureManager.GetOrLoadFromMemory(
 			reinterpret_cast<const unsigned char*>(embeddedTex->pcData),

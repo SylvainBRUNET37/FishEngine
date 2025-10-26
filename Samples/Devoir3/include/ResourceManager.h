@@ -3,7 +3,7 @@
 
 #include <d3d11.h>
 
-#include "rendering/graphics/Model.h"
+#include "rendering/loading/Node.h"
 #include "rendering/shaders/ShaderBank.h"
 
 class ResourceManager
@@ -11,7 +11,7 @@ class ResourceManager
 public:
 	explicit ResourceManager(ID3D11Device* device);
 
-	[[nodiscard]] Model CreateFiatModel() const;
+	[[nodiscard]] SceneResource LoadScene() const;
 
 private:
 	ID3D11Device* device;

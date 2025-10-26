@@ -147,6 +147,9 @@
     <ClInclude Include="include\rendering\RenderSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\rendering\loading\Node.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\rendering\device\RenderContext.cpp">

@@ -8,12 +8,14 @@
 class Renderer
 {
 public:
-	explicit Renderer(ID3D11Device* device, const int frameCbRegisterNumber, const int objectCbRegisterNumber)
-		: frameConstantBuffer{device, frameCbRegisterNumber}, objectConstantBuffer{device, objectCbRegisterNumber}
+	explicit Renderer(ID3D11Device* device, std::vector<Material>&& materials, const int frameCbRegisterNumber,
+	                  const int objectCbRegisterNumber)
+		: frameConstantBuffer{device, frameCbRegisterNumber}, objectConstantBuffer{device, objectCbRegisterNumber},
+		  materials{std::move(materials)}
 	{
 	}
 
-	void Draw(Model& model, ID3D11DeviceContext* context,
+	void Render(const Mesh& mesh, ID3D11DeviceContext* context,
 	          const Transform& transform,
 	          const SceneData& scene);
 
@@ -35,6 +37,7 @@ private:
 
 	ConstantBuffer<FrameBufferData> frameConstantBuffer;
 	ConstantBuffer<ObjectConstants> objectConstantBuffer;
+	std::vector<Material> materials;
 
 	static void Draw(const Mesh& mesh, ID3D11DeviceContext* context);
 

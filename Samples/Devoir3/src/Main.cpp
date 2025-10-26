@@ -13,9 +13,9 @@
 #include "rendering/device/DeviceBuilder.h"
 #include "rendering/device/RenderContext.h"
 #include "rendering/shaders/ShaderProgramDesc.h"
-#include "rendering/ecs/EntityManager.h"
 #include "rendering/RenderSystem.h"
 
+#include "EntityManagerFactory.h"
 
 using namespace std;
 using namespace DirectX;
@@ -50,15 +50,12 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 	auto renderContext = DeviceBuilder::CreateRenderContext(application.GetMainWindow(), windowData);
 
 	ResourceManager resourceManager{ renderContext.GetDevice() };
-	auto model = resourceManager.CreateFiatModel();
+	auto sceneResources = resourceManager.LoadScene();
 
-	RenderSystem renderSystem{ &renderContext };
+	RenderSystem renderSystem{ &renderContext, std::move(sceneResources.materials) };
 
-	EntityManager<Transform, Renderable> entityManager;
-
-	const auto entity = entityManager.Create();
-	entityManager.AddComponent<Transform>(entity, XMMatrixIdentity());
-	entityManager.AddComponent<Renderable>(entity, std::move(model));
+	EntityManagerFactory<Transform, Mesh, Hierarchy> entityManagerFactory;
+	auto entityManager = entityManagerFactory.Create(sceneResources);
 
 	DWORD prevTime = GetTickCount();
 
@@ -74,9 +71,9 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 
 		renderSystem.UpdateScene(elapsedTime);
 
-		for (const auto& [transform, renderable] : entityManager.View<Transform, Renderable>())
+		for (const auto& [transform, mesh] : entityManager.View<Transform, Mesh>())
 		{
-			renderSystem.Draw(renderable.model, transform);
+			renderSystem.Render(mesh, transform);
 		}
 
 		renderSystem.Render();

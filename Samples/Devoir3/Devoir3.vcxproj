@@ -145,6 +145,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Components.h" />
+    <ClInclude Include="include\EntityManagerFactory.h" />
     <ClInclude Include="include\ResourceManager.h" />
     <ClInclude Include="include\Scene.h" />
   </ItemGroup>

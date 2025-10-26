@@ -3,33 +3,31 @@
 
 using namespace DirectX;
 
-void Renderer::Draw(Model& model, ID3D11DeviceContext* context, const Transform& transform, const SceneData& scene)
+void Renderer::Render(const Mesh& mesh, ID3D11DeviceContext* context, const Transform& transform,
+                      const SceneData& scene)
 {
-	for (size_t i = 0; i < model.meshes.size(); ++i)
-	{
-		auto& material = model.materials[model.meshes[i].materialIndex];
+	auto& material = materials[mesh.materialIndex];
 
-		// Update material constant buffer
-		const auto cbMaterialParams = BuildMaterialConstantBufferParams(material);
-		material.constantBuffer.Update(context, cbMaterialParams);
-		material.constantBuffer.Bind(context);
-		material.shaderProgram.Bind(context);
+	// Update material constant buffer
+	const auto cbMaterialParams = BuildMaterialConstantBufferParams(material);
+	material.constantBuffer.Update(context, cbMaterialParams);
+	material.constantBuffer.Bind(context);
+	material.shaderProgram.Bind(context);
 
-		// Update object constant buffer
-		const auto cbObjectParams = BuildObjectConstantBufferParams(transform);
-		objectConstantBuffer.Update(context, cbObjectParams);
-		objectConstantBuffer.Bind(context);
+	// Update object constant buffer
+	const auto cbObjectParams = BuildObjectConstantBufferParams(transform);
+	objectConstantBuffer.Update(context, cbObjectParams);
+	objectConstantBuffer.Bind(context);
 
-		// Update frame constant buffer
-		const auto cbFrameParams = BuildFrameConstantBufferParams(scene);
-		frameConstantBuffer.Update(context, cbFrameParams);
-		frameConstantBuffer.Bind(context);
+	// Update frame constant buffer
+	const auto cbFrameParams = BuildFrameConstantBufferParams(scene);
+	frameConstantBuffer.Update(context, cbFrameParams);
+	frameConstantBuffer.Bind(context);
 
-		// Bind material's texture of the mesh
-		context->PSSetShaderResources(0, 1, &material.texture);
+	// Bind material's texture of the mesh
+	context->PSSetShaderResources(0, 1, &material.texture);
 
-		Draw(model.meshes[i], context);
-	}
+	Draw(mesh, context);
 }
 
 void Renderer::Draw(const Mesh& mesh, ID3D11DeviceContext* context)

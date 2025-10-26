@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "rendering/RenderSystem.h"
 
-RenderSystem::RenderSystem(RenderContext* renderContext) : renderer{
-	                                                           renderContext->GetDevice(), frameCbRegisterNumber,
+RenderSystem::RenderSystem(RenderContext* renderContext, std::vector<Material>&& materials) : renderer{
+	                                                           renderContext->GetDevice(), std::move(materials), frameCbRegisterNumber,
 	                                                           objectCbRegisterNumber
                                                            },
                                                            sceneData{CreateSceneData()},
@@ -32,9 +32,9 @@ void RenderSystem::UpdateScene(const double elapsedTime)
 	RenderScene();
 }
 
-void RenderSystem::Draw(Model& model, const Transform& transform)
+void RenderSystem::Render(const Mesh& mesh, const Transform& transform)
 {
-	renderer.Draw(model, renderContext->GetContext(), transform, sceneData);
+	renderer.Render(mesh, renderContext->GetContext(), transform, sceneData);
 }
 
 void RenderSystem::AnimeScene(const double elapsedTime)
