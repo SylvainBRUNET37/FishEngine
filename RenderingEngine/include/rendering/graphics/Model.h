@@ -6,6 +6,7 @@
 
 struct Model
 {
+	Model() = default;
 	explicit Model(std::vector<Mesh>&& meshes, std::vector<Material>&& materials);
 
 	std::vector<Mesh> meshes;

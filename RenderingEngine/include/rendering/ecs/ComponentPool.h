@@ -10,8 +10,6 @@ template <typename Component>
 class ComponentPool
 {
 public:
-	ComponentPool() = default;
-
 	void ResizeIfOutOfBound(const Entity::Index entityIndex)
 	{
 		// Resize the container of components (+ presence) if their is a new entity index
@@ -42,7 +40,10 @@ public:
 	void RemoveComponentOf(const Entity::Index entityIndex)
 	{
 		if (entityIndex < present.size())
+		{
+			components[entityIndex] = Component{};
 			present[entityIndex] = false;
+		}
 	}
 
 	[[nodiscard]] Component& Get(const Entity::Index entityIndex) { return components[entityIndex]; }

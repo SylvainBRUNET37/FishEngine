@@ -37,13 +37,6 @@ void RenderingEngine::InitScene()
 	matView = firstPersonCamera->getMatView();
 	matProj = firstPersonCamera->getMatProj();
 	matViewProj = matView * matProj;
-
-	constexpr float fieldOfView = XM_PI / 4.0f; // 45 degrees
-	const float aspectRatio = static_cast<float>(renderContext->GetScreenWidth()) / static_cast<float>(renderContext->GetScreenHeight());
-	constexpr float nearPlane = 2.0f;
-	constexpr float farPlane = 50.0f;
-
-	matViewProj = matView * matProj;
 }
 
 void RenderingEngine::Run()
@@ -139,7 +132,6 @@ void RenderingEngine::AnimeScene(const double elapsedTime)
 		matView = firstPersonCamera->getMatView();
 		matViewProj = matView * matProj;
 	}
-
 }
 
 void RenderingEngine::RenderScene() // TODO: refactor

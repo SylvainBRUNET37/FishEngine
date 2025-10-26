@@ -14,6 +14,10 @@
 #include "rendering/device/RenderContext.h"
 #include "rendering/shaders/ShaderProgramDesc.h"
 #include "rendering/shaders/ShaderFactory.h"
+#include <rendering/ecs/EntityManager.h>
+
+#include "Components.h"
+#include "rendering/RenderSystem.h"
 
 using namespace std;
 using namespace DirectX;
@@ -33,7 +37,7 @@ namespace
 		return shaderBank;
 	}
 
-	Model CreateHumanModel(ID3D11Device* device, const ShaderBank& shaderBank)
+	Model CreateFiatModel(ID3D11Device* device, const ShaderBank& shaderBank)
 	{
 		const ShaderProgram shaderProgram
 		{
@@ -42,11 +46,22 @@ namespace
 			shaderBank.Get<PixelShader>("shaders/MiniPhongPS.hlsl"),
 		};
 
-		//const filesystem::path filePath = "assets\\Jin\\jin.obj";
-		const filesystem::path filePath = "assets\\terrain.glb";
+		const filesystem::path filePath = "assets\\fiat.glb";
 
 		SceneLoader modelLoader{ shaderProgram };
 		return modelLoader.LoadScene(filePath, device);
+	}
+
+	void WaitBeforeNextFrame(const DWORD frameStartTime)
+	{
+		static constexpr double TARGET_FPS = 60.0;
+		static constexpr double FRAME_TIME = 1000.0 / TARGET_FPS;
+
+		const DWORD frameEnd = GetTickCount();
+		const DWORD frameDuration = frameEnd - frameStartTime;
+
+		if (frameDuration < FRAME_TIME)
+			Sleep(static_cast<DWORD>(FRAME_TIME - frameDuration));
 	}
 }
 
@@ -64,10 +79,40 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 
 	auto renderContext = DeviceBuilder::CreateRenderContext(application.GetMainWindow(), windowData);
 	auto shaderBank = CreateShaderBank(renderContext.GetDevice());
-	RenderingEngine renderingEngine{ &renderContext, std::move(shaderBank), {WindowsApplication::ProcessWindowMessages} };
 
-	renderingEngine.AddObjectToScene(CreateHumanModel(renderContext.GetDevice(), std::move(shaderBank)));
-	renderingEngine.Run();
+	auto model = CreateFiatModel(renderContext.GetDevice(), shaderBank);
+
+	RenderSystem renderSystem{ &renderContext };
+
+	EntityManager<Transform, Renderable> entityManager;
+
+	const auto entity = entityManager.Create();
+	entityManager.AddComponent<Transform>(entity, XMMatrixIdentity());
+	entityManager.AddComponent<Renderable>(entity, std::move(model));
+
+	DWORD prevTime = GetTickCount();
+
+	while (true)
+	{
+		const DWORD frameStartTime = GetTickCount();
+
+		double elapsedTime = (frameStartTime - prevTime) / 1000.0f;
+		prevTime = frameStartTime;
+
+		if (not WindowsApplication::ProcessWindowMessages())
+			break;
+
+		renderSystem.UpdateScene(elapsedTime);
+
+		for (const auto& [transform, renderable] : entityManager.View<Transform, Renderable>())
+		{
+			renderSystem.Draw(renderable.model, transform);
+		}
+
+		renderSystem.Render();
+
+		WaitBeforeNextFrame(frameStartTime);
+	}
 
 	return EXIT_SUCCESS;
 }

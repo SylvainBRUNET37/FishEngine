@@ -18,7 +18,7 @@ public:
 
 	explicit RenderingEngine(RenderContext* renderContext, ShaderBank&& shaderBank_,
 	                         const std::initializer_list<MainLoopCallback> callbacks)
-		: shaderBank{shaderBank_},
+		: shaderBank{std::move(shaderBank_)},
 		  mainLoopCallbacks{callbacks},
 		  renderer{renderContext->GetDevice(), frameCbRegisterNumber, objectCbRegisterNumber},
 		  renderContext{renderContext}
@@ -33,6 +33,9 @@ public:
 	{
 		scene.push_back(model);
 	}
+
+	void UpdateScene();
+
 
 private:
 	ShaderBank shaderBank;
@@ -63,7 +66,6 @@ private:
 
 	void AnimeScene(double elapsedTime);
 	void RenderScene();
-	void UpdateScene();
 };
 
 #endif
