@@ -100,36 +100,8 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 
 	//
 
-	//DWORD prevTime = GetTickCount();
-
-	//while (true)
-	//{
-	//	const DWORD frameStartTime = GetTickCount();
-
-	//	double elapsedTime = (frameStartTime - prevTime) / 1000.0f;
-	//	prevTime = frameStartTime;
-
-	//	if (not WindowsApplication::ProcessWindowMessages())
-	//		break;
-
-	//	GameEngine::UpdatePhysics(); // UpdatePhysics physics
-
-	//	renderSystem.UpdateScene(elapsedTime);
-
-	//	for (const auto& [transform, mesh] : entityManager.View<Transform, Mesh>())
-	//	{
-	//		renderSystem.Render(mesh, transform);
-	//	}
-
-	//	for (const auto& [transform, rigidBody] : entityManager.View<Transform, RigidBody>())
-	//	{
-	//		transform.world = ToXMMATRIX(rigidBody.body->GetWorldTransform());
-	//	}
-
-	//	renderSystem.Render();
-
-	//	WaitBeforeNextFrame(frameStartTime);
-	//}
+	GameEngine gameEngine{ std::move(renderSystem), std::move(entityManager) };
+	gameEngine.Run();
 
 	return EXIT_SUCCESS;
 }

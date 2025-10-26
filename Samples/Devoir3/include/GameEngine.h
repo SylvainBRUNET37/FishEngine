@@ -15,8 +15,6 @@ public:
 
 	void Run();
 
-	static void UpdatePhysics();
-
 private:
 	static constexpr double PHYSICS_UPDATE_RATE = 1.0f / 60.0f;
 	static constexpr double TARGET_FPS = 60.0;
@@ -24,6 +22,8 @@ private:
 
 	RenderSystem renderSystem;
 	EntityManager entityManager;
+
+	static void UpdatePhysics();
 
 	static void WaitBeforeNextFrame(DWORD frameStartTime);
 };
