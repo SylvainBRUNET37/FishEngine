@@ -1,6 +1,8 @@
 #ifndef MESH_H
 #define MESH_H
 
+#include <vector>
+
 #include "Vertex.h"
 #include "rendering/buffers/IndexBuffer.h"
 #include "rendering/buffers/VertexBuffer.h"

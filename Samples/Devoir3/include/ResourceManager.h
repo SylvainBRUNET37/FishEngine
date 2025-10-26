@@ -1,0 +1,24 @@
+#ifndef RESOURCE_MANAGER_H
+#define RESOURCE_MANAGER_H
+
+#include <d3d11.h>
+
+#include "rendering/graphics/Model.h"
+#include "rendering/shaders/ShaderBank.h"
+
+class ResourceManager
+{
+public:
+	explicit ResourceManager(ID3D11Device* device);
+
+	[[nodiscard]] Model CreateFiatModel() const;
+
+private:
+	ID3D11Device* device;
+	ShaderBank shaderBank;
+
+	// Compile and create every shader
+	void InitShaderBank();
+};
+
+#endif

@@ -1,6 +1,9 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
+#include <DirectXMath.h>
+#include <string>
+
 #include "rendering/buffers/ConstantBuffer.h"
 #include "rendering/shaders/ShaderProgram.h"
 #include "rendering/utils/ComPtr.h"

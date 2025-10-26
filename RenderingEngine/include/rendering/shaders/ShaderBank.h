@@ -1,6 +1,7 @@
 #ifndef SHADER_BANK_H
 #define SHADER_BANK_H
 
+#include <stdexcept>
 #include <unordered_map>
 
 #include "Shader.h"
