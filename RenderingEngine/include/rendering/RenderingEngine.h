@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <functional>
 
+#include "Renderer.h"
 #include "device/RenderContext.h"
 #include "shaders/ShaderBank.h"
 #include "shaders/ShaderProgramDesc.h"
@@ -15,14 +16,19 @@ class RenderingEngine
 public:
 	using MainLoopCallback = std::function<bool()>;
 
-	explicit RenderingEngine(RenderContext* renderContext, ShaderBank&& shaderBank_, const std::initializer_list<MainLoopCallback> callbacks)
-		: shaderBank{ shaderBank_ }, mainLoopCallbacks{ callbacks }, renderContext{ renderContext }
+	explicit RenderingEngine(RenderContext* renderContext, ShaderBank&& shaderBank_,
+	                         const std::initializer_list<MainLoopCallback> callbacks)
+		: shaderBank{shaderBank_},
+		  mainLoopCallbacks{callbacks},
+		  renderer{renderContext->GetDevice(), frameCbRegisterNumber, objectCbRegisterNumber},
+		  renderContext{renderContext}
 	{
 		InitScene();
 		InitAnimation();
 	}
 
 	void Run();
+
 	void AddObjectToScene(Model&& model)
 	{
 		scene.push_back(model);
@@ -32,9 +38,13 @@ private:
 	ShaderBank shaderBank;
 	std::vector<MainLoopCallback> mainLoopCallbacks;
 
-	DirectX::XMMATRIX matView{};
-	DirectX::XMMATRIX matProj{};
-	DirectX::XMMATRIX matViewProj{};
+	static constexpr int frameCbRegisterNumber = 0; // b0
+	static constexpr int objectCbRegisterNumber = 1; // b1
+	Renderer renderer;
+
+	XMMATRIX matView{};
+	XMMATRIX matProj{};
+	XMMATRIX matViewProj{};
 
 	RenderContext* renderContext; // TODO: use unique ptr ?
 

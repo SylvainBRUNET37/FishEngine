@@ -5,19 +5,28 @@ using namespace DirectX;
 
 void Renderer::Draw(Model& model, ID3D11DeviceContext* context, const Transform& transform, const SceneData& scene)
 {
-	// Prepare constant buffer once for each mesh
 	for (size_t i = 0; i < model.meshes.size(); ++i)
 	{
-		auto& mat = model.materials[model.meshes[i].materialIndex];
-		auto& mesh = model.meshes[i];
-		auto params = BuildMeshConstantBufferParams(mat, transform, scene);
+		auto& material = model.materials[model.meshes[i].materialIndex];
 
-		mesh.shaderProgram.Bind(context);
-		mesh.constantBuffer.Update(context, sizeof(decltype(params)), &params);
-		mesh.constantBuffer.Bind(context);
+		// Update material constant buffer
+		const auto cbMaterialParams = BuildMaterialConstantBufferParams(material);
+		material.constantBuffer.Update(context, cbMaterialParams);
+		material.constantBuffer.Bind(context);
+		material.shaderProgram.Bind(context);
+
+		// Update object constant buffer
+		const auto cbObjectParams = BuildObjectConstantBufferParams(transform);
+		objectConstantBuffer.Update(context, cbObjectParams);
+		objectConstantBuffer.Bind(context);
+
+		// Update frame constant buffer
+		const auto cbFrameParams = BuildFrameConstantBufferParams(scene);
+		frameConstantBuffer.Update(context, cbFrameParams);
+		frameConstantBuffer.Bind(context);
 
 		// Bind material's texture of the mesh
-		context->PSSetShaderResources(0, 1, &mat.texture);
+		context->PSSetShaderResources(0, 1, &material.texture);
 
 		Draw(model.meshes[i], context);
 	}
@@ -37,24 +46,39 @@ void Renderer::Draw(const Mesh& mesh, ID3D11DeviceContext* context)
 	context->DrawIndexed(static_cast<UINT>(mesh.indices.size()), 0, 0);
 }
 
-Mesh::ConstantBufferParams Renderer::BuildMeshConstantBufferParams(const Material& material,
-                                                                    const Transform& transform, const SceneData& scene)
+Renderer::FrameBufferData Renderer::BuildFrameConstantBufferParams(const SceneData& sceneData)
 {
-	Mesh::ConstantBufferParams params;
+	FrameBufferData params;
+
+	params.matViewProj = XMMatrixTranspose(sceneData.matViewProj);
+	params.vLumiere = sceneData.lightPosition;
+	params.vCamera = sceneData.cameraPosition;
+	params.vDEcl = sceneData.vDEcl;
+	params.vAEcl = sceneData.vAEcl;
+	params.vSEcl = sceneData.vSEcl;
+
+	return params;
+}
+
+Renderer::ObjectConstants Renderer::BuildObjectConstantBufferParams(const Transform& transform)
+{
+	ObjectConstants params;
 
 	params.matWorld = XMMatrixTranspose(transform.world);
-	params.matWorldViewProj = XMMatrixTranspose(transform.world * transform.view * transform.proj);
-	params.vLumiere = scene.lightPosition;
-	params.vCamera = scene.cameraPosition;
-	params.vAEcl = scene.vAEcl;
-	params.vDEcl = scene.vDEcl;
-	params.vSEcl = scene.vSEcl;
+
+	return params;
+}
+
+Material::MaterialBufferData Renderer::BuildMaterialConstantBufferParams(const Material& material)
+{
+	Material::MaterialBufferData params;
+
 	params.vAMat = material.ambient;
 	params.vDMat = material.diffuse;
 	params.vSMat = material.specular;
 	params.puissance = material.shininess;
 	params.bTex = material.texture != nullptr;
-	params.remplissage = XMFLOAT2(0, 0);
+	params.padding = XMFLOAT2(0, 0);
 
 	return params;
 }

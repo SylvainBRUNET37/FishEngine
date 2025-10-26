@@ -8,17 +8,39 @@
 class Renderer
 {
 public:
-	static void Draw(Model& model, ID3D11DeviceContext* context,
-	                 const Transform& transform,
-	                 const SceneData& scene);
+	explicit Renderer(ID3D11Device* device, const int frameCbRegisterNumber, const int objectCbRegisterNumber)
+		: frameConstantBuffer{device, frameCbRegisterNumber}, objectConstantBuffer{device, objectCbRegisterNumber}
+	{
+	}
+
+	void Draw(Model& model, ID3D11DeviceContext* context,
+	          const Transform& transform,
+	          const SceneData& scene);
 
 private:
+	struct FrameBufferData // b0 in the shader program
+	{
+		DirectX::XMMATRIX matViewProj;
+		DirectX::XMFLOAT4 vLumiere;
+		DirectX::XMFLOAT4 vCamera;
+		DirectX::XMFLOAT4 vAEcl;
+		DirectX::XMFLOAT4 vDEcl;
+		DirectX::XMFLOAT4 vSEcl;
+	};
+
+	struct ObjectConstants // b1 in the shader program
+	{
+		DirectX::XMMATRIX matWorld;
+	};
+
+	ConstantBuffer<FrameBufferData> frameConstantBuffer;
+	ConstantBuffer<ObjectConstants> objectConstantBuffer;
+
 	static void Draw(const Mesh& mesh, ID3D11DeviceContext* context);
 
-	static Mesh::ConstantBufferParams BuildMeshConstantBufferParams(
-		const Material& material,
-		const Transform& transform,
-		const SceneData& scene);
+	static FrameBufferData BuildFrameConstantBufferParams(const SceneData& sceneData);
+	static ObjectConstants BuildObjectConstantBufferParams(const Transform& transform);
+	static Material::MaterialBufferData BuildMaterialConstantBufferParams(const Material& material);
 };
 
 #endif

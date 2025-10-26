@@ -119,13 +119,14 @@ Mesh SceneLoader::ProcessMesh(const aiMesh* mesh, ID3D11Device* device, const XM
 
 	const UINT materialIndex = mesh->mMaterialIndex;
 
-	return Mesh(std::move(vertices), std::move(indices), materialIndex, device, shaderProgram);
+	return Mesh(std::move(vertices), std::move(indices), materialIndex, device);
 }
 
 Material SceneLoader::ProcessMaterial(const filesystem::path& materialPath, const aiScene* scene,
                                       const aiMaterial* material, ID3D11Device* device)
 {
-	Material mat;
+	static constexpr int materialCbRegisterNumber = 2;
+	Material mat{device, shaderProgram, materialCbRegisterNumber };
 
 	aiColor4D color;
 	if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_AMBIENT, &color))

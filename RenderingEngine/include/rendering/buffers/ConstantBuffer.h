@@ -3,38 +3,42 @@
 
 #include "Buffer.h"
 
+template <typename Params>
 class ConstantBuffer : public Buffer
 {
 public:
-    explicit ConstantBuffer(ID3D11Device* device, const size_t bufferSize)
-    {
-        D3D11_BUFFER_DESC constantBufferDesc{};
+	explicit ConstantBuffer(ID3D11Device* device, const int registerNumber) : registerNumber{registerNumber}
+	{
+		D3D11_BUFFER_DESC constantBufferDesc{};
 
-        constantBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-        constantBufferDesc.ByteWidth = static_cast<UINT>(bufferSize);
-        constantBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-        constantBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+		constantBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+		constantBufferDesc.ByteWidth = static_cast<UINT>(sizeof(Params));
+		constantBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		constantBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
-        const HRESULT hr = device->CreateBuffer(&constantBufferDesc, nullptr, &buffer);
-        assert(SUCCEEDED(hr));
-    }
+		const HRESULT hr = device->CreateBuffer(&constantBufferDesc, nullptr, &buffer);
+		assert(SUCCEEDED(hr));
+	}
 
-    void Update(ID3D11DeviceContext* context, const size_t bufferSize, const void* data)
-    {
-        D3D11_MAPPED_SUBRESOURCE mapped{};
-        const HRESULT hr = context->Map(buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+	void Update(ID3D11DeviceContext* context, const Params& params)
+	{
+		D3D11_MAPPED_SUBRESOURCE mapped{};
+		const HRESULT hr = context->Map(buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
 
-        assert(SUCCEEDED(hr));
-        std::memcpy(mapped.pData, data, bufferSize);
+		assert(SUCCEEDED(hr));
+		std::memcpy(mapped.pData, &params, sizeof(Params));
 
-        context->Unmap(buffer, 0);
-    }
+		context->Unmap(buffer, 0);
+	}
 
-    void Bind(ID3D11DeviceContext* context)
-    {
-        context->VSSetConstantBuffers(0, 1, &buffer);
-        context->PSSetConstantBuffers(0, 1, &buffer);
-    }
+	void Bind(ID3D11DeviceContext* context)
+	{
+		context->VSSetConstantBuffers(registerNumber, 1, &buffer);
+		context->PSSetConstantBuffers(registerNumber, 1, &buffer);
+	}
+
+private:
+	int registerNumber; // The corresponding register number in the shader program constant buffer (b0, b1, b2, ...)
 };
 
 #endif

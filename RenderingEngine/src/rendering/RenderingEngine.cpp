@@ -83,7 +83,7 @@ void RenderingEngine::UpdateScene()
 
 void RenderingEngine::AnimeScene(const double elapsedTime)
 {
-	float deplacement = cameraSpeed * static_cast<float>(elapsedTime);
+	const float deplacement = cameraSpeed * static_cast<float>(elapsedTime);
 	bool cameraUpdated = false;
 	float deltaX = 0.0f;
 	float deltaZ = 0.0f;
@@ -173,13 +173,13 @@ void RenderingEngine::RenderScene() // TODO: refactor
 	constexpr auto vDEcl = XMFLOAT4(1, 1, 1, 1);
 	constexpr auto vSEcl = XMFLOAT4(1, 1, 1, 1);
 
-	const Transform transform{.world = world, .view = view, .proj = proj};
-	SceneData sceneData
+	const Transform transform{.world = world};
+	const SceneData sceneData
 	{
-		.lightPosition = lightPos, .cameraPosition = cameraPos, .vAEcl = vAEcl, .vDEcl = vDEcl,
+		.matViewProj = matViewProj, .lightPosition = lightPos, .cameraPosition = cameraPos, .vAEcl = vAEcl, .vDEcl = vDEcl,
 		.vSEcl = vSEcl
 	};
 
 	for (auto& object : scene)
-		Renderer::Draw(object, pImmediateContext, transform, sceneData);
+		renderer.Draw(object, pImmediateContext, transform, sceneData);
 }

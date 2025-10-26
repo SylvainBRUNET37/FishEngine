@@ -3,6 +3,7 @@
 
 struct SceneData
 {
+	DirectX::XMMATRIX matViewProj;
 	DirectX::XMFLOAT4 lightPosition;
     DirectX::XMFLOAT4 cameraPosition;
     DirectX::XMFLOAT4 vAEcl;

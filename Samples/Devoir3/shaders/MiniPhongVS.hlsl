@@ -1,18 +1,29 @@
-cbuffer param : register(b0)
+// Per-frame: Camera and light data
+cbuffer FrameBuffer : register(b0)
 {
-    float4x4 matWorldViewProj;
+    float4x4 matViewProj;
+    float4 vLumiere; // xyz = light position
+    float4 vCamera; // xyz = camera position
+    float4 vAEcl; // ambient light color
+    float4 vDEcl; // diffuse light color
+    float4 vSEcl; // specular light color
+};
+
+// Per-object: Transform
+cbuffer ObjectBuffer : register(b1)
+{
     float4x4 matWorld;
-    float4 vLumiere;
-    float4 vCamera;
-    float4 vAEcl;
-    float4 vAMat;
-    float4 vDEcl;
-    float4 vDMat;
-    float4 vSEcl;
-    float4 vSMat;
-    float puissance;
-    int bTex;
-    float2 remplissage;
+};
+
+// Per-material: Material parameters
+cbuffer MaterialBuffer : register(b2)
+{
+    float4 vAMat; // ambient color
+    float4 vDMat; // diffuse color
+    float4 vSMat; // specular color
+    float puissance; // shininess
+    float bTex; // texture enabled (float for alignment)
+    float2 padding; // alignment padding
 };
 
 struct VSInput
@@ -35,13 +46,16 @@ VSOutput MiniPhongVS(VSInput vin)
 {
     VSOutput vout = (VSOutput) 0;
 
-    vout.Pos = mul(float4(vin.POSITION, 1.0f), matWorldViewProj);
-    vout.Norm = mul(float4(vin.NORMAL, 0.0f), matWorld).xyz;
+    // Transform position and normal
+    float4 worldPos = mul(float4(vin.POSITION, 1.0f), matWorld);
+    vout.Pos = mul(worldPos, matViewProj);
 
-    float3 posWorld = mul(float4(vin.POSITION, 1.0f), matWorld).xyz;
-    vout.vDirLum = vLumiere.xyz - posWorld;
-    vout.vDirCam = vCamera.xyz - posWorld;
+    vout.Norm = normalize(mul(float4(vin.NORMAL, 0.0f), matWorld).xyz);
+
+    // Compute direction vectors (world space)
+    vout.vDirLum = vLumiere.xyz - worldPos.xyz;
+    vout.vDirCam = vCamera.xyz - worldPos.xyz;
+
     vout.coordTex = vin.TEXCOORD;
-
     return vout;
 }

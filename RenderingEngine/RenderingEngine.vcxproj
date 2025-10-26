@@ -38,6 +38,7 @@
     <ClInclude Include="include\rendering\ecs\ComponentPool.h" />
     <ClInclude Include="include\rendering\ecs\Entity.h" />
     <ClInclude Include="include\rendering\ecs\EntityManager.h" />
+    <ClInclude Include="include\rendering\graphics\Camera.h" />
     <ClInclude Include="include\rendering\Renderer.h" />
     <ClInclude Include="include\rendering\SceneLoader.h" />
     <ClInclude Include="include\rendering\RenderingEngine.h" />

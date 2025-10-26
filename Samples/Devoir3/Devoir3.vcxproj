@@ -140,6 +140,17 @@
       <Project>{10d6a408-012b-4954-aeb9-7cc42784ea15}</Project>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Scene.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\MiniPhongPS.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="shaders\MiniPhongVS.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

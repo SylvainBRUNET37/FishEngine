@@ -1,18 +1,29 @@
-cbuffer param : register(b0)
+// Per-frame: Camera and light data
+cbuffer FrameBuffer : register(b0)
 {
-    float4x4 matWorldViewProj;
+    float4x4 matViewProj;
+    float4 vLumiere; // xyz = light position
+    float4 vCamera; // xyz = camera position
+    float4 vAEcl; // ambient light color
+    float4 vDEcl; // diffuse light color
+    float4 vSEcl; // specular light color
+};
+
+// Per-object: Transform
+cbuffer ObjectBuffer : register(b1)
+{
     float4x4 matWorld;
-    float4 vLumiere;
-    float4 vCamera;
-    float4 vAEcl;
-    float4 vAMat;
-    float4 vDEcl;
-    float4 vDMat;
-    float4 vSEcl;
-    float4 vSMat;
-    float puissance;
-    int bTex;
-    float2 remplissage;
+};
+
+// Per-material: Material parameters
+cbuffer MaterialBuffer : register(b2)
+{
+    float4 vAMat; // ambient color
+    float4 vDMat; // diffuse color
+    float4 vSMat; // specular color
+    float puissance; // shininess
+    float bTex; // texture enabled (float for alignment)
+    float2 padding; // alignment padding
 };
 
 Texture2D textureEntree : register(t0);
@@ -32,25 +43,22 @@ float4 MiniPhongPS(VSOutput vin) : SV_Target
     float3 N = normalize(vin.Norm);
     float3 L = normalize(vin.vDirLum);
     float3 V = normalize(vin.vDirCam);
-    float3 R = normalize(2 * dot(N, L) * N - L);
+    float3 R = reflect(-L, N);
 
     float diff = saturate(dot(N, L));
     float spec = pow(saturate(dot(R, V)), puissance);
 
-    float3 couleur;
+    float3 ambient = vAEcl.rgb * vAMat.rgb;
+    float3 diffuse = vDEcl.rgb * vDMat.rgb * diff;
+    float3 specular = vSEcl.rgb * vSMat.rgb * spec;
 
-    if (bTex > 0)
+    float3 color = ambient + diffuse + specular;
+
+    if (bTex > 0.5f)
     {
         float3 texColor = textureEntree.Sample(SampleState, vin.coordTex).rgb;
-        couleur = texColor * (vAEcl.rgb + vDEcl.rgb * diff) + vSEcl.rgb * vSMat.rgb * spec;
-    }
-    else
-    {
-        couleur = vAEcl.rgb * vAMat.rgb +
-                  vDEcl.rgb * vDMat.rgb * diff +
-                  vSEcl.rgb * vSMat.rgb * spec;
+        color *= texColor;
     }
 
-    return float4(couleur, 1.0f);
+    return float4(color, 1.0f);
 }
-
