@@ -29,7 +29,7 @@
 #include "rendering/RenderSystem.h"
 #include "ResourceManager.h"
 
-#include "EntityManagerFactory.h"
+#include "ecs/EntityManagerFactory.h"
 #include "GameEngine.h"
 
 using namespace JPH;
@@ -55,9 +55,7 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 	auto sceneResources = resourceManager.LoadScene();
 
 	RenderSystem renderSystem{&renderContext, std::move(sceneResources.materials)};
-
-	EntityManagerFactory entityManagerFactory;
-	auto entityManager = entityManagerFactory.Create(sceneResources);
+	auto entityManager = EntityManagerFactory::Create(sceneResources);
 
 	/////	Physics System	 /////
 	JoltSystem::Init();

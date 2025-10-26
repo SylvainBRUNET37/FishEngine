@@ -151,6 +151,7 @@
     <ClInclude Include="include\CC.h" />
     <ClInclude Include="include\ecs\Components.h" />
     <ClInclude Include="include\ecs\ComponentPool.h" />
+    <ClInclude Include="include\ecs\ComponentUtils.h" />
     <ClInclude Include="include\ecs\Entity.h" />
     <ClInclude Include="include\ecs\EntityManager.h" />
     <ClInclude Include="include\PhysicsEngine\layers\BroadPhaseLayerInterfaceImpl.h" />
@@ -163,7 +164,7 @@
     <ClInclude Include="include\PhysicsEngine\pch.h" />
     <ClInclude Include="include\PhysicsEngine\systems\JoltSystem.h" />
     <ClInclude Include="include\PhysicsEngine\utils\Utils.h" />
-    <ClInclude Include="include\EntityManagerFactory.h" />
+    <ClInclude Include="include\ecs\EntityManagerFactory.h" />
     <ClInclude Include="include\ResourceManager.h" />
     <ClInclude Include="include\GameEngine.h" />
   </ItemGroup>

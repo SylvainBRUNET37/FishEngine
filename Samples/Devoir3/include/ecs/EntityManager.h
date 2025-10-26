@@ -4,6 +4,7 @@
 #include "Entity.h"
 #include "ComponentPool.h"
 #include "Components.h"
+#include "ComponentUtils.h"
 
 class EntityManager
 {
@@ -40,7 +41,7 @@ public:
 	}
 
 	template <typename Component, typename... ComponentArgs>
-		requires OneOf<Component>
+		requires IsComponent<Component>
 	Component& AddComponent(const Entity entity, ComponentArgs&&... args)
 	{
 		if (not IsAlive(entity))
@@ -53,7 +54,7 @@ public:
 	}
 
 	template <typename Component>
-		requires OneOf<Component>
+		requires IsComponent<Component>
 	[[nodiscard]] bool HasComponent(const Entity entity) const noexcept
 	{
 		if (not IsAlive(entity))
@@ -64,7 +65,7 @@ public:
 	}
 
 	template <typename Component>
-		requires OneOf<Component>
+		requires IsComponent<Component>
 	[[nodiscard]] Component& Get(const Entity entity)
 	{
 		if (not IsAlive(entity))
@@ -75,7 +76,7 @@ public:
 	}
 
 	template <typename Component>
-		requires OneOf<Component>
+		requires IsComponent<Component>
 	[[nodiscard]] const Component& Get(const Entity entity) const
 	{
 		if (not IsAlive(entity))
