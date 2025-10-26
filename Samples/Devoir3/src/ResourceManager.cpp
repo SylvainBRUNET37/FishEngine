@@ -30,7 +30,7 @@ SceneResource ResourceManager::LoadScene() const
 		shaderBank.Get<PixelShader>("shaders/MiniPhongPS.hlsl"),
 	};
 
-	const std::filesystem::path filePath = "assets\\fiat.glb";
+	const std::filesystem::path filePath = "assets\\quick_cube.glb";
 
 	SceneLoader modelLoader{ shaderProgram };
 	return modelLoader.LoadScene(filePath, device);
