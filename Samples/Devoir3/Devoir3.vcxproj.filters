@@ -2,12 +2,11 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="src\Main.cpp" />
-    <ClCompile Include="src\PhysicsEngine\listeners\ContactListenerImpl.cpp" />
-    <ClCompile Include="src\PhysicsEngine\pch.cpp" />
     <ClCompile Include="src\PhysicsEngine\systems\JoltSystem.cpp" />
     <ClCompile Include="src\ResourceManager.cpp" />
     <ClCompile Include="src\PhysicsEngine\GameEngine.cpp" />
     <ClCompile Include="src\PhysicsEngine\ShapeFactory.cpp" />
+    <ClCompile Include="pch.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\CC.h" />
@@ -18,7 +17,6 @@
     <ClInclude Include="include\PhysicsEngine\layers\ObjectVsBroadPhaseLayerFilterImpl.h" />
     <ClInclude Include="include\PhysicsEngine\listeners\BodyActivationListenerLogger.h" />
     <ClInclude Include="include\PhysicsEngine\listeners\ContactListenerImpl.h" />
-    <ClInclude Include="include\PhysicsEngine\pch.h" />
     <ClInclude Include="include\PhysicsEngine\systems\JoltSystem.h" />
     <ClInclude Include="include\PhysicsEngine\utils\Utils.h" />
     <ClInclude Include="include\ecs\EntityManagerFactory.h" />
@@ -30,6 +28,7 @@
     <ClInclude Include="include\ecs\Components.h" />
     <ClInclude Include="include\ecs\ComponentUtils.h" />
     <ClInclude Include="include\PhysicsEngine\ShapeFactory.h" />
+    <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\MiniPhongPS.hlsl" />

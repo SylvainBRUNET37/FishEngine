@@ -1,7 +1,6 @@
 #ifndef OBJECT_LAYER_PAIR_FILTER_IMPL_H
 #define OBJECT_LAYER_PAIR_FILTER_IMPL_H
 
-#include "PhysicsEngine/pch.h"
 #include "Layers.h"
 
 class ObjectLayerPairFilterImpl : public JPH::ObjectLayerPairFilter

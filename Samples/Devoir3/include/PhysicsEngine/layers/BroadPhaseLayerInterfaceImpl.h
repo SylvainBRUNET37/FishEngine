@@ -1,8 +1,7 @@
 #ifndef BROAD_PHASE_LAYER_INTERFACE_IMPL_H
 #define BROAD_PHASE_LAYER_INTERFACE_IMPL_H
 
-#include "PhysicsEngine/pch.h"
-
+#include <Jolt/Jolt.h>
 #include <Jolt/Physics/Collision/BroadPhase/BroadPhaseLayer.h>
 
 #include "BroadPhaseLayers.h"

@@ -1,17 +1,4 @@
-#include <iostream>
-#include <Windows.h>
-#include <tchar.h>
-#include <d3d11.h>
-#include <DirectXMath.h>
-#include <cstdlib>
-#include <minwindef.h>
-
-#include <Jolt/Jolt.h>
-#include <Jolt/Physics/Body/BodyCreationSettings.h>
-#include <Jolt/Physics/Collision/Shape/BoxShape.h>
-#include <Jolt/Math/Quat.h>
-#include <Jolt/Math/Vec3.h>
-#include <Jolt/Math/Mat44.h>
+#include "pch.h"
 
 #include "ecs/Components.h"
 #include "PhysicsEngine/layers/BroadPhaseLayerInterfaceImpl.h"
@@ -21,7 +8,6 @@
 #include "PhysicsEngine/listeners/BodyActivationListenerLogger.h"
 #include "PhysicsEngine/listeners/ContactListenerImpl.h"
 #include "PhysicsEngine/systems/JoltSystem.h"
-#include "rendering/SceneLoader.h"
 #include "rendering/application/WindowsApplication.h"
 #include "rendering/device/DeviceBuilder.h"
 #include "rendering/device/RenderContext.h"

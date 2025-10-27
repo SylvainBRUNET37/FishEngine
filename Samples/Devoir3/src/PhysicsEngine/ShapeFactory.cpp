@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "PhysicsEngine/ShapeFactory.h"
 
 #include <Jolt/Physics/EActivation.h>
@@ -13,7 +14,7 @@ using namespace JPH::literals;
 
 Body* ShapeFactory::CreateCube(const Transform& transform)
 {
-    // Apply scale to the box half-extents
+    // Apply scale to the box
     auto halfExtents = Vec3(0.5f, 0.5f, 0.5f);
     halfExtents *= Vec3(transform.scale.x, transform.scale.y, transform.scale.z);
 
@@ -40,7 +41,7 @@ Body* ShapeFactory::CreateCube(const Transform& transform)
 
 Body* ShapeFactory::CreatePlane(const Transform& transform)
 {
-    // Apply scale to the box half-extents
+    // Apply scale to the box
 	auto halfExtents = Vec3(0.5f, 0.05f, 0.5f);
     halfExtents *= Vec3(transform.scale.x, transform.scale.y, transform.scale.z);
 

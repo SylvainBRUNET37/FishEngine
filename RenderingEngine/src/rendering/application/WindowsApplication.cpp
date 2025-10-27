@@ -15,7 +15,7 @@ bool WindowsApplication::Init()
 	return true;
 }
 
-bool WindowsApplication::ProcessWindowMessages()
+bool WindowsApplication::ProcessWindowsMessages()
 {
 	MSG msg;
 

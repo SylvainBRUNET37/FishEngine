@@ -26,7 +26,7 @@ public:
 	[[nodiscard]] HWND& GetMainWindow() { return mainWindow; }
 	[[nodiscard]] WindowData GetWindowData() const noexcept { return windowData; }
 
-	[[nodiscard]] static bool ProcessWindowMessages();
+	[[nodiscard]] static bool ProcessWindowsMessages();
 
 private:
 	HINSTANCE instance{};

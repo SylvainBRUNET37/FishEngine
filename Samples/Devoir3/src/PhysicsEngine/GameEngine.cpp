@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "GameEngine.h"
 
 #include "ecs/Components.h"
@@ -5,27 +6,6 @@
 #include "rendering/application/WindowsApplication.h"
 #include "rendering/core/Transform.h"
 #include "rendering/graphics/Mesh.h"
-
-// TODO: put it elsewhere
-XMMATRIX ToXMMATRIX(const JPH::RMat44& transform)
-{
-	// Extract Jolt basis vectors and translation
-	const JPH::Vec3 x = transform.GetAxisX();
-	const JPH::Vec3 y = transform.GetAxisY();
-	const JPH::Vec3 z = transform.GetAxisZ();
-	const JPH::RVec3 p = transform.GetTranslation();
-
-	// Construct a DirectX right-handed matrix
-	return XMMatrixSet(
-		x.GetX(), x.GetY(), x.GetZ(), 0.0f,
-		y.GetX(), y.GetY(), y.GetZ(), 0.0f,
-		z.GetX(), z.GetY(), z.GetZ(), 0.0f,
-		p.GetX(),
-		p.GetY(),
-		p.GetZ(),
-		1.0f
-	);
-}
 
 void GameEngine::Run()
 {
@@ -39,35 +19,12 @@ void GameEngine::Run()
 		const double elapsedTime = (frameStartTime - prevTime) / 1000.0;
 		prevTime = frameStartTime;
 
-		shouldContinue = WindowsApplication::ProcessWindowMessages();
+		// End the loop if Windows want to terminate the program (+ process messages)
+		shouldContinue = WindowsApplication::ProcessWindowsMessages();
 
 		UpdatePhysics();
-		renderSystem.UpdateScene(elapsedTime);
-
-		for (const auto& [entity, transform, rigidBody] : entityManager.View<Transform, RigidBody>())
-		{
-			// Uses Jolt position and rotation and keep the orginal scale of the transform
-			const JPH::RMat44& joltTransform = rigidBody.body->GetWorldTransform();
-			const JPH::Vec3 joltPos = joltTransform.GetTranslation();
-			const JPH::Quat joltRot = joltTransform.GetQuaternion();
-
-			transform.position = { joltPos.GetX(), joltPos.GetY(), joltPos.GetZ() };
-			transform.rotation = { joltRot.GetX(), joltRot.GetY(), joltRot.GetZ(), joltRot.GetW() };
-
-			const auto scaleMatrix = XMMatrixScaling(transform.scale.x, transform.scale.y, transform.scale.z);
-			const auto rotationMatrix = XMMatrixRotationQuaternion(XMLoadFloat4(&transform.rotation));
-			const auto translationMatrix = XMMatrixTranslation(transform.position.x, transform.position.y,
-				transform.position.z);
-
-			transform.world = scaleMatrix * rotationMatrix * translationMatrix;
-		}
-
-		for (const auto& [entity, transform, mesh] : entityManager.View<Transform, Mesh>())
-		{
-			renderSystem.Render(mesh, transform);
-		}
-
-		renderSystem.Render();
+		UpdateTransforms();
+		RenderScene(elapsedTime);
 
 		WaitBeforeNextFrame(frameStartTime);
 	}
@@ -88,8 +45,41 @@ void GameEngine::UpdatePhysics()
 	JoltSystem::GetPostStepCallbacks().clear();
 }
 
-void GameEngine::WaitBeforeNextFrame(const DWORD frameStartTime)
+void GameEngine::UpdateTransforms()
+{
+	for (const auto& [entity, transform, rigidBody] : entityManager.View<Transform, RigidBody>())
+	{
+		// Get jolt transform data
+		const JPH::RMat44& joltTransform = rigidBody.body->GetWorldTransform();
+		const JPH::Vec3 joltPos = joltTransform.GetTranslation();
+		const JPH::Quat joltRot = joltTransform.GetQuaternion();
 
+		transform.position = { joltPos.GetX(), joltPos.GetY(), joltPos.GetZ() };
+		transform.rotation = { joltRot.GetX(), joltRot.GetY(), joltRot.GetZ(), joltRot.GetW() };
+
+		// Uses Jolt position and rotation and keep the orginal scale of the transform
+		const auto scaleMatrix = XMMatrixScaling(transform.scale.x, transform.scale.y, transform.scale.z);
+		const auto rotationMatrix = XMMatrixRotationQuaternion(XMLoadFloat4(&transform.rotation));
+		const auto translationMatrix = XMMatrixTranslation(transform.position.x, transform.position.y,
+			transform.position.z);
+
+		transform.world = scaleMatrix * rotationMatrix * translationMatrix;
+	}
+}
+
+void GameEngine::RenderScene(const double elapsedTime)
+{
+	renderSystem.UpdateScene(elapsedTime);
+
+	for (const auto& [entity, transform, mesh] : entityManager.View<Transform, Mesh>())
+	{
+		renderSystem.Render(mesh, transform);
+	}
+
+	renderSystem.Render();
+}
+
+void GameEngine::WaitBeforeNextFrame(const DWORD frameStartTime)
 {
 	static constexpr double TARGET_FPS = 120.0;
 	static constexpr double FRAME_TIME = 1000.0 / TARGET_FPS;

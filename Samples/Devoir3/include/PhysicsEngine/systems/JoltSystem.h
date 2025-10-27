@@ -1,8 +1,10 @@
 #ifndef JOLT_INITIALISER_H
 #define JOLT_INITIALISER_H
 
-#include "PhysicsEngine/pch.h"
+#include <functional>
+#include <cassert>
 
+#include <Jolt/Jolt.h>
 #include <Jolt/Core/JobSystemThreadPool.h>
 #include <Jolt/Core/TempAllocator.h>
 #include <Jolt/Physics/PhysicsSettings.h>

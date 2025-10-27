@@ -1,8 +1,7 @@
 #ifndef OBJECT_VS_BROAD_PHASE_LAYER_FILTER_IMPL_H
 #define OBJECT_VS_BROAD_PHASE_LAYER_FILTER_IMPL_H
 
-#include "PhysicsEngine/pch.h"
-
+#include <Jolt/Jolt.h>
 #include <Jolt/Physics/Collision/BroadPhase/BroadPhaseLayer.h>
 
 #include "BroadPhaseLayers.h"

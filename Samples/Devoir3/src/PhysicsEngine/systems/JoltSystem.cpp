@@ -1,5 +1,7 @@
+#include "pch.h"
 #include "PhysicsEngine/systems/JoltSystem.h"
 
+#include <Jolt/Jolt.h>
 #include <Jolt/Core/Factory.h>
 #include <Jolt/RegisterTypes.h>
 

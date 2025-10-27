@@ -1,10 +1,11 @@
 #ifndef CONTACT_LISTENER_LOGGER_H
 #define CONTACT_LISTENER_LOGGER_H
 
+#include <iostream>
 
+#include <Jolt/Jolt.h>
 #include <Jolt/Physics/Collision/ContactListener.h>
 
-#include "PhysicsEngine/pch.h"
 #include "PhysicsEngine/systems/JoltSystem.h"
 
 class ContactListenerImpl : public JPH::ContactListener

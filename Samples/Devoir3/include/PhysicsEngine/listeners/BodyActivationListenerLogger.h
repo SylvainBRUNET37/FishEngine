@@ -1,8 +1,7 @@
 #ifndef BODY_ACTIVATION_LISTENER_LOGGER_H
 #define BODY_ACTIVATION_LISTENER_LOGGER_H
 
-#include "PhysicsEngine/pch.h"
-
+#include <Jolt/Jolt.h>
 #include <Jolt/Physics/Body/BodyActivationListener.h>
 
 class BodyActivationListenerLogger : public JPH::BodyActivationListener

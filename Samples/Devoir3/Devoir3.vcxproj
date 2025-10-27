@@ -76,7 +76,9 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>;include;include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>;include;include;$(ProjectDir)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -91,7 +93,9 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>;include;include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>;include;include;$(ProjectDir)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -104,9 +108,11 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;JPH_DEBUG_RENDERER;JPH_FLOATING_POINT_EXCEPTIONS_ENABLED;JPH_PROFILE_ENABLED;JPH_OBJECT_STREAM;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)RenderingEngine\include;$(SolutionDir)extern\assimp\include;%(AdditionalIncludeDirectories);$(SolutionDir)extern\JoltPhysics;include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)RenderingEngine\include;$(SolutionDir)extern\assimp\include;%(AdditionalIncludeDirectories);$(SolutionDir)extern\JoltPhysics;include;$(ProjectDir)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -123,9 +129,11 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;JPH_DEBUG_RENDERER;JPH_FLOATING_POINT_EXCEPTIONS_ENABLED;JPH_PROFILE_ENABLED;JPH_OBJECT_STREAM;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)RenderingEngine\include;$(SolutionDir)extern\assimp\include;$(SolutionDir)extern\JoltPhysics;include;include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)RenderingEngine\include;$(SolutionDir)extern\assimp\include;$(SolutionDir)extern\JoltPhysics;include;include;$(ProjectDir)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -135,9 +143,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="src\Main.cpp" />
-    <ClCompile Include="src\PhysicsEngine\listeners\ContactListenerImpl.cpp" />
-    <ClCompile Include="src\PhysicsEngine\pch.cpp" />
     <ClCompile Include="src\PhysicsEngine\GameEngine.cpp" />
     <ClCompile Include="src\PhysicsEngine\ShapeFactory.cpp" />
     <ClCompile Include="src\PhysicsEngine\systems\JoltSystem.cpp" />
@@ -162,13 +174,13 @@
     <ClInclude Include="include\PhysicsEngine\layers\ObjectVsBroadPhaseLayerFilterImpl.h" />
     <ClInclude Include="include\PhysicsEngine\listeners\BodyActivationListenerLogger.h" />
     <ClInclude Include="include\PhysicsEngine\listeners\ContactListenerImpl.h" />
-    <ClInclude Include="include\PhysicsEngine\pch.h" />
     <ClInclude Include="include\PhysicsEngine\ShapeFactory.h" />
     <ClInclude Include="include\PhysicsEngine\systems\JoltSystem.h" />
     <ClInclude Include="include\PhysicsEngine\utils\Utils.h" />
     <ClInclude Include="include\ecs\EntityManagerFactory.h" />
     <ClInclude Include="include\ResourceManager.h" />
     <ClInclude Include="include\GameEngine.h" />
+    <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\MiniPhongPS.hlsl">
