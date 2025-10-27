@@ -7,6 +7,7 @@
 
 #include "Entity.h"
 
+// A container for the given component
 template <typename Component>
 class ComponentPool
 {

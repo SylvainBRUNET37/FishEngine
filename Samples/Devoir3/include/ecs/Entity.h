@@ -9,7 +9,7 @@ struct Entity
 	using Generation = uint32_t;
 
 	Index index{};
-	Generation generation{};
+	Generation generation{}; // Used to reuse index and check if the entity is dead
 };
 
 static constexpr Entity INVALID_ENTITY = {.index = UINT32_MAX, .generation = UINT32_MAX};

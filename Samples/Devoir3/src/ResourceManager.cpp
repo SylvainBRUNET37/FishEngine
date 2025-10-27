@@ -15,6 +15,7 @@ void ResourceManager::InitShaderBank()
 {
 	ShaderProgramDesc<VertexShader, PixelShader> desc;
 
+	// Add description of each shader program of the project
 	desc.AddDesc<VertexShader>("shaders/MiniPhongVS.hlsl", "MiniPhongVS", "vs_5_0")
 		.AddDesc<PixelShader>("shaders/MiniPhongPS.hlsl", "MiniPhongPS", "ps_5_0");
 
@@ -24,6 +25,7 @@ void ResourceManager::InitShaderBank()
 
 SceneResource ResourceManager::LoadScene() const
 {
+	// TODO: Link shaders to Mesh (curently, every mesh use the same shaders)
 	const ShaderProgram shaderProgram
 	{
 		device,

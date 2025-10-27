@@ -81,9 +81,6 @@ void GameEngine::RenderScene(const double elapsedTime)
 
 void GameEngine::WaitBeforeNextFrame(const DWORD frameStartTime)
 {
-	static constexpr double TARGET_FPS = 120.0;
-	static constexpr double FRAME_TIME = 1000.0 / TARGET_FPS;
-
 	const DWORD frameEnd = GetTickCount();
 	const DWORD frameDuration = frameEnd - frameStartTime;
 

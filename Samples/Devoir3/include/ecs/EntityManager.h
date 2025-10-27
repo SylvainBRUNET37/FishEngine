@@ -166,7 +166,7 @@ public:
 
 private:
 	std::vector<uint32_t> freeIndices; // Indices of dead entities (can be reused with generation + 1)
-	std::vector<uint32_t> generations; // Generation of each indices
+	std::vector<uint32_t> generations; // Generation of each indices (is incremented if the entity is dead)
 
 	ComponentPools componentPools;
 
@@ -188,7 +188,7 @@ private:
 	{
 		const auto index = static_cast<Entity::Index>(generations.size());
 
-		generations.push_back(1); // Add the generation of the new entity
+		generations.push_back(1); // Create a new generation for this index (1 = first gen)
 
 		// Resize every component pools to include the new entity
 		std::apply

@@ -5,9 +5,9 @@
 
 #include "Components.h"
 
-//
-// Utility for component pool data structure
-//
+//====================================================================
+// Util traits for component pool data structure
+//====================================================================
 
 template<typename Tuple> struct ComponentPoolsFromTuple;
 template<typename... Types>
@@ -18,9 +18,9 @@ struct ComponentPoolsFromTuple<std::tuple<Types...>>
 
 using ComponentPools = ComponentPoolsFromTuple<Components>::type;
 
-//
-// Utiliy to validate that a given type is from the list of component
-//
+//====================================================================
+// Util traits to validate that a given type is from the list of component
+//====================================================================
 
 template <typename Type, typename Tuple>
 struct IsOneOf;

@@ -8,12 +8,11 @@
 #include <Jolt/Jolt.h>
 #include <Jolt/Physics/Body/Body.h>
 
-#include "ComponentPool.h"
 #include "ecs/Entity.h"
 #include "rendering/core/Transform.h"
 #include "rendering/graphics/Mesh.h"
 
-// TODO: temporary component for Devoir3
+// TODO: Temporary component for Devoir3, delete it after
 struct Name
 {
 	std::string name;
@@ -30,7 +29,7 @@ struct RigidBody
 	JPH::Body* body;
 };
 
-// The list of components
+// The list of components ! Add a component here to add it to the engine
 using Components = std::tuple
 <
 	Mesh,
