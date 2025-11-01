@@ -1,9 +1,12 @@
 #include "pch.h"
 #include "GameEngine.h"
 
+#include "imgui.h"
+#include "imgui_impl_dx11.h"
+#include "imgui_impl_win32.h"
+#include "application/WindowsApplication.h"
 #include "ecs/Components.h"
 #include "PhysicsEngine/systems/JoltSystem.h"
-#include "rendering/application/WindowsApplication.h"
 #include "rendering/core/Transform.h"
 #include "rendering/graphics/Mesh.h"
 
@@ -24,7 +27,10 @@ void GameEngine::Run()
 
 		UpdatePhysics();
 		UpdateTransforms();
+
 		RenderScene(elapsedTime);
+		RenderDebugOverlay();
+		renderSystem.Present(); // Display on the screen updated scene + UI
 
 		WaitBeforeNextFrame(frameStartTime);
 	}
@@ -75,8 +81,6 @@ void GameEngine::RenderScene(const double elapsedTime)
 	{
 		renderSystem.Render(mesh, transform);
 	}
-
-	renderSystem.Render();
 }
 
 void GameEngine::WaitBeforeNextFrame(const DWORD frameStartTime)
@@ -86,4 +90,16 @@ void GameEngine::WaitBeforeNextFrame(const DWORD frameStartTime)
 
 	if (frameDuration < FRAME_TIME)
 		Sleep(static_cast<DWORD>(FRAME_TIME - frameDuration));
+}
+
+void GameEngine::RenderDebugOverlay()
+{
+	ImGui_ImplDX11_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
+
+	ImGui::ShowDemoWindow();
+	ImGui::Render();
+
+	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 }

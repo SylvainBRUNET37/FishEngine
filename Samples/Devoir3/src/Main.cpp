@@ -8,7 +8,6 @@
 #include "PhysicsEngine/listeners/BodyActivationListenerLogger.h"
 #include "PhysicsEngine/listeners/ContactListenerImpl.h"
 #include "PhysicsEngine/systems/JoltSystem.h"
-#include "rendering/application/WindowsApplication.h"
 #include "rendering/device/DeviceBuilder.h"
 #include "rendering/device/RenderContext.h"
 #include "rendering/shaders/ShaderProgramDesc.h"
@@ -18,6 +17,8 @@
 #include "ecs/EntityManagerFactory.h"
 #include "GameEngine.h"
 #include "PhysicsEngine/ShapeFactory.h"
+#include "DebugUI.h"
+#include "application/WindowsApplication.h"
 
 using namespace JPH;
 using namespace JPH::literals;
@@ -43,6 +44,8 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 
 	RenderSystem renderSystem{&renderContext, std::move(sceneResources.materials)};
 	auto entityManager = EntityManagerFactory::Create(sceneResources);
+
+	DebugUI debugUi{ application.GetMainWindow(), renderContext.GetDevice(), renderContext.GetContext()};
 
 	/////	Physics System	 /////
 	JoltSystem::Init();

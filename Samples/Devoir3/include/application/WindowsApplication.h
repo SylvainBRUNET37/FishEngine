@@ -2,7 +2,6 @@
 #define WINDOWS_APPLICATION_H
 
 #include "rendering/core/WindowData.h"
-#include "rendering/device/BlendState.h"
 
 class WindowsApplication
 {
@@ -16,6 +15,8 @@ public:
 	explicit WindowsApplication(const HINSTANCE hInstance, const LPCWSTR windowTitle, const LPCWSTR className)
 		: instance(hInstance), className(className), windowTitle(windowTitle)
 	{
+		SetProcessDPIAware();
+
 		windowData.screenWidth = GetSystemMetrics(SM_CXSCREEN);
 		windowData.screenHeight = GetSystemMetrics(SM_CYSCREEN);
 		windowData.displayMode = DisplayMode::WINDOWED; // Windowed by default but should be a setting

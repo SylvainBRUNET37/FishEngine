@@ -28,6 +28,7 @@ private:
 	void RenderScene(double elapsedTime);
 
 	static void WaitBeforeNextFrame(DWORD frameStartTime);
+	static void RenderDebugOverlay();
 };
 
 #endif

@@ -15,7 +15,7 @@ public:
 
 	void UpdateScene(double elapsedTime);
 	void Render(const Mesh& mesh, const Transform& transform);
-	void Render() const { renderContext->Present(); }
+	void Present() const { renderContext->Present(); }
 
 private:
 	static constexpr int frameCbRegisterNumber = 0; // b0

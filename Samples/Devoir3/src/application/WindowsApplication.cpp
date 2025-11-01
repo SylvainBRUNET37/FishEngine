@@ -1,5 +1,6 @@
 #include "pch.h"
-#include "rendering/application/WindowsApplication.h"
+#include "application/WindowsApplication.h"
+#include "imgui_impl_win32.h"
 
 bool WindowsApplication::Init()
 {
@@ -93,6 +94,10 @@ LRESULT WindowsApplication::ProcessWindowMessage(const HWND hWnd, const UINT msg
 LRESULT WindowsApplication::HandleWindowsMessage(const HWND hWnd, const UINT message, const WPARAM wParam,
                                                  const LPARAM lParam)
 {
+	// Allow navigation in ImGui UI
+	if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam))
+		return true;
+
 	if (message == WM_NCCREATE)
 	{
 		const auto cs = reinterpret_cast<CREATESTRUCTW*>(lParam);

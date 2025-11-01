@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\rendering\application\WindowsApplication.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\rendering\device\RenderContext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -144,9 +141,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\rendering\utils\Clock.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\rendering\application\WindowsApplication.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\rendering\SceneLoader.cpp">

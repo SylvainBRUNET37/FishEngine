@@ -20,7 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="external\stb_image.h" />
-    <ClInclude Include="include\rendering\application\WindowsApplication.h" />
     <ClInclude Include="include\rendering\core\SceneData.h" />
     <ClInclude Include="include\rendering\core\Transform.h" />
     <ClInclude Include="include\rendering\core\WindowData.h" />
@@ -67,7 +66,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="src\rendering\application\WindowsApplication.cpp" />
     <ClCompile Include="src\rendering\device\BlendState.cpp" />
     <ClCompile Include="src\rendering\device\DepthBuffer.cpp" />
     <ClCompile Include="src\rendering\device\DeviceBuilder.cpp" />
