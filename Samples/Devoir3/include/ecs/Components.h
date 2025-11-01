@@ -29,6 +29,10 @@ struct RigidBody
 	JPH::Body* body;
 };
 
+struct Controllable
+{
+};
+
 // The list of components ! Add a component here to add it to the engine
 using Components = std::tuple
 <
@@ -36,7 +40,8 @@ using Components = std::tuple
 	RigidBody,
 	Transform,
 	Hierarchy,
-	Name
+	Name,
+	Controllable
 >;
 
 #endif

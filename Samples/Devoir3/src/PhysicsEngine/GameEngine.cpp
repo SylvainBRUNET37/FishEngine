@@ -32,6 +32,42 @@ void GameEngine::Run()
 
 void GameEngine::UpdatePhysics()
 {
+	// update controllables
+	for (const auto& [entity, rigidBody, _] : entityManager.View<RigidBody, Controllable>())
+	{
+		const auto& transform = rigidBody.body->GetWorldTransform();
+		JPH::Vec3 right = transform.GetColumn3(0).Normalized();
+		JPH::Vec3 up = transform.GetColumn3(1).Normalized();
+		JPH::Vec3 forward = transform.GetColumn3(2).Normalized();
+
+		JPH::Vec3 currentSpeed = JoltSystem::GetBodyInterface().GetLinearVelocity(rigidBody.body->GetID());
+		if (GetAsyncKeyState('I') & 0x8000) // I
+		{
+			JoltSystem::GetBodyInterface().SetLinearVelocity(rigidBody.body->GetID(), currentSpeed + 1.0f * forward);
+		}
+		if (GetAsyncKeyState('K') & 0x8000) // K
+		{
+			JoltSystem::GetBodyInterface().SetLinearVelocity(rigidBody.body->GetID(), currentSpeed + -1.0f * forward);
+		}
+		if (GetAsyncKeyState('L') & 0x8000) // L
+		{
+			JoltSystem::GetBodyInterface().SetLinearVelocity(rigidBody.body->GetID(), currentSpeed + -1.0f * right);
+		}
+		if (GetAsyncKeyState('J') & 0x8000) // J
+		{
+			JoltSystem::GetBodyInterface().SetLinearVelocity(rigidBody.body->GetID(), currentSpeed + 1.0f * right);
+		}
+
+		// Rotation
+		bool rotatesPositive = GetAsyncKeyState('U') & 0x8000;
+		if (rotatesPositive || GetAsyncKeyState('O') & 0x8000) // U & O
+		{
+			JPH::Quat delta = JPH::Quat::sRotation(up, .05f * (1-2*!rotatesPositive)); // theta = 10
+			JoltSystem::GetBodyInterface().SetRotation(rigidBody.body->GetID(), rigidBody.body->GetRotation() * delta, JPH::EActivation::Activate);
+		}
+	}
+
+
 	// Update physics
 	constexpr int collisionSteps = 1;
 	JoltSystem::GetPhysicSystem().Update(PHYSICS_UPDATE_RATE, collisionSteps,
