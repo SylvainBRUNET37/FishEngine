@@ -63,7 +63,10 @@ void GameEngine::UpdatePhysics()
 		if (rotatesPositive || GetAsyncKeyState('O') & 0x8000) // U & O
 		{
 			JPH::Quat delta = JPH::Quat::sRotation(up, .05f * (1-2*!rotatesPositive)); // theta = 10
-			JoltSystem::GetBodyInterface().SetRotation(rigidBody.body->GetID(), rigidBody.body->GetRotation() * delta, JPH::EActivation::Activate);
+			JoltSystem::GetBodyInterface().SetRotation(
+				rigidBody.body->GetID(),
+				(rigidBody.body->GetRotation() * delta).Normalized(),
+				JPH::EActivation::Activate);
 		}
 	}
 
