@@ -36,10 +36,8 @@ SceneResource SceneLoader::LoadScene(const filesystem::path& filePath, ID3D11Dev
 		filePath.string(),
 		aiProcess_Triangulate |
 		aiProcess_GenSmoothNormals |
-		aiProcess_ConvertToLeftHanded |
 		aiProcess_CalcTangentSpace |
-		aiProcess_JoinIdenticalVertices |
-		aiProcess_FlipWindingOrder
+		aiProcess_JoinIdenticalVertices
 	);
 
 	if (!scene || !scene->mRootNode)
