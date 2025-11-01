@@ -33,7 +33,7 @@ void GameEngine::Run()
 void GameEngine::UpdatePhysics()
 {
 	// update controllables
-	for (const auto& [entity, rigidBody, _] : entityManager.View<RigidBody, Controllable>())
+	for (const auto& [entity, rigidBody, controllable] : entityManager.View<RigidBody, Controllable>())
 	{
 		const auto& transform = rigidBody.body->GetWorldTransform();
 		JPH::Vec3 right = transform.GetColumn3(0).Normalized();
@@ -41,21 +41,33 @@ void GameEngine::UpdatePhysics()
 		JPH::Vec3 forward = transform.GetColumn3(2).Normalized();
 
 		JPH::Vec3 currentSpeed = JoltSystem::GetBodyInterface().GetLinearVelocity(rigidBody.body->GetID());
+		JPH::Vec3 newSpeed = currentSpeed;
+		bool speedChanged = false;
+
 		if (GetAsyncKeyState('I') & 0x8000) // I
 		{
-			JoltSystem::GetBodyInterface().SetLinearVelocity(rigidBody.body->GetID(), currentSpeed + 1.0f * forward);
+			newSpeed = newSpeed + 1.0f * forward;
+			speedChanged = true;
 		}
 		if (GetAsyncKeyState('K') & 0x8000) // K
 		{
-			JoltSystem::GetBodyInterface().SetLinearVelocity(rigidBody.body->GetID(), currentSpeed + -1.0f * forward);
+			newSpeed = newSpeed - 1.0f * forward;
+			speedChanged = true;
 		}
 		if (GetAsyncKeyState('L') & 0x8000) // L
 		{
-			JoltSystem::GetBodyInterface().SetLinearVelocity(rigidBody.body->GetID(), currentSpeed + -1.0f * right);
+			newSpeed = newSpeed - 1.0f * right;
+			speedChanged = true;
 		}
 		if (GetAsyncKeyState('J') & 0x8000) // J
 		{
-			JoltSystem::GetBodyInterface().SetLinearVelocity(rigidBody.body->GetID(), currentSpeed + 1.0f * right);
+			newSpeed = newSpeed + 1.0f * right;
+			speedChanged = true;
+		}
+
+		if (speedChanged) {
+			if (newSpeed.Length() > controllable.maxSpeed) newSpeed = newSpeed.Normalized();
+			JoltSystem::GetBodyInterface().SetLinearVelocity(rigidBody.body->GetID(), newSpeed);
 		}
 
 		// Rotation

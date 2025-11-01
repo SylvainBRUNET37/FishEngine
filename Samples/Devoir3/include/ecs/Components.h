@@ -31,6 +31,7 @@ struct RigidBody
 
 struct Controllable
 {
+	float maxSpeed;
 };
 
 // The list of components ! Add a component here to add it to the engine

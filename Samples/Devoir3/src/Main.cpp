@@ -73,7 +73,7 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 		{
 			const auto transform = entityManager.Get<Transform>(entity);
 			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCube(transform));
-			entityManager.AddComponent<Controllable>(entity); // TODO: changer la scène, changer ça
+			entityManager.AddComponent<Controllable>(entity, 100.0f); // TODO: changer la scène, changer ça
 		}
 		else if (name.name == "Plane")
 		{
