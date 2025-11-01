@@ -84,6 +84,10 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>copy /Y "$(SolutionDir)extern\assimp\bin\$(Configuration)\assimp*.dll" "$(TargetDir)"
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -101,6 +105,10 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>copy /Y "$(SolutionDir)extern\assimp\bin\$(Configuration)\assimp*.dll" "$(TargetDir)"
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -120,6 +128,10 @@
       <AdditionalLibraryDirectories>$(SolutionDir)extern\assimp\lib\Debug;$(SolutionDir)extern\\JoltPhysics\Build\VS2022_CL\Debug</AdditionalLibraryDirectories>
       <AdditionalDependencies>dxguid.lib;winmm.lib;d3d11.lib;d3dcompiler.lib;DXGI.lib;dinput8.lib;assimp-vc143-mtd.lib;$(SolutionDir)extern\JoltPhysics\Build\VS2022_CL\Debug\Jolt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>copy /Y "$(SolutionDir)extern\assimp\bin\$(Configuration)\assimp*.dll" "$(TargetDir)"
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -141,6 +153,10 @@
       <AdditionalLibraryDirectories>$(SolutionDir)extern\assimp\lib\Release;$(SolutionDir)extern\\JoltPhysics\Build\VS2022_CL\Release</AdditionalLibraryDirectories>
       <AdditionalDependencies>dxguid.lib;winmm.lib;d3d11.lib;d3dcompiler.lib;DXGI.lib;dinput8.lib;assimp-vc143-mt.lib;$(SolutionDir)extern\JoltPhysics\Build\VS2022_CL\Release\Jolt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>copy /Y "$(SolutionDir)extern\assimp\bin\$(Configuration)\assimp*.dll" "$(TargetDir)"
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
