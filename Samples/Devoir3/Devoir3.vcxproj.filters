@@ -13,7 +13,7 @@
     <ClCompile Include="..\..\extern\imgui\imgui_widgets.cpp" />
     <ClCompile Include="..\..\extern\imgui\backends\imgui_impl_dx11.cpp" />
     <ClCompile Include="..\..\extern\imgui\backends\imgui_impl_win32.cpp" />
-    <ClCompile Include="src\DebugUI.cpp" />
+    <ClCompile Include="src\debug\DebugUI.cpp" />
     <ClCompile Include="..\..\extern\imgui\imgui_demo.cpp" />
     <ClCompile Include="src\application\WindowsApplication.cpp" />
   </ItemGroup>
@@ -41,8 +41,9 @@
     <ClInclude Include="..\..\extern\imgui\imgui.h" />
     <ClInclude Include="..\..\extern\imgui\backends\imgui_impl_dx11.h" />
     <ClInclude Include="..\..\extern\imgui\backends\imgui_impl_win32.h" />
-    <ClInclude Include="include\DebugUI.h" />
+    <ClInclude Include="include\debug\DebugUI.h" />
     <ClInclude Include="include\application\WindowsApplication.h" />
+    <ClInclude Include="include\debug\DebugRenderer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\MiniPhongPS.hlsl" />

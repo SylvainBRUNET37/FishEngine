@@ -194,7 +194,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="src\application\WindowsApplication.cpp" />
-    <ClCompile Include="src\DebugUI.cpp" />
+    <ClCompile Include="src\debug\DebugUI.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\GameEngine.cpp" />
     <ClCompile Include="src\PhysicsEngine\ShapeFactory.cpp" />
@@ -212,7 +212,8 @@
     <ClInclude Include="..\..\extern\imgui\imgui.h" />
     <ClInclude Include="include\application\WindowsApplication.h" />
     <ClInclude Include="include\CC.h" />
-    <ClInclude Include="include\DebugUI.h" />
+    <ClInclude Include="include\debug\DebugRenderer.h" />
+    <ClInclude Include="include\debug\DebugUI.h" />
     <ClInclude Include="include\ecs\Components.h" />
     <ClInclude Include="include\ecs\ComponentPool.h" />
     <ClInclude Include="include\ecs\ComponentUtils.h" />

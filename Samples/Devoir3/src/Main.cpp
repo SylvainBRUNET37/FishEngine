@@ -1,5 +1,7 @@
 #include "pch.h"
 
+#include <Jolt/Renderer/DebugRendererSimple.h>
+
 #include "ecs/Components.h"
 #include "PhysicsEngine/layers/BroadPhaseLayerInterfaceImpl.h"
 #include "PhysicsEngine/layers/BroadPhaseLayers.h"
@@ -17,8 +19,9 @@
 #include "ecs/EntityManagerFactory.h"
 #include "GameEngine.h"
 #include "PhysicsEngine/ShapeFactory.h"
-#include "DebugUI.h"
 #include "application/WindowsApplication.h"
+#include "debug/DebugRenderer.h"
+#include "debug/DebugUI.h"
 
 using namespace JPH;
 using namespace JPH::literals;
@@ -66,6 +69,9 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 
 	ContactListenerImpl contactListener;
 	physicsSystem.SetContactListener(&contactListener);
+
+	static DX11DebugRenderer debugRenderer{renderContext.GetDevice(),renderContext.GetContext()};
+	DebugRenderer::sInstance = &debugRenderer;
 	//////////////////////////////
 
 	// Create the scene

@@ -10,6 +10,9 @@
 #include "rendering/core/Transform.h"
 #include "rendering/graphics/Mesh.h"
 
+#include <Jolt/Jolt.h>
+#include <Jolt/Renderer/DebugRenderer.h>
+
 void GameEngine::Run()
 {
 	bool shouldContinue = true;
@@ -30,6 +33,16 @@ void GameEngine::Run()
 
 		RenderScene(elapsedTime);
 		RenderDebugOverlay();
+
+		JPH::BodyManager::DrawSettings drawSettings;
+
+		drawSettings.mDrawShape = true;
+		drawSettings.mDrawShapeWireframe = true;
+		drawSettings.mDrawShapeWireframe = false;
+		drawSettings.mDrawBoundingBox = true;
+
+		JoltSystem::GetPhysicSystem().DrawBodies(drawSettings, JPH::DebugRenderer::sInstance);
+
 		renderSystem.Present(); // Display on the screen updated scene + UI
 
 		WaitBeforeNextFrame(frameStartTime);
