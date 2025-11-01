@@ -7,6 +7,12 @@
     <ClCompile Include="src\PhysicsEngine\GameEngine.cpp" />
     <ClCompile Include="src\PhysicsEngine\ShapeFactory.cpp" />
     <ClCompile Include="pch.cpp" />
+    <ClCompile Include="..\..\extern\imgui\imgui.cpp" />
+    <ClCompile Include="..\..\extern\imgui\imgui_draw.cpp" />
+    <ClCompile Include="..\..\extern\imgui\imgui_tables.cpp" />
+    <ClCompile Include="..\..\extern\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="..\..\extern\imgui\backends\imgui_impl_dx11.cpp" />
+    <ClCompile Include="..\..\extern\imgui\backends\imgui_impl_win32.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\CC.h" />
@@ -29,6 +35,9 @@
     <ClInclude Include="include\ecs\ComponentUtils.h" />
     <ClInclude Include="include\PhysicsEngine\ShapeFactory.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="..\..\extern\imgui\imgui.h" />
+    <ClInclude Include="..\..\extern\imgui\backends\imgui_impl_dx11.h" />
+    <ClInclude Include="..\..\extern\imgui\backends\imgui_impl_win32.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\MiniPhongPS.hlsl" />
