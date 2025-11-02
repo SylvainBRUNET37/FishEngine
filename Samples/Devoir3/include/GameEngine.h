@@ -38,7 +38,7 @@ private:
 	// BallShooterSystem
 	void ShootBallIfKeyPressed();
 	// LifeSpan system
-	void DestroyObjectAtEndOfLife();
+	void DestroyObjectAtEndOfLife(double elapsedTIme);
 
 	static void WaitBeforeNextFrame(DWORD frameStartTime);
 

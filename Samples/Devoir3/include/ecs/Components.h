@@ -36,8 +36,8 @@ struct BallShooter
 
 struct LifeSpan
 {
-	double lifeTime; // Store in ms the age of the object
-	double lifeDuration;
+	double lifeTime{}; // Store in ms the age of the object
+	double lifeDuration{};
 };
 
 // The list of components ! Add a component here to add it to the engine
@@ -48,7 +48,8 @@ using Components = std::tuple
 	Transform,
 	Hierarchy,
 	Name,
-	BallShooter
+	BallShooter,
+	LifeSpan
 >;
 
 #endif

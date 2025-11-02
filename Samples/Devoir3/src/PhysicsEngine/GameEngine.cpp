@@ -50,7 +50,9 @@ void GameEngine::Run()
 		// End the loop if Windows want to terminate the program (+ process messages)
 		shouldContinue = WindowsApplication::ProcessWindowsMessages();
 
+		DestroyObjectAtEndOfLife(elapsedTime);
 		ShootBallIfKeyPressed();
+
 		UpdatePhysics();
 		UpdateTransforms();
 
@@ -167,6 +169,9 @@ void GameEngine::ShootBallIfKeyPressed()
 			entityManager.AddComponent<Transform>(ballEntity, ballTransform);
 			entityManager.AddComponent<Mesh>(ballEntity, resourceManager.LoadSphere());
 
+			static constexpr double ballLifeTime = 10.0;
+			entityManager.AddComponent<LifeSpan>(ballEntity, 0.0, ballLifeTime);
+
 			XMFLOAT3 direction;
 			XMStoreFloat3(&direction, entityForwardDirection);
 			direction = Sanitize(direction);
@@ -180,9 +185,14 @@ void GameEngine::ShootBallIfKeyPressed()
 	}
 }
 
-void GameEngine::DestroyObjectAtEndOfLife()
+void GameEngine::DestroyObjectAtEndOfLife(const double elapsedTIme)
 {
-
+	for (const auto& [entity, lifeSpan] : entityManager.View<LifeSpan>())
+	{
+		lifeSpan.lifeTime += elapsedTIme;
+		if (lifeSpan.lifeTime >= lifeSpan.lifeDuration) [[unlikely]]
+			entityManager.Kill(entity);
+	}
 }
 
 void GameEngine::WaitBeforeNextFrame(const DWORD frameStartTime)
