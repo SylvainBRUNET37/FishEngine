@@ -51,7 +51,7 @@ SceneResource ResourceManager::LoadScene() const
 		shaderBank.Get<PixelShader>("shaders/MiniPhongPS.hlsl"),
 	};
 
-	const std::filesystem::path filePath = "assets\\sceneDevoir3.glb";
+	const std::filesystem::path filePath = "assets\\sceneDevoir3_v2.glb";
 
 	SceneLoader modelLoader{ shaderProgram };
 	return modelLoader.LoadScene(filePath, device);

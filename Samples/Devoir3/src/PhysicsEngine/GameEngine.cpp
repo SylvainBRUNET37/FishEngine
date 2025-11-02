@@ -271,18 +271,11 @@ void GameEngine::MoveSensorRandomly()
 	{
 		if (name.name == "Capsule")
 		{
-			//Of course, below doesn't work: Jolt is supposed to control where things are for correct physics...
-			//auto transform = entityManager.Get<Transform>(entity);
-			//float newX = rand() % 2000 - 1000; //Not clean at all, but sufficient for testing, hopefully...
-			//float newY = 500.0f; //Should this be in global?
-			//float newZ = rand() % 2000 - 1000;
-			//transform.position = XMFLOAT3(newX, newY, newZ);
-
 			// Get jolt transform data
 			const JPH::RMat44& joltTransform = rigidBody.body->GetWorldTransform();
 			const JPH::Vec3 joltPos = joltTransform.GetTranslation();
 			float newX = rand() % 500 - 250; //Not clean at all, but sufficient for testing, hopefully...
-			float newY = 105.f; //Should this be in global?
+			float newY = 17.565f; //Should this be in global?
 			float newZ = rand() % 500 - 250;
 			JPH::BodyInterface& bodyInterface = JoltSystem::GetBodyInterface();
 			bodyInterface.SetPosition(rigidBody.body->GetID(), JPH::RVec3Arg(newX, newY, newZ),
