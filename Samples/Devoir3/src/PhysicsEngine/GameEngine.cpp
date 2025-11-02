@@ -44,22 +44,22 @@ void GameEngine::UpdatePhysics()
 		JPH::Vec3 newSpeed = currentSpeed;
 		bool speedChanged = false;
 
-		if (GetAsyncKeyState('I') & 0x8000) // I
+		if (GetAsyncKeyState('W') & 0x8000) // I
 		{
 			newSpeed = newSpeed + 1.0f * forward;
 			speedChanged = true;
 		}
-		if (GetAsyncKeyState('K') & 0x8000) // K
+		if (GetAsyncKeyState('S') & 0x8000) // K
 		{
 			newSpeed = newSpeed - 1.0f * forward;
 			speedChanged = true;
 		}
-		if (GetAsyncKeyState('L') & 0x8000) // L
+		if (GetAsyncKeyState('D') & 0x8000) // L
 		{
 			newSpeed = newSpeed - 1.0f * right;
 			speedChanged = true;
 		}
-		if (GetAsyncKeyState('J') & 0x8000) // J
+		if (GetAsyncKeyState('A') & 0x8000) // J
 		{
 			newSpeed = newSpeed + 1.0f * right;
 			speedChanged = true;
@@ -71,8 +71,8 @@ void GameEngine::UpdatePhysics()
 		}
 
 		// Rotation
-		bool rotatesPositive = GetAsyncKeyState('U') & 0x8000;
-		if (rotatesPositive || GetAsyncKeyState('O') & 0x8000) // U & O
+		bool rotatesPositive = GetAsyncKeyState('Q') & 0x8000;
+		if (rotatesPositive || GetAsyncKeyState('E') & 0x8000) // U & O
 		{
 			JPH::Quat delta = JPH::Quat::sRotation(up, .05f * (1-2*!rotatesPositive)); // theta = 10
 			JoltSystem::GetBodyInterface().SetRotation(
