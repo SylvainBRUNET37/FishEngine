@@ -8,6 +8,8 @@
 
 #include "PhysicsEngine/systems/JoltSystem.h"
 
+#include <Jolt/Geometry/AABox.h>
+
 class ContactListenerImpl : public JPH::ContactListener
 {
 public:
@@ -15,7 +17,21 @@ public:
 	                                      JPH::RVec3Arg inBaseOffset,
 	                                      const JPH::CollideShapeResult& inCollisionResult) override
 	{
-		//std::cout << "Contact validate callback between body1 in layer " << GetObjectLayerName(inBody1.GetObjectLayer()) << " and body2 in layer " << GetObjectLayerName(inBody2.GetObjectLayer()) << std::endl;
+		std::cout << "Contact validate callback between body1 in layer " << GetObjectLayerName(inBody1.GetObjectLayer()) << " and body2 in layer " << GetObjectLayerName(inBody2.GetObjectLayer()) << std::endl;
+		if (inBody1.GetObjectLayer() == Layers::SENSOR && inBody2.GetObjectLayer() == Layers::CARGO) {
+			JPH::AABox sensorBox = inBody1.GetWorldSpaceBounds();
+			JPH::AABox cargoBox = inBody2.GetWorldSpaceBounds();
+			if (sensorBox.Contains(cargoBox)) {
+				std::cout << "TODO: React to goal containing cargo" << std::endl;
+			}
+		} else if (inBody1.GetObjectLayer() == Layers::CARGO && inBody2.GetObjectLayer() == Layers::SENSOR) {
+			JPH::AABox sensorBox = inBody2.GetWorldSpaceBounds();
+			JPH::AABox cargoBox = inBody1.GetWorldSpaceBounds();
+			if (sensorBox.Contains(cargoBox)) {
+				std::cout << "TODO: React to goal containing cargo" << std::endl;
+			}
+		}
+		
 		return JPH::ValidateResult::AcceptAllContactsForThisBodyPair;
 	}
 
@@ -27,7 +43,7 @@ public:
 
 		//Replaces calculated mass (based on what?) with whatever's needed, here enough for a small ball to move a cube of cargo
 		if (inBody1.GetObjectLayer() == Layers::BALL) {
-			ioSettings.mInvMassScale1 = 0.01f;
+			ioSettings.mInvMassScale1 = 0.01f; //To test pushing cargo inside goal, changed these 0.01f to 0 and use scene "sceneDevoir3_sphere.glb". These really should be constants or perhaps a function...
 			ioSettings.mInvInertiaScale1 = 0.01f;
 			ioSettings.mInvMassScale2 = 1.0f;
 			ioSettings.mInvInertiaScale2 = 1.0f;
