@@ -22,7 +22,7 @@ public:
 		if (not IsAlive(entity))
 			return;
 
-		// Erase the enttiy from every component pool
+		// Erase the entity from every component pool
 		std::apply
 		(
 			[&](auto&... pools) { (pools.RemoveComponentOf(entity.index), ...); },

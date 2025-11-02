@@ -3,6 +3,7 @@
 
 #include "ecs/EntityManager.h"
 #include "rendering/RenderSystem.h"
+#include <cstdlib>
 
 class GameEngine
 {
@@ -11,6 +12,7 @@ public:
 		: renderSystem{std::move(renderSystem)},
 		  entityManager{std::move(entityManager)}
 	{
+		std::srand(std::time(0));
 	}
 
 	void Run();
@@ -26,8 +28,13 @@ private:
 	static void UpdatePhysics();
 	void UpdateTransforms();
 	void RenderScene(double elapsedTime);
+	void CheckForWinConditions();
+
+	int currentWinCount = 0;
 
 	static void WaitBeforeNextFrame(DWORD frameStartTime);
+
+	void MoveSensorRandomly();
 };
 
 #endif
