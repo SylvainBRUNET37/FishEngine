@@ -22,7 +22,6 @@ protected:
 	int viewHeight;
 	float aspectRatio;
 
-	//Transform transfCube;
 	const Transform* followedCube = nullptr;
 
 public:
@@ -39,10 +38,6 @@ public:
 	void FollowCube(const Transform* cubeTransform) {
 		followedCube = cubeTransform;
 	}
-
-	/*void setCubeTransform(Transform transfCube) {
-		this->transfCube = transfCube;
-	}*/
 
 	virtual ~Camera() = default;
 
@@ -189,7 +184,12 @@ class ThirdPersonCamera : public Camera {
 			targetPosition = XMLoadFloat3(&followedCube->position);
 		}
 		
-		focus = XMVectorAdd(targetPosition, XMVectorSet(0, heightOffset, 0, 0));
+		// Décalage pour être plus haut et plus loin
+		distance = 50.f;
+		heightOffset = 25.f;
+
+		XMVECTOR heightOffsetVec = XMVectorSet(0.0f, heightOffset, -distance, 0.0f);
+		focus = XMVectorAdd(targetPosition, heightOffsetVec);
 		position = CalculateCameraPosition();
 
 		if (!IsPositionValid(position)) {
