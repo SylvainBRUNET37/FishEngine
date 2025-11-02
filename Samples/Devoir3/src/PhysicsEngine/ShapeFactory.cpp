@@ -25,7 +25,7 @@ Body* ShapeFactory::CreateCubeInVehicleLayer(const Transform& transform)
 
     // Convert mesh type of position and rotation to jolt's ones
     const RVec3 position(transform.position.x, transform.position.y, transform.position.z);
-    const Quat rotation(transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w);
+    const Quat rotation(transform.rotation.x, transform.rotation.y - 1, transform.rotation.z, transform.rotation.w - 1);
 
     BodyCreationSettings boxSettings(
         shape,
@@ -40,6 +40,7 @@ Body* ShapeFactory::CreateCubeInVehicleLayer(const Transform& transform)
     BodyInterface& bodyInterface = JoltSystem::GetBodyInterface();
     Body* body = bodyInterface.CreateBody(boxSettings);
     bodyInterface.AddBody(body->GetID(), EActivation::Activate);
+
     body->SetFriction(0.6f);
 
     return body;
