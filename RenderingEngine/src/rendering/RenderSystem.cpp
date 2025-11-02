@@ -1,28 +1,14 @@
 #include "pch.h"
 #include "rendering/RenderSystem.h"
 
-RenderSystem::RenderSystem(RenderContext* renderContext, std::vector<Material>&& materials) : renderer{
-	                                                           renderContext->GetDevice(), std::move(materials), frameCbRegisterNumber,
-	                                                           objectCbRegisterNumber
-                                                           },
-                                                           sceneData{CreateSceneData()},
-                                                           renderContext{renderContext}, cursorCoordinates{}
-
+RenderSystem::RenderSystem(RenderContext* renderContext, std::vector<Material>&& materials)
+	: renderer(renderContext->GetDevice(), std::move(materials), frameCbRegisterNumber, objectCbRegisterNumber),
+	sceneData(CreateSceneData()),
+	renderContext(renderContext),
+	cursorCoordinates{}
 {
-	const XMVECTOR eyePosition = XMVectorSet(0.0f, 5.0f, -4.0f, 1.0f);
-	const XMVECTOR focusPoint = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
-	const XMVECTOR upDirection = XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f);
-
-	displayedCamera = std::make_unique<FirstPersonCamera>(
-		eyePosition,
-		focusPoint,
-		upDirection,
-		static_cast<float>(renderContext->GetScreenWidth()),
-		static_cast<float>(renderContext->GetScreenHeight())
-	);
-
+	InitializeCamera();
 	sceneData.matViewProj = displayedCamera->getMatView() * displayedCamera->getMatProj();
-
 	RenderScene();
 }
 
@@ -37,122 +23,149 @@ void RenderSystem::Render(const Mesh& mesh, const Transform& transform)
 	renderer.Render(mesh, renderContext->GetContext(), transform, sceneData);
 }
 
+void RenderSystem::InitializeCamera()
+{
+	const XMVECTOR eyePosition = XMVectorSet(0.0f, 5.0f, -4.0f, 1.0f);
+	const XMVECTOR focusPoint = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+	const XMVECTOR upDirection = XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f);
+
+	displayedCamera = std::make_unique<FirstPersonCamera>(
+		eyePosition, focusPoint, upDirection,
+		static_cast<float>(renderContext->GetScreenWidth()),
+		static_cast<float>(renderContext->GetScreenHeight())
+	);
+}
+
+void RenderSystem::SwitchToThirdPerson()
+{
+	auto* fpCam = dynamic_cast<FirstPersonCamera*>(displayedCamera.get());
+	float currentYaw = fpCam ? fpCam->GetYaw() : 0.0f;
+	XMVECTOR targetPos = displayedCamera->GetFocus();
+
+	displayedCamera = std::make_unique<ThirdPersonCamera>(
+		targetPos, 10.0f, 2.0f,
+		static_cast<float>(renderContext->GetScreenWidth()),
+		static_cast<float>(renderContext->GetScreenHeight()),
+		currentYaw, 0.0f
+	);
+}
+
+void RenderSystem::SwitchToFirstPerson()
+{
+	XMVECTOR newPosition = displayedCamera->GetPosition();
+	XMVECTOR newFocus = displayedCamera->GetFocus();
+
+	displayedCamera = std::make_unique<FirstPersonCamera>(
+		newPosition, newFocus, XMVectorSet(0, 1, 0, 0),
+		static_cast<float>(renderContext->GetScreenWidth()),
+		static_cast<float>(renderContext->GetScreenHeight())
+	);
+}
+
+bool RenderSystem::HandleCameraSwitch()
+{
+	static bool cKeyWasPressed = false;
+	const bool cKeyIsPressed = (GetAsyncKeyState('C') & 0x8000) != 0;
+
+	if (cKeyIsPressed && !cKeyWasPressed) {
+		if (isFirstPerson) {
+			SwitchToThirdPerson();
+		}
+		else {
+			SwitchToFirstPerson();
+		}
+		isFirstPerson = !isFirstPerson;
+		cKeyWasPressed = cKeyIsPressed;
+		return true;
+	}
+
+	cKeyWasPressed = cKeyIsPressed;
+	return false;
+}
+
+bool RenderSystem::HandleMovement(float deplacement, float& deltaX, float& deltaZ)
+{
+	bool moved = false;
+
+	if (GetAsyncKeyState(VK_LEFT) & 0x8000 || GetAsyncKeyState('A') & 0x8000) {
+		deltaX += deplacement;
+		moved = true;
+	}
+	if (GetAsyncKeyState(VK_RIGHT) & 0x8000 || GetAsyncKeyState('D') & 0x8000) {
+		deltaX -= deplacement;
+		moved = true;
+	}
+	if (GetAsyncKeyState(VK_UP) & 0x8000 || GetAsyncKeyState('W') & 0x8000) {
+		deltaZ += deplacement;
+		moved = true;
+	}
+	if (GetAsyncKeyState(VK_DOWN) & 0x8000 || GetAsyncKeyState('S') & 0x8000) {
+		deltaZ -= deplacement;
+		moved = true;
+	}
+
+	return moved;
+}
+
+bool RenderSystem::HandleRotation()
+{
+	POINT currentCursorCoordinates;
+	if (!GetCursorPos(&currentCursorCoordinates)) {
+		return false;
+	}
+
+	bool rotated = false;
+	if (GetAsyncKeyState(VK_LBUTTON) & 0x8000) {
+		const auto deltaX = currentCursorCoordinates.x - cursorCoordinates.x;
+		const auto deltaY = currentCursorCoordinates.y - cursorCoordinates.y;
+
+		constexpr float mouseSensitivity = 0.002f;
+		const float yaw = deltaX * mouseSensitivity;
+		const float pitch = -deltaY * mouseSensitivity;
+
+		displayedCamera->Rotate(yaw, pitch);
+		rotated = true;
+	}
+
+	cursorCoordinates = currentCursorCoordinates;
+	return rotated;
+}
+
 void RenderSystem::AnimeScene(const double elapsedTime)
 {
 	const float deplacement = cameraSpeed * static_cast<float>(elapsedTime);
-	bool cameraUpdated = false;
 	float deltaX = 0.0f;
 	float deltaZ = 0.0f;
 
-	if (GetAsyncKeyState(VK_LEFT) & 0x8000 || GetAsyncKeyState('A') & 0x8000) // Flèche droite
-	{
-		deltaX += deplacement;
-		cameraUpdated = true;
-	}
+	bool cameraUpdated = HandleCameraSwitch(); //Contrôles changement caméra
+	cameraUpdated |= HandleMovement(deplacement, deltaX, deltaZ); //Contrôles move caméra
+	cameraUpdated |= HandleRotation(); //Contrôles rotation caméra
 
-	if (GetAsyncKeyState(VK_RIGHT) & 0x8000 || GetAsyncKeyState('D') & 0x8000) // Flèche gauche
-	{
-		deltaX -= deplacement;
-		cameraUpdated = true;
-	}
-
-	if (GetAsyncKeyState(VK_UP) & 0x8000 || GetAsyncKeyState('W') & 0x8000) // Flèche haut
-	{
-		deltaZ += deplacement;
-		cameraUpdated = true;
-	}
-
-	if (GetAsyncKeyState(VK_DOWN) & 0x8000 || GetAsyncKeyState('S') & 0x8000) // Flèche bas
-	{
-		deltaZ -= deplacement;
-		cameraUpdated = true;
-	}
-
-	//if (GetAsyncKeyState('C') & 0x8000) // C
-	//{
-	//	if (isFirstPerson) {
-	//		isFirstPerson = false;
-	//		oldFocus = displayedCamera->GetFocus();
-	//		displayedCamera = std::make_unique<ThirdPersonCamera>(
-	//			displayedCamera->GetFocus(),
-	//			displayedCamera->GetUp(),
-	//			20.0f, // distance arbitraire
-	//			0.0f, // Angle arbitraire
-	//			0.0f, // Angle arbitraire
-	//			static_cast<float>(renderContext->GetScreenWidth()),
-	//			static_cast<float>(renderContext->GetScreenHeight())
-	//		);
-	//	}
-	//	else {
-	//		isFirstPerson = true;
-	//		displayedCamera = std::make_unique<FirstPersonCamera>(
-	//			displayedCamera->GetFocus(),
-	//			oldFocus,
-	//			displayedCamera->GetUp(),
-	//			static_cast<float>(renderContext->GetScreenWidth()),
-	//			static_cast<float>(renderContext->GetScreenHeight())
-	//		);
-	//		cameraUpdated = true;
-	//	}
-	// }
-
-	sceneData.matViewProj = displayedCamera->getMatView() * displayedCamera->getMatProj();
-
-	POINT currentCursorCoordinates; // Structure to store the cursor's coordinates
-
-	// Call GetCursorPos to get the current cursor position
-	const bool gotPos = GetCursorPos(&currentCursorCoordinates);
-	if (gotPos and GetAsyncKeyState(VK_LBUTTON) & 0x8000)
-	{
-		// Get difference
-		const auto deltaX1 = currentCursorCoordinates.x - cursorCoordinates.x;
-		const auto deltaY1 = currentCursorCoordinates.y - cursorCoordinates.y;
-
-		// Rotate camera
-		constexpr float mouseSensitivity = 0.002f; // radians per pixel, tweak as needed
-		const float yaw = deltaX1 * mouseSensitivity; // horizontal rotation
-		const float pitch = -deltaY1 * mouseSensitivity; // vertical rotation (negative = FPS style)
-		displayedCamera->Rotate(yaw, pitch);
-		cameraUpdated = true;
-	}
-	// Update coords
-	cursorCoordinates = currentCursorCoordinates;
-
-	// Mettre à jour la caméra active si déplacement
-	if (cameraUpdated)
-	{
+	if (cameraUpdated) {
 		displayedCamera->Move(deltaZ, deltaX, 0.0f);
 		sceneData.matViewProj = displayedCamera->getMatView() * displayedCamera->getMatProj();
 	}
-
 }
 
 void RenderSystem::RenderScene()
 {
-	ID3D11DeviceContext* pImmediateContext = renderContext->GetContext();
-	ID3D11RenderTargetView* pRenderTargetView = renderContext->GetRenderTargetView();
-	ID3D11DepthStencilView* pDepthStencilView = renderContext->GetDepthStencilView();
+	ID3D11DeviceContext* context = renderContext->GetContext();
+	ID3D11RenderTargetView* renderTarget = renderContext->GetRenderTargetView();
+	ID3D11DepthStencilView* depthStencil = renderContext->GetDepthStencilView();
 
-	// Add green background color
-	constexpr float backgroundColor[4] = {0.0f, 0.5f, 0.0f, 1.0f};
-	pImmediateContext->ClearRenderTargetView(pRenderTargetView, backgroundColor);
+	constexpr float backgroundColor[4] = { 0.0f, 0.5f, 0.0f, 1.0f };
+	context->ClearRenderTargetView(renderTarget, backgroundColor);
+	context->ClearDepthStencilView(depthStencil, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-	// Clear both depth and stencil
-	pImmediateContext->ClearDepthStencilView(pDepthStencilView,
-	                                         D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	ID3D11RenderTargetView* rtvs[] = { renderTarget };
+	context->OMSetRenderTargets(1, rtvs, depthStencil);
 
-	// Bind render target AND depth stencil view
-	ID3D11RenderTargetView* rtvs[] = {pRenderTargetView};
-	pImmediateContext->OMSetRenderTargets(1, rtvs, pDepthStencilView);
-
-	// Update camera position in scene data
 	XMStoreFloat4(&sceneData.cameraPosition, displayedCamera->GetPosition());
 }
 
 SceneData RenderSystem::CreateSceneData()
 {
-	return
-	{
+	return {
 		.matViewProj = {},
 		.lightPosition = XMFLOAT4(2, 2, -20, 1),
 		.cameraPosition = {},

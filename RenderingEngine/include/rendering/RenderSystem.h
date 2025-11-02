@@ -25,6 +25,15 @@ private:
 	SceneData sceneData;
 	RenderContext* renderContext;
 
+
+	//Nouvelles méthodes pour rendre le code plus visible
+	void InitializeCamera();
+	void SwitchToThirdPerson();
+	void SwitchToFirstPerson();
+	bool HandleCameraSwitch();
+	bool HandleMovement(float deplacement, float& deltaX, float& deltaZ);
+	bool HandleRotation();
+
 	// TODO : reusinage
 	float cameraSpeed = 50.0f; // Vitesse de déplacement à utiliser // A dégager
 	POINT cursorCoordinates; // Structure to store the cursor's coordinates TODO: a dégager
