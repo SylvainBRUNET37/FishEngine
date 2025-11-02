@@ -15,14 +15,28 @@ public:
 	                                      JPH::RVec3Arg inBaseOffset,
 	                                      const JPH::CollideShapeResult& inCollisionResult) override
 	{
+		//std::cout << "Contact validate callback between body1 in layer " << GetObjectLayerName(inBody1.GetObjectLayer()) << " and body2 in layer " << GetObjectLayerName(inBody2.GetObjectLayer()) << std::endl;
 		return JPH::ValidateResult::AcceptAllContactsForThisBodyPair;
 	}
 
 	void OnContactAdded(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold,
 	                    JPH::ContactSettings& ioSettings) override
 	{
-		std::cout << "A contact was added" << '\n';
+		//std::cout << "A contact was added" << '\n';
+		std::cout << "A contact was added between body1 in layer " << GetObjectLayerName(inBody1.GetObjectLayer()) << " and body2 in layer " << GetObjectLayerName(inBody2.GetObjectLayer()) << std::endl;
 
+		//Replaces calculated mass (based on what?) with whatever's needed, here enough for a small ball to move a cube of cargo
+		if (inBody1.GetObjectLayer() == Layers::BALL) {
+			ioSettings.mInvMassScale1 = 0.01f;
+			ioSettings.mInvInertiaScale1 = 0.01f;
+			ioSettings.mInvMassScale2 = 1.0f;
+			ioSettings.mInvInertiaScale2 = 1.0f;
+		} else if (inBody2.GetObjectLayer() == Layers::BALL) {
+			ioSettings.mInvMassScale1 = 1.0f;
+			ioSettings.mInvInertiaScale1 = 1.0f;
+			ioSettings.mInvMassScale2 = 0.01f;
+			ioSettings.mInvInertiaScale2 = 0.01f;
+		}
 	}
 
 	void OnContactPersisted(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold,
@@ -36,7 +50,19 @@ public:
 	}
 
 private:
-
+	//This really should be in Layers.h, but then the compiler complained it was already defined for some reason
+	const char* GetObjectLayerName(JPH::ObjectLayer inLayer)
+	{
+		switch (inLayer)
+		{
+		case Layers::NON_MOVING:	return "NON_MOVING";
+		case Layers::VEHICLE:		return "VEHICLE";
+		case Layers::SENSOR:		return "SENSOR";
+		case Layers::CARGO:			return "CARGO";
+		case Layers::BALL:			return "BALL";
+		default:					JPH_ASSERT(false); return "INVALID";
+		}
+	}
 };
 
 #endif

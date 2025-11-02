@@ -17,8 +17,14 @@ public:
 		{
 		case Layers::NON_MOVING:
 			return broadPhaseLayer == BroadPhaseLayers::MOVING;
-		case Layers::MOVING:
+		case Layers::VEHICLE:
 			return broadPhaseLayer == BroadPhaseLayers::NON_MOVING;
+		case Layers::SENSOR:
+			return broadPhaseLayer == BroadPhaseLayers::MOVING;
+		case Layers::CARGO:
+			return true;
+		case Layers::BALL:
+			return true;
 		default:
 			return false;
 		}

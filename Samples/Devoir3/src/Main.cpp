@@ -72,12 +72,12 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 		if (name.name == "Cube")
 		{
 			const auto transform = entityManager.Get<Transform>(entity);
-			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCube(transform));
+			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCubeInVehicleLayer(transform));
 		}
 		else if (name.name == "Cargo")
 		{
 			const auto transform = entityManager.Get<Transform>(entity);
-			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCube(transform));
+			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCubeInCargoLayer(transform));
 		}
 		else if (name.name == "Plane")
 		{
@@ -97,6 +97,14 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 	}
 
 	GameEngine gameEngine{ std::move(renderSystem), std::move(entityManager) };
+
+
+	//Source: https://stackoverflow.com/questions/16703835/how-can-i-see-cout-output-in-a-non-console-application
+	AllocConsole();// Décommenter si la console est voulu
+	freopen("CONOUT$", "w", stdout);
+	freopen("CONOUT$", "w", stderr);
+
+
 	gameEngine.Run();
 
 	return EXIT_SUCCESS;

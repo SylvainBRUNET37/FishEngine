@@ -8,7 +8,8 @@
 
 namespace ShapeFactory
 {
-	[[nodiscard]] JPH::Body* CreateCube(const Transform& transform);
+	[[nodiscard]] JPH::Body* CreateCubeInVehicleLayer(const Transform& transform);
+	[[nodiscard]] JPH::Body* CreateCubeInCargoLayer(const Transform& transform);
 	[[nodiscard]] JPH::Body* CreatePlane(const Transform& transform);
 	[[nodiscard]] JPH::Body* CreateCylinder(const Transform& transform);
 	[[nodiscard]] JPH::Body* CreateSphere(const Transform& transform);

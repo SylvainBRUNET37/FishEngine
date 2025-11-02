@@ -14,7 +14,7 @@
 using namespace JPH;
 using namespace JPH::literals;
 
-Body* ShapeFactory::CreateCube(const Transform& transform)
+Body* ShapeFactory::CreateCubeInVehicleLayer(const Transform& transform)
 {
     // Apply scale to the box
     auto halfExtents = Vec3(1.f, 1.f, 1.f);
@@ -31,12 +31,40 @@ Body* ShapeFactory::CreateCube(const Transform& transform)
         position,
         rotation,
         EMotionType::Dynamic,
-        Layers::MOVING
+        Layers::VEHICLE
     );
 
     BodyInterface& bodyInterface = JoltSystem::GetBodyInterface();
     Body* body = bodyInterface.CreateBody(boxSettings);
     bodyInterface.AddBody(body->GetID(), EActivation::Activate);
+
+    return body;
+}
+
+Body* ShapeFactory::CreateCubeInCargoLayer(const Transform& transform)
+{
+    // Apply scale to the box
+    auto halfExtents = Vec3(1.f, 1.f, 1.f);
+    halfExtents *= Vec3(transform.scale.x, transform.scale.y, transform.scale.z);
+
+    const RefConst shape = new BoxShape(halfExtents);
+
+    // Convert mesh type of position and rotation to jolt's ones
+    const RVec3 position(transform.position.x, transform.position.y, transform.position.z);
+    const Quat rotation(transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w);
+
+    const BodyCreationSettings boxSettings(
+        shape,
+        position,
+        rotation,
+        EMotionType::Dynamic,
+        Layers::CARGO
+    );
+
+    BodyInterface& bodyInterface = JoltSystem::GetBodyInterface();
+    Body* body = bodyInterface.CreateBody(boxSettings);
+    bodyInterface.AddBody(body->GetID(), EActivation::Activate);
+    bodyInterface.SetRestitution(body->GetID(), 0.5f); //what is restitution supposed to be anyway?
 
     return body;
 }
@@ -47,7 +75,7 @@ Body* ShapeFactory::CreateSphere(const Transform& transform)
     /*auto halfExtents = Vec3(0.5f, 0.5f, 0.5f);
     halfExtents *= Vec3(transform.scale.x, transform.scale.y, transform.scale.z);*/
 
-    const RefConst shape = new SphereShape(0.5f * transform.scale.x);
+    const RefConst shape = new SphereShape(2.0f * transform.scale.x); //Ah, Thierry comprends peut-être. 1 unité Jolt = 1 metre dans Blender, on dirait...
 
     // Convert mesh type of position and rotation to jolt's ones
     const RVec3 position(transform.position.x, transform.position.y, transform.position.z);
@@ -58,13 +86,13 @@ Body* ShapeFactory::CreateSphere(const Transform& transform)
         position,
         rotation,
         EMotionType::Dynamic,
-        Layers::MOVING
+        Layers::BALL
     );
 
     BodyInterface& bodyInterface = JoltSystem::GetBodyInterface();
     Body* body = bodyInterface.CreateBody(sphereSettings);
     bodyInterface.AddBody(body->GetID(), EActivation::Activate);
-    bodyInterface.SetLinearVelocity(body->GetID(), Vec3(0.0f, 0.0f, -2.0f));
+    bodyInterface.SetLinearVelocity(body->GetID(), Vec3(0.0f, 0.0f, 20.0f)); //Devrait être fait ailleurs qu'au chargement...
     bodyInterface.SetRestitution(body->GetID(), 0.5f);
     return body;
 }
@@ -111,12 +139,13 @@ Body* ShapeFactory::CreateCylinder(const Transform& transform)
         position,
         rotation,
         EMotionType::Static,
-        Layers::NON_MOVING
+        Layers::SENSOR
     );
 
     BodyInterface& bodyInterface = JoltSystem::GetBodyInterface();
     Body* body = bodyInterface.CreateBody(cylinderSettings);
     bodyInterface.AddBody(body->GetID(), EActivation::Activate);
+    body->SetIsSensor(true);
 
     return body;
 }
