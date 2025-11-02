@@ -2,6 +2,8 @@
 #include "GameEngine.h"
 
 #include "ecs/Components.h"
+#include "ecs/EntityManagerFactory.h"
+#include "PhysicsEngine/ShapeFactory.h"
 #include "PhysicsEngine/systems/JoltSystem.h"
 #include "rendering/application/WindowsApplication.h"
 #include "rendering/core/Transform.h"
@@ -24,6 +26,8 @@ void GameEngine::Run()
 
 		UpdatePhysics();
 		UpdateTransforms();
+		ShootBallIfKeyPressed();
+
 		RenderScene(elapsedTime);
 
 		WaitBeforeNextFrame(frameStartTime);
@@ -35,8 +39,8 @@ void GameEngine::UpdatePhysics()
 	// Update physics
 	constexpr int collisionSteps = 1;
 	JoltSystem::GetPhysicSystem().Update(PHYSICS_UPDATE_RATE, collisionSteps,
-		&JoltSystem::GetTempAllocator(),
-		&JoltSystem::GetJobSystem());
+	                                     &JoltSystem::GetTempAllocator(),
+	                                     &JoltSystem::GetJobSystem());
 
 	// Apply logic related to the physics simulation results
 	for (auto& task : JoltSystem::GetPostStepCallbacks())
@@ -54,14 +58,14 @@ void GameEngine::UpdateTransforms()
 		const JPH::Vec3 joltPos = joltTransform.GetTranslation();
 		const JPH::Quat joltRot = joltTransform.GetQuaternion();
 
-		transform.position = { joltPos.GetX(), joltPos.GetY(), joltPos.GetZ() };
-		transform.rotation = { joltRot.GetX(), joltRot.GetY(), joltRot.GetZ(), joltRot.GetW() };
+		transform.position = {joltPos.GetX(), joltPos.GetY(), joltPos.GetZ()};
+		transform.rotation = {joltRot.GetX(), joltRot.GetY(), joltRot.GetZ(), joltRot.GetW()};
 
 		// Uses Jolt position and rotation and keep the orginal scale of the transform
 		const auto scaleMatrix = XMMatrixScaling(transform.scale.x, transform.scale.y, transform.scale.z);
 		const auto rotationMatrix = XMMatrixRotationQuaternion(XMLoadFloat4(&transform.rotation));
 		const auto translationMatrix = XMMatrixTranslation(transform.position.x, transform.position.y,
-			transform.position.z);
+		                                                   transform.position.z);
 
 		transform.world = scaleMatrix * rotationMatrix * translationMatrix;
 	}
@@ -77,6 +81,51 @@ void GameEngine::RenderScene(const double elapsedTime)
 	}
 
 	renderSystem.Render();
+}
+
+void GameEngine::ShootBallIfKeyPressed()
+{
+	static auto sanitize = [](const float v)
+	{
+		if (!std::isfinite(v))
+			return 0.0f;
+
+		if (std::fabs(v) < 1e-6f || std::fabs(v) > 1e6f)
+			return 0.0f;
+
+		return v;
+	};
+
+	for (const auto& [entity, entityTransform, entityBallShooter] : entityManager.View<Transform, BallShooter>())
+	{
+		if (GetAsyncKeyState(entityBallShooter.inputKey) & 0x8000) [[unlikely]]
+		{
+			const auto ballEntity = entityManager.CreateEntity();
+
+			constexpr auto spawnDistance = 6.0f;
+			const XMFLOAT3 ballPosition
+			(
+				sanitize(entityTransform.position.x),
+				sanitize(entityTransform.position.y),
+				sanitize(entityTransform.position.z) + spawnDistance
+			);
+
+			const Transform ballTransform
+			{
+				.world = XMMatrixIdentity(),
+				.position = ballPosition,
+				.rotation = {0, 0, 0, 1},
+				.scale = {1, 1, 1},
+			};
+
+			entityManager.AddComponent<Transform>(ballEntity, ballTransform);
+			entityManager.AddComponent<Mesh>(ballEntity, resourceManager.LoadSphere());
+			JoltSystem::AddPostStepCallback([this, ballEntity, ballTransform]()
+			{
+				entityManager.AddComponent<RigidBody>(ballEntity, ShapeFactory::CreateSphere(ballTransform));
+			});
+		}
+	}
 }
 
 void GameEngine::WaitBeforeNextFrame(const DWORD frameStartTime)

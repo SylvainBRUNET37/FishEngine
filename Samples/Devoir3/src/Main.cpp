@@ -24,6 +24,16 @@ using namespace JPH::literals;
 using namespace std;
 using namespace DirectX;
 
+static bool MyAssertFailed(const char* inExpression, const char* inMessage, const char* inFile, uint inLine)
+{
+	std::cerr << "Jolt Assertion Failed!\n";
+	std::cerr << "Expression: " << inExpression << "\n";
+	std::cerr << "Message: " << (inMessage ? inMessage : "(none)") << "\n";
+	std::cerr << "File: " << inFile << ":" << inLine << "\n";
+
+	return false;
+}
+
 int APIENTRY _tWinMain(const HINSTANCE hInstance,
                        HINSTANCE,
                        LPTSTR,
@@ -48,6 +58,8 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 	JoltSystem::Init();
 	auto& physicsSystem = JoltSystem::GetPhysicSystem();
 
+	AssertFailed = MyAssertFailed;
+
 	const BroadPhaseLayerInterfaceImpl broadPhaseLayerInterface;
 	const ObjectVsBroadPhaseLayerFilterImpl objectVsBroadPhaseLayerFilter;
 	const ObjectLayerPairFilterImpl objectLayerPairFilter;
@@ -65,13 +77,14 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 	physicsSystem.SetContactListener(&contactListener);
 	//////////////////////////////
 
-	// Create the scene (it's a temporary way of assigning components)
+	// Initialize the scene (it's a temporary way of doing it)
 	for (const auto& [entity, name] : entityManager.View<Name>())
 	{
 		if (name.name == "Cube")
 		{
 			const auto transform = entityManager.Get<Transform>(entity);
 			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCubeInVehicleLayer(transform));
+			entityManager.AddComponent<BallShooter>(entity);
 		}
 		else if (name.name == "Cargo")
 		{
@@ -88,20 +101,14 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 			const auto transform = entityManager.Get<Transform>(entity);
 			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCapsule(transform));
 		}
-		else if (name.name == "Sphere")
-		{
-			const auto transform = entityManager.Get<Transform>(entity);
-			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateSphere(transform));
-		}
 	}
 
-	GameEngine gameEngine{ std::move(renderSystem), std::move(entityManager) };
+	GameEngine gameEngine{ std::move(renderSystem), std::move(entityManager), std::move(resourceManager) };
 
-	//Source: https://stackoverflow.com/questions/16703835/how-can-i-see-cout-output-in-a-non-console-application
+	// Source: https://stackoverflow.com/questions/16703835/how-can-i-see-cout-output-in-a-non-console-application
 	AllocConsole();// Décommenter si la console est voulu
 	freopen("CONOUT$", "w", stdout);
 	freopen("CONOUT$", "w", stderr);
-
 
 	gameEngine.Run();
 

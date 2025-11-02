@@ -12,6 +12,7 @@ public:
 	explicit ResourceManager(ID3D11Device* device);
 
 	[[nodiscard]] SceneResource LoadScene() const;
+	[[nodiscard]] Mesh LoadSphere() const;
 
 private:
 	ID3D11Device* device;

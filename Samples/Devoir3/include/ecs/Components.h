@@ -29,6 +29,11 @@ struct RigidBody
 	JPH::Body* body;
 };
 
+struct BallShooter
+{
+	char inputKey= VK_SPACE; // The input key for shooting (space by default)
+};
+
 // The list of components ! Add a component here to add it to the engine
 using Components = std::tuple
 <
@@ -36,7 +41,8 @@ using Components = std::tuple
 	RigidBody,
 	Transform,
 	Hierarchy,
-	Name
+	Name,
+	BallShooter
 >;
 
 #endif
