@@ -65,7 +65,7 @@ class ThirdPersonCamera : public Camera {
 	float distance;
 	float heightOffset;
 	float yawOffset = 0.0f;
-	float pitchAngle = -0.3f;
+	float pitchAngle = -0.1f;
 
 	static constexpr float MIN_DISTANCE = 10.0f;
 
