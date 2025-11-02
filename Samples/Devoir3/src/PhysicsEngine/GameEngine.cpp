@@ -9,6 +9,7 @@
 #include "rendering/core/Transform.h"
 #include "rendering/graphics/Mesh.h"
 
+#include "Globals.h"
 namespace
 {
 	[[nodiscard]] float Sanitize(const float value)
@@ -53,6 +54,7 @@ void GameEngine::Run()
 		ShootBallIfKeyPressed();
 
 		RenderScene(elapsedTime);
+		CheckForWinConditions();
 
 		WaitBeforeNextFrame(frameStartTime);
 	}
@@ -107,6 +109,18 @@ void GameEngine::RenderScene(const double elapsedTime)
 	renderSystem.Render();
 }
 
+void GameEngine::CheckForWinConditions()
+{
+	if (currentWinCount < Globals::getNGamesWon()) { //A new game has been won
+		currentWinCount = Globals::getNGamesWon();
+		if (currentWinCount >= Globals::getMaxGamesWon()) {
+			exit(0); //end game
+		}
+		else {
+			MoveSensorRandomly();
+			}
+			}
+			}
 void GameEngine::ShootBallIfKeyPressed()
 {
 	for (const auto& [entity, entityTransform, entityBallShooter] : entityManager.View<Transform, BallShooter>())
@@ -166,4 +180,29 @@ void GameEngine::WaitBeforeNextFrame(const DWORD frameStartTime)
 
 	if (frameDuration < FRAME_TIME)
 		Sleep(static_cast<DWORD>(FRAME_TIME - frameDuration));
+}
+
+void GameEngine::MoveSensorRandomly()
+{
+	//TODO: Teleport sensor here
+	for (const auto& [entity, name, rigidBody] : entityManager.View<Name, RigidBody>()) //Was there a better way to do this? Probably...
+	{
+		if (name.name == "Cylinder") {
+			//Of course, below doesn't work: Jolt is supposed to control where things are for correct physics...
+			//auto transform = entityManager.Get<Transform>(entity);
+			//float newX = rand() % 2000 - 1000; //Not clean at all, but sufficient for testing, hopefully...
+			//float newY = 500.0f; //Should this be in global?
+			//float newZ = rand() % 2000 - 1000;
+			//transform.position = XMFLOAT3(newX, newY, newZ);
+
+			// Get jolt transform data
+			const JPH::RMat44& joltTransform = rigidBody.body->GetWorldTransform();
+			const JPH::Vec3 joltPos = joltTransform.GetTranslation();
+			float newX = rand() % 2000 - 1000; //Not clean at all, but sufficient for testing, hopefully...
+			float newY = 500.0f; //Should this be in global?
+			float newZ = rand() % 2000 - 1000;
+			JPH::BodyInterface& bodyInterface = JoltSystem::GetBodyInterface();
+			bodyInterface.SetPosition(rigidBody.body->GetID(), JPH::RVec3Arg(newX, newY, newZ), JPH::EActivation::Activate);
+		}
+	}
 }
