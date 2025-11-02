@@ -27,13 +27,15 @@ Body* ShapeFactory::CreateCubeInVehicleLayer(const Transform& transform)
     const RVec3 position(transform.position.x, transform.position.y, transform.position.z);
     const Quat rotation(transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w);
 
-    const BodyCreationSettings boxSettings(
+    BodyCreationSettings boxSettings(
         shape,
         position,
         rotation,
         EMotionType::Dynamic,
         Layers::VEHICLE
     );
+
+    boxSettings.mLinearDamping = 1.f;
 
     BodyInterface& bodyInterface = JoltSystem::GetBodyInterface();
     Body* body = bodyInterface.CreateBody(boxSettings);
@@ -55,13 +57,15 @@ Body* ShapeFactory::CreateCubeInCargoLayer(const Transform& transform)
     const RVec3 position(transform.position.x, transform.position.y, transform.position.z);
     const Quat rotation(transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w);
 
-    const BodyCreationSettings boxSettings(
+    BodyCreationSettings boxSettings(
         shape,
         position,
         rotation,
         EMotionType::Dynamic,
         Layers::CARGO
     );
+
+    boxSettings.mLinearDamping = 1.f;
 
     BodyInterface& bodyInterface = JoltSystem::GetBodyInterface();
     Body* body = bodyInterface.CreateBody(boxSettings);
