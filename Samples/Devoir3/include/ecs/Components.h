@@ -9,6 +9,7 @@
 #include <Jolt/Physics/Body/Body.h>
 
 #include "ecs/Entity.h"
+#include "PhysicsEngine/systems/JoltSystem.h"
 #include "rendering/core/Transform.h"
 #include "rendering/graphics/Mesh.h"
 
@@ -27,6 +28,12 @@ struct Hierarchy
 struct RigidBody
 {
 	JPH::Body* body;
+
+	~RigidBody() noexcept
+	{
+		JoltSystem::GetBodyInterface().RemoveBody(body->GetID());
+		JoltSystem::GetBodyInterface().DestroyBody(body->GetID());
+	}
 };
 
 struct BallShooter

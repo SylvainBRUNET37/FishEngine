@@ -1,5 +1,7 @@
 #include "pch.h"
 
+#include <Jolt/RegisterTypes.h>
+
 #include "ecs/Components.h"
 #include "PhysicsEngine/layers/BroadPhaseLayerInterfaceImpl.h"
 #include "PhysicsEngine/layers/BroadPhaseLayers.h"
@@ -111,6 +113,8 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 	freopen("CONOUT$", "w", stderr);
 
 	gameEngine.Run();
+
+	UnregisterTypes();
 
 	return EXIT_SUCCESS;
 }
