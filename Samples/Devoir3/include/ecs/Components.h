@@ -47,6 +47,11 @@ struct LifeSpan
 	double lifeDuration{};
 };
 
+struct Controllable
+{
+	float maxSpeed;
+};
+
 // The list of components ! Add a component here to add it to the engine
 using Components = std::tuple
 <
@@ -55,6 +60,7 @@ using Components = std::tuple
 	Transform,
 	Hierarchy,
 	Name,
+	Controllable,
 	BallShooter,
 	LifeSpan
 >;

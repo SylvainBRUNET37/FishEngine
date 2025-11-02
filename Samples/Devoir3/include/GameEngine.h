@@ -28,7 +28,7 @@ private:
 	RenderSystem renderSystem;
 	EntityManager entityManager;
 
-	static void UpdatePhysics();
+	void UpdatePhysics();
 	void UpdateTransforms();
 	void RenderScene(double elapsedTime);
 	void CheckForWinConditions();

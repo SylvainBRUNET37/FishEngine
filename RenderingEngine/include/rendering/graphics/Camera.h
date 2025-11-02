@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <DirectXMath.h>
 #include <algorithm>
 
@@ -6,122 +6,123 @@ using namespace DirectX;
 
 class Camera
 {
-	// Vectors
+protected:
 	XMVECTOR position;
 	XMVECTOR focus;
 	XMVECTOR up;
 
-	// Matrices
 	XMMATRIX matView;
 	XMMATRIX matProj;
 
-	// Planes(walker)
-	float nearPlane = 0.05;
-	float farPlane = 1000.0;
-
-	// Other
+	float nearPlane = 0.05f;
+	float farPlane = 1000.0f;
 	float fov = XM_PI / 4.0f;
+
 	int viewWidth;
 	int viewHeight;
 	float aspectRatio;
 
-	// For camera rotation
-	float pitchAccum = 0.0f;
-	float yawAccum = 0.0f;
-
 public:
 	Camera(XMVECTOR position, XMVECTOR focus, XMVECTOR up, float viewWidth, float viewHeight)
-		: position(position),
-		focus(focus),
-		up(up),
-		viewWidth((viewWidth > 0) ? viewWidth : 1),
-		viewHeight((viewHeight > 0) ? viewHeight : 1)
+		: position(position), focus(focus), up(up),
+		viewWidth(viewWidth > 0 ? viewWidth : 1),
+		viewHeight(viewHeight > 0 ? viewHeight : 1)
 	{
-		this->aspectRatio = viewWidth / viewHeight;
-
-		this->matView = XMMatrixLookAtRH(
-			position,
-			focus,
-			up
-		);
-
-		this->matProj = XMMatrixPerspectiveFovRH(
-			this->fov,
-			this->aspectRatio,
-			this->nearPlane,
-			this->farPlane
-		);
+		aspectRatio = static_cast<float>(viewWidth) / static_cast<float>(viewHeight);
+		matView = XMMatrixLookAtRH(position, focus, up);
+		matProj = XMMatrixPerspectiveFovRH(fov, aspectRatio, nearPlane, farPlane);
 	}
 
-	XMMATRIX getMatView() const  noexcept {
-		return this->matView;
-	}
+	virtual ~Camera() = default;
 
-	XMMATRIX getMatProj() const  noexcept {
-		return this->matProj;
-	}
-
-
+	XMMATRIX getMatView() const noexcept { return matView; }
+	XMMATRIX getMatProj() const noexcept { return matProj; }
 	XMVECTOR GetPosition() const noexcept { return position; }
 	XMVECTOR GetFocus() const noexcept { return focus; }
 	XMVECTOR GetUp() const noexcept { return up; }
 
-	void SetPosition(const XMVECTOR pos) noexcept {
+	void SetPosition(XMVECTOR pos) noexcept {
 		position = pos;
 		UpdateMatView();
 	}
 
-	void SetFocus(const XMVECTOR foc) noexcept {
+	void SetFocus(XMVECTOR foc) noexcept {
 		focus = foc;
 		UpdateMatView();
 	}
 
-	void Move(float deltaX, float deltaZ) noexcept {
-		const XMVECTOR delta = XMVectorSet(deltaX, 0.0f, deltaZ, 0.0f);
-		position = XMVectorAdd(position, delta);
-		focus = XMVectorAdd(focus, delta);
-		UpdateMatView();
-	}
+	virtual void Move(float deltaForward, float deltaSide, float deltaHeight) noexcept = 0;
+	virtual void Rotate(float yawDelta, float pitchDelta) noexcept = 0;
 
-	void MoveFirstPerson(float deltaForward, float deltaSide) noexcept {
-		const XMVECTOR forward = XMVectorSubtract(focus, position);
-		const XMVECTOR right = XMVector3Normalize(XMVector3Cross(up, forward));
-
-		// Compute movement delta
-		const XMVECTOR move = XMVectorAdd(
-			XMVectorScale(forward, deltaForward),
-			XMVectorScale(right, deltaSide)
-		);
-
-		// Update position, focus and viewMatrix
-		position = XMVectorAdd(position, move);
-		focus = XMVectorAdd(focus, move);
-		UpdateMatView();
-	}
-
-	void RotateFirstPerson(float yawDelta, float pitchDelta) noexcept {
-		constexpr float maxPitch = XM_PIDIV2 - 0.01f;
-		yawAccum += yawDelta;
-		pitchAccum += pitchDelta;
-
-		pitchAccum = std::clamp(pitchAccum, -maxPitch, maxPitch);
-
-		XMVECTOR forward = XMVectorSet(
-			cosf(pitchAccum) * sinf(yawAccum),
-			sinf(pitchAccum),
-			cosf(pitchAccum) * cosf(yawAccum),
-			0.0f
-		);
-
-		XMVECTOR right = XMVector3Normalize(XMVector3Cross({ 0,1,0,0 }, forward));
-		up = XMVector3Normalize(XMVector3Cross(forward, right));
-
-		focus = XMVectorAdd(position, forward);
-		UpdateMatView();
-	}
-
-private:
+protected:
 	void UpdateMatView() noexcept {
 		matView = XMMatrixLookAtRH(position, focus, up);
+	}
+};
+
+class ThirdPersonCamera : public Camera {
+	XMVECTOR targetPosition;
+	float distance;
+	float heightOffset;
+	float yawOffset = 0.0f;
+	float pitchAngle = -0.1f;
+
+	static constexpr float MIN_DISTANCE = 10.0f;
+
+	void UpdateCameraPosition(float cubeYaw) noexcept {
+		focus = XMVectorAdd(targetPosition, XMVectorSet(0, heightOffset, 0, 0));
+
+		float totalYaw = cubeYaw + yawOffset;
+		float horizontalDistance = distance * cosf(pitchAngle);
+		float verticalDistance = distance * sinf(pitchAngle);
+
+		position = XMVectorSet(
+			XMVectorGetX(focus) - horizontalDistance * sinf(totalYaw),
+			XMVectorGetY(focus) + verticalDistance + heightOffset,
+			XMVectorGetZ(focus) - horizontalDistance * cosf(totalYaw),
+			1.0f
+		);
+
+		XMVECTOR forward = XMVector3Normalize(XMVectorSubtract(focus, position));
+		XMVECTOR worldUp = XMVectorSet(0, 1, 0, 0);
+		XMVECTOR right = XMVector3Normalize(XMVector3Cross(worldUp, forward));
+		up = XMVector3Normalize(XMVector3Cross(forward, right));
+
+		UpdateMatView();
+	}
+
+public:
+	ThirdPersonCamera(XMVECTOR targetPos, float distance, float heightOffset, float viewWidth, float viewHeight)
+		: Camera(XMVectorSet(0, 5, -10, 1), XMVectorSet(0, 0, 0, 1), XMVectorSet(0, 1, 0, 0), viewWidth, viewHeight),
+		targetPosition(targetPos),
+		distance(max(MIN_DISTANCE, distance)),
+		heightOffset(heightOffset)
+	{
+		UpdateCameraPosition(0.0f);
+	}
+
+	void UpdateFromCube(const Transform* cubeTransform) noexcept {
+		if (!cubeTransform) return;
+
+		targetPosition = XMLoadFloat3(&cubeTransform->position);
+
+		XMVECTOR cubeRotQuat = XMLoadFloat4(&cubeTransform->rotation);
+		XMMATRIX rotMatrix = XMMatrixRotationQuaternion(cubeRotQuat);
+		XMVECTOR forward = rotMatrix.r[2];
+		float cubeYaw = atan2f(XMVectorGetX(forward), XMVectorGetZ(forward));
+
+		UpdateCameraPosition(cubeYaw);
+	}
+
+	void Move(float, float, float) noexcept override {}
+
+	void Rotate(float yawDelta, float pitchDelta) noexcept override {
+		yawOffset += yawDelta;
+		pitchAngle = std::clamp(pitchAngle + pitchDelta, -XM_PIDIV2 + 0.1f, 0.0f);
+		UpdateCameraPosition(0.0f);
+	}
+
+	void SetDistance(float newDistance) noexcept {
+		distance = max(MIN_DISTANCE, newDistance);
 	}
 };
