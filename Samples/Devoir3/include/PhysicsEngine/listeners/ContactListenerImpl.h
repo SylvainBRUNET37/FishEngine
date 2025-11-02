@@ -49,15 +49,15 @@ public:
 
 		//Replaces calculated mass (based on what?) with whatever's needed, here enough for a small ball to move a cube of cargo
 		if (inBody1.GetObjectLayer() == Layers::BALL) {
-			ioSettings.mInvMassScale1 = 0.0f; //To test pushing cargo inside goal, changed these 0.01f to 0 and use scene "sceneDevoir3_sphere.glb". These really should be constants or perhaps a function...
-			ioSettings.mInvInertiaScale1 = 0.00f;
+			ioSettings.mInvMassScale1 = 0.01f; //To test pushing cargo inside goal, changed these 0.01f to 0 and use scene "sceneDevoir3_sphere.glb". These really should be constants or perhaps a function...
+			ioSettings.mInvInertiaScale1 = 0.01f;
 			ioSettings.mInvMassScale2 = 1.0f;
 			ioSettings.mInvInertiaScale2 = 1.0f;
 		} else if (inBody2.GetObjectLayer() == Layers::BALL) {
 			ioSettings.mInvMassScale1 = 1.0f;
 			ioSettings.mInvInertiaScale1 = 1.0f;
-			ioSettings.mInvMassScale2 = 0.00f;
-			ioSettings.mInvInertiaScale2 = 0.00f;
+			ioSettings.mInvMassScale2 = 0.01f;
+			ioSettings.mInvInertiaScale2 = 0.01f;
 		}
 	}
 
