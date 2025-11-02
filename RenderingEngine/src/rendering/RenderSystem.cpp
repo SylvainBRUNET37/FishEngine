@@ -9,13 +9,13 @@ RenderSystem::RenderSystem(RenderContext* renderContext, std::vector<Material>&&
 {
 	InitializeCamera();
 	sceneData.matViewProj = displayedCamera->getMatView() * displayedCamera->getMatProj();
-	RenderScene();
+	//RenderScene();
 }
 
-void RenderSystem::UpdateScene(const double elapsedTime)
+void RenderSystem::UpdateScene(const double elapsedTime, Transform cubeTransform)
 {
 	AnimeScene(elapsedTime);
-	RenderScene();
+	RenderScene(cubeTransform);
 }
 
 void RenderSystem::Render(const Mesh& mesh, const Transform& transform)
@@ -147,11 +147,13 @@ void RenderSystem::AnimeScene(const double elapsedTime)
 	}
 }
 
-void RenderSystem::RenderScene()
+void RenderSystem::RenderScene(Transform transfCube)
 {
 	ID3D11DeviceContext* context = renderContext->GetContext();
 	ID3D11RenderTargetView* renderTarget = renderContext->GetRenderTargetView();
 	ID3D11DepthStencilView* depthStencil = renderContext->GetDepthStencilView();
+
+	displayedCamera->setCubeTransform(transfCube);
 
 	constexpr float backgroundColor[4] = { 0.0f, 0.5f, 0.0f, 1.0f };
 	context->ClearRenderTargetView(renderTarget, backgroundColor);

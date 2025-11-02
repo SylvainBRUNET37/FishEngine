@@ -22,6 +22,8 @@ protected:
 	int viewHeight;
 	float aspectRatio;
 
+	Transform transfCube;
+
 public:
 	Camera(XMVECTOR position, XMVECTOR focus, XMVECTOR up, float viewWidth, float viewHeight)
 		: position(position), focus(focus), up(up),
@@ -31,6 +33,10 @@ public:
 		aspectRatio = static_cast<float>(viewWidth) / static_cast<float>(viewHeight);
 		matView = XMMatrixLookAtRH(position, focus, up);
 		matProj = XMMatrixPerspectiveFovRH(fov, aspectRatio, nearPlane, farPlane);
+	}
+
+	void setCubeTransform(Transform transfCube) {
+		this->transfCube = transfCube;
 	}
 
 	virtual ~Camera() = default;

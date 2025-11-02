@@ -120,7 +120,15 @@ void GameEngine::UpdateTransforms()
 
 void GameEngine::RenderScene(const double elapsedTime)
 {
-	renderSystem.UpdateScene(elapsedTime);
+	Transform cubeTransform;
+	for (const auto& [entity, name, transform] : entityManager.View<Name, Transform>())
+	{
+		if (name.name == "Cube") {
+			cubeTransform = transform;
+		}
+	}
+	
+	renderSystem.UpdateScene(elapsedTime,cubeTransform);
 
 	for (const auto& [entity, transform, mesh] : entityManager.View<Transform, Mesh>())
 	{
