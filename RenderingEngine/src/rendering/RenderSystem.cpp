@@ -50,7 +50,7 @@ void RenderSystem::UpdateCamera(const Transform& cubeTransform)
 
 void RenderSystem::UpdateScene(double elapsedTime, const Transform& cubeTransform)
 {
-	HandleRotation();
+	// HandleRotation(); // Handle rotation with the mouse
 	UpdateCamera(cubeTransform);
 	sceneData.matViewProj = camera->getMatView() * camera->getMatProj();
 	RenderScene();

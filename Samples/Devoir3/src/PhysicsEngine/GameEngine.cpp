@@ -179,7 +179,8 @@ void GameEngine::CheckForWinConditions()
 		currentWinCount = Globals::getNGamesWon();
 		if (currentWinCount >= Globals::getMaxGamesWon())
 		{
-			abort(); //end game
+			entityManager = {};
+			//abort(); //end game
 		}
 		MoveSensorRandomly();
 	}
