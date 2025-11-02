@@ -30,6 +30,7 @@
     <ClInclude Include="include\ecs\ComponentUtils.h" />
     <ClInclude Include="include\PhysicsEngine\ShapeFactory.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="include\Globals.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\MiniPhongPS.hlsl" />

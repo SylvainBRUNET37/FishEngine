@@ -184,6 +184,7 @@
     <ClInclude Include="include\ecs\ComponentUtils.h" />
     <ClInclude Include="include\ecs\Entity.h" />
     <ClInclude Include="include\ecs\EntityManager.h" />
+    <ClInclude Include="include\Globals.h" />
     <ClInclude Include="include\PhysicsEngine\layers\BroadPhaseLayerInterfaceImpl.h" />
     <ClInclude Include="include\PhysicsEngine\layers\BroadPhaseLayers.h" />
     <ClInclude Include="include\PhysicsEngine\layers\Layers.h" />

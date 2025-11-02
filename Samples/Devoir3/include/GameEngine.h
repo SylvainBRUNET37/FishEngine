@@ -15,6 +15,7 @@ public:
 		  entityManager{std::move(entityManager)}
 	{
 		std::srand(std::time(0));
+		MoveSensorRandomly();
 	}
 
 	void Run();
