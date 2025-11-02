@@ -3,6 +3,7 @@
 
 #include <utility>
 #include <vector>
+#include <deque>
 #include <optional>
 
 #include "Entity.h"
@@ -55,7 +56,7 @@ public:
     }
 
 private:
-    std::vector<std::optional<Component>> components;
+    std::deque<std::optional<Component>> components;
 };
 
 #endif

@@ -12,6 +12,7 @@
 #include "PhysicsEngine/systems/JoltSystem.h"
 
 using namespace JPH;
+using namespace DirectX;
 using namespace JPH::literals;
 
 Body* ShapeFactory::CreateCubeInVehicleLayer(const Transform& transform)
@@ -69,7 +70,7 @@ Body* ShapeFactory::CreateCubeInCargoLayer(const Transform& transform)
     return body;
 }
 
-Body* ShapeFactory::CreateSphere(const Transform& transform)
+Body* ShapeFactory::CreateSphere(const Transform& transform, const XMFLOAT3& direction)
 {
     // Apply scale to the sphere... but Thierry does not know how to do this or what this multiplication by 0.5 is for...
     /*auto halfExtents = Vec3(0.5f, 0.5f, 0.5f);
@@ -92,8 +93,17 @@ Body* ShapeFactory::CreateSphere(const Transform& transform)
     BodyInterface& bodyInterface = JoltSystem::GetBodyInterface();
     Body* body = bodyInterface.CreateBody(sphereSettings);
     bodyInterface.AddBody(body->GetID(), EActivation::Activate);
-    bodyInterface.SetLinearVelocity(body->GetID(), Vec3(0.0f, 0.0f, 20.0f)); //Devrait être fait ailleurs qu'au chargement...
+
+    Vec3 velocity(direction.x, direction.y, direction.z);
+    velocity = velocity.Normalized();
+
+    static constexpr float shootSpeed = 20.0f;
+    velocity *= shootSpeed;
+
+    bodyInterface.SetLinearVelocity(body->GetID(), velocity);
     bodyInterface.SetRestitution(body->GetID(), 0.5f);
+    body->SetFriction(0.6f);
+
     return body;
 }
 

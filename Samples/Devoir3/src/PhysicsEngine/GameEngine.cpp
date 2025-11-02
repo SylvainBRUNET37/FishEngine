@@ -9,6 +9,30 @@
 #include "rendering/core/Transform.h"
 #include "rendering/graphics/Mesh.h"
 
+namespace
+{
+	[[nodiscard]] float Sanitize(const float value)
+	{
+		if (!std::isfinite(value))
+			return 0.0f;
+
+		if (std::fabs(value) < 1e-6f || std::fabs(value) > 1e6f)
+			return 0.0f;
+
+		return value;
+	};
+
+	[[nodiscard]] XMFLOAT3 Sanitize(const XMFLOAT3 value)
+	{
+		return { Sanitize(value.x), Sanitize(value.y), Sanitize(value.z) };
+	};
+
+	[[nodiscard]] XMFLOAT4 Sanitize(const XMFLOAT4 value)
+	{
+		return { Sanitize(value.x), Sanitize(value.y), Sanitize(value.z), value.w };
+	};
+}
+
 void GameEngine::Run()
 {
 	bool shouldContinue = true;
@@ -85,17 +109,6 @@ void GameEngine::RenderScene(const double elapsedTime)
 
 void GameEngine::ShootBallIfKeyPressed()
 {
-	static auto Sanitize = [](const float value)
-	{
-		if (!std::isfinite(value))
-			return 0.0f;
-
-		if (std::fabs(value) < 1e-6f || std::fabs(value) > 1e6f)
-			return 0.0f;
-
-		return value;
-	};
-
 	for (const auto& [entity, entityTransform, entityBallShooter] : entityManager.View<Transform, BallShooter>())
 	{
 		if (GetAsyncKeyState(entityBallShooter.inputKey) & 0x8000) [[unlikely]]
@@ -103,20 +116,23 @@ void GameEngine::ShootBallIfKeyPressed()
 			const auto ballEntity = entityManager.CreateEntity();
 
 			constexpr auto spawnDistance = 10.f;
-			const XMVECTOR entityForwardDirection = XMVector3Normalize(
-				XMVector3Rotate(XMVectorSet(0, 0, 1, 0), XMLoadFloat4(&entityTransform.rotation))
-			);
+			const auto entityRotation = Sanitize(entityTransform.rotation);
+
+			const XMVECTOR entityForwardDirection = 
+			
+				XMVector3Rotate(XMVectorSet(0, 0, 1, 0),
+				                XMLoadFloat4(&entityRotation))
+			;
 
 			const XMVECTOR entityPos = XMLoadFloat3(&entityTransform.position);
-			const XMVECTOR ballSpawnPosition = XMVectorAdd(entityPos, XMVectorScale(entityForwardDirection, spawnDistance));
+			const XMVECTOR ballSpawnPosition = XMVectorAdd(
+				entityPos, XMVectorScale(entityForwardDirection, spawnDistance));
 
 			XMFLOAT3 ballPosition;
 			XMStoreFloat3(&ballPosition, ballSpawnPosition);
 
 			// Sanitize values to avoid very little/high values
-			ballPosition.x = Sanitize(ballPosition.x);
-			ballPosition.y = Sanitize(ballPosition.y);
-			ballPosition.z = Sanitize(ballPosition.z);
+			ballPosition = Sanitize(ballPosition);
 
 			const Transform ballTransform
 			{
@@ -129,9 +145,15 @@ void GameEngine::ShootBallIfKeyPressed()
 			// Add components on the ball
 			entityManager.AddComponent<Transform>(ballEntity, ballTransform);
 			entityManager.AddComponent<Mesh>(ballEntity, resourceManager.LoadSphere());
-			JoltSystem::AddPostStepCallback([this, ballEntity, ballTransform]()
+
+			XMFLOAT3 direction;
+			XMStoreFloat3(&direction, entityForwardDirection);
+			direction = Sanitize(direction);
+
+			JoltSystem::AddPostStepCallback([this, ballEntity, ballTransform, direction]()
 			{
-				entityManager.AddComponent<RigidBody>(ballEntity, ShapeFactory::CreateSphere(ballTransform));
+				entityManager.AddComponent<RigidBody>(
+					ballEntity, ShapeFactory::CreateSphere(ballTransform, direction));
 			});
 		}
 	}
