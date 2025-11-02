@@ -79,6 +79,11 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 			const auto transform = entityManager.Get<Transform>(entity);
 			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreatePlane(transform));
 		}
+		else if (name.name == "Sphere")
+		{
+			const auto transform = entityManager.Get<Transform>(entity);
+			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateSphere(transform));
+		}
 	}
 
 	GameEngine gameEngine{ std::move(renderSystem), std::move(entityManager) };
