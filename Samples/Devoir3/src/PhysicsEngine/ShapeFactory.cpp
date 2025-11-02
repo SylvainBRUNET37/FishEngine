@@ -97,7 +97,7 @@ Body* ShapeFactory::CreateSphere(const Transform& transform, const XMFLOAT3& dir
     Vec3 velocity(direction.x, direction.y, direction.z);
     velocity = velocity.Normalized();
 
-    static constexpr float shootSpeed = 20.0f;
+    static constexpr float shootSpeed = 50.0f;
     velocity *= shootSpeed;
 
     bodyInterface.SetLinearVelocity(body->GetID(), velocity);
@@ -134,10 +134,10 @@ Body* ShapeFactory::CreatePlane(const Transform& transform)
 	return body;
 }
 
-Body* ShapeFactory::CreateCapsule(const Transform& transform) // TODO: should be a sensor
+Body* ShapeFactory::CreateCapsule(const Transform& transform)
 {
-    const float radius = transform.scale.x;
-    const float halfHeight = transform.scale.y;
+    const float radius = transform.scale.x * (115/ 2);
+    const float halfHeight = transform.scale.y * (215 / 2);
 
     const RefConst shape = new CapsuleShape(halfHeight, radius);
 
@@ -149,12 +149,13 @@ Body* ShapeFactory::CreateCapsule(const Transform& transform) // TODO: should be
         position,
         rotation,
         EMotionType::Static,
-        Layers::NON_MOVING
+        Layers::SENSOR
     );
 
     BodyInterface& bodyInterface = JoltSystem::GetBodyInterface();
     Body* body = bodyInterface.CreateBody(capsuleSettings);
     bodyInterface.AddBody(body->GetID(), EActivation::Activate);
+    body->SetIsSensor(true);
 
     return body;
 }

@@ -10,6 +10,7 @@
 #include "rendering/graphics/Mesh.h"
 
 #include "Globals.h"
+
 namespace
 {
 	[[nodiscard]] float Sanitize(const float value)
@@ -25,12 +26,12 @@ namespace
 
 	[[nodiscard]] XMFLOAT3 Sanitize(const XMFLOAT3 value)
 	{
-		return { Sanitize(value.x), Sanitize(value.y), Sanitize(value.z) };
+		return {Sanitize(value.x), Sanitize(value.y), Sanitize(value.z)};
 	};
 
 	[[nodiscard]] XMFLOAT4 Sanitize(const XMFLOAT4 value)
 	{
-		return { Sanitize(value.x), Sanitize(value.y), Sanitize(value.z), value.w };
+		return {Sanitize(value.x), Sanitize(value.y), Sanitize(value.z), value.w};
 	};
 }
 
@@ -111,16 +112,18 @@ void GameEngine::RenderScene(const double elapsedTime)
 
 void GameEngine::CheckForWinConditions()
 {
-	if (currentWinCount < Globals::getNGamesWon()) { //A new game has been won
+	if (currentWinCount < Globals::getNGamesWon())
+	{
+		//A new game has been won
 		currentWinCount = Globals::getNGamesWon();
-		if (currentWinCount >= Globals::getMaxGamesWon()) {
+		if (currentWinCount >= Globals::getMaxGamesWon())
+		{
 			exit(0); //end game
 		}
-		else {
-			MoveSensorRandomly();
-			}
-			}
-			}
+		MoveSensorRandomly();
+	}
+}
+
 void GameEngine::ShootBallIfKeyPressed()
 {
 	for (const auto& [entity, entityTransform, entityBallShooter] : entityManager.View<Transform, BallShooter>())
@@ -132,11 +135,10 @@ void GameEngine::ShootBallIfKeyPressed()
 			constexpr auto spawnDistance = 10.f;
 			const auto entityRotation = Sanitize(entityTransform.rotation);
 
-			const XMVECTOR entityForwardDirection = 
-			
+			const XMVECTOR entityForwardDirection =
+
 				XMVector3Rotate(XMVectorSet(0, 0, 1, 0),
-				                XMLoadFloat4(&entityRotation))
-			;
+				                XMLoadFloat4(&entityRotation));
 
 			const XMVECTOR entityPos = XMLoadFloat3(&entityTransform.position);
 			const XMVECTOR ballSpawnPosition = XMVectorAdd(
@@ -185,9 +187,11 @@ void GameEngine::WaitBeforeNextFrame(const DWORD frameStartTime)
 void GameEngine::MoveSensorRandomly()
 {
 	//TODO: Teleport sensor here
-	for (const auto& [entity, name, rigidBody] : entityManager.View<Name, RigidBody>()) //Was there a better way to do this? Probably...
+	for (const auto& [entity, name, rigidBody] : entityManager.View<Name, RigidBody>())
+	//Was there a better way to do this? Probably...
 	{
-		if (name.name == "Cylinder") {
+		if (name.name == "Capsule")
+		{
 			//Of course, below doesn't work: Jolt is supposed to control where things are for correct physics...
 			//auto transform = entityManager.Get<Transform>(entity);
 			//float newX = rand() % 2000 - 1000; //Not clean at all, but sufficient for testing, hopefully...
@@ -198,11 +202,12 @@ void GameEngine::MoveSensorRandomly()
 			// Get jolt transform data
 			const JPH::RMat44& joltTransform = rigidBody.body->GetWorldTransform();
 			const JPH::Vec3 joltPos = joltTransform.GetTranslation();
-			float newX = rand() % 2000 - 1000; //Not clean at all, but sufficient for testing, hopefully...
-			float newY = 500.0f; //Should this be in global?
-			float newZ = rand() % 2000 - 1000;
+			float newX = rand() % 500 - 250; //Not clean at all, but sufficient for testing, hopefully...
+			float newY = 105.f; //Should this be in global?
+			float newZ = rand() % 500 - 250;
 			JPH::BodyInterface& bodyInterface = JoltSystem::GetBodyInterface();
-			bodyInterface.SetPosition(rigidBody.body->GetID(), JPH::RVec3Arg(newX, newY, newZ), JPH::EActivation::Activate);
+			bodyInterface.SetPosition(rigidBody.body->GetID(), JPH::RVec3Arg(newX, newY, newZ),
+			                          JPH::EActivation::Activate);
 		}
 	}
 }
