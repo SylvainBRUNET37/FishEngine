@@ -9,12 +9,11 @@ RenderSystem::RenderSystem(RenderContext* renderContext, std::vector<Material>&&
 {
 	InitializeCamera();
 	sceneData.matViewProj = displayedCamera->getMatView() * displayedCamera->getMatProj();
-	//RenderScene();
 }
 
 void RenderSystem::UpdateScene(const double elapsedTime, Transform cubeTransform)
 {
-	AnimeScene(elapsedTime);
+	AnimeScene(elapsedTime, cubeTransform);
 	RenderScene(cubeTransform);
 }
 
@@ -131,7 +130,7 @@ bool RenderSystem::HandleRotation()
 	return rotated;
 }
 
-void RenderSystem::AnimeScene(const double elapsedTime)
+void RenderSystem::AnimeScene(const double elapsedTime, const Transform& cubeTransform)
 {
 	const float deplacement = cameraSpeed * static_cast<float>(elapsedTime);
 	float deltaX = 0.0f;
@@ -140,6 +139,13 @@ void RenderSystem::AnimeScene(const double elapsedTime)
 	bool cameraUpdated = HandleCameraSwitch(); //Contrôles changement caméra
 	cameraUpdated |= HandleMovement(deplacement, deltaX, deltaZ); //Contrôles move caméra
 	cameraUpdated |= HandleRotation(); //Contrôles rotation caméra
+
+	//En 3e personne, on vérifie si le cube a bougé en plus du mouvement de la caméra
+	XMVECTOR currentCubePos = XMLoadFloat3(&cubeTransform.position);
+	if (!XMVector3Equal(currentCubePos, lastCubePosition)) {
+		cameraUpdated = true;
+		lastCubePosition = currentCubePos;
+	}
 
 	if (cameraUpdated) {
 		displayedCamera->Move(deltaZ, deltaX, 0.0f);

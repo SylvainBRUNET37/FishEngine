@@ -35,16 +35,20 @@ private:
 	bool HandleMovement(float deplacement, float& deltaX, float& deltaZ);
 	bool HandleRotation();
 
+
 	float cameraSpeed = 50.0f; // Vitesse de déplacement à utiliser // A dégager
 	POINT cursorCoordinates; // Structure to store the cursor's coordinates TODO: a dégager
 	std::unique_ptr<Camera> displayedCamera;
 	XMVECTOR oldFocus;
 	bool isFirstPerson = true;
 
-	void AnimeScene(double elapsedTime);
+	void AnimeScene(const double elapsedTime, const Transform& cubeTransform);
 	void RenderScene(const Transform& transfCube);
 
 	static SceneData CreateSceneData();
+
+	XMVECTOR lastCubePosition = XMVectorZero();
+
 };
 
 #endif
