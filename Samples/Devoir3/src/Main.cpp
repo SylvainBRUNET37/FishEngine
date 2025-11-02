@@ -65,8 +65,7 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 	physicsSystem.SetContactListener(&contactListener);
 	//////////////////////////////
 
-	// Create the scene
-
+	// Create the scene (it's a temporary way of assigning components)
 	for (const auto& [entity, name] : entityManager.View<Name>())
 	{
 		if (name.name == "Cube")
@@ -84,10 +83,10 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 			const auto transform = entityManager.Get<Transform>(entity);
 			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreatePlane(transform));
 		}
-		else if (name.name == "Cylinder")
+		else if (name.name == "Capsule")
 		{
 			const auto transform = entityManager.Get<Transform>(entity);
-			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCylinder(transform));
+			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCapsule(transform));
 		}
 		else if (name.name == "Sphere")
 		{
@@ -97,7 +96,6 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 	}
 
 	GameEngine gameEngine{ std::move(renderSystem), std::move(entityManager) };
-
 
 	//Source: https://stackoverflow.com/questions/16703835/how-can-i-see-cout-output-in-a-non-console-application
 	AllocConsole();// Décommenter si la console est voulu

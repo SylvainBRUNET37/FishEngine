@@ -5,7 +5,7 @@
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
 #include <Jolt/Physics/Collision/Shape/BoxShape.h>
 #include <Jolt/Physics/Collision/Shape/PlaneShape.h>
-#include <Jolt/Physics/Collision/Shape/CylinderShape.h>
+#include <Jolt/Physics/Collision/Shape/CapsuleShape.h>
 #include <Jolt/Physics/Collision/Shape/SphereShape.h>
 
 #include "PhysicsEngine/layers/Layers.h"
@@ -124,28 +124,27 @@ Body* ShapeFactory::CreatePlane(const Transform& transform)
 	return body;
 }
 
-Body* ShapeFactory::CreateCylinder(const Transform& transform)
+Body* ShapeFactory::CreateCapsule(const Transform& transform) // TODO: should be a sensor
 {
-    const float radius = transform.scale.x * 1.0f;
-    const float halfHeight = transform.scale.y * 1.0f;
+    const float radius = transform.scale.x;
+    const float halfHeight = transform.scale.y;
 
-    const RefConst shape = new CylinderShape(halfHeight, radius);
+    const RefConst shape = new CapsuleShape(halfHeight, radius);
 
     const RVec3 position(transform.position.x, transform.position.y, transform.position.z);
     const Quat rotation(transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w);
 
-    const BodyCreationSettings cylinderSettings(
+    const BodyCreationSettings capsuleSettings(
         shape,
         position,
         rotation,
         EMotionType::Static,
-        Layers::SENSOR
+        Layers::NON_MOVING
     );
 
     BodyInterface& bodyInterface = JoltSystem::GetBodyInterface();
-    Body* body = bodyInterface.CreateBody(cylinderSettings);
+    Body* body = bodyInterface.CreateBody(capsuleSettings);
     bodyInterface.AddBody(body->GetID(), EActivation::Activate);
-    body->SetIsSensor(true);
 
     return body;
 }
