@@ -65,7 +65,7 @@ Body* ShapeFactory::CreateCubeInCargoLayer(const Transform& transform)
         Layers::CARGO
     );
 
-    boxSettings.mLinearDamping = 0.5f;
+    boxSettings.mLinearDamping = 1.f;
 
     BodyInterface& bodyInterface = JoltSystem::GetBodyInterface();
     Body* body = bodyInterface.CreateBody(boxSettings);
@@ -103,7 +103,7 @@ Body* ShapeFactory::CreateSphere(const Transform& transform, const XMFLOAT3& dir
     Vec3 velocity(direction.x, direction.y, direction.z);
     velocity = velocity.Normalized();
 
-    static constexpr float shootSpeed = 50.f;
+    static constexpr float shootSpeed = 200.f;
     velocity *= shootSpeed;
 
     bodyInterface.SetLinearVelocity(body->GetID(), velocity);
