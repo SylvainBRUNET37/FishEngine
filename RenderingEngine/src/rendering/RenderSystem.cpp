@@ -81,7 +81,7 @@ SceneData RenderSystem::CreateSceneData()
 {
 	return {
 		.matViewProj = {},
-		.lightPosition = XMFLOAT4(2, 2, -20, 1),
+		.lightPosition = XMFLOAT4(2, 20, -20, 1),
 		.cameraPosition = {},
 		.vAEcl = XMFLOAT4(0.2f, 0.2f, 0.2f, 1),
 		.vDEcl = XMFLOAT4(1, 1, 1, 1),

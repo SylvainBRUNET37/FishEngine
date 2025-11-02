@@ -2,14 +2,15 @@
 
 ## Étapes à suivre pour Thomas
 
-1. Exécuter la commande :
+1. Exécuter :
    ```bash
    ./build.bat
    ```
-2. Mettre "...\Samples\Devoir3" en projet de démarrage
-3. Lancer le projet
+2. Choisir "Samples\Devoir3" comme projet de démarrage
+3. Compiler le projet
+4. Lancer le projet
 
-## Étapes à suivre si le git n'est pas déjà cloné
+## Étapes à suivre pour cloner (devs)
 
 1.  ```bash
     git clone -b develop --recurse-submodules https://github.com/SylvainBRUNET37/FishEngine.git
