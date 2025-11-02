@@ -74,10 +74,20 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 			const auto transform = entityManager.Get<Transform>(entity);
 			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCube(transform));
 		}
+		else if (name.name == "Cargo")
+		{
+			const auto transform = entityManager.Get<Transform>(entity);
+			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCube(transform));
+		}
 		else if (name.name == "Plane")
 		{
 			const auto transform = entityManager.Get<Transform>(entity);
 			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreatePlane(transform));
+		}
+		else if (name.name == "Cylinder")
+		{
+			const auto transform = entityManager.Get<Transform>(entity);
+			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCylinder(transform));
 		}
 	}
 
