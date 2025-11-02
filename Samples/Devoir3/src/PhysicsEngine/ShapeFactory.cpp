@@ -136,6 +136,7 @@ Body* ShapeFactory::CreatePlane(const Transform& transform)
 
 Body* ShapeFactory::CreateCapsule(const Transform& transform)
 {
+    // TODO: Hardcoded dimension of the capsule in blender 
     const float radius = transform.scale.x * (115/ 2);
     const float halfHeight = transform.scale.y * (215 / 2);
 

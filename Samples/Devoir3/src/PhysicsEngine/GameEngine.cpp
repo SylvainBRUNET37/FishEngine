@@ -50,9 +50,9 @@ void GameEngine::Run()
 		// End the loop if Windows want to terminate the program (+ process messages)
 		shouldContinue = WindowsApplication::ProcessWindowsMessages();
 
+		ShootBallIfKeyPressed();
 		UpdatePhysics();
 		UpdateTransforms();
-		ShootBallIfKeyPressed();
 
 		RenderScene(elapsedTime);
 		CheckForWinConditions();
@@ -118,7 +118,7 @@ void GameEngine::CheckForWinConditions()
 		currentWinCount = Globals::getNGamesWon();
 		if (currentWinCount >= Globals::getMaxGamesWon())
 		{
-			exit(0); //end game
+			abort(); //end game
 		}
 		MoveSensorRandomly();
 	}
@@ -126,10 +126,15 @@ void GameEngine::CheckForWinConditions()
 
 void GameEngine::ShootBallIfKeyPressed()
 {
+	static constexpr double timeBetweenBallShoot = 500; // in ms
+	static double prevTimeBallWasFired = 0;
+
 	for (const auto& [entity, entityTransform, entityBallShooter] : entityManager.View<Transform, BallShooter>())
 	{
-		if (GetAsyncKeyState(entityBallShooter.inputKey) & 0x8000) [[unlikely]]
+		if (GetAsyncKeyState(entityBallShooter.inputKey) & 0x8000 
+			&& GetTickCount() - prevTimeBallWasFired > timeBetweenBallShoot) [[unlikely]]
 		{
+			prevTimeBallWasFired = GetTickCount();
 			const auto ballEntity = entityManager.CreateEntity();
 
 			constexpr auto spawnDistance = 10.f;
@@ -173,6 +178,11 @@ void GameEngine::ShootBallIfKeyPressed()
 			});
 		}
 	}
+}
+
+void GameEngine::DestroyObjectAtEndOfLife()
+{
+
 }
 
 void GameEngine::WaitBeforeNextFrame(const DWORD frameStartTime)

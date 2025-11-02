@@ -35,7 +35,10 @@ private:
 
 	int currentWinCount = 0;
 
+	// BallShooterSystem
 	void ShootBallIfKeyPressed();
+	// LifeSpan system
+	void DestroyObjectAtEndOfLife();
 
 	static void WaitBeforeNextFrame(DWORD frameStartTime);
 

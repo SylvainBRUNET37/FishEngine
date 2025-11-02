@@ -31,7 +31,13 @@ struct RigidBody
 
 struct BallShooter
 {
-	char inputKey= VK_SPACE; // The input key for shooting (space by default)
+	char inputKey = VK_SPACE; // The input key for shooting (space by default)
+};
+
+struct LifeSpan
+{
+	double lifeTime; // Store in ms the age of the object
+	double lifeDuration;
 };
 
 // The list of components ! Add a component here to add it to the engine
