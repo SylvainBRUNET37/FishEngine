@@ -38,6 +38,7 @@ Body* ShapeFactory::CreateCubeInVehicleLayer(const Transform& transform)
     BodyInterface& bodyInterface = JoltSystem::GetBodyInterface();
     Body* body = bodyInterface.CreateBody(boxSettings);
     bodyInterface.AddBody(body->GetID(), EActivation::Activate);
+    body->SetFriction(0.6f);
 
     return body;
 }
@@ -66,6 +67,7 @@ Body* ShapeFactory::CreateCubeInCargoLayer(const Transform& transform)
     Body* body = bodyInterface.CreateBody(boxSettings);
     bodyInterface.AddBody(body->GetID(), EActivation::Activate);
     bodyInterface.SetRestitution(body->GetID(), 0.5f); //what is restitution supposed to be anyway?
+    body->SetFriction(0.6f);
 
     return body;
 }

@@ -26,13 +26,14 @@ using namespace JPH::literals;
 using namespace std;
 using namespace DirectX;
 
-static bool MyAssertFailed(const char* inExpression, const char* inMessage, const char* inFile, uint inLine)
+static bool MyAssertFailed(const char* inExpression, const char* inMessage, const char* inFile, const uint inLine)
 {
 	std::cerr << "Jolt Assertion Failed!\n";
 	std::cerr << "Expression: " << inExpression << "\n";
 	std::cerr << "Message: " << (inMessage ? inMessage : "(none)") << "\n";
 	std::cerr << "File: " << inFile << ":" << inLine << "\n";
 
+	assert(false && "Jolt Assertion Failed. See error output for more information.");
 	return false;
 }
 
