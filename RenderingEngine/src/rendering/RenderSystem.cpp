@@ -13,7 +13,7 @@ RenderSystem::RenderSystem(RenderContext* renderContext, std::vector<Material>&&
 	const XMVECTOR focusPoint = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
 	const XMVECTOR upDirection = XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f);
 
-	firstPersonCamera = std::make_unique<Camera>(
+	firstPersonCamera = std::make_unique<FirstPersonCamera>(
 		eyePosition,
 		focusPoint,
 		upDirection,
@@ -82,7 +82,7 @@ void RenderSystem::AnimeScene(const double elapsedTime)
 		constexpr float mouseSensitivity = 0.002f; // radians per pixel, tweak as needed
 		const float yaw = deltaX1 * mouseSensitivity; // horizontal rotation
 		const float pitch = -deltaY1 * mouseSensitivity; // vertical rotation (negative = FPS style)
-		firstPersonCamera->RotateFirstPerson(yaw, pitch);
+		firstPersonCamera->Rotate(yaw, pitch);
 		cameraUpdated = true;
 	}
 	// Update coords
@@ -91,7 +91,7 @@ void RenderSystem::AnimeScene(const double elapsedTime)
 	// Mettre à jour la caméra active si déplacement
 	if (cameraUpdated)
 	{
-		firstPersonCamera->MoveFirstPerson(deltaZ, deltaX);
+		firstPersonCamera->Move(deltaZ, deltaX);
 		sceneData.matViewProj = firstPersonCamera->getMatView() * firstPersonCamera->getMatProj();
 	}
 }

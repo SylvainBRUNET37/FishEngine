@@ -6,6 +6,7 @@ using namespace DirectX;
 
 class Camera
 {
+protected:
 	// Vectors
 	XMVECTOR position;
 	XMVECTOR focus;
@@ -25,43 +26,25 @@ class Camera
 	int viewHeight;
 	float aspectRatio;
 
-	// For camera rotation
-	float pitchAccum = 0.0f;
-	float yawAccum = 0.0f;
-
 public:
+
 	Camera(XMVECTOR position, XMVECTOR focus, XMVECTOR up, float viewWidth, float viewHeight)
 		: position(position),
 		focus(focus),
 		up(up),
-		viewWidth((viewWidth > 0) ? viewWidth : 1),
-		viewHeight((viewHeight > 0) ? viewHeight : 1)
+		viewWidth(viewWidth > 0 ? viewWidth : 1),
+		viewHeight(viewHeight > 0 ? viewHeight : 1)
 	{
-		this->aspectRatio = viewWidth / viewHeight;
+		aspectRatio = viewWidth / viewHeight;
 
-		this->matView = XMMatrixLookAtRH(
-			position,
-			focus,
-			up
-		);
-
-		this->matProj = XMMatrixPerspectiveFovRH(
-			this->fov,
-			this->aspectRatio,
-			this->nearPlane,
-			this->farPlane
-		);
+		matView = XMMatrixLookAtRH(position, focus, up);
+		matProj = XMMatrixPerspectiveFovRH(fov, aspectRatio, nearPlane, farPlane);
 	}
 
-	XMMATRIX getMatView() const  noexcept {
-		return this->matView;
-	}
+	virtual ~Camera() = default;
 
-	XMMATRIX getMatProj() const  noexcept {
-		return this->matProj;
-	}
-
-
+	XMMATRIX getMatView() const  noexcept { return this->matView; }
+	XMMATRIX getMatProj() const  noexcept { return this->matProj; }
 	XMVECTOR GetPosition() const noexcept { return position; }
 	XMVECTOR GetFocus() const noexcept { return focus; }
 	XMVECTOR GetUp() const noexcept { return up; }
@@ -76,14 +59,34 @@ public:
 		UpdateMatView();
 	}
 
-	void Move(float deltaX, float deltaZ) noexcept {
+	virtual void MoveBy(float deltaX, float deltaZ) noexcept = 0;
+	virtual void Move(float deltaForward, float deltaSide) noexcept = 0;
+	virtual void Rotate(float yawDelta, float pitchDelta) noexcept = 0;
+
+protected:
+	void UpdateMatView() noexcept {
+		matView = XMMatrixLookAtRH(position, focus, up);
+	}
+};
+
+class FirstPersonCamera : public Camera {
+	// For camera rotation
+	float pitchAccum = 0.0f;
+	float yawAccum = 0.0f;
+public:
+	FirstPersonCamera(XMVECTOR position, XMVECTOR focus, XMVECTOR up, float viewWidth, float viewHeight)
+		: Camera(position, focus, up, viewWidth, viewHeight)
+	{
+	}
+
+	void MoveBy(float deltaX, float deltaZ) noexcept override {
 		const XMVECTOR delta = XMVectorSet(deltaX, 0.0f, deltaZ, 0.0f);
 		position = XMVectorAdd(position, delta);
 		focus = XMVectorAdd(focus, delta);
 		UpdateMatView();
 	}
 
-	void MoveFirstPerson(float deltaForward, float deltaSide) noexcept {
+	void Move(float deltaForward, float deltaSide) noexcept override {
 		const XMVECTOR forward = XMVectorSubtract(focus, position);
 		const XMVECTOR right = XMVector3Normalize(XMVector3Cross(up, forward));
 
@@ -99,7 +102,7 @@ public:
 		UpdateMatView();
 	}
 
-	void RotateFirstPerson(float yawDelta, float pitchDelta) noexcept {
+	void Rotate(float yawDelta, float pitchDelta) noexcept override {
 		constexpr float maxPitch = XM_PIDIV2 - 0.01f;
 		yawAccum += yawDelta;
 		pitchAccum += pitchDelta;
@@ -119,9 +122,5 @@ public:
 		focus = XMVectorAdd(position, forward);
 		UpdateMatView();
 	}
-
-private:
-	void UpdateMatView() noexcept {
-		matView = XMMatrixLookAtRH(position, focus, up);
-	}
+	
 };
