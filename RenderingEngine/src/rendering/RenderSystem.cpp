@@ -147,13 +147,14 @@ void RenderSystem::AnimeScene(const double elapsedTime)
 	}
 }
 
-void RenderSystem::RenderScene(Transform transfCube)
+void RenderSystem::RenderScene(const Transform& transfCube)
 {
+	// Lier la caméra au cube
+	displayedCamera->FollowCube(&transfCube);
+
 	ID3D11DeviceContext* context = renderContext->GetContext();
 	ID3D11RenderTargetView* renderTarget = renderContext->GetRenderTargetView();
 	ID3D11DepthStencilView* depthStencil = renderContext->GetDepthStencilView();
-
-	displayedCamera->setCubeTransform(transfCube);
 
 	constexpr float backgroundColor[4] = { 0.0f, 0.5f, 0.0f, 1.0f };
 	context->ClearRenderTargetView(renderTarget, backgroundColor);

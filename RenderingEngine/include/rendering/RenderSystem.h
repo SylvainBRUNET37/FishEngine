@@ -42,7 +42,7 @@ private:
 	bool isFirstPerson = true;
 
 	void AnimeScene(double elapsedTime);
-	void RenderScene(Transform c);
+	void RenderScene(const Transform& transfCube);
 
 	static SceneData CreateSceneData();
 };
