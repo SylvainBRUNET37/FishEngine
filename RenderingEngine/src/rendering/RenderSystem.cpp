@@ -13,7 +13,7 @@ RenderSystem::RenderSystem(RenderContext* renderContext, std::vector<Material>&&
 	const XMVECTOR focusPoint = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
 	const XMVECTOR upDirection = XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f);
 
-	firstPersonCamera = std::make_unique<FirstPersonCamera>(
+	displayedCamera = std::make_unique<FirstPersonCamera>(
 		eyePosition,
 		focusPoint,
 		upDirection,
@@ -21,7 +21,7 @@ RenderSystem::RenderSystem(RenderContext* renderContext, std::vector<Material>&&
 		static_cast<float>(renderContext->GetScreenHeight())
 	);
 
-	sceneData.matViewProj = firstPersonCamera->getMatView() * firstPersonCamera->getMatProj();
+	sceneData.matViewProj = displayedCamera->getMatView() * displayedCamera->getMatProj();
 
 	RenderScene();
 }
@@ -68,6 +68,36 @@ void RenderSystem::AnimeScene(const double elapsedTime)
 		cameraUpdated = true;
 	}
 
+	//if (GetAsyncKeyState('C') & 0x8000) // C
+	//{
+	//	if (isFirstPerson) {
+	//		isFirstPerson = false;
+	//		oldFocus = displayedCamera->GetFocus();
+	//		displayedCamera = std::make_unique<ThirdPersonCamera>(
+	//			displayedCamera->GetFocus(),
+	//			displayedCamera->GetUp(),
+	//			20.0f, // distance arbitraire
+	//			0.0f, // Angle arbitraire
+	//			0.0f, // Angle arbitraire
+	//			static_cast<float>(renderContext->GetScreenWidth()),
+	//			static_cast<float>(renderContext->GetScreenHeight())
+	//		);
+	//	}
+	//	else {
+	//		isFirstPerson = true;
+	//		displayedCamera = std::make_unique<FirstPersonCamera>(
+	//			displayedCamera->GetFocus(),
+	//			oldFocus,
+	//			displayedCamera->GetUp(),
+	//			static_cast<float>(renderContext->GetScreenWidth()),
+	//			static_cast<float>(renderContext->GetScreenHeight())
+	//		);
+	//		cameraUpdated = true;
+	//	}
+	// }
+
+	sceneData.matViewProj = displayedCamera->getMatView() * displayedCamera->getMatProj();
+
 	POINT currentCursorCoordinates; // Structure to store the cursor's coordinates
 
 	// Call GetCursorPos to get the current cursor position
@@ -82,7 +112,7 @@ void RenderSystem::AnimeScene(const double elapsedTime)
 		constexpr float mouseSensitivity = 0.002f; // radians per pixel, tweak as needed
 		const float yaw = deltaX1 * mouseSensitivity; // horizontal rotation
 		const float pitch = -deltaY1 * mouseSensitivity; // vertical rotation (negative = FPS style)
-		firstPersonCamera->Rotate(yaw, pitch);
+		displayedCamera->Rotate(yaw, pitch);
 		cameraUpdated = true;
 	}
 	// Update coords
@@ -91,9 +121,10 @@ void RenderSystem::AnimeScene(const double elapsedTime)
 	// Mettre à jour la caméra active si déplacement
 	if (cameraUpdated)
 	{
-		firstPersonCamera->Move(deltaZ, deltaX);
-		sceneData.matViewProj = firstPersonCamera->getMatView() * firstPersonCamera->getMatProj();
+		displayedCamera->Move(deltaZ, deltaX, 0.0f);
+		sceneData.matViewProj = displayedCamera->getMatView() * displayedCamera->getMatProj();
 	}
+
 }
 
 void RenderSystem::RenderScene()
@@ -115,7 +146,7 @@ void RenderSystem::RenderScene()
 	pImmediateContext->OMSetRenderTargets(1, rtvs, pDepthStencilView);
 
 	// Update camera position in scene data
-	XMStoreFloat4(&sceneData.cameraPosition, firstPersonCamera->GetPosition());
+	XMStoreFloat4(&sceneData.cameraPosition, displayedCamera->GetPosition());
 }
 
 SceneData RenderSystem::CreateSceneData()

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <DirectXMath.h>
 #include <algorithm>
 
@@ -59,8 +59,7 @@ public:
 		UpdateMatView();
 	}
 
-	virtual void MoveBy(float deltaX, float deltaZ) noexcept = 0;
-	virtual void Move(float deltaForward, float deltaSide) noexcept = 0;
+	virtual void Move(float deltaForward, float deltaSide, float deltaHeight) noexcept = 0;
 	virtual void Rotate(float yawDelta, float pitchDelta) noexcept = 0;
 
 protected:
@@ -70,24 +69,19 @@ protected:
 };
 
 class FirstPersonCamera : public Camera {
+
 	// For camera rotation
 	float pitchAccum = 0.0f;
 	float yawAccum = 0.0f;
+
 public:
 	FirstPersonCamera(XMVECTOR position, XMVECTOR focus, XMVECTOR up, float viewWidth, float viewHeight)
 		: Camera(position, focus, up, viewWidth, viewHeight)
 	{
 	}
 
-	void MoveBy(float deltaX, float deltaZ) noexcept override {
-		const XMVECTOR delta = XMVectorSet(deltaX, 0.0f, deltaZ, 0.0f);
-		position = XMVectorAdd(position, delta);
-		focus = XMVectorAdd(focus, delta);
-		UpdateMatView();
-	}
-
-	void Move(float deltaForward, float deltaSide) noexcept override {
-		const XMVECTOR forward = XMVectorSubtract(focus, position);
+	void Move(float deltaForward, float deltaSide, float deltaHeight) noexcept override {
+		const XMVECTOR forward = XMVector3Normalize(XMVectorSubtract(focus, position));
 		const XMVECTOR right = XMVector3Normalize(XMVector3Cross(up, forward));
 
 		// Compute movement delta
@@ -124,3 +118,7 @@ public:
 	}
 	
 };
+
+// class ThirdPersonCamera : public Camera {
+	// TODO
+// };

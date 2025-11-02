@@ -28,7 +28,9 @@ private:
 	// TODO : reusinage
 	float cameraSpeed = 50.0f; // Vitesse de déplacement à utiliser // A dégager
 	POINT cursorCoordinates; // Structure to store the cursor's coordinates TODO: a dégager
-	std::unique_ptr<Camera> firstPersonCamera;
+	std::unique_ptr<Camera> displayedCamera;
+	XMVECTOR oldFocus;
+	bool isFirstPerson = true;
 	// END TODO
 
 	void AnimeScene(double elapsedTime);
