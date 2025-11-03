@@ -7,31 +7,9 @@
 RenderSystem::RenderSystem(RenderContext* renderContext, std::vector<Material>&& materials)
 	: renderer(renderContext->GetDevice(), std::move(materials), frameCbRegisterNumber, objectCbRegisterNumber),
 	sceneData(InitSceneData()),
-	renderContext(renderContext),
-	cursorCoordinates{}
+	renderContext(renderContext)
 {
 
-}
-
-bool RenderSystem::HandleRotation()
-{
-	POINT currentCursorCoordinates;
-	if (!GetCursorPos(&currentCursorCoordinates)) {
-		return false;
-	}
-
-	bool rotated = false;
-	if (GetAsyncKeyState(VK_LBUTTON) & 0x8000) {
-		const auto deltaX = currentCursorCoordinates.x - cursorCoordinates.x;
-		const auto deltaY = currentCursorCoordinates.y - cursorCoordinates.y;
-
-		constexpr float mouseSensitivity = 0.002f;
-		camera->Rotate(deltaX * mouseSensitivity, -deltaY * mouseSensitivity);
-		rotated = true;
-	}
-
-	cursorCoordinates = currentCursorCoordinates;
-	return rotated;
 }
 
 void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)

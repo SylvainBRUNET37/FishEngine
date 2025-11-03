@@ -26,13 +26,9 @@ private:
 	SceneData sceneData;
 	RenderContext* renderContext;
 
-	std::unique_ptr<ThirdPersonCamera> camera;
-	POINT cursorCoordinates;
-
 	void Render(const Mesh& mesh, const Transform& transform);
 	void Present() const { renderContext->Present(); }
 
-	bool HandleRotation();
 	void RenderScene() const;
 
 	static SceneData InitSceneData();

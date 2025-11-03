@@ -29,6 +29,9 @@ struct CameraData
 	float heightOffset{};
 	float yawOffset = 0.0f;
 	float pitchAngle = -0.1f;
+
+	// Mouse
+	POINT cursorCoordinates;
 };
 
 class Camera
