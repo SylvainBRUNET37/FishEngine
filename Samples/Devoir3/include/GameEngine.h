@@ -35,8 +35,6 @@ private:
 	RenderSystem renderSystem;
 	EntityManager entityManager;
 
-	void UpdateControllables();
-
 	void RenderScene(double elapsedTime);
 	void CheckForWinConditions();
 

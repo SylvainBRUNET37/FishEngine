@@ -11,6 +11,7 @@ public:
 private:
 	void Update(double, EntityManager& entityManager) override;
 
+	static void UpdateControllables(EntityManager& entityManager);
 	static void UpdateTransforms(EntityManager& entityManager);
 	static void UpdatePhysics();
 };

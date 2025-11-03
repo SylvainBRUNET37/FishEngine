@@ -96,6 +96,7 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 		}
 	}
 
+	// Care about the order of construction, it will be the order of update calls
 	std::vector<std::unique_ptr<System>> systems;
 	systems.emplace_back(std::make_unique<PhysicsSimulationSystem>());
 

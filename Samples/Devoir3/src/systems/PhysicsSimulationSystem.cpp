@@ -11,8 +11,62 @@ using namespace DirectX;
 
 void PhysicsSimulationSystem::Update(double, EntityManager& entityManager)
 {
+	UpdateControllables(entityManager);
 	UpdatePhysics();
 	UpdateTransforms(entityManager);
+}
+
+void PhysicsSimulationSystem::UpdateControllables(EntityManager& entityManager)
+{
+	for (const auto& [entity, rigidBody, controllable] : entityManager.View<RigidBody, Controllable>())
+	{
+		const auto& transform = rigidBody.body->GetWorldTransform();
+		JPH::Vec3 right = transform.GetColumn3(0).Normalized();
+		JPH::Vec3 up = transform.GetColumn3(1).Normalized();
+		JPH::Vec3 forward = transform.GetColumn3(2).Normalized();
+
+		JPH::Vec3 currentSpeed = JoltSystem::GetBodyInterface().GetLinearVelocity(rigidBody.body->GetID());
+		JPH::Vec3 newSpeed = currentSpeed;
+		bool speedChanged = false;
+
+		if (GetAsyncKeyState('W') & 0x8000)
+		{
+			newSpeed = newSpeed + 1.0f * forward;
+			speedChanged = true;
+		}
+		if (GetAsyncKeyState('S') & 0x8000)
+		{
+			newSpeed = newSpeed - 1.0f * forward;
+			speedChanged = true;
+		}
+		if (GetAsyncKeyState('D') & 0x8000)
+		{
+			newSpeed = newSpeed - 1.0f * right;
+			speedChanged = true;
+		}
+		if (GetAsyncKeyState('A') & 0x8000)
+		{
+			newSpeed = newSpeed + 1.0f * right;
+			speedChanged = true;
+		}
+
+		if (speedChanged)
+		{
+			if (newSpeed.Length() > controllable.maxSpeed) newSpeed = newSpeed.Normalized();
+			JoltSystem::GetBodyInterface().SetLinearVelocity(rigidBody.body->GetID(), newSpeed);
+		}
+
+		// Rotation
+		bool rotatesPositive = GetAsyncKeyState('Q') & 0x8000;
+		if (rotatesPositive || GetAsyncKeyState('E') & 0x8000)
+		{
+			JPH::Quat delta = JPH::Quat::sRotation(up, .05f * (1 - 2 * !rotatesPositive)); // theta = 10
+			JoltSystem::GetBodyInterface().SetRotation(
+				rigidBody.body->GetID(),
+				(rigidBody.body->GetRotation() * delta).Normalized(),
+				JPH::EActivation::Activate);
+		}
+	}
 }
 
 void PhysicsSimulationSystem::UpdatePhysics()
