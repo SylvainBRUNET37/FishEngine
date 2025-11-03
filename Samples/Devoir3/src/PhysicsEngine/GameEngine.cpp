@@ -29,6 +29,7 @@ void GameEngine::Run()
 		DestroyObjectAtEndOfLife(elapsedTime);
 		ShootBallIfKeyPressed();
 
+		UpdateControllables();
 		UpdatePhysics();
 		UpdateTransforms();
 
@@ -39,9 +40,8 @@ void GameEngine::Run()
 	}
 }
 
-void GameEngine::UpdatePhysics()
+void GameEngine::UpdateControllables()
 {
-	// update controllables
 	for (const auto& [entity, rigidBody, controllable] : entityManager.View<RigidBody, Controllable>())
 	{
 		const auto& transform = rigidBody.body->GetWorldTransform();
@@ -91,8 +91,10 @@ void GameEngine::UpdatePhysics()
 				JPH::EActivation::Activate);
 		}
 	}
+}
 
-
+void GameEngine::UpdatePhysics()
+{
 	// Update physics
 	constexpr int collisionSteps = 1;
 	JoltSystem::GetPhysicSystem().Update(PHYSICS_UPDATE_RATE, collisionSteps,
@@ -157,7 +159,7 @@ void GameEngine::CheckForWinConditions()
 		currentWinCount = Globals::getNGamesWon();
 		if (currentWinCount >= Globals::getMaxGamesWon())
 		{
-			entityManager = {};
+			entityManager = {}; // Reset the scene
 		}
 
 		MoveSensorRandomly();
@@ -180,7 +182,6 @@ void GameEngine::ShootBallIfKeyPressed()
 			constexpr auto spawnDistance = 10.f;
 
 			const XMVECTOR entityForwardDirection =
-
 				XMVector3Rotate(XMVectorSet(0, 0, 1, 0),
 				                XMLoadFloat4(&entityTransform.rotation));
 

@@ -14,7 +14,7 @@ public:
 		  renderSystem{std::move(renderSystem)},
 		  entityManager{std::move(entityManager)}
 	{
-		std::srand(std::time(0));
+		std::srand(std::time(nullptr));
 		MoveSensorRandomly();
 	}
 
@@ -29,8 +29,10 @@ private:
 	RenderSystem renderSystem;
 	EntityManager entityManager;
 
-	void UpdatePhysics();
+	void UpdateControllables();
+	static void UpdatePhysics();
 	void UpdateTransforms();
+
 	void RenderScene(double elapsedTime);
 	void CheckForWinConditions();
 
