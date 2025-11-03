@@ -1,5 +1,6 @@
 #include "pch.h"
-#include "rendering/RenderSystem.h"
+
+#include "systems/RenderSystem.h"
 
 RenderSystem::RenderSystem(RenderContext* renderContext, std::vector<Material>&& materials)
 	: renderer(renderContext->GetDevice(), std::move(materials), frameCbRegisterNumber, objectCbRegisterNumber),

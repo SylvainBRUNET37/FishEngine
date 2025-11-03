@@ -14,7 +14,7 @@
 #include "rendering/device/DeviceBuilder.h"
 #include "rendering/device/RenderContext.h"
 #include "rendering/shaders/ShaderProgramDesc.h"
-#include "rendering/RenderSystem.h"
+#include "systems/RenderSystem.h"
 #include "ResourceManager.h"
 
 #include "entityComponentSystem/EntityManagerFactory.h"
@@ -44,7 +44,6 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 	ResourceManager resourceManager{renderContext.GetDevice()};
 	auto sceneResources = resourceManager.LoadScene();
 
-	RenderSystem renderSystem{&renderContext, std::move(sceneResources.materials)};
 	auto entityManager = EntityManagerFactory::Create(sceneResources);
 
 
@@ -99,10 +98,10 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 	// Care about the order of construction, it will be the order of update calls
 	std::vector<std::unique_ptr<System>> systems;
 	systems.emplace_back(std::make_unique<PhysicsSimulationSystem>());
+	systems.emplace_back(std::make_unique<RenderSystem>(&renderContext, std::move(sceneResources.materials)));
 
 	GameEngine gameEngine
 	{
-		std::move(renderSystem),
 		std::move(entityManager),
 		std::move(resourceManager),
 		std::move(systems)

@@ -20,44 +20,22 @@ void GameEngine::Run()
 	{
 		const DWORD frameStartTime = GetTickCount();
 
-		const double elapsedTime = (frameStartTime - prevTime) / 1000.0;
+		const double deltaTime = (frameStartTime - prevTime) / 1000.0;
 		prevTime = frameStartTime;
 
 		// End the loop if Windows want to terminate the program (+ process messages)
 		shouldContinue = WindowsApplication::ProcessWindowsMessages();
 
-		DestroyObjectAtEndOfLife(elapsedTime);
+		DestroyObjectAtEndOfLife(deltaTime);
 		ShootBallIfKeyPressed();
 
 		for (const auto& system : systems)
-			system->Update(elapsedTime, entityManager);
+			system->Update(deltaTime, entityManager);
 
-		RenderScene(elapsedTime);
 		CheckForWinConditions();
 
 		WaitBeforeNextFrame(frameStartTime);
 	}
-}
-
-void GameEngine::RenderScene(const double elapsedTime)
-{
-	Transform cubeTransform;
-	for (const auto& [entity, name, transform] : entityManager.View<Name, Transform>())
-	{
-		if (name.name == "Cube")
-		{
-			cubeTransform = transform;
-		}
-	}
-
-	renderSystem.UpdateScene(elapsedTime, cubeTransform);
-
-	for (const auto& [entity, transform, mesh] : entityManager.View<Transform, Mesh>())
-	{
-		renderSystem.Render(mesh, transform);
-	}
-
-	renderSystem.Render();
 }
 
 void GameEngine::CheckForWinConditions()

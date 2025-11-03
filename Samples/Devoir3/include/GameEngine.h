@@ -5,17 +5,16 @@
 
 #include "ResourceManager.h"
 #include "entityComponentSystem/EntityManager.h"
-#include "rendering/RenderSystem.h"
+#include "systems/RenderSystem.h"
 #include "systems/System.h"
 
 class GameEngine
 {
 public:
-	explicit GameEngine(RenderSystem&& renderSystem, EntityManager&& entityManager, ResourceManager&& resourceManager,
+	explicit GameEngine(EntityManager&& entityManager, ResourceManager&& resourceManager,
 	                    std::vector<std::unique_ptr<System>>&& systems)
 		: systems{std::move(systems)},
 		  resourceManager{std::move(resourceManager)},
-		  renderSystem{std::move(renderSystem)},
 		  entityManager{std::move(entityManager)}
 	{
 		std::srand(std::time(nullptr));
@@ -32,10 +31,8 @@ private:
 	std::vector<std::unique_ptr<System>> systems;
 
 	ResourceManager resourceManager;
-	RenderSystem renderSystem;
 	EntityManager entityManager;
 
-	void RenderScene(double elapsedTime);
 	void CheckForWinConditions();
 
 	int currentWinCount = 0;

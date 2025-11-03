@@ -10,6 +10,7 @@
     <ClCompile Include="src\Globals.cpp" />
     <ClCompile Include="src\systems\CameraSystem.cpp" />
     <ClCompile Include="src\systems\PhysicsSimulationSystem.cpp" />
+    <ClCompile Include="src\systems\RenderSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\CC.h" />
@@ -36,6 +37,7 @@
     <ClInclude Include="include\systems\CameraSystem.h" />
     <ClInclude Include="include\systems\System.h" />
     <ClInclude Include="include\systems\PhysicsSimulationSystem.h" />
+    <ClInclude Include="include\systems\RenderSystem.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\MiniPhongPS.hlsl" />

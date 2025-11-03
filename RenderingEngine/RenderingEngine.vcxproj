@@ -36,7 +36,6 @@
     <ClInclude Include="include\rendering\device\RenderTarget.h" />
     <ClInclude Include="include\rendering\graphics\Camera.h" />
     <ClInclude Include="include\rendering\loading\Node.h" />
-    <ClInclude Include="include\rendering\RenderSystem.h" />
     <ClInclude Include="include\rendering\Renderer.h" />
     <ClInclude Include="include\rendering\SceneLoader.h" />
     <ClInclude Include="include\rendering\shaders\Shader.h" />
@@ -76,7 +75,6 @@
     <ClCompile Include="src\rendering\device\Rasterizer.cpp" />
     <ClCompile Include="src\rendering\graphics\Mesh.cpp" />
     <ClCompile Include="src\rendering\Renderer.cpp" />
-    <ClCompile Include="src\rendering\RenderSystem.cpp" />
     <ClCompile Include="src\rendering\SceneLoader.cpp" />
     <ClCompile Include="src\rendering\shaders\ShaderProgram.cpp" />
     <ClCompile Include="src\rendering\shaders\ShaderReflector.cpp" />

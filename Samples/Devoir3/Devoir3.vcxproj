@@ -173,6 +173,7 @@
     <ClCompile Include="src\ResourceManager.cpp" />
     <ClCompile Include="src\systems\CameraSystem.cpp" />
     <ClCompile Include="src\systems\PhysicsSimulationSystem.cpp" />
+    <ClCompile Include="src\systems\RenderSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\RenderingEngine\RenderingEngine.vcxproj">
@@ -202,6 +203,7 @@
     <ClInclude Include="include\GameEngine.h" />
     <ClInclude Include="include\systems\CameraSystem.h" />
     <ClInclude Include="include\systems\PhysicsSimulationSystem.h" />
+    <ClInclude Include="include\systems\RenderSystem.h" />
     <ClInclude Include="include\systems\System.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
