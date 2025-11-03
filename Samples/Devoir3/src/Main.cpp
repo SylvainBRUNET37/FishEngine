@@ -113,6 +113,7 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 	AllocConsole();// D�commenter si la console est voulu
 	freopen("CONOUT$", "w", stdout);
 	freopen("CONOUT$", "w", stderr);
+	cout << "Controles\n- W et S pour avancer et reculer\n- A et D pour strafe a gauche et a droite\n- Q et E pour pivoter\n- Barre d'espace pour tirer les balles\n\n";
 
 	gameEngine.Run();
 
