@@ -64,7 +64,7 @@ using Components = std::tuple
 	Controllable,
 	BallShooter,
 	LifeSpan,
-	CameraData
+	Camera
 >;
 
 #endif

@@ -3,14 +3,14 @@
 
 void CameraSystem::Update(double deltaTime, EntityManager& entityManager)
 {
-	for (const auto& [entity, camera] : entityManager.View<CameraData>())
+	for (const auto& [entity, camera] : entityManager.View<Camera>())
 	{
 		HandleRotation(camera);
 		UpdateCameraMatrices(camera, entityManager);
 	}
 }
 
-void CameraSystem::ComputeCameraPosition(CameraData& camera, const Transform& transform)
+void CameraSystem::ComputeCameraPosition(Camera& camera, const Transform& transform)
 {
 	const XMVECTOR targetPos = XMLoadFloat3(&transform.position);
 	const XMVECTOR targetRotQuat = XMLoadFloat4(&transform.rotation);
@@ -36,7 +36,7 @@ void CameraSystem::ComputeCameraPosition(CameraData& camera, const Transform& tr
 	);
 }
 
-void CameraSystem::ComputeCameraOrientation(CameraData& camera)
+void CameraSystem::ComputeCameraOrientation(Camera& camera)
 {
 	const XMVECTOR forward = XMVector3Normalize(XMVectorSubtract(camera.focus, camera.position));
 	const XMVECTOR worldUp = XMVectorSet(0, 1, 0, 0);
@@ -45,7 +45,7 @@ void CameraSystem::ComputeCameraOrientation(CameraData& camera)
 	camera.up = XMVector3Normalize(XMVector3Cross(forward, right));
 }
 
-void CameraSystem::UpdateCameraMatrices(CameraData& camera, const EntityManager& entityManager)
+void CameraSystem::UpdateCameraMatrices(Camera& camera, const EntityManager& entityManager)
 {
 	const auto targetTransform = entityManager.Get<Transform>(camera.targetEntity);
 
@@ -56,24 +56,25 @@ void CameraSystem::UpdateCameraMatrices(CameraData& camera, const EntityManager&
 	camera.matProj = XMMatrixPerspectiveFovRH(camera.fov, camera.aspectRatio, camera.nearPlane, camera.farPlane);
 }
 
-void CameraSystem::HandleRotation(CameraData& cameraData)
+void CameraSystem::HandleRotation(Camera& cameraData)
 {
 	POINT currentCursorCoordinates;
+	if (!GetCursorPos(&currentCursorCoordinates))
+		return;
 
-	if (GetCursorPos(&currentCursorCoordinates) && GetAsyncKeyState(VK_LBUTTON) & 0x8000)
+	if (GetAsyncKeyState(VK_LBUTTON) & 0x8000) 
 	{
-		static constexpr float mouseSensitivity = 0.002f;
-
 		const auto deltaX = static_cast<float>(currentCursorCoordinates.x - cameraData.cursorCoordinates.x);
 		const auto deltaY = static_cast<float>(currentCursorCoordinates.y - cameraData.cursorCoordinates.y);
 
+		constexpr float mouseSensitivity = 0.002f;
 		Rotate(cameraData, deltaX * mouseSensitivity, -deltaY * mouseSensitivity);
-
-		cameraData.cursorCoordinates = currentCursorCoordinates;
 	}
+
+	cameraData.cursorCoordinates = currentCursorCoordinates;
 }
 
-void CameraSystem::Rotate(CameraData& cameraData, const float yawDelta, const float pitchDelta)
+void CameraSystem::Rotate(Camera& cameraData, const float yawDelta, const float pitchDelta)
 {
 	cameraData.yawOffset += yawDelta;
 	cameraData.pitchAngle = std::clamp(cameraData.pitchAngle + pitchDelta, -XM_PIDIV2 + 0.1f, 0.0f);

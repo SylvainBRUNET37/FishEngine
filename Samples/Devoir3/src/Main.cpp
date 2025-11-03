@@ -70,7 +70,7 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 	physicsSystem.SetContactListener(&contactListener);
 	//////////////////////////////
 
-	CameraData camera
+	Camera camera
 	{
 		.position = XMVectorSet(0, 5, -10, 1),
 		.focus = XMVectorSet(0, 0, 0, 1),
@@ -80,7 +80,7 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 		.heightOffset = 30.f,
 	};
 	const auto cameraEntity = entityManager.CreateEntity();
-	auto& wow = entityManager.AddComponent<CameraData>(cameraEntity, camera);
+	auto& wow = entityManager.AddComponent<Camera>(cameraEntity, camera);
 
 	// Initialize the scene (it's a temporary way of doing it)
 	for (const auto& [entity, name] : entityManager.View<Name>())

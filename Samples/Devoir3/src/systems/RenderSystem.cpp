@@ -14,7 +14,7 @@ RenderSystem::RenderSystem(RenderContext* renderContext, std::vector<Material>&&
 
 void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 {
-	const auto currentCamera = entityManager.Get<CameraData>(GameEngine::currentCameraEntity);
+	const auto currentCamera = entityManager.Get<Camera>(GameEngine::currentCameraEntity);
 	sceneData.matViewProj = currentCamera.matView * currentCamera.matProj;
 	XMStoreFloat4(&sceneData.cameraPosition, currentCamera.position);
 

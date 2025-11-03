@@ -46,7 +46,7 @@ void GameEngine::CheckForWinConditions()
 		currentWinCount = Globals::getNGamesWon();
 		if (currentWinCount >= Globals::getMaxGamesWon())
 		{
-			entityManager = {}; // Reset the scene
+			exit(0); // Stop the game
 		}
 
 		MoveSensorRandomly();
