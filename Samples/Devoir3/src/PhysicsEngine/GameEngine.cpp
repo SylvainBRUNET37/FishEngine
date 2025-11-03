@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "GameEngine.h"
 
-#include "ecs/Components.h"
-#include "ecs/EntityManagerFactory.h"
+#include "entityComponentSystem/Components.h"
+#include "entityComponentSystem/EntityManagerFactory.h"
 #include "PhysicsEngine/ShapeFactory.h"
 #include "PhysicsEngine/systems/JoltSystem.h"
 #include "rendering/application/WindowsApplication.h"
@@ -244,7 +244,6 @@ void GameEngine::MoveSensorRandomly()
 		if (name.name == "Capsule")
 		{
 			// Get jolt transform data
-			const JPH::RMat44& joltTransform = rigidBody.body->GetWorldTransform();
 			const float newX = rand() % 500 - 250; // Not clean at all, but sufficient for testing, hopefully...
 			constexpr float newY = 17.565f; // Should this be in global?
 			const float newZ = rand() % 500 - 250;

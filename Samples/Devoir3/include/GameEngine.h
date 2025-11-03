@@ -2,7 +2,7 @@
 #define GAME_ENGINE_H
 
 #include "ResourceManager.h"
-#include "ecs/EntityManager.h"
+#include "entityComponentSystem/EntityManager.h"
 #include "rendering/RenderSystem.h"
 #include <cstdlib>
 
