@@ -6,10 +6,10 @@ class Globals
 public:
 	static int getNGamesWon();
 	static void incrementNGamesWon();
-	static const int getMaxGamesWon();
+	static int getMaxGamesWon();
 private:
 	static int nGamesWon;
-	static const int MAX_GAMES_WON = 3;
+	static constexpr int MAX_GAMES_WON = 3;
 };
 
 #endif // !GLOBALS_H

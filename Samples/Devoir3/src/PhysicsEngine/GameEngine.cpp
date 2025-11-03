@@ -11,30 +11,6 @@
 
 #include "Globals.h"
 
-namespace
-{
-	[[nodiscard]] float Sanitize(const float value)
-	{
-		if (!std::isfinite(value))
-			return 0.0f;
-
-		if (std::fabs(value) < 1e-6f || std::fabs(value) > 1e6f)
-			return 0.0f;
-
-		return value;
-	};
-
-	[[nodiscard]] XMFLOAT3 Sanitize(const XMFLOAT3 value)
-	{
-		return {Sanitize(value.x), Sanitize(value.y), Sanitize(value.z)};
-	};
-
-	[[nodiscard]] XMFLOAT4 Sanitize(const XMFLOAT4 value)
-	{
-		return {Sanitize(value.x), Sanitize(value.y), Sanitize(value.z), value.w};
-	};
-}
-
 void GameEngine::Run()
 {
 	bool shouldContinue = true;
@@ -77,37 +53,38 @@ void GameEngine::UpdatePhysics()
 		JPH::Vec3 newSpeed = currentSpeed;
 		bool speedChanged = false;
 
-		if (GetAsyncKeyState('W') & 0x8000) // I
+		if (GetAsyncKeyState('W') & 0x8000)
 		{
 			newSpeed = newSpeed + 1.0f * forward;
 			speedChanged = true;
 		}
-		if (GetAsyncKeyState('S') & 0x8000) // K
+		if (GetAsyncKeyState('S') & 0x8000)
 		{
 			newSpeed = newSpeed - 1.0f * forward;
 			speedChanged = true;
 		}
-		if (GetAsyncKeyState('D') & 0x8000) // L
+		if (GetAsyncKeyState('D') & 0x8000)
 		{
 			newSpeed = newSpeed - 1.0f * right;
 			speedChanged = true;
 		}
-		if (GetAsyncKeyState('A') & 0x8000) // J
+		if (GetAsyncKeyState('A') & 0x8000)
 		{
 			newSpeed = newSpeed + 1.0f * right;
 			speedChanged = true;
 		}
 
-		if (speedChanged) {
+		if (speedChanged)
+		{
 			if (newSpeed.Length() > controllable.maxSpeed) newSpeed = newSpeed.Normalized();
 			JoltSystem::GetBodyInterface().SetLinearVelocity(rigidBody.body->GetID(), newSpeed);
 		}
 
 		// Rotation
 		bool rotatesPositive = GetAsyncKeyState('Q') & 0x8000;
-		if (rotatesPositive || GetAsyncKeyState('E') & 0x8000) // U & O
+		if (rotatesPositive || GetAsyncKeyState('E') & 0x8000)
 		{
-			JPH::Quat delta = JPH::Quat::sRotation(up, .05f * (1-2*!rotatesPositive)); // theta = 10
+			JPH::Quat delta = JPH::Quat::sRotation(up, .05f * (1 - 2 * !rotatesPositive)); // theta = 10
 			JoltSystem::GetBodyInterface().SetRotation(
 				rigidBody.body->GetID(),
 				(rigidBody.body->GetRotation() * delta).Normalized(),
@@ -156,12 +133,13 @@ void GameEngine::RenderScene(const double elapsedTime)
 	Transform cubeTransform;
 	for (const auto& [entity, name, transform] : entityManager.View<Name, Transform>())
 	{
-		if (name.name == "Cube") {
+		if (name.name == "Cube")
+		{
 			cubeTransform = transform;
 		}
 	}
-	
-	renderSystem.UpdateScene(elapsedTime,cubeTransform);
+
+	renderSystem.UpdateScene(elapsedTime, cubeTransform);
 
 	for (const auto& [entity, transform, mesh] : entityManager.View<Transform, Mesh>())
 	{
@@ -175,13 +153,13 @@ void GameEngine::CheckForWinConditions()
 {
 	if (currentWinCount < Globals::getNGamesWon())
 	{
-		//A new game has been won
+		// A new game has been won !
 		currentWinCount = Globals::getNGamesWon();
 		if (currentWinCount >= Globals::getMaxGamesWon())
 		{
 			entityManager = {};
-			//abort(); //end game
 		}
+
 		MoveSensorRandomly();
 	}
 }
@@ -193,19 +171,18 @@ void GameEngine::ShootBallIfKeyPressed()
 
 	for (const auto& [entity, entityTransform, entityBallShooter] : entityManager.View<Transform, BallShooter>())
 	{
-		if (GetAsyncKeyState(entityBallShooter.inputKey) & 0x8000 
+		if (GetAsyncKeyState(entityBallShooter.inputKey) & 0x8000
 			&& GetTickCount() - prevTimeBallWasFired > timeBetweenBallShoot) [[unlikely]]
 		{
 			prevTimeBallWasFired = GetTickCount();
 			const auto ballEntity = entityManager.CreateEntity();
 
 			constexpr auto spawnDistance = 10.f;
-			const auto entityRotation = Sanitize(entityTransform.rotation);
 
 			const XMVECTOR entityForwardDirection =
 
 				XMVector3Rotate(XMVectorSet(0, 0, 1, 0),
-				                XMLoadFloat4(&entityRotation));
+				                XMLoadFloat4(&entityTransform.rotation));
 
 			const XMVECTOR entityPos = XMLoadFloat3(&entityTransform.position);
 			const XMVECTOR ballSpawnPosition = XMVectorAdd(
@@ -213,9 +190,6 @@ void GameEngine::ShootBallIfKeyPressed()
 
 			XMFLOAT3 ballPosition;
 			XMStoreFloat3(&ballPosition, ballSpawnPosition);
-
-			// Sanitize values to avoid very little/high values
-			ballPosition = Sanitize(ballPosition);
 
 			const Transform ballTransform
 			{
@@ -234,7 +208,6 @@ void GameEngine::ShootBallIfKeyPressed()
 
 			XMFLOAT3 direction;
 			XMStoreFloat3(&direction, entityForwardDirection);
-			direction = Sanitize(direction);
 
 			JoltSystem::AddPostStepCallback([this, ballEntity, ballTransform, direction]()
 			{
@@ -266,18 +239,15 @@ void GameEngine::WaitBeforeNextFrame(const DWORD frameStartTime)
 
 void GameEngine::MoveSensorRandomly()
 {
-	//TODO: Teleport sensor here
 	for (const auto& [entity, name, rigidBody] : entityManager.View<Name, RigidBody>())
-	//Was there a better way to do this? Probably...
 	{
 		if (name.name == "Capsule")
 		{
 			// Get jolt transform data
 			const JPH::RMat44& joltTransform = rigidBody.body->GetWorldTransform();
-			const JPH::Vec3 joltPos = joltTransform.GetTranslation();
-			float newX = rand() % 500 - 250; //Not clean at all, but sufficient for testing, hopefully...
-			float newY = 17.565f; //Should this be in global?
-			float newZ = rand() % 500 - 250;
+			const float newX = rand() % 500 - 250; // Not clean at all, but sufficient for testing, hopefully...
+			constexpr float newY = 17.565f; // Should this be in global?
+			const float newZ = rand() % 500 - 250;
 			JPH::BodyInterface& bodyInterface = JoltSystem::GetBodyInterface();
 			bodyInterface.SetPosition(rigidBody.body->GetID(), JPH::RVec3Arg(newX, newY, newZ),
 			                          JPH::EActivation::Activate);

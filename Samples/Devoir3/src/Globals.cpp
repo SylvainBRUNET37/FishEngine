@@ -5,17 +5,17 @@ int Globals::nGamesWon = 0;
 
 int Globals::getNGamesWon()
 {
-	return Globals::nGamesWon;
+	return nGamesWon;
 }
 
 void Globals::incrementNGamesWon()
 {
-	Globals::nGamesWon++;
+	nGamesWon++;
 }
 
-const int Globals::getMaxGamesWon()
+int Globals::getMaxGamesWon()
 {
-	return Globals::MAX_GAMES_WON;
+	return MAX_GAMES_WON;
 }
 
 
