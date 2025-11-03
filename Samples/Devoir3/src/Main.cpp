@@ -20,6 +20,7 @@
 #include "entityComponentSystem/EntityManagerFactory.h"
 #include "GameEngine.h"
 #include "PhysicsEngine/ShapeFactory.h"
+#include <systems/PhysicsSimulationSystem.h>
 
 using namespace JPH;
 using namespace JPH::literals;
@@ -45,6 +46,7 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 
 	RenderSystem renderSystem{&renderContext, std::move(sceneResources.materials)};
 	auto entityManager = EntityManagerFactory::Create(sceneResources);
+
 
 	/////	Physics System	 /////
 	JoltSystem::Init();
@@ -94,13 +96,23 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 		}
 	}
 
-	GameEngine gameEngine{ std::move(renderSystem), std::move(entityManager), std::move(resourceManager) };
+	std::vector<std::unique_ptr<System>> systems;
+	systems.emplace_back(std::make_unique<PhysicsSimulationSystem>());
+
+	GameEngine gameEngine
+	{
+		std::move(renderSystem),
+		std::move(entityManager),
+		std::move(resourceManager),
+		std::move(systems)
+	};
 
 	// Source: https://stackoverflow.com/questions/16703835/how-can-i-see-cout-output-in-a-non-console-application
-	AllocConsole();// D�commenter si la console est voulu
+	AllocConsole(); // D�commenter si la console est voulu
 	freopen("CONOUT$", "w", stdout);
 	freopen("CONOUT$", "w", stderr);
-	cout << "Controles\n- W et S pour avancer et reculer\n- A et D pour strafe a gauche et a droite\n- Q et E pour pivoter\n- Barre d'espace pour tirer les balles\n\n";
+	cout <<
+		"Controles\n- W et S pour avancer et reculer\n- A et D pour strafe a gauche et a droite\n- Q et E pour pivoter\n- Barre d'espace pour tirer les balles\n\n";
 
 	gameEngine.Run();
 

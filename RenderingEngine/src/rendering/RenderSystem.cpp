@@ -15,8 +15,8 @@ void RenderSystem::InitializeCamera()
 {
 	camera = std::make_unique<ThirdPersonCamera>(
 		XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f),
-		100.0f, //Distance
-		30.0f, //Hauteur
+		100.0f, // Distance
+		30.0f, // Hauteur
 		static_cast<float>(renderContext->GetScreenWidth()),
 		static_cast<float>(renderContext->GetScreenHeight())
 	);

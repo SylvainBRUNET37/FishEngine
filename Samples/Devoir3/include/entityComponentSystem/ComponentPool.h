@@ -56,6 +56,7 @@ public:
     }
 
 private:
+    // TODO: replace it for plf::colony? or use a kind of index table which avoid reference invalidation
     std::deque<std::optional<Component>> components;
 };
 

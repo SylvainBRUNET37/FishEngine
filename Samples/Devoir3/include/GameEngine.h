@@ -1,16 +1,20 @@
 #ifndef GAME_ENGINE_H
 #define GAME_ENGINE_H
 
+#include <cstdlib>
+
 #include "ResourceManager.h"
 #include "entityComponentSystem/EntityManager.h"
 #include "rendering/RenderSystem.h"
-#include <cstdlib>
+#include "systems/System.h"
 
 class GameEngine
 {
 public:
-	explicit GameEngine(RenderSystem&& renderSystem, EntityManager&& entityManager, ResourceManager&& resourceManager)
-		: resourceManager{std::move(resourceManager)},
+	explicit GameEngine(RenderSystem&& renderSystem, EntityManager&& entityManager, ResourceManager&& resourceManager,
+	                    std::vector<std::unique_ptr<System>>&& systems)
+		: systems{std::move(systems)},
+		  resourceManager{std::move(resourceManager)},
 		  renderSystem{std::move(renderSystem)},
 		  entityManager{std::move(entityManager)}
 	{
@@ -25,13 +29,13 @@ private:
 	static constexpr double FRAME_TIME = 1000.0 / TARGET_FPS;
 	static constexpr double PHYSICS_UPDATE_RATE = 1.0f / TARGET_FPS;
 
+	std::vector<std::unique_ptr<System>> systems;
+
 	ResourceManager resourceManager;
 	RenderSystem renderSystem;
 	EntityManager entityManager;
 
 	void UpdateControllables();
-	static void UpdatePhysics();
-	void UpdateTransforms();
 
 	void RenderScene(double elapsedTime);
 	void CheckForWinConditions();

@@ -25,10 +25,10 @@ protected:
 public:
 	Camera(XMVECTOR position, XMVECTOR focus, XMVECTOR up, float viewWidth, float viewHeight)
 		: position(position), focus(focus), up(up),
-		viewWidth(viewWidth > 0 ? viewWidth : 1),
-		viewHeight(viewHeight > 0 ? viewHeight : 1)
+		  viewWidth(viewWidth > 0 ? viewWidth : 1),
+		  viewHeight(viewHeight > 0 ? viewHeight : 1)
 	{
-		aspectRatio = static_cast<float>(viewWidth) / static_cast<float>(viewHeight);
+		aspectRatio = viewWidth / viewHeight;
 		matView = XMMatrixLookAtRH(position, focus, up);
 		matProj = XMMatrixPerspectiveFovRH(fov, aspectRatio, nearPlane, farPlane);
 	}
@@ -41,12 +41,14 @@ public:
 	XMVECTOR GetFocus() const noexcept { return focus; }
 	XMVECTOR GetUp() const noexcept { return up; }
 
-	void SetPosition(XMVECTOR pos) noexcept {
+	void SetPosition(XMVECTOR pos) noexcept
+	{
 		position = pos;
 		UpdateMatView();
 	}
 
-	void SetFocus(XMVECTOR foc) noexcept {
+	void SetFocus(XMVECTOR foc) noexcept
+	{
 		focus = foc;
 		UpdateMatView();
 	}
@@ -55,12 +57,14 @@ public:
 	virtual void Rotate(float yawDelta, float pitchDelta) noexcept = 0;
 
 protected:
-	void UpdateMatView() noexcept {
+	void UpdateMatView() noexcept
+	{
 		matView = XMMatrixLookAtRH(position, focus, up);
 	}
 };
 
-class ThirdPersonCamera : public Camera {
+class ThirdPersonCamera : public Camera
+{
 	XMVECTOR targetPosition;
 	float distance;
 	float heightOffset;
@@ -69,7 +73,8 @@ class ThirdPersonCamera : public Camera {
 
 	static constexpr float MIN_DISTANCE = 10.0f;
 
-	void UpdateCameraPosition(float cubeYaw) noexcept {
+	void UpdateCameraPosition(float cubeYaw) noexcept
+	{
 		focus = XMVectorAdd(targetPosition, XMVectorSet(0, heightOffset, 0, 0));
 
 		float totalYaw = cubeYaw + yawOffset;
@@ -94,14 +99,15 @@ class ThirdPersonCamera : public Camera {
 public:
 	ThirdPersonCamera(XMVECTOR targetPos, float distance, float heightOffset, float viewWidth, float viewHeight)
 		: Camera(XMVectorSet(0, 5, -10, 1), XMVectorSet(0, 0, 0, 1), XMVectorSet(0, 1, 0, 0), viewWidth, viewHeight),
-		targetPosition(targetPos),
-		distance(max(MIN_DISTANCE, distance)),
-		heightOffset(heightOffset)
+		  targetPosition(targetPos),
+		  distance(max(MIN_DISTANCE, distance)),
+		  heightOffset(heightOffset)
 	{
 		UpdateCameraPosition(0.0f);
 	}
 
-	void UpdateFromCube(const Transform* cubeTransform) noexcept {
+	void UpdateFromCube(const Transform* cubeTransform) noexcept
+	{
 		if (!cubeTransform) return;
 
 		targetPosition = XMLoadFloat3(&cubeTransform->position);
@@ -114,15 +120,19 @@ public:
 		UpdateCameraPosition(cubeYaw);
 	}
 
-	void Move(float, float, float) noexcept override {}
+	void Move(float, float, float) noexcept override
+	{
+	}
 
-	void Rotate(float yawDelta, float pitchDelta) noexcept override {
+	void Rotate(float yawDelta, float pitchDelta) noexcept override
+	{
 		yawOffset += yawDelta;
 		pitchAngle = std::clamp(pitchAngle + pitchDelta, -XM_PIDIV2 + 0.1f, 0.0f);
 		UpdateCameraPosition(0.0f);
 	}
 
-	void SetDistance(float newDistance) noexcept {
+	void SetDistance(float newDistance) noexcept
+	{
 		distance = max(MIN_DISTANCE, newDistance);
 	}
 };
