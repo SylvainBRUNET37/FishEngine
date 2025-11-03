@@ -1,7 +1,7 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
-#include "entityComponentSystem/EntityManager.h"
+#include "entities/EntityManager.h"
 
 // Contains the logic that operate on different component
 struct System

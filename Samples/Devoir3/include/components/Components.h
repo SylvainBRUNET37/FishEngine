@@ -8,7 +8,7 @@
 #include <Jolt/Jolt.h>
 #include <Jolt/Physics/Body/Body.h>
 
-#include "entityComponentSystem/Entity.h"
+#include "entities/Entity.h"
 #include "PhysicsEngine/systems/JoltSystem.h"
 #include "rendering/core/Transform.h"
 #include "rendering/graphics/Mesh.h"

@@ -2,9 +2,9 @@
 #define ENTITY_MANAGER_H
 
 #include "Entity.h"
-#include "ComponentPool.h"
-#include "Components.h"
-#include "ComponentUtils.h"
+#include "components/ComponentPool.h"
+#include "components/Components.h"
+#include "components/ComponentUtils.h"
 
 class EntityManager
 {

@@ -53,7 +53,7 @@ private:
 
 	void InitializeCamera();
 	bool HandleRotation();
-	void UpdateCamera(const Transform& cubeTransform);
+	void UpdateCamera(const Transform& cubeTransform) const;
 	void RenderScene();
 
 	static SceneData CreateSceneData();

@@ -2,7 +2,7 @@
 
 #include <Jolt/RegisterTypes.h>
 
-#include "entityComponentSystem/Components.h"
+#include "components/Components.h"
 #include "PhysicsEngine/layers/BroadPhaseLayerInterfaceImpl.h"
 #include "PhysicsEngine/layers/BroadPhaseLayers.h"
 #include "PhysicsEngine/layers/ObjectLayerPairFilterImpl.h"
@@ -17,7 +17,7 @@
 #include "systems/RenderSystem.h"
 #include "ResourceManager.h"
 
-#include "entityComponentSystem/EntityManagerFactory.h"
+#include "entities/EntityManagerFactory.h"
 #include "GameEngine.h"
 #include "PhysicsEngine/ShapeFactory.h"
 #include <systems/PhysicsSimulationSystem.h>

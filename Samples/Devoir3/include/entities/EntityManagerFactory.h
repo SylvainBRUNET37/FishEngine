@@ -1,9 +1,9 @@
 #ifndef ENTITY_MANAGER_FACTORY_H
 #define ENTITY_MANAGER_FACTORY_H
 
-#include "entityComponentSystem/Components.h"
+#include "components/Components.h"
 #include "rendering/core/Transform.h"
-#include "entityComponentSystem/EntityManager.h"
+#include "entities/EntityManager.h"
 
 class EntityManagerFactory
 {

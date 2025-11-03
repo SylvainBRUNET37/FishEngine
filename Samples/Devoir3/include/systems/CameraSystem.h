@@ -3,7 +3,7 @@
 
 #include "System.h"
 
-class CameraSystem : System
+class CameraSystem : public System
 {
 	void Update(double deltaTime, EntityManager& entityManager) override { }
 };

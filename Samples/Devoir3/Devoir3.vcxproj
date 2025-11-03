@@ -182,11 +182,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\CC.h" />
-    <ClInclude Include="include\entityComponentSystem\Components.h" />
-    <ClInclude Include="include\entityComponentSystem\ComponentPool.h" />
-    <ClInclude Include="include\entityComponentSystem\ComponentUtils.h" />
-    <ClInclude Include="include\entityComponentSystem\Entity.h" />
-    <ClInclude Include="include\entityComponentSystem\EntityManager.h" />
+    <ClInclude Include="include\components\Components.h" />
+    <ClInclude Include="include\components\ComponentPool.h" />
+    <ClInclude Include="include\components\ComponentUtils.h" />
+    <ClInclude Include="include\entities\Entity.h" />
+    <ClInclude Include="include\entities\EntityManager.h" />
     <ClInclude Include="include\Globals.h" />
     <ClInclude Include="include\PhysicsEngine\layers\BroadPhaseLayerInterfaceImpl.h" />
     <ClInclude Include="include\PhysicsEngine\layers\BroadPhaseLayers.h" />
@@ -198,7 +198,7 @@
     <ClInclude Include="include\PhysicsEngine\ShapeFactory.h" />
     <ClInclude Include="include\PhysicsEngine\systems\JoltSystem.h" />
     <ClInclude Include="include\PhysicsEngine\utils\Utils.h" />
-    <ClInclude Include="include\entityComponentSystem\EntityManagerFactory.h" />
+    <ClInclude Include="include\entities\EntityManagerFactory.h" />
     <ClInclude Include="include\ResourceManager.h" />
     <ClInclude Include="include\GameEngine.h" />
     <ClInclude Include="include\systems\CameraSystem.h" />

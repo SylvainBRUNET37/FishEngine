@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "GameEngine.h"
 
-#include "entityComponentSystem/Components.h"
-#include "entityComponentSystem/EntityManagerFactory.h"
+#include "components/Components.h"
+#include "entities/EntityManagerFactory.h"
 #include "PhysicsEngine/ShapeFactory.h"
 #include "PhysicsEngine/systems/JoltSystem.h"
 #include "rendering/application/WindowsApplication.h"
@@ -20,17 +20,17 @@ void GameEngine::Run()
 	{
 		const DWORD frameStartTime = GetTickCount();
 
-		const double deltaTime = (frameStartTime - prevTime) / 1000.0;
+		const double elapsedTime = (frameStartTime - prevTime) / 1000.0;
 		prevTime = frameStartTime;
 
 		// End the loop if Windows want to terminate the program (+ process messages)
 		shouldContinue = WindowsApplication::ProcessWindowsMessages();
 
-		DestroyObjectAtEndOfLife(deltaTime);
+		DestroyObjectAtEndOfLife(elapsedTime);
 		ShootBallIfKeyPressed();
 
 		for (const auto& system : systems)
-			system->Update(deltaTime, entityManager);
+			system->Update(elapsedTime, entityManager);
 
 		CheckForWinConditions();
 

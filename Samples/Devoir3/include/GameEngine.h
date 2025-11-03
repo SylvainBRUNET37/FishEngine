@@ -4,7 +4,7 @@
 #include <cstdlib>
 
 #include "ResourceManager.h"
-#include "entityComponentSystem/EntityManager.h"
+#include "entities/EntityManager.h"
 #include "systems/RenderSystem.h"
 #include "systems/System.h"
 
@@ -33,6 +33,7 @@ private:
 	ResourceManager resourceManager;
 	EntityManager entityManager;
 
+	void RenderScene(double elapsedTime);
 	void CheckForWinConditions();
 
 	int currentWinCount = 0;

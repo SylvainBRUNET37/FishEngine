@@ -44,7 +44,7 @@ bool RenderSystem::HandleRotation()
 	return rotated;
 }
 
-void RenderSystem::UpdateCamera(const Transform& cubeTransform)
+void RenderSystem::UpdateCamera(const Transform& cubeTransform) const
 {
 	camera->UpdateFromCube(&cubeTransform);
 }
