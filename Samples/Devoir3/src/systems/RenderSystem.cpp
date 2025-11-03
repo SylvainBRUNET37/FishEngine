@@ -2,25 +2,15 @@
 
 #include "systems/RenderSystem.h"
 
+#include "GameEngine.h"
+
 RenderSystem::RenderSystem(RenderContext* renderContext, std::vector<Material>&& materials)
 	: renderer(renderContext->GetDevice(), std::move(materials), frameCbRegisterNumber, objectCbRegisterNumber),
-	sceneData(CreateSceneData()),
+	sceneData(InitSceneData()),
 	renderContext(renderContext),
 	cursorCoordinates{}
 {
-	InitializeCamera();
-	sceneData.matViewProj = camera->getMatView() * camera->getMatProj();
-}
 
-void RenderSystem::InitializeCamera()
-{
-	camera = std::make_unique<ThirdPersonCamera>(
-		XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f),
-		100.0f, // Distance
-		30.0f, // Hauteur
-		static_cast<float>(renderContext->GetScreenWidth()),
-		static_cast<float>(renderContext->GetScreenHeight())
-	);
 }
 
 bool RenderSystem::HandleRotation()
@@ -44,17 +34,18 @@ bool RenderSystem::HandleRotation()
 	return rotated;
 }
 
-void RenderSystem::UpdateCamera(const Transform& cubeTransform) const
+void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 {
-	camera->UpdateFromCube(&cubeTransform);
-}
+	const auto currentCamera = entityManager.Get<CameraData>(GameEngine::currentCameraEntity);
+	sceneData.matViewProj = currentCamera.matView * currentCamera.matProj;
+	XMStoreFloat4(&sceneData.cameraPosition, currentCamera.position);
 
-void RenderSystem::UpdateScene(double elapsedTime, const Transform& cubeTransform)
-{
-	// HandleRotation(); // Handle rotation with the mouse
-	UpdateCamera(cubeTransform);
-	sceneData.matViewProj = camera->getMatView() * camera->getMatProj();
 	RenderScene();
+
+	for (const auto& [entity, transform, mesh] : entityManager.View<Transform, Mesh>())
+		Render(mesh, transform);
+
+	Present();
 }
 
 void RenderSystem::Render(const Mesh& mesh, const Transform& transform)
@@ -62,7 +53,7 @@ void RenderSystem::Render(const Mesh& mesh, const Transform& transform)
 	renderer.Render(mesh, renderContext->GetContext(), transform, sceneData);
 }
 
-void RenderSystem::RenderScene()
+void RenderSystem::RenderScene() const
 {
 	ID3D11DeviceContext* context = renderContext->GetContext();
 	ID3D11RenderTargetView* renderTarget = renderContext->GetRenderTargetView();
@@ -74,13 +65,12 @@ void RenderSystem::RenderScene()
 
 	ID3D11RenderTargetView* rtvs[] = { renderTarget };
 	context->OMSetRenderTargets(1, rtvs, depthStencil);
-
-	XMStoreFloat4(&sceneData.cameraPosition, camera->GetPosition());
 }
 
-SceneData RenderSystem::CreateSceneData()
+SceneData RenderSystem::InitSceneData()
 {
-	return {
+	return
+	{
 		.matViewProj = {},
 		.lightPosition = XMFLOAT4(2, 20, -20, 1),
 		.cameraPosition = {},

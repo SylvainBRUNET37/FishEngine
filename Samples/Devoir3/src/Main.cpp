@@ -22,6 +22,8 @@
 #include "PhysicsEngine/ShapeFactory.h"
 #include <systems/PhysicsSimulationSystem.h>
 
+#include "systems/CameraSystem.h"
+
 using namespace JPH;
 using namespace JPH::literals;
 using namespace std;
@@ -68,6 +70,18 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 	physicsSystem.SetContactListener(&contactListener);
 	//////////////////////////////
 
+	CameraData camera
+	{
+		.position = XMVectorSet(0, 5, -10, 1),
+		.focus = XMVectorSet(0, 0, 0, 1),
+		.up = XMVectorSet(0, 1, 0, 0),
+		.aspectRatio = static_cast<float>(windowData.screenWidth) / static_cast<float>(windowData.screenHeight),
+		.distance = 100.f,
+		.heightOffset = 30.f,
+	};
+	const auto cameraEntity = entityManager.CreateEntity();
+	auto& wow = entityManager.AddComponent<CameraData>(cameraEntity, camera);
+
 	// Initialize the scene (it's a temporary way of doing it)
 	for (const auto& [entity, name] : entityManager.View<Name>())
 	{
@@ -77,6 +91,9 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCubeInVehicleLayer(transform));
 			entityManager.AddComponent<BallShooter>(entity);
 			entityManager.AddComponent<Controllable>(entity, 100.0f);
+
+			// Link camera to the cube
+			wow.targetEntity = entity;
 		}
 		else if (name.name == "Cargo")
 		{
@@ -98,6 +115,7 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 	// Care about the order of construction, it will be the order of update calls
 	std::vector<std::unique_ptr<System>> systems;
 	systems.emplace_back(std::make_unique<PhysicsSimulationSystem>());
+	systems.emplace_back(std::make_unique<CameraSystem>());
 	systems.emplace_back(std::make_unique<RenderSystem>(&renderContext, std::move(sceneResources.materials)));
 
 	GameEngine gameEngine
@@ -106,6 +124,8 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 		std::move(resourceManager),
 		std::move(systems)
 	};
+
+	GameEngine::currentCameraEntity = cameraEntity;
 
 	// Source: https://stackoverflow.com/questions/16703835/how-can-i-see-cout-output-in-a-non-console-application
 	AllocConsole(); // D�commenter si la console est voulu

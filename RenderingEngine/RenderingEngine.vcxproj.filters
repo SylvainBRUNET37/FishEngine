@@ -126,9 +126,6 @@
     <ClInclude Include="include\rendering\shaders\ShaderReflector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\rendering\graphics\Camera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\rendering\loading\Node.h">
       <Filter>Header Files</Filter>
     </ClInclude>

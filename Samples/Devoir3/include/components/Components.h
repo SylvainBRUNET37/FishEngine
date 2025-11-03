@@ -8,6 +8,7 @@
 #include <Jolt/Jolt.h>
 #include <Jolt/Physics/Body/Body.h>
 
+#include "camera/Camera.h"
 #include "entities/Entity.h"
 #include "PhysicsEngine/systems/JoltSystem.h"
 #include "rendering/core/Transform.h"
@@ -62,7 +63,8 @@ using Components = std::tuple
 	Name,
 	Controllable,
 	BallShooter,
-	LifeSpan
+	LifeSpan,
+	CameraData
 >;
 
 #endif

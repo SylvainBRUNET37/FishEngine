@@ -11,6 +11,9 @@
 class GameEngine
 {
 public:
+	// TODO: avoid this, globals are bad !
+	inline static Entity currentCameraEntity = INVALID_ENTITY;
+
 	explicit GameEngine(EntityManager&& entityManager, ResourceManager&& resourceManager,
 	                    std::vector<std::unique_ptr<System>>&& systems)
 		: systems{std::move(systems)},
@@ -28,12 +31,12 @@ private:
 	static constexpr double FRAME_TIME = 1000.0 / TARGET_FPS;
 	static constexpr double PHYSICS_UPDATE_RATE = 1.0f / TARGET_FPS;
 
+
 	std::vector<std::unique_ptr<System>> systems;
 
 	ResourceManager resourceManager;
 	EntityManager entityManager;
 
-	void RenderScene(double elapsedTime);
 	void CheckForWinConditions();
 
 	int currentWinCount = 0;

@@ -38,6 +38,7 @@
     <ClInclude Include="include\systems\System.h" />
     <ClInclude Include="include\systems\PhysicsSimulationSystem.h" />
     <ClInclude Include="include\systems\RenderSystem.h" />
+    <ClInclude Include="include\components\camera\Camera.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\MiniPhongPS.hlsl" />

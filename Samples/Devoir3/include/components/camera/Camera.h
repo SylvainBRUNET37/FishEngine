@@ -1,8 +1,35 @@
 ﻿#pragma once
+
 #include <DirectXMath.h>
 #include <algorithm>
 
+#include "entities/Entity.h"
+#include "rendering/core/Transform.h"
+
 using namespace DirectX;
+
+struct CameraData
+{
+	XMVECTOR position{};
+	XMVECTOR focus{};
+	XMVECTOR up{};
+
+	XMMATRIX matView{};
+	XMMATRIX matProj{};
+
+	float nearPlane = 0.05f;
+	float farPlane = 1000.0f;
+	float fov = XM_PI / 3.0f;
+
+	float aspectRatio = 1920.f / 1080.f;
+
+	// 3rd person
+	Entity targetEntity = INVALID_ENTITY;
+	float distance{};
+	float heightOffset{};
+	float yawOffset = 0.0f;
+	float pitchAngle = -0.1f;
+};
 
 class Camera
 {

@@ -7,7 +7,7 @@
 #include "rendering/Renderer.h"
 #include "rendering/core/Transform.h"
 #include "rendering/device/RenderContext.h"
-#include "rendering/graphics/Camera.h"
+#include "components/camera/Camera.h"
 #include "rendering/graphics/Material.h"
 #include "rendering/graphics/Mesh.h"
 
@@ -16,30 +16,7 @@ class RenderSystem : public System
 public:
 	explicit RenderSystem(RenderContext* renderContext, std::vector<Material>&& materials);
 
-	void UpdateScene(double elapsedTime, const Transform& cubeTransform);
-	void Render(const Mesh& mesh, const Transform& transform);
-	void Render() const { renderContext->Present(); }
-
-	void Update(const double deltaTime, EntityManager& entityManager) override
-	{
-		Transform cubeTransform;
-		for (const auto& [entity, name, transform] : entityManager.View<Name, Transform>())
-		{
-			if (name.name == "Cube")
-			{
-				cubeTransform = transform;
-			}
-		}
-
-		UpdateScene(deltaTime, cubeTransform);
-
-		for (const auto& [entity, transform, mesh] : entityManager.View<Transform, Mesh>())
-		{
-			Render(mesh, transform);
-		}
-
-		Render();
-	}
+	void Update(double deltaTime, EntityManager& entityManager) override;
 
 private:
 	static constexpr int frameCbRegisterNumber = 0;
@@ -48,15 +25,17 @@ private:
 	Renderer renderer;
 	SceneData sceneData;
 	RenderContext* renderContext;
+
 	std::unique_ptr<ThirdPersonCamera> camera;
 	POINT cursorCoordinates;
 
-	void InitializeCamera();
-	bool HandleRotation();
-	void UpdateCamera(const Transform& cubeTransform) const;
-	void RenderScene();
+	void Render(const Mesh& mesh, const Transform& transform);
+	void Present() const { renderContext->Present(); }
 
-	static SceneData CreateSceneData();
+	bool HandleRotation();
+	void RenderScene() const;
+
+	static SceneData InitSceneData();
 };
 
 #endif

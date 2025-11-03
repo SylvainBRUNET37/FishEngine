@@ -182,6 +182,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\CC.h" />
+    <ClInclude Include="include\components\camera\Camera.h" />
     <ClInclude Include="include\components\Components.h" />
     <ClInclude Include="include\components\ComponentPool.h" />
     <ClInclude Include="include\components\ComponentUtils.h" />

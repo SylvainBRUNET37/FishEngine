@@ -5,7 +5,7 @@
 
 class CameraSystem : public System
 {
-	void Update(double deltaTime, EntityManager& entityManager) override { }
+	void Update(double deltaTime, EntityManager& entityManager) override;
 };
 
 #endif
