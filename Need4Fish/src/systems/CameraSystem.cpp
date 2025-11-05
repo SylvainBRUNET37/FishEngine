@@ -77,6 +77,49 @@ void CameraSystem::HandleRotation(Camera& cameraData)
 	}
 
 	cameraData.cursorCoordinates = currentCursorCoordinates;*/
+	// Touche ESC pour libérer la souris
+	if (GetAsyncKeyState(VK_ESCAPE) & 0x8000)
+	{
+		if (cameraData.isMouseCaptured)
+		{
+			ShowCursor(TRUE);
+			cameraData.isMouseCaptured = false;
+		}
+		return;
+	}
+
+	// Clic pour recapturer la souris
+	if (!cameraData.isMouseCaptured && (GetAsyncKeyState(VK_LBUTTON) & 0x8000))
+	{
+		cameraData.isMouseCaptured = false;
+	}
+
+	// Capturer la souris
+	if (!cameraData.isMouseCaptured)
+	{
+		// Obtenir le centre de l'écran
+		HWND hwnd = GetActiveWindow();
+		if (hwnd)
+		{
+			RECT rect;
+			GetClientRect(hwnd, &rect);
+			cameraData.screenCenter.x = (rect.right - rect.left) / 2;
+			cameraData.screenCenter.y = (rect.bottom - rect.top) / 2;
+
+			// Convertir en repère écran
+			ClientToScreen(hwnd, &cameraData.screenCenter);
+
+			// Positionner la souris au centre
+			SetCursorPos(cameraData.screenCenter.x, cameraData.screenCenter.y);
+			cameraData.cursorCoordinates = cameraData.screenCenter;
+
+			// Cacher le curseur -> peut-être à changer pour menu pause
+			ShowCursor(FALSE);
+
+			cameraData.isMouseCaptured = true;
+		}
+	}
+
 	POINT currentCursorCoordinates;
 	if (!GetCursorPos(&currentCursorCoordinates))
 		return;
@@ -108,6 +151,9 @@ void CameraSystem::HandleRotation(Camera& cameraData)
 			}
 		}
 	}
+
+	// Recentrer pour rotation infinie
+	SetCursorPos(cameraData.screenCenter.x, cameraData.screenCenter.y);
 
 	cameraData.cursorCoordinates = currentCursorCoordinates;
 }

@@ -30,6 +30,10 @@ struct Camera
 	// Mouse
 	POINT cursorCoordinates;
 
+	// Pour limiter/capturer la souris
+	bool isMouseCaptured = false;
+	POINT screenCenter;
+
 	// Direction cible pour le poisson
 	float targetYaw = 0.0f;  
 };
