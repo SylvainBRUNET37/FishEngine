@@ -87,6 +87,8 @@
     </Link>
     <PostBuildEvent>
       <Command>copy /Y "$(SolutionDir)extern\assimp\bin\$(Configuration)\assimp*.dll" "$(TargetDir)"
+xcopy /E /Y /I "$(ProjectDir)assets\*" "$(TargetDir)assets\"
+xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -108,6 +110,8 @@
     </Link>
     <PostBuildEvent>
       <Command>copy /Y "$(SolutionDir)extern\assimp\bin\$(Configuration)\assimp*.dll" "$(TargetDir)"
+xcopy /E /Y /I "$(ProjectDir)assets\*" "$(TargetDir)assets\"
+xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -131,6 +135,8 @@
     </Link>
     <PostBuildEvent>
       <Command>copy /Y "$(SolutionDir)extern\assimp\bin\$(Configuration)\assimp*.dll" "$(TargetDir)"
+xcopy /E /Y /I "$(ProjectDir)assets\*" "$(TargetDir)assets\"
+xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -156,6 +162,8 @@
     </Link>
     <PostBuildEvent>
       <Command>copy /Y "$(SolutionDir)extern\assimp\bin\$(Configuration)\assimp*.dll" "$(TargetDir)"
+xcopy /E /Y /I "$(ProjectDir)assets\*" "$(TargetDir)assets\"
+xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>

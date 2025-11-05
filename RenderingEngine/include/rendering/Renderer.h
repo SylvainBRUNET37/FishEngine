@@ -1,6 +1,8 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
+#include "buffers/constantBuffers/FrameBuffer.h"
+#include "buffers/constantBuffers/ObjectBuffer.h"
 #include "core/SceneData.h"
 #include "core/Transform.h"
 #include "graphics/Material.h"
@@ -11,40 +13,26 @@ class Renderer
 public:
 	explicit Renderer(ID3D11Device* device, std::vector<Material>&& materials, const int frameCbRegisterNumber,
 	                  const int objectCbRegisterNumber)
-		: frameConstantBuffer{device, frameCbRegisterNumber}, objectConstantBuffer{device, objectCbRegisterNumber},
-		  materials{std::move(materials)}
+		: materials{std::move(materials)}, constantFrameBuffer{device, frameCbRegisterNumber},
+		  constantObjectBuffer{device, objectCbRegisterNumber}
 	{
 	}
 
+	void UpdateFrameBuffer(const FrameBuffer& frameBuffer_) { frameBuffer = frameBuffer_; };
 	void Render(const Mesh& mesh, ID3D11DeviceContext* context,
-	          const Transform& transform,
-	          const SceneData& scene);
+	          const Transform& transform);
 
 private:
-	struct FrameBufferData // b0 in the shader program
-	{
-		DirectX::XMMATRIX matViewProj;
-		DirectX::XMFLOAT4 vLumiere;
-		DirectX::XMFLOAT4 vCamera;
-		DirectX::XMFLOAT4 vAEcl;
-		DirectX::XMFLOAT4 vDEcl;
-		DirectX::XMFLOAT4 vSEcl;
-	};
-
-	struct ObjectConstants // b1 in the shader program
-	{
-		DirectX::XMMATRIX matWorld;
-	};
-
-	ConstantBuffer<FrameBufferData> frameConstantBuffer;
-	ConstantBuffer<ObjectConstants> objectConstantBuffer;
 	std::vector<Material> materials;
+	FrameBuffer frameBuffer{};
+
+	ConstantBuffer<FrameBuffer> constantFrameBuffer;
+	ConstantBuffer<ObjectBuffer> constantObjectBuffer;
 
 	static void Draw(const Mesh& mesh, ID3D11DeviceContext* context);
 
-	static FrameBufferData BuildFrameConstantBufferParams(const SceneData& sceneData);
-	static ObjectConstants BuildObjectConstantBufferParams(const Transform& transform);
-	static Material::MaterialBufferData BuildMaterialConstantBufferParams(const Material& material);
+	static ObjectBuffer BuildConstantObjectBuffer(const Transform& transform);
+	static MaterialBuffer BuildConstantMaterialBuffer(const Material& material);
 };
 
 #endif

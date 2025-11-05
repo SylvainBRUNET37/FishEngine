@@ -5,6 +5,8 @@
 #include <d3dcompiler.h>
 #include <string>
 
+#include "rendering/utils/Util.h"
+
 ComPtr<ID3DBlob> ShaderUtils::Compile(const std::wstring& filePath, const std::string& entry,
                                       const std::string& profile)
 {
@@ -16,11 +18,10 @@ ComPtr<ID3DBlob> ShaderUtils::Compile(const std::wstring& filePath, const std::s
 	ComPtr<ID3DBlob> byteCode;
 	ComPtr<ID3DBlob> errors;
 
-	const HRESULT hr = D3DCompileFromFile(filePath.c_str(), nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE,
-		entry.c_str(), profile.c_str(), flags, 0, &byteCode, &errors);
+	DXEssayer(D3DCompileFromFile(filePath.c_str(), nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE,
+		entry.c_str(), profile.c_str(), flags, 0, &byteCode, &errors));
 	if (errors)
 		OutputDebugStringA(static_cast<char*>(errors->GetBufferPointer()));
 
-	assert(SUCCEEDED(hr));
 	return byteCode;
 }

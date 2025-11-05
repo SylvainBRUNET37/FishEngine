@@ -2,7 +2,7 @@
 // Constant buffers datas
 // =====================================
 
-struct DirLight
+struct DirectionLight
 {
     float4 ambient;
     float4 diffuse;
@@ -31,7 +31,7 @@ cbuffer FrameBuffer : register(b0)
 {
     float4x4 matViewProj;
     float4 vCamera; // camera position
-    DirLight dirLight;
+    DirectionLight dirLight;
     PointLight pointLights[MAX_POINT_LIGHTS];
 };
 

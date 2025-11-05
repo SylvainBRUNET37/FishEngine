@@ -21,6 +21,9 @@
   <ItemGroup>
     <ClInclude Include="external\stb_image.h" />
     <ClInclude Include="include\rendering\application\WindowsApplication.h" />
+    <ClInclude Include="include\rendering\buffers\constantBuffers\FrameBuffer.h" />
+    <ClInclude Include="include\rendering\buffers\constantBuffers\MaterialBuffer.h" />
+    <ClInclude Include="include\rendering\buffers\constantBuffers\ObjectBuffer.h" />
     <ClInclude Include="include\rendering\core\SceneData.h" />
     <ClInclude Include="include\rendering\core\Transform.h" />
     <ClInclude Include="include\rendering\core\WindowData.h" />
@@ -29,11 +32,13 @@
     <ClInclude Include="include\rendering\device\DeviceBuilder.h" />
     <ClInclude Include="include\rendering\device\RenderContext.h" />
     <ClInclude Include="include\rendering\buffers\Buffer.h" />
-    <ClInclude Include="include\rendering\buffers\ConstantBuffer.h" />
+    <ClInclude Include="include\rendering\buffers\constantBuffers\ConstantBuffer.h" />
     <ClInclude Include="include\rendering\buffers\IndexBuffer.h" />
     <ClInclude Include="include\rendering\buffers\VertexBuffer.h" />
     <ClInclude Include="include\rendering\device\Rasterizer.h" />
     <ClInclude Include="include\rendering\device\RenderTarget.h" />
+    <ClInclude Include="include\rendering\graphics\lights\DirectionalLight.h" />
+    <ClInclude Include="include\rendering\graphics\lights\PointLight.h" />
     <ClInclude Include="include\rendering\loading\Node.h" />
     <ClInclude Include="include\rendering\Renderer.h" />
     <ClInclude Include="include\rendering\loading\SceneLoader.h" />

@@ -20,12 +20,12 @@ namespace
 {
 	XMMATRIX AiToXMMatrix(const aiMatrix4x4& aiMatrix)
 	{
-		return XMMATRIX(
+		return {
 			aiMatrix.a1, aiMatrix.b1, aiMatrix.c1, aiMatrix.d1,
 			aiMatrix.a2, aiMatrix.b2, aiMatrix.c2, aiMatrix.d2,
 			aiMatrix.a3, aiMatrix.b3, aiMatrix.c3, aiMatrix.d3,
 			aiMatrix.a4, aiMatrix.b4, aiMatrix.c4, aiMatrix.d4
-		);
+		};
 	}
 }
 

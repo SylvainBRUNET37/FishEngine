@@ -3,26 +3,26 @@
 
 using namespace DirectX;
 
-void Renderer::Render(const Mesh& mesh, ID3D11DeviceContext* context, const Transform& transform,
-                      const SceneData& scene)
+void Renderer::Render(const Mesh& mesh,
+                      ID3D11DeviceContext* context,
+                      const Transform& transform)
 {
 	auto& material = materials[mesh.materialIndex];
 
 	// Update material constant buffer
-	const auto cbMaterialParams = BuildMaterialConstantBufferParams(material);
+	const auto cbMaterialParams = BuildConstantMaterialBuffer(material);
 	material.constantBuffer.Update(context, cbMaterialParams);
 	material.constantBuffer.Bind(context);
 	material.shaderProgram.Bind(context);
 
 	// Update object constant buffer
-	const auto cbObjectParams = BuildObjectConstantBufferParams(transform);
-	objectConstantBuffer.Update(context, cbObjectParams);
-	objectConstantBuffer.Bind(context);
+	const auto cbObjectParams = BuildConstantObjectBuffer(transform);
+	constantObjectBuffer.Update(context, cbObjectParams);
+	constantObjectBuffer.Bind(context);
 
 	// Update frame constant buffer
-	const auto cbFrameParams = BuildFrameConstantBufferParams(scene);
-	frameConstantBuffer.Update(context, cbFrameParams);
-	frameConstantBuffer.Bind(context);
+	constantFrameBuffer.Update(context, frameBuffer);
+	constantFrameBuffer.Bind(context);
 
 	// Bind material's texture of the mesh
 	context->PSSetShaderResources(0, 1, &material.texture);
@@ -44,32 +44,18 @@ void Renderer::Draw(const Mesh& mesh, ID3D11DeviceContext* context)
 	context->DrawIndexed(static_cast<UINT>(mesh.indices.size()), 0, 0);
 }
 
-Renderer::FrameBufferData Renderer::BuildFrameConstantBufferParams(const SceneData& sceneData)
+ObjectBuffer Renderer::BuildConstantObjectBuffer(const Transform& transform)
 {
-	FrameBufferData params;
-
-	params.matViewProj = XMMatrixTranspose(sceneData.matViewProj);
-	params.vLumiere = sceneData.lightPosition;
-	params.vCamera = sceneData.cameraPosition;
-	params.vDEcl = sceneData.vDEcl;
-	params.vAEcl = sceneData.vAEcl;
-	params.vSEcl = sceneData.vSEcl;
-
-	return params;
-}
-
-Renderer::ObjectConstants Renderer::BuildObjectConstantBufferParams(const Transform& transform)
-{
-	ObjectConstants params;
+	ObjectBuffer params;
 
 	params.matWorld = XMMatrixTranspose(transform.world);
 
 	return params;
 }
 
-Material::MaterialBufferData Renderer::BuildMaterialConstantBufferParams(const Material& material)
+MaterialBuffer Renderer::BuildConstantMaterialBuffer(const Material& material)
 {
-	Material::MaterialBufferData params;
+	MaterialBuffer params;
 
 	params.vAMat = material.ambient;
 	params.vDMat = material.diffuse;

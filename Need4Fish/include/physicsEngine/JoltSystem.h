@@ -42,14 +42,14 @@ public:
 
 	static JPH::PhysicsSystem& GetPhysicSystem()
 	{
-		assert(physicsSystem != nullptr);
+		assert(physicsSystem != nullptr && "PhysicsSystem cannot be null");
 
 		return *physicsSystem;
 	}
 
 	static JPH::BodyInterface& GetBodyInterface()
 	{
-		assert(physicsSystem != nullptr);
+		assert(physicsSystem != nullptr && "PhysicsSystem cannot be null");
 
 		return physicsSystem->GetBodyInterface();
 	}

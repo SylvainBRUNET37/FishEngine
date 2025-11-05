@@ -1,7 +1,7 @@
 #ifndef CONSTANT_BUFFER
 #define CONSTANT_BUFFER
 
-#include "Buffer.h"
+#include "rendering/buffers/Buffer.h"
 #include "rendering/utils/Util.h"
 
 template <typename Params>

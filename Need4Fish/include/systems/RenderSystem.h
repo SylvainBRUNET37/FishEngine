@@ -1,13 +1,10 @@
 #ifndef RENDER_SYSTEM_H
 #define RENDER_SYSTEM_H
 
-#include <memory>
-
 #include "System.h"
 #include "rendering/Renderer.h"
 #include "rendering/core/Transform.h"
 #include "rendering/device/RenderContext.h"
-#include "components/camera/Camera.h"
 #include "rendering/graphics/Material.h"
 #include "rendering/graphics/Mesh.h"
 
@@ -23,7 +20,7 @@ private:
 	static constexpr int objectCbRegisterNumber = 1;
 
 	Renderer renderer;
-	SceneData sceneData;
+	FrameBuffer frameBuffer;
 	RenderContext* renderContext;
 
 	void Render(const Mesh& mesh, const Transform& transform);
@@ -31,7 +28,7 @@ private:
 
 	void RenderScene() const;
 
-	static SceneData InitSceneData();
+	static FrameBuffer InitFrameBuffer();
 };
 
 #endif
