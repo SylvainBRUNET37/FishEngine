@@ -2,6 +2,7 @@
 #include "systems/PhysicsSimulationSystem.h"
 
 #include "PhysicsEngine/JoltSystem.h"
+#include <GameState.h>
 
 using namespace DirectX;
 
@@ -38,6 +39,15 @@ void PhysicsSimulationSystem::UpdateControllables(EntityManager& entityManager)
 		JPH::Vec3 currentSpeed = JoltSystem::GetBodyInterface().GetLinearVelocity(rigidBody.body->GetID());
 		JPH::Vec3 newSpeed = currentSpeed;
 		bool speedChanged = false;
+
+		// Toggle pause avec ESC
+		static bool escWasPressed = false;
+		bool escIsPressed = GetAsyncKeyState(VK_ESCAPE) & 0x8000;
+		if (escIsPressed && !escWasPressed)
+		{
+			ChangePauseStatus();			
+		}
+		escWasPressed = escIsPressed;
 
 		if (GetAsyncKeyState('W') & 0x8000)
 		{

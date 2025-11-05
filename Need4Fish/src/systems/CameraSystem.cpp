@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "systems/CameraSystem.h"
+#include "GameState.h"
 
 using namespace DirectX;
 
@@ -77,47 +78,16 @@ void CameraSystem::HandleRotation(Camera& cameraData)
 	}
 
 	cameraData.cursorCoordinates = currentCursorCoordinates;*/
-	// Touche ESC pour libérer la souris
-	if (GetAsyncKeyState(VK_ESCAPE) & 0x8000)
+	// Si en pause, ne pas traiter la rotation
+	if (GameState::isPaused)
 	{
-		if (cameraData.isMouseCaptured)
-		{
-			ShowCursor(TRUE);
-			cameraData.isMouseCaptured = false;
-		}
 		return;
 	}
-
-	// Clic pour recapturer la souris
-	if (!cameraData.isMouseCaptured && (GetAsyncKeyState(VK_LBUTTON) & 0x8000))
-	{
-		cameraData.isMouseCaptured = false;
-	}
-
-	// Capturer la souris
+	// Sortie de pause
 	if (!cameraData.isMouseCaptured)
 	{
-		// Obtenir le centre de l'écran
-		HWND hwnd = GetActiveWindow();
-		if (hwnd)
-		{
-			RECT rect;
-			GetClientRect(hwnd, &rect);
-			cameraData.screenCenter.x = (rect.right - rect.left) / 2;
-			cameraData.screenCenter.y = (rect.bottom - rect.top) / 2;
-
-			// Convertir en repère écran
-			ClientToScreen(hwnd, &cameraData.screenCenter);
-
-			// Positionner la souris au centre
-			SetCursorPos(cameraData.screenCenter.x, cameraData.screenCenter.y);
-			cameraData.cursorCoordinates = cameraData.screenCenter;
-
-			// Cacher le curseur -> peut-être à changer pour menu pause
-			ShowCursor(FALSE);
-
-			cameraData.isMouseCaptured = true;
-		}
+		SetMouseCursor();
+		return;
 	}
 
 	POINT currentCursorCoordinates;
@@ -152,10 +122,22 @@ void CameraSystem::HandleRotation(Camera& cameraData)
 		}
 	}
 
-	// Recentrer pour rotation infinie
-	SetCursorPos(cameraData.screenCenter.x, cameraData.screenCenter.y);
+	//Recentrer seulement si la souris s'éloigne trop du centre
+	constexpr float recenterThreshold = 100.0f;
+	const float distanceFromCenter = sqrtf(
+		powf(currentCursorCoordinates.x - cameraData.screenCenter.x, 2.0f) +
+		powf(currentCursorCoordinates.y - cameraData.screenCenter.y, 2.0f)
+	);
 
-	cameraData.cursorCoordinates = currentCursorCoordinates;
+	if (distanceFromCenter > recenterThreshold)
+	{
+		SetCursorPos(cameraData.screenCenter.x, cameraData.screenCenter.y);
+		cameraData.cursorCoordinates = cameraData.screenCenter;
+	}
+	else
+	{
+		cameraData.cursorCoordinates = currentCursorCoordinates;
+	}
 }
 
 void CameraSystem::Rotate(Camera& cameraData, const float yawDelta, const float pitchDelta)
