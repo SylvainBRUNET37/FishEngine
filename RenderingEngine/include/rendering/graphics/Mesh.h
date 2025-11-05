@@ -1,6 +1,7 @@
 #ifndef MESH_H
 #define MESH_H
 
+#include <DirectXCollision.h>
 #include <vector>
 
 #include "Vertex.h"

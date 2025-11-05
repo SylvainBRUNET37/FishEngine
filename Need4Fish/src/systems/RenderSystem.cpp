@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #include "systems/RenderSystem.h"
+#include "rendering/culling/FrustumCuller.h"
 
 #include "GameEngine.h"
 
@@ -25,7 +26,11 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 	renderer.UpdateFrameBuffer(frameBuffer);
 
 	for (const auto& [entity, transform, mesh] : entityManager.View<Transform, Mesh>())
+	{
+		// check if the mesh should be rendered or not
+		if (FurstumCuller::IsMeshCulled(mesh, transform)) continue;
 		Render(mesh, transform);
+	}
 
 	Present();
 }
