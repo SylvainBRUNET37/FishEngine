@@ -60,6 +60,7 @@ void CameraSystem::UpdateCameraMatrices(Camera& camera, const EntityManager& ent
 
 void CameraSystem::HandleRotation(Camera& cameraData)
 {
+	/*//Version avec clic
 	POINT currentCursorCoordinates;
 	if (!GetCursorPos(&currentCursorCoordinates))
 		return;
@@ -73,11 +74,41 @@ void CameraSystem::HandleRotation(Camera& cameraData)
 		Rotate(cameraData, deltaX * mouseSensitivity, -deltaY * mouseSensitivity);
 	}
 
+	cameraData.cursorCoordinates = currentCursorCoordinates;*/
+	POINT currentCursorCoordinates;
+	if (!GetCursorPos(&currentCursorCoordinates))
+		return;
+
+	const auto deltaX = static_cast<float>(currentCursorCoordinates.x - cameraData.cursorCoordinates.x);
+	const auto deltaY = static_cast<float>(currentCursorCoordinates.y - cameraData.cursorCoordinates.y);
+
+	constexpr float mouseSensitivity = 0.002f;
+
+	Rotate(cameraData, deltaX * mouseSensitivity, -deltaY * mouseSensitivity);
+
 	cameraData.cursorCoordinates = currentCursorCoordinates;
 }
 
 void CameraSystem::Rotate(Camera& cameraData, const float yawDelta, const float pitchDelta)
 {
+	/*//Version avec clic
 	cameraData.yawOffset += yawDelta;
 	cameraData.pitchAngle = std::clamp(cameraData.pitchAngle + pitchDelta, -XM_PIDIV2 + 0.1f, 0.0f);
+	*/
+	// Limiter la caméra
+	constexpr float maxYawOffset = XM_PIDIV4;      // ±45 degrés à gauche et à droite
+	constexpr float minPitch = -XM_PIDIV4;         // -45 degrés vers le bas
+	constexpr float maxPitch = XM_PIDIV4 * 0.5f;   // +22.5 degrés vers le haut... pourrait être 45 aussi
+
+	cameraData.yawOffset = std::clamp(
+		cameraData.yawOffset + yawDelta,
+		-maxYawOffset,
+		maxYawOffset
+	);
+
+	cameraData.pitchAngle = std::clamp(
+		cameraData.pitchAngle + pitchDelta,
+		minPitch,
+		maxPitch
+	);
 }
