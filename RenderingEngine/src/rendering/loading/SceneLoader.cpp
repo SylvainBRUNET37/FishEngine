@@ -81,7 +81,16 @@ void SceneLoader::ProcessNodeHierarchy(
 		XMStoreFloat3(&transform.scale, scale);
 		XMStoreFloat4(&transform.rotation, rotationQuat);
 		XMStoreFloat3(&transform.position, translation);
+
+		const XMMATRIX scaleMatrix = XMMatrixScalingFromVector(scale);
+		const XMMATRIX rotationMatrix = XMMatrixRotationQuaternion(rotationQuat);
+		const XMMATRIX translationMatrix = XMMatrixTranslationFromVector(translation);
+
+		// Construct world matrix
+		transform.world = scaleMatrix * rotationMatrix * translationMatrix;
 	}
+	else
+		transform.world = nodeMatrix;
 
 	node.parentIndex = parentIndex;
 	node.name = aiNode->mName.C_Str();
