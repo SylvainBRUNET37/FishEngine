@@ -2,13 +2,12 @@
 #define MODEL_LOADER_H
 
 #include <filesystem>
-#include <vector>
 #include <assimp/scene.h>
 #include <DirectXMath.h>
 
-#include "device/RenderContext.h"
-#include "texture/TextureManager.h"
-#include "loading/Node.h"
+#include "rendering/device/RenderContext.h"
+#include "rendering/texture/TextureManager.h"
+#include "Node.h"
 
 class SceneLoader
 {

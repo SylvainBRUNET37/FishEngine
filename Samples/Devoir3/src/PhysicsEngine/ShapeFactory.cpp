@@ -9,7 +9,7 @@
 #include <Jolt/Physics/Collision/Shape/SphereShape.h>
 
 #include "PhysicsEngine/layers/Layers.h"
-#include "PhysicsEngine/systems/JoltSystem.h"
+#include "PhysicsEngine/JoltSystem.h"
 
 using namespace JPH;
 using namespace DirectX;

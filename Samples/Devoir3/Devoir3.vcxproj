@@ -169,7 +169,7 @@
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\GameEngine.cpp" />
     <ClCompile Include="src\physicsEngine\ShapeFactory.cpp" />
-    <ClCompile Include="src\physicsEngine\systems\JoltSystem.cpp" />
+    <ClCompile Include="src\physicsEngine\JoltSystem.cpp" />
     <ClCompile Include="src\ResourceManager.cpp" />
     <ClCompile Include="src\systems\CameraSystem.cpp" />
     <ClCompile Include="src\systems\PhysicsSimulationSystem.cpp" />
@@ -197,7 +197,7 @@
     <ClInclude Include="include\physicsEngine\listeners\BodyActivationListenerImpl.h" />
     <ClInclude Include="include\physicsEngine\listeners\ContactListenerImpl.h" />
     <ClInclude Include="include\physicsEngine\ShapeFactory.h" />
-    <ClInclude Include="include\physicsEngine\systems\JoltSystem.h" />
+    <ClInclude Include="include\physicsEngine\JoltSystem.h" />
     <ClInclude Include="include\physicsEngine\utils\JoltUtils.h" />
     <ClInclude Include="include\entities\EntityManagerFactory.h" />
     <ClInclude Include="include\ResourceManager.h" />

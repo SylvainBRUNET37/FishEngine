@@ -9,6 +9,9 @@ public:
 	PhysicsSimulationSystem() = default;
 
 private:
+	static constexpr double TARGET_UPDATES_PER_SECOND = 60.0;
+	static constexpr double PHYSICS_UPDATE_RATE = 1.0 / TARGET_UPDATES_PER_SECOND;
+
 	void Update(double, EntityManager& entityManager) override;
 
 	static void UpdateControllables(EntityManager& entityManager);

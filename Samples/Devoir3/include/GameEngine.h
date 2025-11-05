@@ -25,7 +25,6 @@ public:
 private:
 	static constexpr double TARGET_FPS = 60.0;
 	static constexpr double FRAME_TIME = 1000.0 / TARGET_FPS;
-	static constexpr double PHYSICS_UPDATE_RATE = 1.0f / TARGET_FPS;
 
 	std::vector<std::unique_ptr<System>> systems;
 

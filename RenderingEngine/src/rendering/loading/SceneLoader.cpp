@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "rendering/SceneLoader.h"
+#include "rendering/loading/SceneLoader.h"
 
 #include <filesystem>
 #include <assimp/Importer.hpp>

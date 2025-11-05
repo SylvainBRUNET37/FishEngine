@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "components/physics/RigidBody.h"
 
-#include "PhysicsEngine/systems/JoltSystem.h"
+#include "PhysicsEngine/JoltSystem.h"
 
 RigidBody& RigidBody::operator=(RigidBody&& other) noexcept
 {

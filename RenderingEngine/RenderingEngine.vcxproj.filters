@@ -36,7 +36,7 @@
     <ClInclude Include="resources\resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\rendering\SceneLoader.h">
+    <ClInclude Include="include\rendering\loading\SceneLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\rendering\graphics\Mesh.h">
@@ -143,7 +143,7 @@
     <ClCompile Include="src\rendering\application\WindowsApplication.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\rendering\SceneLoader.cpp">
+    <ClCompile Include="src\rendering\loading\SceneLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\rendering\utils\DDSTextureLoader.cpp">

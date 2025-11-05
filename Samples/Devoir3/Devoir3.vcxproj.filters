@@ -2,7 +2,7 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="src\Main.cpp" />
-    <ClCompile Include="src\PhysicsEngine\systems\JoltSystem.cpp" />
+    <ClCompile Include="src\physicsEngine\JoltSystem.cpp" />
     <ClCompile Include="src\ResourceManager.cpp" />
     <ClCompile Include="src\GameEngine.cpp" />
     <ClCompile Include="pch.cpp" />
@@ -21,7 +21,7 @@
     <ClInclude Include="include\PhysicsEngine\layers\ObjectVsBroadPhaseLayerFilterImpl.h" />
     <ClInclude Include="include\PhysicsEngine\listeners\BodyActivationListenerImpl.h" />
     <ClInclude Include="include\PhysicsEngine\listeners\ContactListenerImpl.h" />
-    <ClInclude Include="include\PhysicsEngine\systems\JoltSystem.h" />
+    <ClInclude Include="include\physicsEngine\JoltSystem.h" />
     <ClInclude Include="include\PhysicsEngine\utils\JoltUtils.h" />
     <ClInclude Include="include\entities\EntityManagerFactory.h" />
     <ClInclude Include="include\ResourceManager.h" />

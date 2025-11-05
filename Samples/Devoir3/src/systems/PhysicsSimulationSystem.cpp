@@ -1,11 +1,7 @@
 #include "pch.h"
 #include "systems/PhysicsSimulationSystem.h"
 
-#include "PhysicsEngine/systems/JoltSystem.h"
-
-static constexpr double TARGET_FPS = 60.0;
-static constexpr double FRAME_TIME = 1000.0 / TARGET_FPS;
-static constexpr double PHYSICS_UPDATE_RATE = 1.0f / TARGET_FPS;
+#include "PhysicsEngine/JoltSystem.h"
 
 using namespace DirectX;
 

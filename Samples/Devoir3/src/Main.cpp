@@ -9,7 +9,7 @@
 #include "PhysicsEngine/layers/ObjectVsBroadPhaseLayerFilterImpl.h"
 #include "PhysicsEngine/listeners/BodyActivationListenerImpl.h"
 #include "PhysicsEngine/listeners/ContactListenerImpl.h"
-#include "PhysicsEngine/systems/JoltSystem.h"
+#include "PhysicsEngine/JoltSystem.h"
 #include "rendering/application/WindowsApplication.h"
 #include "rendering/device/DeviceBuilder.h"
 #include "rendering/device/RenderContext.h"
