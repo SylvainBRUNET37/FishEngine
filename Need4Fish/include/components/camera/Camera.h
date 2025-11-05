@@ -29,6 +29,9 @@ struct Camera
 
 	// Mouse
 	POINT cursorCoordinates;
+
+	// Direction cible pour le poisson
+	float targetYaw = 0.0f;  
 };
 
 #endif

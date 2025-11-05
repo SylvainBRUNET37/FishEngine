@@ -14,12 +14,26 @@ void PhysicsSimulationSystem::Update(double, EntityManager& entityManager)
 
 void PhysicsSimulationSystem::UpdateControllables(EntityManager& entityManager)
 {
+	//Récupérer la caméra pour le targetYaw
+	Camera* activeCamera = nullptr;
+	for (const auto& [entity, camera] : entityManager.View<Camera>())
+	{
+		activeCamera = &camera;
+		break;
+	}
+	
 	for (const auto& [entity, rigidBody, controllable] : entityManager.View<RigidBody, Controllable>())
 	{
 		const auto& transform = rigidBody.body->GetWorldTransform();
 		JPH::Vec3 right = transform.GetColumn3(0).Normalized();
 		JPH::Vec3 up = transform.GetColumn3(1).Normalized();
 		JPH::Vec3 forward = transform.GetColumn3(2).Normalized();
+
+		// Rotation progressive vers la direction de la caméra
+		if (activeCamera)
+		{
+			RotateTowardsCameraDirection(rigidBody, *activeCamera, forward, up);
+		}
 
 		JPH::Vec3 currentSpeed = JoltSystem::GetBodyInterface().GetLinearVelocity(rigidBody.body->GetID());
 		JPH::Vec3 newSpeed = currentSpeed;
@@ -52,7 +66,7 @@ void PhysicsSimulationSystem::UpdateControllables(EntityManager& entityManager)
 			JoltSystem::GetBodyInterface().SetLinearVelocity(rigidBody.body->GetID(), newSpeed);
 		}
 
-		// Rotation
+		// Rotation manuelle -> on pourrait retirer
 		bool rotatesPositive = GetAsyncKeyState('Q') & 0x8000;
 		if (rotatesPositive || GetAsyncKeyState('E') & 0x8000)
 		{
@@ -80,6 +94,36 @@ void PhysicsSimulationSystem::UpdatePhysics()
 	JoltSystem::GetPostStepCallbacks().clear();
 }
 
+void PhysicsSimulationSystem::RotateTowardsCameraDirection(RigidBody& rigidBody, const Camera& camera,
+	const JPH::Vec3& forward, const JPH::Vec3& up)
+{
+	// Yaw actuel du poisson
+	const float currentYaw = atan2f(forward.GetX(), forward.GetZ());
+	const float targetYaw = camera.targetYaw;
+
+	//Différence d'angle
+	float angleDiff = targetYaw - currentYaw;
+
+	// Normaliser
+	while (angleDiff > JPH::JPH_PI) angleDiff -= 2.0f * JPH::JPH_PI;
+	while (angleDiff < -JPH::JPH_PI) angleDiff += 2.0f * JPH::JPH_PI;
+
+	// Rotation progressive
+	constexpr float rotationSpeed = 0.02f;
+	constexpr float rotationThreshold = 0.05f; //"Deadzone"
+
+	const float rotationStep = std::clamp(angleDiff, -rotationSpeed, rotationSpeed);
+
+	if (std::abs(angleDiff) > rotationThreshold)
+	{
+		const JPH::Quat delta = JPH::Quat::sRotation(up, rotationStep);
+		JoltSystem::GetBodyInterface().SetRotation(
+			rigidBody.body->GetID(),
+			(rigidBody.body->GetRotation() * delta).Normalized(),
+			JPH::EActivation::Activate);
+	}
+}
+
 void PhysicsSimulationSystem::UpdateTransforms(EntityManager& entityManager)
 {
 	for (const auto& [entity, transform, rigidBody] : entityManager.View<Transform, RigidBody>())
@@ -100,4 +144,6 @@ void PhysicsSimulationSystem::UpdateTransforms(EntityManager& entityManager)
 
 		transform.world = scaleMatrix * rotationMatrix * translationMatrix;
 	}
+
+
 }

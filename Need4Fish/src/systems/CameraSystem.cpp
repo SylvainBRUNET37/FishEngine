@@ -18,14 +18,16 @@ void CameraSystem::ComputeCameraPosition(Camera& camera, const Transform& transf
 	const XMVECTOR targetRotQuat = XMLoadFloat4(&transform.rotation);
 	const XMMATRIX targetRotMat = XMMatrixRotationQuaternion(targetRotQuat);
 
-	// Compute entity's yaw
+	// Yaw actuel
 	const XMVECTOR forward = targetRotMat.r[2];
 	const float targetYaw = atan2f(XMVectorGetX(forward), XMVectorGetZ(forward));
 
-	// Adjust the height of the camera
+	// Yaw visé
+	const float totalYaw = targetYaw + camera.yawOffset;
+	camera.targetYaw = totalYaw;  // Pour la physique	
+
 	camera.focus = XMVectorAdd(targetPos, XMVectorSet(0, camera.heightOffset, 0, 0));
 
-	const float totalYaw = targetYaw + camera.yawOffset;
 	const float horizontalDist = camera.distance * cosf(camera.pitchAngle);
 	const float verticalDist = camera.distance * sinf(camera.pitchAngle);
 
@@ -83,8 +85,29 @@ void CameraSystem::HandleRotation(Camera& cameraData)
 	const auto deltaY = static_cast<float>(currentCursorCoordinates.y - cameraData.cursorCoordinates.y);
 
 	constexpr float mouseSensitivity = 0.002f;
+	constexpr float deadzone = 2.0f;  // Pixels de tolérance
 
-	Rotate(cameraData, deltaX * mouseSensitivity, -deltaY * mouseSensitivity);
+	// Appliquer la rotation seulement si le mouvement dépasse la deadzone
+	if (std::abs(deltaX) > deadzone || std::abs(deltaY) > deadzone)
+	{
+		Rotate(cameraData, deltaX * mouseSensitivity, -deltaY * mouseSensitivity);
+	}
+	else
+	{
+		// Ramener progressivement vers zéro quand pas de mouvement
+		constexpr float returnSpeed = 0.02f;
+		if (std::abs(cameraData.yawOffset) > 0.001f)
+		{
+			const float returnStep = std::copysign(returnSpeed, -cameraData.yawOffset);
+			cameraData.yawOffset += returnStep;
+
+			// Snap à zéro si très proche
+			if (std::abs(cameraData.yawOffset) < returnSpeed)
+			{
+				cameraData.yawOffset = 0.0f;
+			}
+		}
+	}
 
 	cameraData.cursorCoordinates = currentCursorCoordinates;
 }
