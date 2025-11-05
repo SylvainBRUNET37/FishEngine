@@ -159,6 +159,4 @@ void PhysicsSimulationSystem::UpdateTransforms(EntityManager& entityManager)
 
 		transform.world = scaleMatrix * rotationMatrix * translationMatrix;
 	}
-
-
 }

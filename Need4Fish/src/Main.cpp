@@ -132,7 +132,7 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 
 	GameEngine::currentCameraEntity = cameraEntity;
 
-	SetMouseCursor();
+	CameraSystem::SetMouseCursor();
 	gameEngine.Run();
 
 	UnregisterTypes();

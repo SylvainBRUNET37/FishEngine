@@ -35,7 +35,7 @@ struct Camera
 
 	// Pour limiter/capturer la souris
 	inline static POINT screenCenter;
-	inline static bool isMouseCaptured = false;
+	inline static bool isMouseCaptured = false;	
 };
 #endif
 

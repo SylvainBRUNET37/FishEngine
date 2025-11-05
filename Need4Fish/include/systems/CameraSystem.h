@@ -14,6 +14,9 @@ class CameraSystem : public System
 
 	static void HandleRotation(Camera& cameraData);
 	static void Rotate(Camera& cameraData, float yawDelta, float pitchDelta);
+
+public:
+	static void SetMouseCursor();
 };
 
 #endif

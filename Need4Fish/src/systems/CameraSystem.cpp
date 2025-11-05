@@ -163,3 +163,28 @@ void CameraSystem::Rotate(Camera& cameraData, const float yawDelta, const float 
 		maxPitch
 	);
 }
+
+void CameraSystem::SetMouseCursor()
+{
+	ShowCursor(FALSE);
+	Camera::isMouseCaptured = true;
+
+	HWND hwnd = GetActiveWindow();
+	if (!hwnd)
+		return;
+
+	RECT rect;
+	GetClientRect(hwnd, &rect);
+
+	Camera::screenCenter.x = (rect.right - rect.left) / 2;
+	Camera::screenCenter.y = (rect.bottom - rect.top) / 2;
+
+	// Convertir en repère écran
+	ClientToScreen(hwnd, &Camera::screenCenter);
+
+	// Centrer le curseur
+	SetCursorPos(Camera::screenCenter.x, Camera::screenCenter.y);
+
+	// Initialiser les coordonnées de la caméra
+	Camera::cursorCoordinates = Camera::screenCenter;
+}
