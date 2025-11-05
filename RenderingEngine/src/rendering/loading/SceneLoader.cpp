@@ -20,12 +20,12 @@ namespace
 {
 	XMMATRIX AiToXMMatrix(const aiMatrix4x4& aiMatrix)
 	{
-		return {
+		return XMMATRIX(
 			aiMatrix.a1, aiMatrix.b1, aiMatrix.c1, aiMatrix.d1,
 			aiMatrix.a2, aiMatrix.b2, aiMatrix.c2, aiMatrix.d2,
 			aiMatrix.a3, aiMatrix.b3, aiMatrix.c3, aiMatrix.d3,
 			aiMatrix.a4, aiMatrix.b4, aiMatrix.c4, aiMatrix.d4
-		};
+		);
 	}
 }
 
@@ -178,6 +178,10 @@ Material SceneLoader::ProcessMaterial(
 	float shininess = 0.0f;
 	if (AI_SUCCESS == aiGetMaterialFloat(material, AI_MATKEY_SHININESS, &shininess))
 		mat.shininess = shininess;
+
+	// après la lecture depuis Assimp :
+	mat.specular = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	mat.shininess = 32.0f;
 
 	aiString texturePath;
 	if (material->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == AI_SUCCESS)

@@ -83,7 +83,10 @@ VSOutput MiniPhongVS(VSInput vin)
 
     vout.position = mul(worldPos, matViewProj);
     vout.worldPosition = worldPos.xyz;
-    vout.normal = normalize(mul(float4(vin.NORMAL, 0.0f), matWorld).xyz);
+
+    float3 normalWorld = mul((float3x3) matWorld, vin.NORMAL);
+    vout.normal = normalize(normalWorld);
+
     vout.textCoord = vin.TEXCOORD;
 
     return vout;
