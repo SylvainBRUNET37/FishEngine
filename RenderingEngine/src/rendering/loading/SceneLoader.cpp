@@ -165,6 +165,8 @@ Material SceneLoader::ProcessMaterial(
 	static constexpr int materialCbRegisterNumber = 2;
 	Material mat{ device, shaderProgram, materialCbRegisterNumber };
 
+	mat.name = material->GetName().C_Str();
+
 	aiColor4D color;
 	if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_AMBIENT, &color))
 		mat.ambient = XMFLOAT4(color.r, color.g, color.b, color.a);
