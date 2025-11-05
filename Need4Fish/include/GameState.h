@@ -34,10 +34,8 @@ inline void SetMouseCursor()
 
 inline void ChangePauseStatus() {
     if (GameState::isPaused) //Sortie de pause : recapture
-    {
-        // Récupérer le centre de la dernière position connue afin d'éviter une "téléportation de la caméra
+    {        
         SetMouseCursor();
-
         GameState::isPaused = false;
     }
     else //Mise en pause : libération

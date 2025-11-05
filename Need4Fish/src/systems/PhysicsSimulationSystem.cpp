@@ -15,6 +15,15 @@ void PhysicsSimulationSystem::Update(double, EntityManager& entityManager)
 
 void PhysicsSimulationSystem::UpdateControllables(EntityManager& entityManager)
 {
+	// Toggle pause avec ESC
+	static bool escWasPressed = false;
+	bool escIsPressed = GetAsyncKeyState(VK_ESCAPE) & 0x8000;
+	if (escIsPressed && !escWasPressed)
+	{
+		ChangePauseStatus();
+	}
+	escWasPressed = escIsPressed;
+
 	//Récupérer la caméra pour le targetYaw
 	Camera* activeCamera = nullptr;
 	for (const auto& [entity, camera] : entityManager.View<Camera>())
@@ -22,71 +31,67 @@ void PhysicsSimulationSystem::UpdateControllables(EntityManager& entityManager)
 		activeCamera = &camera;
 		break;
 	}
-	
-	for (const auto& [entity, rigidBody, controllable] : entityManager.View<RigidBody, Controllable>())
-	{
-		const auto& transform = rigidBody.body->GetWorldTransform();
-		JPH::Vec3 right = transform.GetColumn3(0).Normalized();
-		JPH::Vec3 up = transform.GetColumn3(1).Normalized();
-		JPH::Vec3 forward = transform.GetColumn3(2).Normalized();
 
-		// Rotation progressive vers la direction de la caméra
-		if (activeCamera)
+	if (!GameState::isPaused) {
+		for (const auto& [entity, rigidBody, controllable] : entityManager.View<RigidBody, Controllable>())
 		{
-			RotateTowardsCameraDirection(rigidBody, *activeCamera, forward, up);
-		}
+			const auto& transform = rigidBody.body->GetWorldTransform();
+			JPH::Vec3 right = transform.GetColumn3(0).Normalized();
+			JPH::Vec3 up = transform.GetColumn3(1).Normalized();
+			JPH::Vec3 forward = transform.GetColumn3(2).Normalized();
 
-		JPH::Vec3 currentSpeed = JoltSystem::GetBodyInterface().GetLinearVelocity(rigidBody.body->GetID());
-		JPH::Vec3 newSpeed = currentSpeed;
-		bool speedChanged = false;
+			// Rotation progressive vers la direction de la caméra
+			if (activeCamera)
+			{
+				RotateTowardsCameraDirection(rigidBody, *activeCamera, forward, up);
+			}
 
-		// Toggle pause avec ESC
-		static bool escWasPressed = false;
-		bool escIsPressed = GetAsyncKeyState(VK_ESCAPE) & 0x8000;
-		if (escIsPressed && !escWasPressed)
-		{
-			ChangePauseStatus();			
-		}
-		escWasPressed = escIsPressed;
+			JPH::Vec3 currentSpeed = JoltSystem::GetBodyInterface().GetLinearVelocity(rigidBody.body->GetID());
+			JPH::Vec3 newSpeed = currentSpeed;
+			bool speedChanged = false;
 
-		if (GetAsyncKeyState('W') & 0x8000)
-		{
-			newSpeed = newSpeed + 1.0f * forward;
-			speedChanged = true;
-		}
-		if (GetAsyncKeyState('S') & 0x8000)
-		{
-			newSpeed = newSpeed - 1.0f * forward;
-			speedChanged = true;
-		}
-		if (GetAsyncKeyState('D') & 0x8000)
-		{
-			newSpeed = newSpeed - 1.0f * right;
-			speedChanged = true;
-		}
-		if (GetAsyncKeyState('A') & 0x8000)
-		{
-			newSpeed = newSpeed + 1.0f * right;
-			speedChanged = true;
-		}
 
-		if (speedChanged)
-		{
-			if (newSpeed.Length() > controllable.maxSpeed) newSpeed = newSpeed.Normalized();
-			JoltSystem::GetBodyInterface().SetLinearVelocity(rigidBody.body->GetID(), newSpeed);
-		}
 
-		// Rotation manuelle -> on pourrait retirer
-		bool rotatesPositive = GetAsyncKeyState('Q') & 0x8000;
-		if (rotatesPositive || GetAsyncKeyState('E') & 0x8000)
-		{
-			JPH::Quat delta = JPH::Quat::sRotation(up, .05f * (1 - 2 * !rotatesPositive)); // theta = 10
-			JoltSystem::GetBodyInterface().SetRotation(
-				rigidBody.body->GetID(),
-				(rigidBody.body->GetRotation() * delta).Normalized(),
-				JPH::EActivation::Activate);
+			if (GetAsyncKeyState('W') & 0x8000)
+			{
+				newSpeed = newSpeed + 1.0f * forward;
+				speedChanged = true;
+			}
+			if (GetAsyncKeyState('S') & 0x8000)
+			{
+				newSpeed = newSpeed - 1.0f * forward;
+				speedChanged = true;
+			}
+			if (GetAsyncKeyState('D') & 0x8000)
+			{
+				newSpeed = newSpeed - 1.0f * right;
+				speedChanged = true;
+			}
+			if (GetAsyncKeyState('A') & 0x8000)
+			{
+				newSpeed = newSpeed + 1.0f * right;
+				speedChanged = true;
+			}
+
+			if (speedChanged)
+			{
+				if (newSpeed.Length() > controllable.maxSpeed) newSpeed = newSpeed.Normalized();
+				JoltSystem::GetBodyInterface().SetLinearVelocity(rigidBody.body->GetID(), newSpeed);
+			}
+
+			// Rotation manuelle -> on pourrait retirer
+			bool rotatesPositive = GetAsyncKeyState('Q') & 0x8000;
+			if (rotatesPositive || GetAsyncKeyState('E') & 0x8000)
+			{
+				JPH::Quat delta = JPH::Quat::sRotation(up, .05f * (1 - 2 * !rotatesPositive)); // theta = 10
+				JoltSystem::GetBodyInterface().SetRotation(
+					rigidBody.body->GetID(),
+					(rigidBody.body->GetRotation() * delta).Normalized(),
+					JPH::EActivation::Activate);
+			}
 		}
 	}
+	
 }
 
 void PhysicsSimulationSystem::UpdatePhysics()
