@@ -14,10 +14,7 @@ public:
 	{
 		mObjectToBroadPhase[Layers::NON_MOVING] = BroadPhaseLayers::NON_MOVING;
 		mObjectToBroadPhase[Layers::SENSOR] = BroadPhaseLayers::NON_MOVING;
-
-		mObjectToBroadPhase[Layers::VEHICLE] = BroadPhaseLayers::MOVING;
-		mObjectToBroadPhase[Layers::CARGO] = BroadPhaseLayers::MOVING;
-		mObjectToBroadPhase[Layers::BALL] = BroadPhaseLayers::MOVING;
+		mObjectToBroadPhase[Layers::MOVING] = BroadPhaseLayers::MOVING;
 	}
 
 	[[nodiscard]] JPH::uint GetNumBroadPhaseLayers() const override

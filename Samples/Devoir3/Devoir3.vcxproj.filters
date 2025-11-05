@@ -5,12 +5,11 @@
     <ClCompile Include="src\PhysicsEngine\systems\JoltSystem.cpp" />
     <ClCompile Include="src\ResourceManager.cpp" />
     <ClCompile Include="src\GameEngine.cpp" />
-    <ClCompile Include="src\PhysicsEngine\ShapeFactory.cpp" />
     <ClCompile Include="pch.cpp" />
-    <ClCompile Include="src\Globals.cpp" />
     <ClCompile Include="src\systems\CameraSystem.cpp" />
     <ClCompile Include="src\systems\PhysicsSimulationSystem.cpp" />
     <ClCompile Include="src\systems\RenderSystem.cpp" />
+    <ClCompile Include="src\PhysicsEngine\ShapeFactory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\CC.h" />
@@ -31,9 +30,7 @@
     <ClInclude Include="include\entities\EntityManager.h" />
     <ClInclude Include="include\components\Components.h" />
     <ClInclude Include="include\components\ComponentUtils.h" />
-    <ClInclude Include="include\PhysicsEngine\ShapeFactory.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="include\Globals.h" />
     <ClInclude Include="include\systems\CameraSystem.h" />
     <ClInclude Include="include\systems\System.h" />
     <ClInclude Include="include\systems\PhysicsSimulationSystem.h" />

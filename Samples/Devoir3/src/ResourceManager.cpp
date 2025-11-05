@@ -11,24 +11,6 @@ ResourceManager::ResourceManager(ID3D11Device* device) : device{device}
 	InitShaderBank();
 }
 
-Mesh ResourceManager::LoadSphere() const
-{
-	// TODO: Link shaders to Mesh (curently, every mesh use the same shaders)
-	const ShaderProgram shaderProgram
-	{
-		device,
-		shaderBank.Get<VertexShader>("shaders/MiniPhongVS.hlsl"),
-		shaderBank.Get<PixelShader>("shaders/MiniPhongPS.hlsl"),
-	};
-
-	const std::filesystem::path filePath = "assets\\sphere.glb";
-
-	SceneLoader modelLoader{ shaderProgram };
-	const auto sceneResource = modelLoader.LoadScene(filePath, device);
-
-	return sceneResource.meshes[0];
-}
-
 void ResourceManager::InitShaderBank()
 {
 	ShaderProgramDesc<VertexShader, PixelShader> desc;

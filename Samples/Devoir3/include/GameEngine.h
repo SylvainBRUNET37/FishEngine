@@ -1,8 +1,6 @@
 #ifndef GAME_ENGINE_H
 #define GAME_ENGINE_H
 
-#include <cstdlib>
-
 #include "ResourceManager.h"
 #include "entities/EntityManager.h"
 #include "systems/RenderSystem.h"
@@ -11,7 +9,7 @@
 class GameEngine
 {
 public:
-	// TODO: avoid this, globals are bad !
+	// TODO: try to avoid this, globals are bad !
 	inline static Entity currentCameraEntity = INVALID_ENTITY;
 
 	explicit GameEngine(EntityManager&& entityManager, ResourceManager&& resourceManager,
@@ -20,8 +18,6 @@ public:
 		  resourceManager{std::move(resourceManager)},
 		  entityManager{std::move(entityManager)}
 	{
-		std::srand(std::time(nullptr));
-		MoveSensorRandomly();
 	}
 
 	void Run();
@@ -31,24 +27,12 @@ private:
 	static constexpr double FRAME_TIME = 1000.0 / TARGET_FPS;
 	static constexpr double PHYSICS_UPDATE_RATE = 1.0f / TARGET_FPS;
 
-
 	std::vector<std::unique_ptr<System>> systems;
 
 	ResourceManager resourceManager;
 	EntityManager entityManager;
 
-	void CheckForWinConditions();
-
-	int currentWinCount = 0;
-
-	// BallShooterSystem
-	void ShootBallIfKeyPressed();
-	// LifeSpan system
-	void DestroyObjectAtEndOfLife(double elapsedTIme);
-
 	static void WaitBeforeNextFrame(DWORD frameStartTime);
-
-	void MoveSensorRandomly();
 };
 
 #endif

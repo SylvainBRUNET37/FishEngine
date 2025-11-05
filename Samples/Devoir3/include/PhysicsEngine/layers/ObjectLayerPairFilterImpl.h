@@ -10,16 +10,12 @@ public:
 	{
 		switch (inLayer1)
 		{
-		case Layers::VEHICLE:
+		case Layers::MOVING:
 			return inLayer2 == Layers::NON_MOVING;
 		case Layers::NON_MOVING:
-			return inLayer2 == Layers::VEHICLE || inLayer2 == Layers::BALL || Layers::CARGO;
+			return inLayer2 == Layers::MOVING;
 		case Layers::SENSOR:
-			return inLayer2 == Layers::CARGO;
-		case Layers::CARGO:
-			return inLayer2 == Layers::NON_MOVING || inLayer2 == Layers::BALL || inLayer2 == Layers::SENSOR;
-		case Layers::BALL:
-			return inLayer2 == Layers::CARGO || inLayer2 == Layers::NON_MOVING;
+			return false;
 		default:
 			JPH_ASSERT(false);
 			return false;

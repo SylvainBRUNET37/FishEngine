@@ -15,7 +15,7 @@ using namespace JPH;
 using namespace DirectX;
 using namespace JPH::literals;
 
-Body* ShapeFactory::CreateCubeInVehicleLayer(const Transform& transform)
+Body* ShapeFactory::CreateCube(const Transform& transform)
 {
     // Apply scale to the box
     auto halfExtents = Vec3(1.f, 1.f, 1.f);
@@ -32,7 +32,7 @@ Body* ShapeFactory::CreateCubeInVehicleLayer(const Transform& transform)
         position,
         rotation,
         EMotionType::Dynamic,
-        Layers::VEHICLE
+        Layers::MOVING
     );
 
     boxSettings.mLinearDamping = 1.f;
@@ -41,37 +41,6 @@ Body* ShapeFactory::CreateCubeInVehicleLayer(const Transform& transform)
     Body* body = bodyInterface.CreateBody(boxSettings);
     bodyInterface.AddBody(body->GetID(), EActivation::Activate);
 
-    body->SetFriction(0.6f);
-
-    return body;
-}
-
-Body* ShapeFactory::CreateCubeInCargoLayer(const Transform& transform)
-{
-    // Apply scale to the box
-    auto halfExtents = Vec3(1.f, 1.f, 1.f);
-    halfExtents *= Vec3(transform.scale.x, transform.scale.y, transform.scale.z);
-
-    const RefConst shape = new BoxShape(halfExtents);
-
-    // Convert mesh type of position and rotation to jolt's ones
-    const RVec3 position(transform.position.x, transform.position.y, transform.position.z);
-    const Quat rotation(transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w);
-
-    BodyCreationSettings boxSettings(
-        shape,
-        position,
-        rotation,
-        EMotionType::Dynamic,
-        Layers::CARGO
-    );
-
-    boxSettings.mLinearDamping = 1.f;
-
-    BodyInterface& bodyInterface = JoltSystem::GetBodyInterface();
-    Body* body = bodyInterface.CreateBody(boxSettings);
-    bodyInterface.AddBody(body->GetID(), EActivation::Activate);
-    bodyInterface.SetRestitution(body->GetID(), 0.5f); //what is restitution supposed to be anyway?
     body->SetFriction(0.6f);
 
     return body;
@@ -94,7 +63,7 @@ Body* ShapeFactory::CreateSphere(const Transform& transform, const XMFLOAT3& dir
         position,
         rotation,
         EMotionType::Dynamic,
-        Layers::BALL
+        Layers::MOVING
     );
 
     BodyInterface& bodyInterface = JoltSystem::GetBodyInterface();

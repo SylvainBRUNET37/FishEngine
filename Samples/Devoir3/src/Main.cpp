@@ -24,6 +24,17 @@
 
 #include "systems/CameraSystem.h"
 
+static bool MyAssertFailed(const char* inExpression, const char* inMessage, const char* inFile, const JPH::uint inLine)
+{
+	std::cerr << "Jolt Assertion Failed!\n";
+	std::cerr << "Expression: " << inExpression << "\n";
+	std::cerr << "Message: " << (inMessage ? inMessage : "(none)") << "\n";
+	std::cerr << "File: " << inFile << ":" << inLine << "\n";
+
+	assert(false && "Jolt Assertion Failed. See error output for more information.");
+	return false;
+}
+
 using namespace JPH;
 using namespace JPH::literals;
 using namespace std;
@@ -34,6 +45,11 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
                        LPTSTR,
                        int)
 {
+	// Source: https://stackoverflow.com/questions/16703835/how-can-i-see-cout-output-in-a-non-console-application
+	AllocConsole(); // D�commenter si la console est voulu
+	freopen("CONOUT$", "w", stdout);
+	freopen("CONOUT$", "w", stderr);
+
 	WindowsApplication application{hInstance, L"RenderingEngineSample", L"RenderingEngineSampleClass"};
 
 	if (!application.Init())
@@ -52,6 +68,8 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 	/////	Physics System	 /////
 	JoltSystem::Init();
 	auto& physicsSystem = JoltSystem::GetPhysicSystem();
+
+	AssertFailed = MyAssertFailed;
 
 	const BroadPhaseLayerInterfaceImpl broadPhaseLayerInterface;
 	const ObjectVsBroadPhaseLayerFilterImpl objectVsBroadPhaseLayerFilter;
@@ -80,7 +98,7 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 		.heightOffset = 30.f,
 	};
 	const auto cameraEntity = entityManager.CreateEntity();
-	auto& wow = entityManager.AddComponent<Camera>(cameraEntity, camera);
+	auto& cameraComponent = entityManager.AddComponent<Camera>(cameraEntity, camera);
 
 	// Initialize the scene (it's a temporary way of doing it)
 	for (const auto& [entity, name] : entityManager.View<Name>())
@@ -88,27 +106,21 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 		if (name.name == "Cube")
 		{
 			const auto transform = entityManager.Get<Transform>(entity);
-			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCubeInVehicleLayer(transform));
-			entityManager.AddComponent<BallShooter>(entity);
+			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCube(transform));
 			entityManager.AddComponent<Controllable>(entity, 100.0f);
 
 			// Link camera to the cube
-			wow.targetEntity = entity;
+			cameraComponent.targetEntity = entity;
 		}
 		else if (name.name == "Cargo")
 		{
 			const auto transform = entityManager.Get<Transform>(entity);
-			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCubeInCargoLayer(transform));
+			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCube(transform));
 		}
 		else if (name.name == "Plane")
 		{
 			const auto transform = entityManager.Get<Transform>(entity);
 			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreatePlane(transform));
-		}
-		else if (name.name == "Capsule")
-		{
-			const auto transform = entityManager.Get<Transform>(entity);
-			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCapsule(transform));
 		}
 	}
 
@@ -126,13 +138,6 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 	};
 
 	GameEngine::currentCameraEntity = cameraEntity;
-
-	// Source: https://stackoverflow.com/questions/16703835/how-can-i-see-cout-output-in-a-non-console-application
-	AllocConsole(); // D�commenter si la console est voulu
-	freopen("CONOUT$", "w", stdout);
-	freopen("CONOUT$", "w", stderr);
-	cout <<
-		"Controles\n- W et S pour avancer et reculer\n- A et D pour strafe a gauche et a droite\n- Q et E pour pivoter\n- Barre d'espace pour tirer les balles\n\n";
 
 	gameEngine.Run();
 
