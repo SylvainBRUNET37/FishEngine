@@ -20,7 +20,7 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 	RenderScene();
 
 	// Update frame buffer
-	frameBuffer.matViewProj = XMMatrixTranspose(currentCamera.matView * currentCamera.matProj);
+    XMStoreFloat4x4(&frameBuffer.matViewProj, XMMatrixTranspose(currentCamera.matView * currentCamera.matProj));
 	XMStoreFloat4(&frameBuffer.vCamera, currentCamera.position);
 	renderer.UpdateFrameBuffer(frameBuffer);
 
@@ -52,35 +52,36 @@ void RenderSystem::RenderScene() const
 // TODO: exist for testing purpose
 FrameBuffer RenderSystem::InitFrameBuffer()
 {
-	return
-	{
-		.matViewProj = XMMatrixIdentity(),
-		.vCamera = XMFLOAT4(0.0f, 0.0f, -5.0f, 1.0f),
+    return
+    {
+        .matViewProj = {},
+        .vCamera = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f),
 
-		.dirLight =
-		{
-			.ambient = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f),
-			.diffuse = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f),
+        .dirLight =
+        {
+            .ambient = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
+            .diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 0.8f),
 			.specular = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
 
-			.direction = XMFLOAT3(0.0f, -1.0f, 0.0f),
-			.pad = 0.0f
-		},
+            .direction = XMFLOAT3(-0.5f, 1.0f, -0.5f),
+            .pad = 0.0f
+        },
 
-		.pointLights =
-		{
-			PointLight
-			{
-				.ambient = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f),
-				.diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
-				.specular = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
+        .pointLights =
+        {
+            PointLight
+            {
+                .ambient = XMFLOAT4(0.02f, 0.02f, 0.02f, 1.0f),
+                .diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
+                .specular = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
 
-				.position = XMFLOAT3(2.0f, 20.0f, -20.0f),
-				.range = 50.0f,
+                .position = XMFLOAT3(2.0f, 20.0f, -20.0f),
+                .range = 50.0f,
 
-				.attenuation = XMFLOAT3(1.0f, 0.1f, 0.01f),
-				.pad = 0.0f
-			}
-		}
-	};
+                .attenuation = XMFLOAT3(1.0f, 0.09f, 0.032f),
+                .pad = 0.0f
+            }
+        }
+    };
 }
+
