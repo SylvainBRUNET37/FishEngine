@@ -5,10 +5,11 @@
 #include "GameEngine.h"
 
 using namespace DirectX;
+using namespace std;
 
 RenderSystem::RenderSystem(RenderContext* renderContext, std::vector<Material>&& materials)
 	: renderer(renderContext->GetDevice(), std::move(materials), frameCbRegisterNumber, objectCbRegisterNumber),
-	  frameBuffer(InitFrameBuffer()),
+	  frameBuffer(AddDirectionLightToFrameBuffer()),
 	  renderContext(renderContext)
 {
 }
@@ -18,6 +19,16 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 	const auto currentCamera = entityManager.Get<Camera>(GameEngine::currentCameraEntity);
 
 	RenderScene();
+
+	// Add point lights to the frame buffer
+	int lightCount = 0;
+	for (const auto& [entity, pointLight] : entityManager.View<PointLight>())
+	{
+		if (lightCount >= FrameBuffer::MAX_POINT_LIGHTS)
+			throw runtime_error(format("Cannot exceed {} point light", FrameBuffer::MAX_POINT_LIGHTS));
+
+		frameBuffer.pointLights[lightCount++] = pointLight;
+	}
 
 	// Update frame buffer
     XMStoreFloat4x4(&frameBuffer.matViewProj, XMMatrixTranspose(currentCamera.matView * currentCamera.matProj));
@@ -49,14 +60,10 @@ void RenderSystem::RenderScene() const
 	context->OMSetRenderTargets(1, rtvs, depthStencil);
 }
 
-// TODO: exist for testing purpose
-FrameBuffer RenderSystem::InitFrameBuffer()
+FrameBuffer RenderSystem::AddDirectionLightToFrameBuffer()
 {
     return
     {
-        .matViewProj = {},
-        .vCamera = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f),
-
         .dirLight =
         {
             .ambient = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
@@ -66,22 +73,6 @@ FrameBuffer RenderSystem::InitFrameBuffer()
             .direction = XMFLOAT3(-0.5f, 1.0f, -0.5f),
             .pad = 0.0f
         },
-
-        .pointLights =
-        {
-            PointLight
-            {
-                .ambient = XMFLOAT4(0.02f, 0.02f, 0.02f, 1.0f),
-                .diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
-                .specular = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
-
-                .position = XMFLOAT3(2.0f, 20.0f, -20.0f),
-                .range = 50.0f,
-
-                .attenuation = XMFLOAT3(1.0f, 0.09f, 0.032f),
-                .pad = 0.0f
-            }
-        }
     };
 }
 

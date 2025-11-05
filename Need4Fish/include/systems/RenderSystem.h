@@ -28,7 +28,7 @@ private:
 
 	void RenderScene() const;
 
-	static FrameBuffer InitFrameBuffer();
+	static FrameBuffer AddDirectionLightToFrameBuffer();
 };
 
 #endif
