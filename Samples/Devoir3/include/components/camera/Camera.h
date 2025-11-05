@@ -5,20 +5,18 @@
 
 #include "entities/Entity.h"
 
-using namespace DirectX;
-
 struct Camera
 {
-	XMVECTOR position{};
-	XMVECTOR focus{};
-	XMVECTOR up{};
+	DirectX::XMVECTOR position{};
+	DirectX::XMVECTOR focus{};
+	DirectX::XMVECTOR up{};
 
-	XMMATRIX matView{};
-	XMMATRIX matProj{};
+	DirectX::XMMATRIX matView{};
+	DirectX::XMMATRIX matProj{};
 
 	float nearPlane = 0.05f;
 	float farPlane = 1000.0f;
-	float fov = XM_PI / 3.0f;
+	float fov = DirectX::XM_PI / 3.0f;
 
 	float aspectRatio = 1920.f / 1080.f;
 

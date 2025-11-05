@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "systems/CameraSystem.h"
 
+using namespace DirectX;
+
 void CameraSystem::Update(double deltaTime, EntityManager& entityManager)
 {
 	for (const auto& [entity, camera] : entityManager.View<Camera>())

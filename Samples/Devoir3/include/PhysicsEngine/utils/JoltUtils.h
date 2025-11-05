@@ -1,5 +1,5 @@
-#ifndef UTILS_H
-#define UTILS_H
+#ifndef JOLT_UTILS_H
+#define JOLT_UTILS_H
 
 #define JPH_ENABLE_ASSERTS
 
@@ -7,7 +7,7 @@
 #include <format>
 #include <iostream>
 
-namespace Utils
+namespace JoltUtils
 {
 	static void TraceImpl(const char* inFMT, ...)
 	{
@@ -22,9 +22,13 @@ namespace Utils
 #ifdef JPH_ENABLE_ASSERTS
 	static bool AssertFailedImpl(const char* inExpression, const char* inMessage, const char* inFile, const JPH::uint inLine)
 	{
-		std::cout << inFile << ":" << inLine << ": (" << inExpression << ") " << (inMessage != nullptr ? inMessage : "") << '\n';
+		std::cerr << "Jolt Assertion Failed!\n";
+		std::cerr << "Expression: " << inExpression << "\n";
+		std::cerr << "Message: " << (inMessage ? inMessage : "(none)") << "\n";
+		std::cerr << "File: " << inFile << ":" << inLine << "\n";
 
-		return true;
+		assert(false && "Jolt Assertion Failed. See error output for more information.");
+		return false;
 	};
 
 #endif

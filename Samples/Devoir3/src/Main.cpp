@@ -7,7 +7,7 @@
 #include "PhysicsEngine/layers/BroadPhaseLayers.h"
 #include "PhysicsEngine/layers/ObjectLayerPairFilterImpl.h"
 #include "PhysicsEngine/layers/ObjectVsBroadPhaseLayerFilterImpl.h"
-#include "PhysicsEngine/listeners/BodyActivationListenerLogger.h"
+#include "PhysicsEngine/listeners/BodyActivationListenerImpl.h"
 #include "PhysicsEngine/listeners/ContactListenerImpl.h"
 #include "PhysicsEngine/systems/JoltSystem.h"
 #include "rendering/application/WindowsApplication.h"
@@ -22,18 +22,8 @@
 #include "PhysicsEngine/ShapeFactory.h"
 #include <systems/PhysicsSimulationSystem.h>
 
+#include "PhysicsEngine/utils/JoltUtils.h"
 #include "systems/CameraSystem.h"
-
-static bool MyAssertFailed(const char* inExpression, const char* inMessage, const char* inFile, const JPH::uint inLine)
-{
-	std::cerr << "Jolt Assertion Failed!\n";
-	std::cerr << "Expression: " << inExpression << "\n";
-	std::cerr << "Message: " << (inMessage ? inMessage : "(none)") << "\n";
-	std::cerr << "File: " << inFile << ":" << inLine << "\n";
-
-	assert(false && "Jolt Assertion Failed. See error output for more information.");
-	return false;
-}
 
 using namespace JPH;
 using namespace JPH::literals;
@@ -69,7 +59,9 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 	JoltSystem::Init();
 	auto& physicsSystem = JoltSystem::GetPhysicSystem();
 
-	AssertFailed = MyAssertFailed;
+#ifndef NDEBUG
+	AssertFailed = JoltUtils::AssertFailedImpl;
+#endif
 
 	const BroadPhaseLayerInterfaceImpl broadPhaseLayerInterface;
 	const ObjectVsBroadPhaseLayerFilterImpl objectVsBroadPhaseLayerFilter;
@@ -81,7 +73,7 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 	settings.mMinVelocityForRestitution = 0.01f;
 	physicsSystem.SetPhysicsSettings(settings);
 
-	BodyActivationListenerLogger bodyActivationListener;
+	BodyActivationListenerImpl bodyActivationListener;
 	physicsSystem.SetBodyActivationListener(&bodyActivationListener);
 
 	ContactListenerImpl contactListener;

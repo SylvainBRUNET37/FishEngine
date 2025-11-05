@@ -9,7 +9,6 @@
 namespace ShapeFactory
 {
 	[[nodiscard]] JPH::Body* CreateCube(const Transform& transform);
-	[[nodiscard]] JPH::Body* CreateCubeInCargoLayer(const Transform& transform);
 	[[nodiscard]] JPH::Body* CreatePlane(const Transform& transform);
 	[[nodiscard]] JPH::Body* CreateCapsule(const Transform& transform);
 	[[nodiscard]] JPH::Body* CreateSphere(const Transform& transform, const DirectX::XMFLOAT3& direction);

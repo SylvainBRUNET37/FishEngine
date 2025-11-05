@@ -1,10 +1,10 @@
-#ifndef BODY_ACTIVATION_LISTENER_LOGGER_H
-#define BODY_ACTIVATION_LISTENER_LOGGER_H
+#ifndef BODY_ACTIVATION_LISTENER_IMPL_H
+#define BODY_ACTIVATION_LISTENER_IMPL_H
 
 #include <Jolt/Jolt.h>
 #include <Jolt/Physics/Body/BodyActivationListener.h>
 
-class BodyActivationListenerLogger : public JPH::BodyActivationListener
+class BodyActivationListenerImpl : public JPH::BodyActivationListener
 {
 public:
 	void OnBodyActivated(const JPH::BodyID& inBodyID, JPH::uint64 inBodyUserData) override

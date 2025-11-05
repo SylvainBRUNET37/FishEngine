@@ -4,6 +4,8 @@
 
 #include "GameEngine.h"
 
+using namespace DirectX;
+
 RenderSystem::RenderSystem(RenderContext* renderContext, std::vector<Material>&& materials)
 	: renderer(renderContext->GetDevice(), std::move(materials), frameCbRegisterNumber, objectCbRegisterNumber),
 	sceneData(InitSceneData()),

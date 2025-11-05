@@ -5,7 +5,7 @@
 #include <Jolt/Core/Factory.h>
 #include <Jolt/RegisterTypes.h>
 
-#include "PhysicsEngine/utils/Utils.h"
+#include "PhysicsEngine/utils/JoltUtils.h"
 
 using namespace JPH;
 
@@ -13,8 +13,8 @@ void JoltSystem::Init()
 {
 	RegisterDefaultAllocator();
 
-	Trace = Utils::TraceImpl;
-	JPH_IF_ENABLE_ASSERTS(JPH::AssertFailed = Utils::AssertFailedImpl;)
+	Trace = JoltUtils::TraceImpl;
+	JPH_IF_ENABLE_ASSERTS(JPH::AssertFailed = JoltUtils::AssertFailedImpl;)
 
 	Factory::sInstance = new Factory();
 

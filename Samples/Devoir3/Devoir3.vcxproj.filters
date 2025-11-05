@@ -10,6 +10,7 @@
     <ClCompile Include="src\systems\PhysicsSimulationSystem.cpp" />
     <ClCompile Include="src\systems\RenderSystem.cpp" />
     <ClCompile Include="src\PhysicsEngine\ShapeFactory.cpp" />
+    <ClCompile Include="src\components\RigidBody.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\CC.h" />
@@ -18,10 +19,10 @@
     <ClInclude Include="include\PhysicsEngine\layers\Layers.h" />
     <ClInclude Include="include\PhysicsEngine\layers\ObjectLayerPairFilterImpl.h" />
     <ClInclude Include="include\PhysicsEngine\layers\ObjectVsBroadPhaseLayerFilterImpl.h" />
-    <ClInclude Include="include\PhysicsEngine\listeners\BodyActivationListenerLogger.h" />
+    <ClInclude Include="include\PhysicsEngine\listeners\BodyActivationListenerImpl.h" />
     <ClInclude Include="include\PhysicsEngine\listeners\ContactListenerImpl.h" />
     <ClInclude Include="include\PhysicsEngine\systems\JoltSystem.h" />
-    <ClInclude Include="include\PhysicsEngine\utils\Utils.h" />
+    <ClInclude Include="include\PhysicsEngine\utils\JoltUtils.h" />
     <ClInclude Include="include\entities\EntityManagerFactory.h" />
     <ClInclude Include="include\ResourceManager.h" />
     <ClInclude Include="include\GameEngine.h" />
@@ -36,6 +37,8 @@
     <ClInclude Include="include\systems\PhysicsSimulationSystem.h" />
     <ClInclude Include="include\systems\RenderSystem.h" />
     <ClInclude Include="include\components\camera\Camera.h" />
+    <ClInclude Include="include\PhysicsEngine\ShapeFactory.h" />
+    <ClInclude Include="include\components\physics\RigidBody.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\MiniPhongPS.hlsl" />
