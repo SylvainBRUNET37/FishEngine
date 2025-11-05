@@ -11,6 +11,7 @@
 #include "rendering/core/Transform.h"
 #include "rendering/graphics/Mesh.h"
 #include "physics/RigidBody.h"
+#include "rendering/graphics/lights/PointLight.h"
 
 struct Name
 {
@@ -40,7 +41,8 @@ using Components = std::tuple
 	Hierarchy,
 	Name,
 	Controllable,
-	Camera
+	Camera,
+	PointLight
 >;
 
 #endif
