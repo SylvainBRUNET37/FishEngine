@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "systems/CameraSystem.h"
+#include "GameState.h"
 
 using namespace DirectX;
 
@@ -18,14 +19,16 @@ void CameraSystem::ComputeCameraPosition(Camera& camera, const Transform& transf
 	const XMVECTOR targetRotQuat = XMLoadFloat4(&transform.rotation);
 	const XMMATRIX targetRotMat = XMMatrixRotationQuaternion(targetRotQuat);
 
-	// Compute entity's yaw
+	// Yaw actuel
 	const XMVECTOR forward = targetRotMat.r[2];
 	const float targetYaw = atan2f(XMVectorGetX(forward), XMVectorGetZ(forward));
 
-	// Adjust the height of the camera
+	// Yaw visé
+	const float totalYaw = targetYaw + camera.yawOffset;
+	camera.targetYaw = totalYaw;  // Pour la physique	
+
 	camera.focus = XMVectorAdd(targetPos, XMVectorSet(0, camera.heightOffset, 0, 0));
 
-	const float totalYaw = targetYaw + camera.yawOffset;
 	const float horizontalDist = camera.distance * cosf(camera.pitchAngle);
 	const float verticalDist = camera.distance * sinf(camera.pitchAngle);
 
@@ -60,6 +63,7 @@ void CameraSystem::UpdateCameraMatrices(Camera& camera, const EntityManager& ent
 
 void CameraSystem::HandleRotation(Camera& cameraData)
 {
+	/*//Version avec clic
 	POINT currentCursorCoordinates;
 	if (!GetCursorPos(&currentCursorCoordinates))
 		return;
@@ -73,11 +77,89 @@ void CameraSystem::HandleRotation(Camera& cameraData)
 		Rotate(cameraData, deltaX * mouseSensitivity, -deltaY * mouseSensitivity);
 	}
 
-	cameraData.cursorCoordinates = currentCursorCoordinates;
+	cameraData.cursorCoordinates = currentCursorCoordinates;*/
+	// Si en pause, ne pas traiter la rotation
+	if (GameState::isPaused)
+	{
+		return;
+	}
+	// Sortie de pause
+	if (!cameraData.isMouseCaptured)
+	{
+		SetMouseCursor();
+		return;
+	}
+
+	POINT currentCursorCoordinates;
+	if (!GetCursorPos(&currentCursorCoordinates))
+		return;
+
+	const auto deltaX = static_cast<float>(currentCursorCoordinates.x - cameraData.cursorCoordinates.x);
+	const auto deltaY = static_cast<float>(currentCursorCoordinates.y - cameraData.cursorCoordinates.y);
+
+	constexpr float mouseSensitivity = 0.002f;
+	constexpr float deadzone = 2.0f;  // Pixels de tolérance
+
+	// Appliquer la rotation seulement si le mouvement dépasse la deadzone
+	if (std::abs(deltaX) > deadzone || std::abs(deltaY) > deadzone)
+	{
+		Rotate(cameraData, deltaX * mouseSensitivity, -deltaY * mouseSensitivity);
+	}
+	else
+	{
+		// Ramener progressivement vers zéro quand pas de mouvement
+		constexpr float returnSpeed = 0.02f;
+		if (std::abs(cameraData.yawOffset) > 0.001f)
+		{
+			const float returnStep = std::copysign(returnSpeed, -cameraData.yawOffset);
+			cameraData.yawOffset += returnStep;
+
+			// Snap à zéro si très proche
+			if (std::abs(cameraData.yawOffset) < returnSpeed)
+			{
+				cameraData.yawOffset = 0.0f;
+			}
+		}
+	}
+
+	//Recentrer seulement si la souris s'éloigne trop du centre
+	constexpr float recenterThreshold = 100.0f;
+	const float distanceFromCenter = sqrtf(
+		powf(currentCursorCoordinates.x - cameraData.screenCenter.x, 2.0f) +
+		powf(currentCursorCoordinates.y - cameraData.screenCenter.y, 2.0f)
+	);
+
+	if (distanceFromCenter > recenterThreshold)
+	{
+		SetCursorPos(cameraData.screenCenter.x, cameraData.screenCenter.y);
+		cameraData.cursorCoordinates = cameraData.screenCenter;
+	}
+	else
+	{
+		cameraData.cursorCoordinates = currentCursorCoordinates;
+	}
 }
 
 void CameraSystem::Rotate(Camera& cameraData, const float yawDelta, const float pitchDelta)
 {
+	/*//Version avec clic
 	cameraData.yawOffset += yawDelta;
 	cameraData.pitchAngle = std::clamp(cameraData.pitchAngle + pitchDelta, -XM_PIDIV2 + 0.1f, 0.0f);
+	*/
+	// Limiter la caméra
+	constexpr float maxYawOffset = XM_PIDIV4;      // ±45 degrés à gauche et à droite
+	constexpr float minPitch = -XM_PIDIV4;         // -45 degrés vers le bas
+	constexpr float maxPitch = XM_PIDIV4 * 0.5f;   // +22.5 degrés vers le haut... pourrait être 45 aussi
+
+	cameraData.yawOffset = std::clamp(
+		cameraData.yawOffset + yawDelta,
+		-maxYawOffset,
+		maxYawOffset
+	);
+
+	cameraData.pitchAngle = std::clamp(
+		cameraData.pitchAngle + pitchDelta,
+		minPitch,
+		maxPitch
+	);
 }

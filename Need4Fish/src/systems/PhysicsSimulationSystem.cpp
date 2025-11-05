@@ -2,6 +2,7 @@
 #include "systems/PhysicsSimulationSystem.h"
 
 #include "PhysicsEngine/JoltSystem.h"
+#include <GameState.h>
 
 using namespace DirectX;
 
@@ -14,55 +15,83 @@ void PhysicsSimulationSystem::Update(double, EntityManager& entityManager)
 
 void PhysicsSimulationSystem::UpdateControllables(EntityManager& entityManager)
 {
-	for (const auto& [entity, rigidBody, controllable] : entityManager.View<RigidBody, Controllable>())
+	// Toggle pause avec ESC
+	static bool escWasPressed = false;
+	bool escIsPressed = GetAsyncKeyState(VK_ESCAPE) & 0x8000;
+	if (escIsPressed && !escWasPressed)
 	{
-		const auto& transform = rigidBody.body->GetWorldTransform();
-		JPH::Vec3 right = transform.GetColumn3(0).Normalized();
-		JPH::Vec3 up = transform.GetColumn3(1).Normalized();
-		JPH::Vec3 forward = transform.GetColumn3(2).Normalized();
+		ChangePauseStatus();
+	}
+	escWasPressed = escIsPressed;
 
-		JPH::Vec3 currentSpeed = JoltSystem::GetBodyInterface().GetLinearVelocity(rigidBody.body->GetID());
-		JPH::Vec3 newSpeed = currentSpeed;
-		bool speedChanged = false;
+	//Récupérer la caméra pour le targetYaw
+	Camera* activeCamera = nullptr;
+	for (const auto& [entity, camera] : entityManager.View<Camera>())
+	{
+		activeCamera = &camera;
+		break;
+	}
 
-		if (GetAsyncKeyState('W') & 0x8000)
+	if (!GameState::isPaused) {
+		for (const auto& [entity, rigidBody, controllable] : entityManager.View<RigidBody, Controllable>())
 		{
-			newSpeed = newSpeed + 1.0f * forward;
-			speedChanged = true;
-		}
-		if (GetAsyncKeyState('S') & 0x8000)
-		{
-			newSpeed = newSpeed - 1.0f * forward;
-			speedChanged = true;
-		}
-		if (GetAsyncKeyState('D') & 0x8000)
-		{
-			newSpeed = newSpeed - 1.0f * right;
-			speedChanged = true;
-		}
-		if (GetAsyncKeyState('A') & 0x8000)
-		{
-			newSpeed = newSpeed + 1.0f * right;
-			speedChanged = true;
-		}
+			const auto& transform = rigidBody.body->GetWorldTransform();
+			JPH::Vec3 right = transform.GetColumn3(0).Normalized();
+			JPH::Vec3 up = transform.GetColumn3(1).Normalized();
+			JPH::Vec3 forward = transform.GetColumn3(2).Normalized();
 
-		if (speedChanged)
-		{
-			if (newSpeed.Length() > controllable.maxSpeed) newSpeed = newSpeed.Normalized();
-			JoltSystem::GetBodyInterface().SetLinearVelocity(rigidBody.body->GetID(), newSpeed);
-		}
+			// Rotation progressive vers la direction de la caméra
+			if (activeCamera)
+			{
+				RotateTowardsCameraDirection(rigidBody, *activeCamera, forward, up);
+			}
 
-		// Rotation
-		bool rotatesPositive = GetAsyncKeyState('Q') & 0x8000;
-		if (rotatesPositive || GetAsyncKeyState('E') & 0x8000)
-		{
-			JPH::Quat delta = JPH::Quat::sRotation(up, .05f * (1 - 2 * !rotatesPositive)); // theta = 10
-			JoltSystem::GetBodyInterface().SetRotation(
-				rigidBody.body->GetID(),
-				(rigidBody.body->GetRotation() * delta).Normalized(),
-				JPH::EActivation::Activate);
+			JPH::Vec3 currentSpeed = JoltSystem::GetBodyInterface().GetLinearVelocity(rigidBody.body->GetID());
+			JPH::Vec3 newSpeed = currentSpeed;
+			bool speedChanged = false;
+
+
+
+			if (GetAsyncKeyState('W') & 0x8000)
+			{
+				newSpeed = newSpeed + 1.0f * forward;
+				speedChanged = true;
+			}
+			if (GetAsyncKeyState('S') & 0x8000)
+			{
+				newSpeed = newSpeed - 1.0f * forward;
+				speedChanged = true;
+			}
+			if (GetAsyncKeyState('D') & 0x8000)
+			{
+				newSpeed = newSpeed - 1.0f * right;
+				speedChanged = true;
+			}
+			if (GetAsyncKeyState('A') & 0x8000)
+			{
+				newSpeed = newSpeed + 1.0f * right;
+				speedChanged = true;
+			}
+
+			if (speedChanged)
+			{
+				if (newSpeed.Length() > controllable.maxSpeed) newSpeed = newSpeed.Normalized();
+				JoltSystem::GetBodyInterface().SetLinearVelocity(rigidBody.body->GetID(), newSpeed);
+			}
+
+			// Rotation manuelle -> on pourrait retirer
+			bool rotatesPositive = GetAsyncKeyState('Q') & 0x8000;
+			if (rotatesPositive || GetAsyncKeyState('E') & 0x8000)
+			{
+				JPH::Quat delta = JPH::Quat::sRotation(up, .05f * (1 - 2 * !rotatesPositive)); // theta = 10
+				JoltSystem::GetBodyInterface().SetRotation(
+					rigidBody.body->GetID(),
+					(rigidBody.body->GetRotation() * delta).Normalized(),
+					JPH::EActivation::Activate);
+			}
 		}
 	}
+	
 }
 
 void PhysicsSimulationSystem::UpdatePhysics()
@@ -78,6 +107,36 @@ void PhysicsSimulationSystem::UpdatePhysics()
 		task();
 
 	JoltSystem::GetPostStepCallbacks().clear();
+}
+
+void PhysicsSimulationSystem::RotateTowardsCameraDirection(RigidBody& rigidBody, const Camera& camera,
+	const JPH::Vec3& forward, const JPH::Vec3& up)
+{
+	// Yaw actuel du poisson
+	const float currentYaw = atan2f(forward.GetX(), forward.GetZ());
+	const float targetYaw = camera.targetYaw;
+
+	//Différence d'angle
+	float angleDiff = targetYaw - currentYaw;
+
+	// Normaliser
+	while (angleDiff > JPH::JPH_PI) angleDiff -= 2.0f * JPH::JPH_PI;
+	while (angleDiff < -JPH::JPH_PI) angleDiff += 2.0f * JPH::JPH_PI;
+
+	// Rotation progressive
+	constexpr float rotationSpeed = 0.02f;
+	constexpr float rotationThreshold = 0.05f; //"Deadzone"
+
+	const float rotationStep = std::clamp(angleDiff, -rotationSpeed, rotationSpeed);
+
+	if (std::abs(angleDiff) > rotationThreshold)
+	{
+		const JPH::Quat delta = JPH::Quat::sRotation(up, rotationStep);
+		JoltSystem::GetBodyInterface().SetRotation(
+			rigidBody.body->GetID(),
+			(rigidBody.body->GetRotation() * delta).Normalized(),
+			JPH::EActivation::Activate);
+	}
 }
 
 void PhysicsSimulationSystem::UpdateTransforms(EntityManager& entityManager)
@@ -100,4 +159,6 @@ void PhysicsSimulationSystem::UpdateTransforms(EntityManager& entityManager)
 
 		transform.world = scaleMatrix * rotationMatrix * translationMatrix;
 	}
+
+
 }

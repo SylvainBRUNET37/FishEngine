@@ -24,6 +24,7 @@
 
 #include "PhysicsEngine/utils/JoltUtils.h"
 #include "systems/CameraSystem.h"
+#include <GameState.h>
 
 using namespace JPH;
 using namespace JPH::literals;
@@ -131,6 +132,7 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 
 	GameEngine::currentCameraEntity = cameraEntity;
 
+	SetMouseCursor();
 	gameEngine.Run();
 
 	UnregisterTypes();

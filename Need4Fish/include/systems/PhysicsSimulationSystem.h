@@ -17,6 +17,9 @@ private:
 	static void UpdateControllables(EntityManager& entityManager);
 	static void UpdateTransforms(EntityManager& entityManager);
 	static void UpdatePhysics();
+
+	//Pour ajustement vers le yaw visé
+	static void RotateTowardsCameraDirection(RigidBody& rigidBody, const Camera& camera, const JPH::Vec3& forward, const JPH::Vec3& up);
 };
 
 #endif

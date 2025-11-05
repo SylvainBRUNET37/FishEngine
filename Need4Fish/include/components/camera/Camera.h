@@ -27,8 +27,15 @@ struct Camera
 	float yawOffset = 0.0f;
 	float pitchAngle = -0.1f;
 
-	// Mouse
-	POINT cursorCoordinates;
-};
+	// Direction cible pour le poisson
+	float targetYaw = 0.0f; 
 
+	// Mouse
+	inline static POINT cursorCoordinates;
+
+	// Pour limiter/capturer la souris
+	inline static POINT screenCenter;
+	inline static bool isMouseCaptured = false;
+};
 #endif
+
