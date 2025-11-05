@@ -41,7 +41,7 @@ void RenderSystem::RenderScene() const
 	ID3D11RenderTargetView* renderTarget = renderContext->GetRenderTargetView();
 	ID3D11DepthStencilView* depthStencil = renderContext->GetDepthStencilView();
 
-	constexpr float backgroundColor[4] = {0.0f, 0.5f, 0.0f, 1.0f};
+	constexpr float backgroundColor[4] = {0.0f, 0.0f, 0.5f, 1.0f};
 	context->ClearRenderTargetView(renderTarget, backgroundColor);
 	context->ClearDepthStencilView(depthStencil, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
