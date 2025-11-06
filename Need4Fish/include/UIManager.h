@@ -9,7 +9,7 @@ class UIManager
 public:
 	explicit UIManager(ID3D11Device* device);
 
-	[[nodiscard]] Sprite GetOrLoadSprite(const std::string& filePath, const ResourceManager& resourceManager);
+	[[nodiscard]] Sprite LoadSprite(const std::string& filePath, const ResourceManager& resourceManager) const;
 
 private:
 	ID3D11Device* device;
