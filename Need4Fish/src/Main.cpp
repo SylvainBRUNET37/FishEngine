@@ -26,6 +26,8 @@
 #include "systems/CameraSystem.h"
 #include <GameState.h>
 
+#include "rendering/texture/TextureLoader.h"
+
 using namespace JPH;
 using namespace JPH::literals;
 using namespace std;
@@ -54,7 +56,6 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 	auto sceneResources = resourceManager.LoadScene();
 
 	auto entityManager = EntityManagerFactory::Create(sceneResources);
-
 
 	/////	Physics System	 /////
 	JoltSystem::Init();
@@ -133,6 +134,25 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 	};
 	const auto pointLightEntity = entityManager.CreateEntity();
 	entityManager.AddComponent<PointLight>(pointLightEntity, pointLight);
+
+	// Add sprite
+	Texture texture
+	{
+		.texture = TextureLoader::LoadTextureFromFile("assets/pauseMenu.jpg", renderContext.GetDevice()),
+		.width = 1920,
+		.height = 1080
+	};
+	ShaderProgram spriteShaderProgram
+	(
+		renderContext.GetDevice(),
+		resourceManager.shaderBank.Get<VertexShader>("shaders/SpriteVS.hlsl"),
+		resourceManager.shaderBank.Get<PixelShader>("shaders/SpritePS.hlsl")
+	);
+
+	Sprite sprite(spriteShaderProgram, texture, renderContext.GetDevice());
+
+	const auto spriteEntity = entityManager.CreateEntity();
+	entityManager.AddComponent<Sprite>(spriteEntity, sprite);
 
 	// Care about the order of construction, it will be the order of update calls
 	std::vector<std::unique_ptr<System>> systems;

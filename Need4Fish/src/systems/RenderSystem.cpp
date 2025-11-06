@@ -9,7 +9,7 @@ using namespace DirectX;
 using namespace std;
 
 RenderSystem::RenderSystem(RenderContext* renderContext, std::vector<Material>&& materials)
-	: renderer(renderContext->GetDevice(), std::move(materials), frameCbRegisterNumber, objectCbRegisterNumber),
+	: renderer(renderContext->GetDevice(), std::move(materials)),
 	  frameBuffer(AddDirectionLightToFrameBuffer()),
 	  renderContext(renderContext)
 {
@@ -38,17 +38,18 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 
 	for (const auto& [entity, transform, mesh] : entityManager.View<Transform, Mesh>())
 	{
-		// check if the mesh should be rendered or not
-        if (FrustumCuller::IsMeshCulled(mesh, transform, static_cast<BaseCameraData>(currentCamera))) continue;
-		Render(mesh, transform);
+		// Check if the mesh should be rendered or not
+        if (FrustumCuller::IsMeshCulled(mesh, transform, static_cast<BaseCameraData>(currentCamera))) 
+			continue;
+
+		renderer.Render(mesh, renderContext->GetContext(), transform);
 	}
 
-	Present();
-}
+	// Render sprites
+	for (const auto& [entity, sprite] : entityManager.View<Sprite>())
+		renderer.Render(sprite, renderContext->GetContext());
 
-void RenderSystem::Render(const Mesh& mesh, const Transform& transform)
-{
-	renderer.Render(mesh, renderContext->GetContext(), transform);
+	Present();
 }
 
 void RenderSystem::RenderScene() const

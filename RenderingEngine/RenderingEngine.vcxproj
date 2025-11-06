@@ -24,6 +24,7 @@
     <ClInclude Include="include\rendering\buffers\constantBuffers\FrameBuffer.h" />
     <ClInclude Include="include\rendering\buffers\constantBuffers\MaterialBuffer.h" />
     <ClInclude Include="include\rendering\buffers\constantBuffers\ObjectBuffer.h" />
+    <ClInclude Include="include\rendering\buffers\constantBuffers\SpriteBuffer.h" />
     <ClInclude Include="include\rendering\core\SceneData.h" />
     <ClInclude Include="include\rendering\core\Transform.h" />
     <ClInclude Include="include\rendering\core\WindowData.h" />
@@ -41,6 +42,8 @@
     <ClInclude Include="include\rendering\graphics\camera\BaseCamera.h" />
     <ClInclude Include="include\rendering\graphics\lights\DirectionalLight.h" />
     <ClInclude Include="include\rendering\graphics\lights\PointLight.h" />
+    <ClInclude Include="include\rendering\graphics\Sprite.h" />
+    <ClInclude Include="include\rendering\graphics\VertexSprite.h" />
     <ClInclude Include="include\rendering\loading\Node.h" />
     <ClInclude Include="include\rendering\Renderer.h" />
     <ClInclude Include="include\rendering\loading\SceneLoader.h" />
@@ -55,6 +58,7 @@
     <ClInclude Include="include\rendering\graphics\Material.h" />
     <ClInclude Include="include\rendering\graphics\Mesh.h" />
     <ClInclude Include="include\rendering\graphics\Vertex.h" />
+    <ClInclude Include="include\rendering\texture\Texture.h" />
     <ClInclude Include="include\rendering\texture\TextureLoader.h" />
     <ClInclude Include="include\rendering\texture\TextureManager.h" />
     <ClInclude Include="include\rendering\utils\ComPtr.h" />
@@ -81,6 +85,7 @@
     <ClCompile Include="src\rendering\device\RenderTarget.cpp" />
     <ClCompile Include="src\rendering\device\Rasterizer.cpp" />
     <ClCompile Include="src\rendering\graphics\Mesh.cpp" />
+    <ClCompile Include="src\rendering\graphics\Sprite.cpp" />
     <ClCompile Include="src\rendering\Renderer.cpp" />
     <ClCompile Include="src\rendering\loading\SceneLoader.cpp" />
     <ClCompile Include="src\rendering\shaders\ShaderProgram.cpp" />

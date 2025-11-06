@@ -1,7 +1,6 @@
 #ifndef MESH_H
 #define MESH_H
 
-#include <DirectXCollision.h>
 #include <vector>
 
 #include "Vertex.h"
@@ -10,7 +9,7 @@
 
 struct Mesh
 {
-	explicit Mesh(std::vector<Vertex>&& vertices_, std::vector<UINT>&& indices_, const UINT materialIndex_,
+	explicit Mesh(std::vector<Vertex>&& vertices_, std::vector<UINT>&& indices_, UINT materialIndex_,
 		ID3D11Device* device);
 
 	std::vector<Vertex> vertices;

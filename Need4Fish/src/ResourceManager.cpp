@@ -17,7 +17,9 @@ void ResourceManager::InitShaderBank()
 
 	// Add description of each shader program of the project
 	desc.AddDesc<VertexShader>("shaders/MiniPhongVS.hlsl", "MiniPhongVS", "vs_5_0")
-		.AddDesc<PixelShader>("shaders/MiniPhongPS.hlsl", "MiniPhongPS", "ps_5_0");
+		.AddDesc<PixelShader>("shaders/MiniPhongPS.hlsl", "MiniPhongPS", "ps_5_0")
+		.AddDesc<VertexShader>("shaders/SpriteVS.hlsl", "SpriteVS", "vs_5_0")
+		.AddDesc<PixelShader>("shaders/SpritePS.hlsl", "SpritePS", "ps_5_0");
 
 	ShaderFactory<VertexShader, PixelShader> shaderFactory;
 	shaderBank = shaderFactory.CreateShaderBank(desc, device);

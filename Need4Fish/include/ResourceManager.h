@@ -9,13 +9,14 @@
 class ResourceManager
 {
 public:
+	ShaderBank shaderBank;
+
 	explicit ResourceManager(ID3D11Device* device);
 
 	[[nodiscard]] SceneResource LoadScene() const;
 
 private:
 	ID3D11Device* device;
-	ShaderBank shaderBank;
 
 	// Compile and create every shader
 	void InitShaderBank();

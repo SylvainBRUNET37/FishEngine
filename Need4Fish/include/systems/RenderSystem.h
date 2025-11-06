@@ -16,16 +16,11 @@ public:
 	void Update(double deltaTime, EntityManager& entityManager) override;
 
 private:
-	static constexpr int frameCbRegisterNumber = 0;
-	static constexpr int objectCbRegisterNumber = 1;
-
 	Renderer renderer;
 	FrameBuffer frameBuffer;
 	RenderContext* renderContext;
 
-	void Render(const Mesh& mesh, const Transform& transform);
 	void Present() const { renderContext->Present(); }
-
 	void RenderScene() const;
 
 	static FrameBuffer AddDirectionLightToFrameBuffer();
