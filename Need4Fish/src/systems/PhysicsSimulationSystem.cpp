@@ -1,4 +1,4 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "systems/PhysicsSimulationSystem.h"
 
 #include "PhysicsEngine/JoltSystem.h"
@@ -24,7 +24,7 @@ void PhysicsSimulationSystem::UpdateControllables(EntityManager& entityManager)
 	}
 	escWasPressed = escIsPressed;
 
-	//Récupérer la caméra pour le targetYaw
+	//RÃ©cupÃ©rer la camÃ©ra pour le targetYaw
 	Camera* activeCamera = nullptr;
 	for (const auto& [entity, camera] : entityManager.View<Camera>())
 	{
@@ -40,7 +40,7 @@ void PhysicsSimulationSystem::UpdateControllables(EntityManager& entityManager)
 			JPH::Vec3 up = transform.GetColumn3(1).Normalized();
 			JPH::Vec3 forward = transform.GetColumn3(2).Normalized();
 
-			// Rotation progressive vers la direction de la caméra
+			// Rotation progressive vers la direction de la camÃ©ra
 			if (activeCamera)
 			{
 				RotateTowardsCameraDirection(rigidBody, *activeCamera, forward, up);
@@ -109,67 +109,70 @@ void PhysicsSimulationSystem::UpdatePhysics()
 	JoltSystem::GetPostStepCallbacks().clear();
 }
 
-void PhysicsSimulationSystem::RotateTowardsCameraDirection(RigidBody& rigidBody, const Camera& camera,
-	const JPH::Vec3& forward, const JPH::Vec3& up)
+void PhysicsSimulationSystem::RotateTowardsCameraDirection(
+	RigidBody& rigidBody,
+	const Camera& camera,
+	JPH::Vec3 forward,
+	JPH::Vec3 up)
 {
-	// Yaw actuel du poisson
+	const JPH::Vec3 worldUp(0.0f, 1.0f, 0.0f);
+
+	// --- angles actuels du corps ---
 	const float currentYaw = atan2f(forward.GetX(), forward.GetZ());
-	const float targetYaw = camera.targetYaw;
+	const float currentPitch = asinf(std::clamp(forward.GetY(), -1.0f, 1.0f));
 
-	//Différence d'angle
-	float yawDiff = targetYaw - currentYaw;
+	// --- diffÃ©rences angulaires avec shortest signed angle ---
+	auto shortestAngle = [](float from, float to) {
+		float d = to - from;
+		while (d > JPH::JPH_PI) d -= 2.0f * JPH::JPH_PI;
+		while (d < -JPH::JPH_PI) d += 2.0f * JPH::JPH_PI;
+		return d;
+		};
 
-	// Normaliser
-	while (yawDiff > JPH::JPH_PI) yawDiff -= 2.0f * JPH::JPH_PI;
-	while (yawDiff < -JPH::JPH_PI) yawDiff += 2.0f * JPH::JPH_PI;
+	float yawDiff = shortestAngle(currentYaw, camera.targetYaw);
+	float pitchDiff = shortestAngle(currentPitch, camera.targetPitch);
 
-	//Même chose pour le pitch
-	const float horizontalLength = sqrtf(forward.GetX() * forward.GetX() + forward.GetZ() * forward.GetZ());
-	const float currentPitch = atan2f(-forward.GetY(), horizontalLength);
-	const float targetPitch = camera.targetPitch;
+	// --- seuil pour Ã©viter micro-oscillations ---
+	constexpr float smallAngleEps = 0.001f;
+	if (std::abs(yawDiff) < smallAngleEps && std::abs(pitchDiff) < smallAngleEps)
+		return;
 
-	float pitchDiff = targetPitch - currentPitch;
+	// --- limiter vitesse de rotation ---
+	constexpr float maxYawStep = 0.02f;
+	constexpr float maxPitchStep = 0.02f;
+	float yawStep = std::clamp(yawDiff, -maxYawStep, maxYawStep);
+	float pitchStep = std::clamp(pitchDiff, -maxPitchStep, maxPitchStep);
 
-	while (pitchDiff > JPH::JPH_PI) pitchDiff -= 2.0f * JPH::JPH_PI;
-	while (pitchDiff < -JPH::JPH_PI) pitchDiff += 2.0f * JPH::JPH_PI;
+	// --- Quaternion pour yaw autour de worldUp ---
+	const JPH::Quat yawQuat = JPH::Quat::sRotation(worldUp, yawStep);
 
-	// Rotation progressive
-	constexpr float rotationSpeed = 0.02f;
-	constexpr float rotationThreshold = 0.05f; //"Deadzone"
+	// --- forward aprÃ¨s yaw pour calculer right local stable ---
+	JPH::Vec3 forwardAfterYaw = yawQuat * forward;
 
-	const float yawStep = std::clamp(yawDiff, -rotationSpeed, rotationSpeed);
-	const float pitchStep = std::clamp(pitchDiff, -rotationSpeed, rotationSpeed);
+	// --- Axe right pour pitch ---
+	JPH::Vec3 right = forwardAfterYaw.Cross(worldUp);
+	if (right.LengthSq() < 1e-6f)
+		right = JPH::Vec3(1, 0, 0); // fallback
+	right = right.Normalized();
 
-	bool needsRotation = false;
-	JPH::Quat combinedRotation = JPH::Quat::sIdentity();
+	// --- Quaternion pour pitch autour de right ---
+	const JPH::Quat pitchQuat = JPH::Quat::sRotation(right, pitchStep);
 
-	// Modifier le yaw si nécessaire
-	if (std::abs(yawDiff) > rotationThreshold)
-	{
-		combinedRotation = JPH::Quat::sRotation(up, yawStep);
-		needsRotation = true;
-	}
+	// --- Appliquer rotation : yaw puis pitch pour que la tÃªte suive la camÃ©ra ---
+	const JPH::Quat deltaRotation = (pitchQuat * yawQuat).Normalized();
 
-	// Modifier le pitch si nécessaire
-	if (std::abs(pitchDiff) > rotationThreshold)
-	{
-		// Calculer l'axe right après la rotation yaw potentielle
-		const JPH::Vec3 right = forward.Cross(up).Normalized();
-		const JPH::Quat pitchRotation = JPH::Quat::sRotation(right, pitchStep);
+	const JPH::Quat currentRotation = rigidBody.body->GetRotation();
+	const JPH::Quat newRotation = (deltaRotation * currentRotation).Normalized();
 
-		combinedRotation = needsRotation ? (combinedRotation * pitchRotation) : pitchRotation;
-		needsRotation = true;
-	}
-
-	// Rotation combinée du yaw et du pitch
-	if (needsRotation)
-	{
-		JoltSystem::GetBodyInterface().SetRotation(
-			rigidBody.body->GetID(),
-			(rigidBody.body->GetRotation() * combinedRotation).Normalized(),
-			JPH::EActivation::Activate);
-	}
+	JoltSystem::GetBodyInterface().SetRotation(
+		rigidBody.body->GetID(),
+		newRotation,
+		JPH::EActivation::Activate
+	);
 }
+
+
+
 
 void PhysicsSimulationSystem::UpdateTransforms(EntityManager& entityManager)
 {

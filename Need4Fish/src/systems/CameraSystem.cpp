@@ -36,7 +36,7 @@ void CameraSystem::ComputeCameraPosition(Camera& camera, const Transform& transf
 	camera.position = XMVectorSet
 	(
 		XMVectorGetX(camera.focus) - horizontalDist * sinf(totalYaw),
-		XMVectorGetY(camera.focus) + verticalDist + camera.heightOffset,
+		XMVectorGetY(camera.focus) - verticalDist + camera.heightOffset,
 		XMVectorGetZ(camera.focus) - horizontalDist * cosf(totalYaw),
 		1.0f
 	);

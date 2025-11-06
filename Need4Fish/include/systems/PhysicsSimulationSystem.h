@@ -19,7 +19,8 @@ private:
 	static void UpdatePhysics();
 
 	//Pour ajustement vers le yaw visé
-	static void RotateTowardsCameraDirection(RigidBody& rigidBody, const Camera& camera, const JPH::Vec3& forward, const JPH::Vec3& up);
+	static void RotateTowardsCameraDirection(RigidBody& rigidBody, const Camera& camera, JPH::Vec3 forward, JPH::Vec3 up);
+	static JPH::Vec3 RotateVectorByQuat(const JPH::Quat& q, const JPH::Vec3& v);
 };
 
 #endif
