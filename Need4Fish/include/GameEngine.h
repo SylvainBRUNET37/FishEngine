@@ -16,6 +16,7 @@ public:
 		  resourceManager{std::move(resourceManager)},
 		  entityManager{std::move(entityManager)}
 	{
+		InitGame();
 	}
 
 	void Run();
@@ -26,6 +27,8 @@ private:
 
 	std::vector<std::unique_ptr<System>> systems;
 
+	Entity mainMenuEntity;
+
 	UIManager uiManager;
 	ResourceManager resourceManager;
 	EntityManager entityManager;
@@ -33,9 +36,12 @@ private:
 	static void WaitBeforeNextFrame(DWORD frameStartTime);
 
 	void HandleGameState();
+
 	void ChangeGameStatus();
 	void PauseGame(Entity mainMenuEntity);
 	void ResumeGame(Entity mainMenuEntity);
+
+	void InitGame();
 };
 
 #endif
