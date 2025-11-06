@@ -20,6 +20,12 @@ public:
 		case Layers::MOVING:
 			return broadPhaseLayer == BroadPhaseLayers::NON_MOVING;
 		case Layers::SENSOR:
+			return broadPhaseLayer == BroadPhaseLayers::NON_MOVING;
+		case Layers::VEHICLE:
+			return broadPhaseLayer == BroadPhaseLayers::MOVING;
+		case Layers::FOOD_CHAIN:
+			return broadPhaseLayer == BroadPhaseLayers::MOVING;
+		case Layers::GOAL:
 			return broadPhaseLayer == BroadPhaseLayers::MOVING;
 		default:
 			return false;
