@@ -117,24 +117,56 @@ void PhysicsSimulationSystem::RotateTowardsCameraDirection(RigidBody& rigidBody,
 	const float targetYaw = camera.targetYaw;
 
 	//Différence d'angle
-	float angleDiff = targetYaw - currentYaw;
+	float yawDiff = targetYaw - currentYaw;
 
 	// Normaliser
-	while (angleDiff > JPH::JPH_PI) angleDiff -= 2.0f * JPH::JPH_PI;
-	while (angleDiff < -JPH::JPH_PI) angleDiff += 2.0f * JPH::JPH_PI;
+	while (yawDiff > JPH::JPH_PI) yawDiff -= 2.0f * JPH::JPH_PI;
+	while (yawDiff < -JPH::JPH_PI) yawDiff += 2.0f * JPH::JPH_PI;
+
+	//Même chose pour le pitch
+	const float horizontalLength = sqrtf(forward.GetX() * forward.GetX() + forward.GetZ() * forward.GetZ());
+	const float currentPitch = atan2f(-forward.GetY(), horizontalLength);
+	const float targetPitch = camera.targetPitch;
+
+	float pitchDiff = targetPitch - currentPitch;
+
+	while (pitchDiff > JPH::JPH_PI) pitchDiff -= 2.0f * JPH::JPH_PI;
+	while (pitchDiff < -JPH::JPH_PI) pitchDiff += 2.0f * JPH::JPH_PI;
 
 	// Rotation progressive
 	constexpr float rotationSpeed = 0.02f;
 	constexpr float rotationThreshold = 0.05f; //"Deadzone"
 
-	const float rotationStep = std::clamp(angleDiff, -rotationSpeed, rotationSpeed);
+	const float yawStep = std::clamp(yawDiff, -rotationSpeed, rotationSpeed);
+	const float pitchStep = std::clamp(pitchDiff, -rotationSpeed, rotationSpeed);
 
-	if (std::abs(angleDiff) > rotationThreshold)
+	bool needsRotation = false;
+	JPH::Quat combinedRotation = JPH::Quat::sIdentity();
+
+	// Modifier le yaw si nécessaire
+	if (std::abs(yawDiff) > rotationThreshold)
 	{
-		const JPH::Quat delta = JPH::Quat::sRotation(up, rotationStep);
+		combinedRotation = JPH::Quat::sRotation(up, yawStep);
+		needsRotation = true;
+	}
+
+	// Modifier le pitch si nécessaire
+	if (std::abs(pitchDiff) > rotationThreshold)
+	{
+		// Calculer l'axe right après la rotation yaw potentielle
+		const JPH::Vec3 right = forward.Cross(up).Normalized();
+		const JPH::Quat pitchRotation = JPH::Quat::sRotation(right, pitchStep);
+
+		combinedRotation = needsRotation ? (combinedRotation * pitchRotation) : pitchRotation;
+		needsRotation = true;
+	}
+
+	// Rotation combinée du yaw et du pitch
+	if (needsRotation)
+	{
 		JoltSystem::GetBodyInterface().SetRotation(
 			rigidBody.body->GetID(),
-			(rigidBody.body->GetRotation() * delta).Normalized(),
+			(rigidBody.body->GetRotation() * combinedRotation).Normalized(),
 			JPH::EActivation::Activate);
 	}
 }

@@ -23,9 +23,10 @@ void CameraSystem::ComputeCameraPosition(Camera& camera, const Transform& transf
 	const XMVECTOR forward = targetRotMat.r[2];
 	const float targetYaw = atan2f(XMVectorGetX(forward), XMVectorGetZ(forward));
 
-	// Yaw visé
+	// Yaw et pitch visés
 	const float totalYaw = targetYaw + camera.yawOffset;
 	camera.targetYaw = totalYaw;  // Pour la physique	
+	camera.targetPitch = camera.pitchAngle;
 
 	camera.focus = XMVectorAdd(targetPos, XMVectorSet(0, camera.heightOffset, 0, 0));
 
@@ -122,7 +123,7 @@ void CameraSystem::HandleRotation(Camera& cameraData)
 		}
 	}
 
-	//Recentrer seulement si la souris s'éloigne trop du centre
+	//Recentrer seulement si la souris s'éloigne suffisament du centre
 	constexpr float recenterThreshold = 100.0f;
 	const float distanceFromCenter = sqrtf(
 		powf(currentCursorCoordinates.x - cameraData.screenCenter.x, 2.0f) +

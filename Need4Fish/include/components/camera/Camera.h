@@ -17,6 +17,7 @@ struct Camera : public BaseCameraData
 
 	// Direction cible pour le poisson
 	float targetYaw = 0.0f; 
+	float targetPitch = 0.0f;
 
 	// Mouse
 	inline static POINT cursorCoordinates;
