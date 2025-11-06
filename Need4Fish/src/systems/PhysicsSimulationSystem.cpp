@@ -113,15 +113,18 @@ void PhysicsSimulationSystem::RotateTowardsCameraDirection(
 	RigidBody& rigidBody,
 	const Camera& camera,
 	JPH::Vec3 forward,
-	JPH::Vec3 up)
+	JPH::Vec3 /*up*/)
 {
 	const JPH::Vec3 worldUp(0.0f, 1.0f, 0.0f);
 
-	// --- angles actuels du corps ---
-	const float currentYaw = atan2f(forward.GetX(), forward.GetZ());
-	const float currentPitch = asinf(std::clamp(forward.GetY(), -1.0f, 1.0f));
+	// Stockage du pitch et roll entre les frames
+	static float currentPitch = 0.0f;
+	static float currentRoll = 0.0f;
 
-	// --- différences angulaires avec shortest signed angle ---
+	// Calcul des angles actuels
+	const float currentYaw = atan2f(forward.GetX(), forward.GetZ());
+
+	// Différence entre les angles
 	auto shortestAngle = [](float from, float to) {
 		float d = to - from;
 		while (d > JPH::JPH_PI) d -= 2.0f * JPH::JPH_PI;
@@ -132,46 +135,42 @@ void PhysicsSimulationSystem::RotateTowardsCameraDirection(
 	float yawDiff = shortestAngle(currentYaw, camera.targetYaw);
 	float pitchDiff = shortestAngle(currentPitch, camera.targetPitch);
 
-	// --- seuil pour éviter micro-oscillations ---
-	constexpr float smallAngleEps = 0.001f;
-	if (std::abs(yawDiff) < smallAngleEps && std::abs(pitchDiff) < smallAngleEps)
-		return;
-
-	// --- limiter vitesse de rotation ---
+	// Limiter vitesse rotation
 	constexpr float maxYawStep = 0.02f;
 	constexpr float maxPitchStep = 0.02f;
 	float yawStep = std::clamp(yawDiff, -maxYawStep, maxYawStep);
 	float pitchStep = std::clamp(pitchDiff, -maxPitchStep, maxPitchStep);
 
-	// --- Quaternion pour yaw autour de worldUp ---
-	const JPH::Quat yawQuat = JPH::Quat::sRotation(worldUp, yawStep);
+	float newYaw = currentYaw + yawStep;
+	currentPitch += pitchStep; // interpolation progressive du pitch
 
-	// --- forward après yaw pour calculer right local stable ---
-	JPH::Vec3 forwardAfterYaw = yawQuat * forward;
+	// Roll limité
+	constexpr float maxRollAngle = 0.2f;
+	float targetRoll = std::clamp(-yawDiff * 0.5f, -maxRollAngle, maxRollAngle);
 
-	// --- Axe right pour pitch ---
-	JPH::Vec3 right = forwardAfterYaw.Cross(worldUp);
-	if (right.LengthSq() < 1e-6f)
-		right = JPH::Vec3(1, 0, 0); // fallback
-	right = right.Normalized();
+	// Progressivement vers le roll cible
+	constexpr float rollInterpSpeed = 0.05f;
+	float rollDelta = targetRoll - currentRoll;
+	rollDelta = std::clamp(rollDelta, -rollInterpSpeed, rollInterpSpeed);
+	currentRoll += rollDelta;
 
-	// --- Quaternion pour pitch autour de right ---
-	const JPH::Quat pitchQuat = JPH::Quat::sRotation(right, pitchStep);
+	// Quats de rotation
+	JPH::Quat yawQuat = JPH::Quat::sRotation(worldUp, newYaw);
+	JPH::Vec3 right = yawQuat * JPH::Vec3::sAxisX();
+	JPH::Quat pitchQuat = JPH::Quat::sRotation(right, currentPitch);
 
-	// --- Appliquer rotation : yaw puis pitch pour que la tête suive la caméra ---
-	const JPH::Quat deltaRotation = (pitchQuat * yawQuat).Normalized();
+	// roll autour du forward après yaw/pitch
+	JPH::Vec3 forwardAfterYawPitch = (pitchQuat * yawQuat) * JPH::Vec3::sAxisZ();
+	JPH::Quat rollQuat = JPH::Quat::sRotation(forwardAfterYawPitch, currentRoll);
 
-	const JPH::Quat currentRotation = rigidBody.body->GetRotation();
-	const JPH::Quat newRotation = (deltaRotation * currentRotation).Normalized();
-
+	// Appliquer rotation finale
+	JPH::Quat finalRotation = (rollQuat * pitchQuat * yawQuat).Normalized();
 	JoltSystem::GetBodyInterface().SetRotation(
 		rigidBody.body->GetID(),
-		newRotation,
+		finalRotation,
 		JPH::EActivation::Activate
 	);
 }
-
-
 
 
 void PhysicsSimulationSystem::UpdateTransforms(EntityManager& entityManager)
