@@ -18,6 +18,7 @@ namespace ShapeFactory
 	[[nodiscard]] JPH::Body* CreateHorizontalCapsule(const Transform& transform, const Mesh& mesh);
 	[[nodiscard]] JPH::Body* CreateSphereWithVelocity(const Transform& transform, const DirectX::XMFLOAT3& direction);
 	[[nodiscard]] JPH::Body* CreateFloor();
+	[[nodiscard]] JPH::Body* CreateMeshShape(const Transform& transform, const Mesh& mesh);
 }
 
 #endif

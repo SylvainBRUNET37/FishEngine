@@ -118,6 +118,12 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 			//entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreatePlane(transform));
 			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateFloor());
 		}
+		else if (name.name == "Aquarium" || name.name == "Sphere")
+		{
+			const auto transform = entityManager.Get<Transform>(entity);
+			const auto mesh = entityManager.Get<Mesh>(entity);
+			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateMeshShape(transform, mesh));
+		}
 	}
 
 	// Add light

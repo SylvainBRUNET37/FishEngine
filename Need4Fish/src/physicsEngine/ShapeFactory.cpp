@@ -7,11 +7,14 @@
 #include <Jolt/Physics/Collision/Shape/PlaneShape.h>
 #include <Jolt/Physics/Collision/Shape/CapsuleShape.h>
 #include <Jolt/Physics/Collision/Shape/SphereShape.h>
+#include <Jolt/Physics/Collision/Shape/MeshShape.h>
+#include <Jolt/Physics/Collision/Shape/ScaledShape.h>
 
 #include "PhysicsEngine/layers/Layers.h"
 #include "PhysicsEngine/JoltSystem.h"
 
-#include "physicsEngine/utils/MeshUtils.h"
+#include "physicsEngine/utils/MeshUtil.h"
+#include "physicsEngine/utils/ConversionUtil.h"
 
 using namespace JPH;
 using namespace DirectX;
@@ -51,7 +54,7 @@ Body* ShapeFactory::CreateCube(const Transform& transform)
 Body* ShapeFactory::CreateCube(const Transform& transform, const Mesh& mesh)
 {
     // Apply scale to the box
-    Vec3 size = MeshUtils::getApproximateSize(mesh);
+    Vec3 size = MeshUtil::getApproximateSize(mesh);
     auto halfExtents = size * 0.5;
     halfExtents *= Vec3(transform.scale.x, transform.scale.y, transform.scale.z);
 
@@ -179,7 +182,7 @@ Body* ShapeFactory::CreatePlane(const Transform& transform, const Mesh& mesh)
 
     auto halfExtents = Vec3(size.x, size.y, size.z);*/
     auto halfExtents = Vec3(1.f, .5f, 1.f);
-    auto size = MeshUtils::getApproximateSize(mesh);
+    auto size = MeshUtil::getApproximateSize(mesh);
     size *= Vec3(transform.scale.x, transform.scale.y, transform.scale.z);
 
     const RefConst shape = new BoxShape(halfExtents);
@@ -232,7 +235,7 @@ Body* ShapeFactory::CreateCapsule(const Transform& transform)
 
 Body* ShapeFactory::CreateVerticalCapsule(const Transform& transform, const Mesh& mesh)
 {
-    Vec3 size = MeshUtils::getApproximateSize(mesh);
+    Vec3 size = MeshUtil::getApproximateSize(mesh);
 
     //Below assumes a vertically aligned capsule...
     const float radius = transform.scale.x * max(size.GetX(), size.GetZ()) / 2;
@@ -261,7 +264,7 @@ Body* ShapeFactory::CreateVerticalCapsule(const Transform& transform, const Mesh
 
 Body* ShapeFactory::CreateHorizontalCapsule(const Transform& transform, const Mesh& mesh)
 {
-    Vec3 size = MeshUtils::getApproximateSize(mesh);
+    Vec3 size = MeshUtil::getApproximateSize(mesh);
 
     //Below assumes a horizontally aligned capsule...
     const float halfHeight = transform.scale.x * max(size.GetX(), size.GetZ()) / 2;
@@ -284,6 +287,33 @@ Body* ShapeFactory::CreateHorizontalCapsule(const Transform& transform, const Me
     Body* body = bodyInterface.CreateBody(capsuleSettings);
     bodyInterface.AddBody(body->GetID(), EActivation::Activate);
     body->SetIsSensor(true);
+
+    return body;
+}
+
+//Creates a Jolt AABB that perfectly matches the mesh, based on it's triangles (polygons)
+JPH::Body* ShapeFactory::CreateMeshShape(const Transform& transform, const Mesh& mesh)
+{
+    TriangleList triangleList = MeshUtil::generateMeshTriangleList(mesh);
+
+    const RVec3 position(transform.position.x, transform.position.y, transform.position.z);
+    const Quat rotation(transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w);
+
+    const RefConst scaledShapeSettings = new ScaledShapeSettings(
+        new MeshShapeSettings(triangleList), ConversionUtil::XMFloat3ToVec3Arg(transform.scale)
+    );
+
+    const BodyCreationSettings meshBodySettings(
+        scaledShapeSettings,
+        position,
+        rotation,
+        EMotionType::Static,
+        Layers::NON_MOVING
+    );
+
+    BodyInterface& bodyInterface = JoltSystem::GetBodyInterface();
+    Body* body = bodyInterface.CreateBody(meshBodySettings);
+    bodyInterface.AddBody(body->GetID(), EActivation::Activate);
 
     return body;
 }

@@ -5,10 +5,11 @@
 #include "Jolt/Jolt.h"
 #include <Jolt/Math/Vec3.h>
 
-class MeshUtils
+class MeshUtil
 {
 public:
 	static JPH::Vec3 getApproximateSize(const Mesh);
+	static JPH::TriangleList generateMeshTriangleList(const Mesh);
 };
 
 #endif
