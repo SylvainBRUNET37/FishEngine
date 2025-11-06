@@ -11,6 +11,8 @@
 #include "PhysicsEngine/layers/Layers.h"
 #include "PhysicsEngine/JoltSystem.h"
 
+#include "physicsEngine/utils/MeshUtils.h"
+
 using namespace JPH;
 using namespace DirectX;
 using namespace JPH::literals;
@@ -110,6 +112,43 @@ Body* ShapeFactory::CreatePlane(const Transform& transform)
 	return body;
 }
 
+Body* ShapeFactory::CreatePlane(const Transform& transform, const Mesh& mesh)
+{
+    // Apply scale to the box
+    /*auto size = mesh.getApproximateSize();
+    if (size.x == 0)
+        size.x += 10;
+    if (size.y == 0)
+        size.y += 10;
+    if (size.z == 0)
+        size.z += 10;
+
+    auto halfExtents = Vec3(size.x, size.y, size.z);*/
+    auto halfExtents = Vec3(1.f, .5f, 1.f);
+    auto size = MeshUtils::getApproximateSize(mesh);
+    size *= Vec3(transform.scale.x, transform.scale.y, transform.scale.z);
+
+    const RefConst shape = new BoxShape(halfExtents);
+
+    // Convert mesh type of position and rotation to jolt's ones
+    const RVec3 position(transform.position.x, transform.position.y, transform.position.z);
+    const Quat rotation(transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w);
+
+    const BodyCreationSettings planeSettings(
+        shape,
+        position,
+        rotation,
+        EMotionType::Static,
+        Layers::NON_MOVING
+    );
+
+    BodyInterface& bodyInterface = JoltSystem::GetBodyInterface();
+    Body* body = bodyInterface.CreateBody(planeSettings);
+    bodyInterface.AddBody(body->GetID(), EActivation::Activate);
+
+    return body;
+}
+
 Body* ShapeFactory::CreateCapsule(const Transform& transform)
 {
     // TODO: Hardcoded dimension of the capsule in blender 
@@ -136,3 +175,4 @@ Body* ShapeFactory::CreateCapsule(const Transform& transform)
 
     return body;
 }
+
