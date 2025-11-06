@@ -118,6 +118,22 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 		}
 	}
 
+	// Add light
+	PointLight pointLight =
+	{
+		.ambient = XMFLOAT4(0.02f, 0.02f, 0.02f, 1.0f),
+		.diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
+		.specular = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
+
+		.position = XMFLOAT3(2.0f, 20.0f, -20.0f),
+		.range = 50.0f,
+
+		.attenuation = XMFLOAT3(1.0f, 0.09f, 0.032f),
+		.pad = 0.0f
+	};
+	const auto pointLightEntity = entityManager.CreateEntity();
+	entityManager.AddComponent<PointLight>(pointLightEntity, pointLight);
+
 	// Care about the order of construction, it will be the order of update calls
 	std::vector<std::unique_ptr<System>> systems;
 	systems.emplace_back(std::make_unique<PhysicsSimulationSystem>());

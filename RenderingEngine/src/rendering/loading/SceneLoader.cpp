@@ -137,7 +137,12 @@ Mesh SceneLoader::ProcessMesh(const aiMesh* mesh, ID3D11Device* device, const XM
 		}
 
 		if (mesh->mTextureCoords[0])
-			vertex.textureCoord = XMFLOAT2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y);
+		{
+			vertex.textureCoord = XMFLOAT2(
+			   mesh->mTextureCoords[0][i].x,
+			   1.0f - mesh->mTextureCoords[0][i].y
+		   );
+		}
 		else
 			vertex.textureCoord = XMFLOAT2(0.0f, 0.0f);
 
@@ -178,10 +183,6 @@ Material SceneLoader::ProcessMaterial(
 	float shininess = 0.0f;
 	if (AI_SUCCESS == aiGetMaterialFloat(material, AI_MATKEY_SHININESS, &shininess))
 		mat.shininess = shininess;
-
-	// après la lecture depuis Assimp :
-	mat.specular = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	mat.shininess = 32.0f;
 
 	aiString texturePath;
 	if (material->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == AI_SUCCESS)
