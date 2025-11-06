@@ -27,6 +27,7 @@
     <ClInclude Include="include\rendering\core\SceneData.h" />
     <ClInclude Include="include\rendering\core\Transform.h" />
     <ClInclude Include="include\rendering\core\WindowData.h" />
+    <ClInclude Include="include\rendering\culling\FrustumCuller.h" />
     <ClInclude Include="include\rendering\device\BlendState.h" />
     <ClInclude Include="include\rendering\device\DepthBuffer.h" />
     <ClInclude Include="include\rendering\device\DeviceBuilder.h" />
@@ -37,6 +38,7 @@
     <ClInclude Include="include\rendering\buffers\VertexBuffer.h" />
     <ClInclude Include="include\rendering\device\Rasterizer.h" />
     <ClInclude Include="include\rendering\device\RenderTarget.h" />
+    <ClInclude Include="include\rendering\graphics\camera\BaseCamera.h" />
     <ClInclude Include="include\rendering\graphics\lights\DirectionalLight.h" />
     <ClInclude Include="include\rendering\graphics\lights\PointLight.h" />
     <ClInclude Include="include\rendering\loading\Node.h" />
@@ -71,6 +73,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="src\rendering\application\WindowsApplication.cpp" />
+    <ClCompile Include="src\rendering\culling\FrustumCuller.cpp" />
     <ClCompile Include="src\rendering\device\BlendState.cpp" />
     <ClCompile Include="src\rendering\device\DepthBuffer.cpp" />
     <ClCompile Include="src\rendering\device\DeviceBuilder.cpp" />

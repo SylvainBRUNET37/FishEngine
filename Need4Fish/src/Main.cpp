@@ -81,15 +81,16 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 	physicsSystem.SetContactListener(&contactListener);
 	//////////////////////////////
 
-	Camera camera
-	{
-		.position = XMVectorSet(0, 5, -10, 1),
-		.focus = XMVectorSet(0, 0, 0, 1),
-		.up = XMVectorSet(0, 1, 0, 0),
-		.aspectRatio = static_cast<float>(windowData.screenWidth) / static_cast<float>(windowData.screenHeight),
-		.distance = 100.f,
-		.heightOffset = 30.f,
-	};
+
+	// TODO: revise this
+	Camera camera;
+	camera.position = XMVectorSet(0, 5, -10, 1);
+	camera.focus = XMVectorSet(0, 0, 0, 1);
+	camera.up = XMVectorSet(0, 1, 0, 0);
+	camera.aspectRatio = static_cast<float>(windowData.screenWidth) / static_cast<float>(windowData.screenHeight);
+	camera.distance = 100.f;
+	camera.heightOffset = 30.f;
+	
 	const auto cameraEntity = entityManager.CreateEntity();
 	auto& cameraComponent = entityManager.AddComponent<Camera>(cameraEntity, camera);
 

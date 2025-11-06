@@ -28,7 +28,7 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 	for (const auto& [entity, transform, mesh] : entityManager.View<Transform, Mesh>())
 	{
 		// check if the mesh should be rendered or not
-		if (FurstumCuller::IsMeshCulled(mesh, transform)) continue;
+        if (FrustumCuller::IsMeshCulled(mesh, transform, static_cast<BaseCameraData>(currentCamera))) continue;
 		Render(mesh, transform);
 	}
 
