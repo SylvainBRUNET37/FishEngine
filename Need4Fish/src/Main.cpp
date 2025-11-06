@@ -26,6 +26,8 @@
 #include "systems/CameraSystem.h"
 #include <GameState.h>
 
+#include "rendering/texture/TextureLoader.h"
+
 using namespace JPH;
 using namespace JPH::literals;
 using namespace std;
@@ -55,7 +57,6 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 
 	auto entityManager = EntityManagerFactory::Create(sceneResources);
 
-
 	/////	Physics System	 /////
 	JoltSystem::Init();
 	auto& physicsSystem = JoltSystem::GetPhysicSystem();
@@ -80,60 +81,8 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 
 	ContactListenerImpl contactListener;
 	physicsSystem.SetContactListener(&contactListener);
+
 	//////////////////////////////
-
-
-	// TODO: revise this
-	Camera camera;
-	camera.position = XMVectorSet(0, 5, -10, 1);
-	camera.focus = XMVectorSet(0, 0, 0, 1);
-	camera.up = XMVectorSet(0, 1, 0, 0);
-	camera.aspectRatio = static_cast<float>(windowData.screenWidth) / static_cast<float>(windowData.screenHeight);
-	camera.distance = 100.f;
-	camera.heightOffset = 30.f;
-	
-	const auto cameraEntity = entityManager.CreateEntity();
-	auto& cameraComponent = entityManager.AddComponent<Camera>(cameraEntity, camera);
-
-	// Initialize the scene (it's a temporary way of doing it)
-	for (const auto& [entity, name] : entityManager.View<Name>())
-	{
-		if (name.name == "Cube")
-		{
-			const auto transform = entityManager.Get<Transform>(entity);
-			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCube(transform));
-			entityManager.AddComponent<Controllable>(entity, 100.0f);
-
-			// Link camera to the cube
-			cameraComponent.targetEntity = entity;
-		}
-		else if (name.name == "Cargo")
-		{
-			const auto transform = entityManager.Get<Transform>(entity);
-			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCube(transform));
-		}
-		else if (name.name == "Plane")
-		{
-			const auto transform = entityManager.Get<Transform>(entity);
-			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreatePlane(transform));
-		}
-	}
-
-	// Add light
-	PointLight pointLight =
-	{
-		.ambient = XMFLOAT4(0.02f, 0.02f, 0.02f, 1.0f),
-		.diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
-		.specular = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
-
-		.position = XMFLOAT3(2.0f, 20.0f, -20.0f),
-		.range = 50.0f,
-
-		.attenuation = XMFLOAT3(1.0f, 0.09f, 0.032f),
-		.pad = 0.0f
-	};
-	const auto pointLightEntity = entityManager.CreateEntity();
-	entityManager.AddComponent<PointLight>(pointLightEntity, pointLight);
 
 	// Care about the order of construction, it will be the order of update calls
 	std::vector<std::unique_ptr<System>> systems;
@@ -145,10 +94,9 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 	{
 		std::move(entityManager),
 		std::move(resourceManager),
+		UIManager{renderContext.GetDevice()},
 		std::move(systems)
 	};
-
-	GameEngine::currentCameraEntity = cameraEntity;
 
 	CameraSystem::SetMouseCursor();
 	gameEngine.Run();

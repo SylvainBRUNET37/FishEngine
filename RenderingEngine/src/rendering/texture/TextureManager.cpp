@@ -5,16 +5,16 @@
 
 using namespace std;
 
-ComPtr<ID3D11ShaderResourceView> TextureManager::GetOrLoadFromFile(const std::string& filePath, ID3D11Device* device)
+Texture TextureManager::GetOrLoadFromFile(const std::string& filePath, ID3D11Device* device)
 {
 	const auto it = fileTextureCache.find(filePath);
 	if (it != fileTextureCache.end())
 		return it->second;
 
-	auto srv = TextureLoader::LoadTextureFromFile(filePath, device);
-	fileTextureCache[filePath] = srv;
+	auto texture = TextureLoader::LoadTextureFromFile(filePath, device);
+	fileTextureCache[filePath] = texture;
 
-	return srv;
+	return texture;
 }
 
 ComPtr<ID3D11ShaderResourceView> TextureManager::GetOrLoadFromMemory(const unsigned char* data, const size_t size,
@@ -26,14 +26,15 @@ ComPtr<ID3D11ShaderResourceView> TextureManager::GetOrLoadFromMemory(const unsig
 	if (it != memeoryTextureCache.end())
 		return it->second;
 
-	auto srv = TextureLoader::LoadTextureFromMemory(data, size, device);
-	memeoryTextureCache[hash] = srv;
+	auto texture = TextureLoader::LoadTextureFromMemory(data, size, device);
+	memeoryTextureCache[hash] = texture;
 
-	return srv;
+	return texture;
 }
 
 size_t TextureManager::HashMemory(const unsigned char* data, const size_t size)
 {
 	constexpr hash<string_view> hasher;
+
 	return hasher(string_view(reinterpret_cast<const char*>(data), size));
 }

@@ -4,12 +4,13 @@
 #include <d3d11.h>
 #include <string>
 
+#include "Texture.h"
 #include "rendering/utils/ComPtr.h"
 
 class TextureLoader
 {
 public:
-	[[nodiscard]] static ComPtr<ID3D11ShaderResourceView>
+	[[nodiscard]] static Texture
 	LoadTextureFromFile(const std::string& filePath, ID3D11Device* device);
 
 	[[nodiscard]] static ComPtr<ID3D11ShaderResourceView>

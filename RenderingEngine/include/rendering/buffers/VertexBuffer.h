@@ -1,12 +1,15 @@
 #ifndef VERTEX_BUFFER
 #define VERTEX_BUFFER
 
+#include <vector>
+
 #include "Buffer.h"
-#include "rendering/graphics/Vertex.h"
+#include "rendering/utils/Util.h"
 
 class VertexBuffer : public Buffer
 {
 public:
+    template <typename Vertex>
 	explicit VertexBuffer(ID3D11Device* device, const std::vector<Vertex>& vertices)
 	{
         D3D11_BUFFER_DESC vertexBufferDesc{};

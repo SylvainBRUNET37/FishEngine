@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "rendering/culling/FrustumCuller.h"
 
+#include <DirectXCollision.h>
+
 bool FrustumCuller::IsMeshCulled(Mesh& mesh, const Transform& transform, BaseCameraData camera) noexcept {
 
 	// Local Mesh bounding box

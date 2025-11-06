@@ -4,7 +4,7 @@
 #include "external/stb_image.h"
 #include "rendering/utils/Util.h"
 
-ComPtr<ID3D11ShaderResourceView> TextureLoader::LoadTextureFromFile(const std::string& filePath, ID3D11Device* device)
+Texture TextureLoader::LoadTextureFromFile(const std::string& filePath, ID3D11Device* device)
 {
 	const auto pictureData = LoadPictureFromFile(filePath);
 	const auto textureDesc = CreateTextureDesc(pictureData);
@@ -12,7 +12,12 @@ ComPtr<ID3D11ShaderResourceView> TextureLoader::LoadTextureFromFile(const std::s
 
 	stbi_image_free(pictureData.data);
 
-	return CreateTextureView(device, texture, textureDesc);
+	return
+	{
+		.texture = CreateTextureView(device, texture, textureDesc),
+		.width = static_cast<UINT>(pictureData.width),
+		.height = static_cast<UINT>(pictureData.height)
+	};
 }
 
 ComPtr<ID3D11ShaderResourceView> TextureLoader::LoadTextureFromMemory(

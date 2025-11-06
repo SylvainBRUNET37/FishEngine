@@ -183,6 +183,7 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     <ClCompile Include="src\systems\CameraSystem.cpp" />
     <ClCompile Include="src\systems\PhysicsSimulationSystem.cpp" />
     <ClCompile Include="src\systems\RenderSystem.cpp" />
+    <ClCompile Include="src\UIManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\RenderingEngine\RenderingEngine.vcxproj">
@@ -219,6 +220,7 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     <ClInclude Include="include\systems\PhysicsSimulationSystem.h" />
     <ClInclude Include="include\systems\RenderSystem.h" />
     <ClInclude Include="include\systems\System.h" />
+    <ClInclude Include="include\UIManager.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
@@ -226,6 +228,14 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
       <FileType>Document</FileType>
     </None>
     <None Include="shaders\MiniPhongVS.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\SpritePS.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="shaders\SpriteVS.hlsl">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>

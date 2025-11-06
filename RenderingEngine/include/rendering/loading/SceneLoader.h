@@ -14,28 +14,30 @@ class SceneLoader
 public:
 	// TODO: Link shader program to mesh.
 	// This method is a temporary solution, every mesh will be rendered using same shaders
-	explicit SceneLoader(const ShaderProgram& shaderProgram) : shaderProgram{shaderProgram}
+	explicit SceneLoader(ID3D11Device* device)
+		: device{device}
 	{
 	}
 
-	[[nodiscard]] SceneResource LoadScene(
-		const std::filesystem::path& filePath,
-		ID3D11Device* device
-	);
+	[[nodiscard]] SceneResource LoadScene(const std::filesystem::path& filePath, const ShaderProgram& shaderProgram);
+
+	[[nodiscard]] Texture GetTexture(const std::string& filePath);
 
 private:
-	ShaderProgram shaderProgram;
 	TextureManager textureManager{};
-	static void ProcessNodeHierarchy(const aiNode* aiNode,
-		const aiScene* scene,
-		uint32_t parentIndex,
-		SceneResource& sceneRes);
 
-	static Mesh ProcessMesh(const aiMesh* mesh, ID3D11Device* device, const DirectX::XMMATRIX& transform);
+	ID3D11Device* device;
+
+	static void ProcessNodeHierarchy(const aiNode* aiNode,
+	                                 const aiScene* scene,
+	                                 uint32_t parentIndex,
+	                                 SceneResource& sceneRes);
+
+	Mesh ProcessMesh(const aiMesh* mesh, const DirectX::XMMATRIX& transform) const;
 
 	Material ProcessMaterial(const std::filesystem::path& materialPath, const aiScene* scene,
-	                         const aiMaterial* material, ID3D11Device* device);
-	ComPtr<ID3D11ShaderResourceView> ProcessEmbededTexture(const aiTexture* embeddedTex, ID3D11Device* device);
+	                         const aiMaterial* material, const ShaderProgram& shaderProgram);
+	ComPtr<ID3D11ShaderResourceView> ProcessEmbededTexture(const aiTexture* embeddedTex);
 };
 
 #endif

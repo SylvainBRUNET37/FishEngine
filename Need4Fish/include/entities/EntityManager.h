@@ -66,6 +66,18 @@ public:
 
 	template <typename Component>
 		requires IsComponent<Component>
+	void RemoveComponent(const Entity entity)
+	{
+		if (not IsAlive(entity))
+			return;
+
+		auto& componentPool = std::get<ComponentPool<Component>>(componentPools);
+
+		componentPool.RemoveComponentOf(entity.index);
+	}
+
+	template <typename Component>
+		requires IsComponent<Component>
 	[[nodiscard]] Component& Get(const Entity entity)
 	{
 		if (not IsAlive(entity))

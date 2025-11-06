@@ -6,7 +6,7 @@
 
 #include "rendering/loading/SceneLoader.h"
 
-ResourceManager::ResourceManager(ID3D11Device* device) : device{device}
+ResourceManager::ResourceManager(ID3D11Device* device) : device{device}, sceneLoader{device}
 {
 	InitShaderBank();
 }
@@ -17,13 +17,15 @@ void ResourceManager::InitShaderBank()
 
 	// Add description of each shader program of the project
 	desc.AddDesc<VertexShader>("shaders/MiniPhongVS.hlsl", "MiniPhongVS", "vs_5_0")
-		.AddDesc<PixelShader>("shaders/MiniPhongPS.hlsl", "MiniPhongPS", "ps_5_0");
+		.AddDesc<PixelShader>("shaders/MiniPhongPS.hlsl", "MiniPhongPS", "ps_5_0")
+		.AddDesc<VertexShader>("shaders/SpriteVS.hlsl", "SpriteVS", "vs_5_0")
+		.AddDesc<PixelShader>("shaders/SpritePS.hlsl", "SpritePS", "ps_5_0");
 
 	ShaderFactory<VertexShader, PixelShader> shaderFactory;
 	shaderBank = shaderFactory.CreateShaderBank(desc, device);
 } 
 
-SceneResource ResourceManager::LoadScene() const
+SceneResource ResourceManager::LoadScene()
 {
 	// TODO: Link shaders to Mesh (curently, every mesh use the same shaders)
 	const ShaderProgram shaderProgram
@@ -35,6 +37,5 @@ SceneResource ResourceManager::LoadScene() const
 
 	const std::filesystem::path filePath = "assets\\TestOcean.glb";
 
-	SceneLoader modelLoader{ shaderProgram };
-	return modelLoader.LoadScene(filePath, device);
+	return sceneLoader.LoadScene(filePath, shaderProgram);
 }

@@ -2,22 +2,21 @@
 #define GAME_ENGINE_H
 
 #include "ResourceManager.h"
+#include "UIManager.h"
 #include "entities/EntityManager.h"
-#include "systems/RenderSystem.h"
 #include "systems/System.h"
 
 class GameEngine
 {
 public:
-	// TODO: try to avoid this, globals are bad !
-	inline static Entity currentCameraEntity = INVALID_ENTITY;
-
-	explicit GameEngine(EntityManager&& entityManager, ResourceManager&& resourceManager,
+	explicit GameEngine(EntityManager&& entityManager, ResourceManager&& resourceManager, UIManager&& uiManager,
 	                    std::vector<std::unique_ptr<System>>&& systems)
 		: systems{std::move(systems)},
+		  uiManager{std::move(uiManager)},
 		  resourceManager{std::move(resourceManager)},
 		  entityManager{std::move(entityManager)}
 	{
+		InitGame();
 	}
 
 	void Run();
@@ -28,10 +27,21 @@ private:
 
 	std::vector<std::unique_ptr<System>> systems;
 
+	Entity mainMenuEntity;
+
+	UIManager uiManager;
 	ResourceManager resourceManager;
 	EntityManager entityManager;
 
 	static void WaitBeforeNextFrame(DWORD frameStartTime);
+
+	void HandleGameState();
+
+	void ChangeGameStatus();
+	void PauseGame(Entity mainMenuEntity);
+	void ResumeGame(Entity mainMenuEntity);
+
+	void InitGame();
 };
 
 #endif
