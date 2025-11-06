@@ -46,7 +46,7 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 	}
 
 	// Render sprites
-	for (const auto& [entity, sprite] : entityManager.View<Sprite>())
+	for (const auto& [entity, sprite] : entityManager.View<Sprite2D>())
 		renderer.Render(sprite, renderContext->GetContext());
 
 	Present();

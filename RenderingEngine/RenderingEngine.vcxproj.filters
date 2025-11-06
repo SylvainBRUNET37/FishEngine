@@ -150,7 +150,7 @@
     <ClInclude Include="include\rendering\culling\FrustumCuller.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\rendering\graphics\Sprite.h">
+    <ClInclude Include="include\rendering\graphics\Sprite2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\rendering\graphics\VertexSprite.h">
@@ -221,7 +221,7 @@
     <ClCompile Include="src\rendering\culling\FrustumCuller.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\rendering\graphics\Sprite.cpp">
+    <ClCompile Include="src\rendering\graphics\Sprite2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

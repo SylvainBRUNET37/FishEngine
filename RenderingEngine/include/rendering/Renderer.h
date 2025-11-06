@@ -7,7 +7,7 @@
 #include "core/Transform.h"
 #include "graphics/Material.h"
 #include "graphics/Mesh.h"
-#include "graphics/Sprite.h"
+#include "graphics/Sprite2D.h"
 
 class Renderer
 {
@@ -22,7 +22,7 @@ public:
 
 	void UpdateFrameBuffer(const FrameBuffer& frameBuffer_) { frameBuffer = frameBuffer_; };
 	void Render(const Mesh& mesh, ID3D11DeviceContext* context, const Transform& transform);
-	void Render(Sprite& sprite, ID3D11DeviceContext* context);
+	void Render(Sprite2D& sprite, ID3D11DeviceContext* context);
 
 private:
 	static constexpr int frameCbRegisterNumber = 0;
@@ -37,7 +37,7 @@ private:
 	ConstantBuffer<SpriteBuffer> spriteConstantBuffer;
 
 	static void Draw(const Mesh& mesh, ID3D11DeviceContext* context);
-	static void Draw(const Sprite& sprite, ID3D11DeviceContext* context);
+	static void Draw(const Sprite2D& sprite, ID3D11DeviceContext* context);
 
 	static ObjectBuffer BuildConstantObjectBuffer(const Transform& transform);
 	static MaterialBuffer BuildConstantMaterialBuffer(const Material& material);

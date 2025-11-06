@@ -30,7 +30,7 @@ void Renderer::Render(const Mesh& mesh,
 	Draw(mesh, context);
 }
 
-void Renderer::Render(Sprite& sprite, ID3D11DeviceContext* context)
+void Renderer::Render(Sprite2D& sprite, ID3D11DeviceContext* context)
 {
 	context->OMSetDepthStencilState(nullptr, 0); // TODO: delete
 
@@ -66,7 +66,7 @@ void Renderer::Draw(const Mesh& mesh, ID3D11DeviceContext* context)
 	context->DrawIndexed(static_cast<UINT>(mesh.indices.size()), 0, 0);
 }
 
-void Renderer::Draw(const Sprite& sprite, ID3D11DeviceContext* context)
+void Renderer::Draw(const Sprite2D& sprite, ID3D11DeviceContext* context)
 {
 	// There is 2 triangle in a sprite, so 6 vertices
 	static constexpr UINT SPRITE_VERTICES_COUNT = 6;

@@ -2,19 +2,19 @@
 #define UI_MANAGER_H
 
 #include "ResourceManager.h"
-#include "rendering/graphics/Sprite.h"
+#include "rendering/graphics/Sprite2D.h"
 
 class UIManager
 {
 public:
 	explicit UIManager(ID3D11Device* device);
 
-	[[nodiscard]] Sprite LoadSprite(const std::string& filePath, const ResourceManager& resourceManager) const;
+	[[nodiscard]] Sprite2D LoadSprite(const std::string& filePath, const ResourceManager& resourceManager) const;
 
 private:
 	ID3D11Device* device;
 
-	std::unordered_map<std::string, Sprite> sprites;
+	std::unordered_map<std::string, Sprite2D> sprites;
 };
 
 #endif

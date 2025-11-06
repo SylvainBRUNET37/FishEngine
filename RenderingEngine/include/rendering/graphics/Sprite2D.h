@@ -1,12 +1,12 @@
-#ifndef SPRITE_H
-#define SPRITE_H
+#ifndef SPRITE_2D_H
+#define SPRITE_2D_H
 
 #include "VertexSprite.h"
 #include "rendering/buffers/VertexBuffer.h"
 #include "rendering/shaders/ShaderProgram.h"
 #include "rendering/texture/Texture.h"
 
-struct Sprite
+struct Sprite2D
 {
     struct SpritePosition
     {
@@ -14,7 +14,7 @@ struct Sprite
         float y;
     };
 
-    explicit Sprite(const ShaderProgram& shaderProgram, const Texture& texture, ID3D11Device* device);
+    explicit Sprite2D(const ShaderProgram& shaderProgram, const Texture& texture, ID3D11Device* device);
 
     Texture texture;
     SpritePosition position;

@@ -7,7 +7,7 @@ UIManager::UIManager(ID3D11Device* device) : device{device}
 {
 }
 
-Sprite UIManager::LoadSprite(const std::string& filePath, const ResourceManager& resourceManager) const
+Sprite2D UIManager::LoadSprite(const std::string& filePath, const ResourceManager& resourceManager) const
 {
 	const auto texture = TextureLoader::LoadTextureFromFile(filePath, device);
 	auto& shaderBank = resourceManager.GetShaderBank();
@@ -19,5 +19,5 @@ Sprite UIManager::LoadSprite(const std::string& filePath, const ResourceManager&
 		shaderBank.Get<PixelShader>("shaders/SpritePS.hlsl")
 	);
 
-	return Sprite{ spriteShaderProgram, texture, device };
+	return Sprite2D{ spriteShaderProgram, texture, device };
 }

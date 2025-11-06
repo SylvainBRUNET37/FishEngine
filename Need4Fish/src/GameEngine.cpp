@@ -66,7 +66,7 @@ void GameEngine::PauseGame(const Entity mainMenuEntity)
 {
 	CameraSystem::SetMouseCursor();
 	GameState::currentState = GameState::PLAYING;
-	entityManager.RemoveComponent<Sprite>(mainMenuEntity);
+	entityManager.RemoveComponent<Sprite2D>(mainMenuEntity);
 }
 
 void GameEngine::ResumeGame(const Entity mainMenuEntity)
@@ -79,7 +79,7 @@ void GameEngine::ResumeGame(const Entity mainMenuEntity)
 
 	GameState::currentState = GameState::PAUSED;
 
-	entityManager.AddComponent<Sprite>
+	entityManager.AddComponent<Sprite2D>
 	(
 		mainMenuEntity, 
 		uiManager.LoadSprite("assets/pauseMenu.jpg", resourceManager)

@@ -1,10 +1,10 @@
 #include "pch.h"
-#include "rendering/graphics/Sprite.h"
+#include "rendering/graphics/Sprite2D.h"
 
 using namespace std;
 using namespace DirectX;
 
-Sprite::Sprite(const ShaderProgram& shaderProgram_, const Texture& texture_, ID3D11Device* device)
+Sprite2D::Sprite2D(const ShaderProgram& shaderProgram_, const Texture& texture_, ID3D11Device* device)
 	: texture{texture_},
 	  position{},
 	  vertexBuffer{device, ComputeVertices(position, texture)},
@@ -12,7 +12,7 @@ Sprite::Sprite(const ShaderProgram& shaderProgram_, const Texture& texture_, ID3
 {
 }
 
-std::vector<VertexSprite> Sprite::ComputeVertices(const SpritePosition& position, const Texture& texture)
+std::vector<VertexSprite> Sprite2D::ComputeVertices(const SpritePosition& position, const Texture& texture)
 {
 	return
 	{
