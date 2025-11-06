@@ -79,23 +79,9 @@ void GameEngine::ResumeGame(const Entity mainMenuEntity)
 
 	GameState::currentState = GameState::PAUSED;
 
-	// TODO: refactor
-
-	const Texture texture
-	{
-		.texture = TextureLoader::LoadTextureFromFile("assets/pauseMenu.jpg", resourceManager.device),
-		.width = 1920,
-		.height = 1080
-	};
-	const ShaderProgram spriteShaderProgram
+	entityManager.AddComponent<Sprite>
 	(
-		resourceManager.device,
-		resourceManager.shaderBank.Get<VertexShader>("shaders/SpriteVS.hlsl"),
-		resourceManager.shaderBank.Get<PixelShader>("shaders/SpritePS.hlsl")
+		mainMenuEntity, 
+		uiManager.LoadSprite("assets/pauseMenu.jpg", resourceManager)
 	);
-
-	Sprite sprite(spriteShaderProgram, texture, resourceManager.device);
-	entityManager.AddComponent<Sprite>(mainMenuEntity, std::move(sprite));
-
-	//
 }

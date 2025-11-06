@@ -140,6 +140,7 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 	{
 		std::move(entityManager),
 		std::move(resourceManager),
+		UIManager{renderContext.GetDevice()},
 		std::move(systems)
 	};
 

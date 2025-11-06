@@ -2,15 +2,17 @@
 #define GAME_ENGINE_H
 
 #include "ResourceManager.h"
+#include "UIManager.h"
 #include "entities/EntityManager.h"
 #include "systems/System.h"
 
 class GameEngine
 {
 public:
-	explicit GameEngine(EntityManager&& entityManager, ResourceManager&& resourceManager,
+	explicit GameEngine(EntityManager&& entityManager, ResourceManager&& resourceManager, UIManager&& uiManager,
 	                    std::vector<std::unique_ptr<System>>&& systems)
 		: systems{std::move(systems)},
+		  uiManager{std::move(uiManager)},
 		  resourceManager{std::move(resourceManager)},
 		  entityManager{std::move(entityManager)}
 	{
@@ -24,6 +26,7 @@ private:
 
 	std::vector<std::unique_ptr<System>> systems;
 
+	UIManager uiManager;
 	ResourceManager resourceManager;
 	EntityManager entityManager;
 

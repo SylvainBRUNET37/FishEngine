@@ -6,7 +6,7 @@
 
 #include "rendering/loading/SceneLoader.h"
 
-ResourceManager::ResourceManager(ID3D11Device* device) : device{device}
+ResourceManager::ResourceManager(ID3D11Device* device) : device{device}, sceneLoader{device}
 {
 	InitShaderBank();
 }
@@ -25,7 +25,7 @@ void ResourceManager::InitShaderBank()
 	shaderBank = shaderFactory.CreateShaderBank(desc, device);
 } 
 
-SceneResource ResourceManager::LoadScene() const
+SceneResource ResourceManager::LoadScene()
 {
 	// TODO: Link shaders to Mesh (curently, every mesh use the same shaders)
 	const ShaderProgram shaderProgram
@@ -37,6 +37,5 @@ SceneResource ResourceManager::LoadScene() const
 
 	const std::filesystem::path filePath = "assets\\TestOcean.glb";
 
-	SceneLoader modelLoader{ shaderProgram };
-	return modelLoader.LoadScene(filePath, device);
+	return sceneLoader.LoadScene(filePath, shaderProgram);
 }

@@ -29,7 +29,7 @@ namespace
 	}
 }
 
-SceneResource SceneLoader::LoadScene(const filesystem::path& filePath, ID3D11Device* device)
+SceneResource SceneLoader::LoadScene(const filesystem::path& filePath, const ShaderProgram& shaderProgram)
 {
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(
@@ -49,18 +49,23 @@ SceneResource SceneLoader::LoadScene(const filesystem::path& filePath, ID3D11Dev
 	// Load materials
 	sceneRes.materials.reserve(scene->mNumMaterials);
 	for (unsigned int i = 0; i < scene->mNumMaterials; i++)
-		sceneRes.materials.push_back(ProcessMaterial(filePath.parent_path(), scene, scene->mMaterials[i], device));
+		sceneRes.materials.push_back(ProcessMaterial(filePath.parent_path(), scene, scene->mMaterials[i], shaderProgram));
 
 	// Load meshes
 	sceneRes.meshes.reserve(scene->mNumMeshes);
 	for (unsigned int i = 0; i < scene->mNumMeshes; i++)
-		sceneRes.meshes.push_back(ProcessMesh(scene->mMeshes[i], device, XMMatrixIdentity()));
+		sceneRes.meshes.push_back(ProcessMesh(scene->mMeshes[i], XMMatrixIdentity()));
 
 	// Build node hierarchy
 	sceneRes.nodes.reserve(scene->mNumMeshes); // rough estimate
 	ProcessNodeHierarchy(scene->mRootNode, scene, UINT32_MAX, sceneRes);
 
 	return sceneRes;
+}
+
+Texture SceneLoader::GetTexture(const std::string& filePath)
+{
+	return textureManager.GetOrLoadFromFile(filePath, device);
 }
 
 void SceneLoader::ProcessNodeHierarchy(
@@ -115,7 +120,7 @@ void SceneLoader::ProcessNodeHierarchy(
 	}
 }
 
-Mesh SceneLoader::ProcessMesh(const aiMesh* mesh, ID3D11Device* device, const XMMATRIX& transform)
+Mesh SceneLoader::ProcessMesh(const aiMesh* mesh, const XMMATRIX& transform) const
 {
 	std::vector<Vertex> vertices;
 	std::vector<UINT> indices;
@@ -164,8 +169,7 @@ Mesh SceneLoader::ProcessMesh(const aiMesh* mesh, ID3D11Device* device, const XM
 Material SceneLoader::ProcessMaterial(
 	const filesystem::path& materialPath,
 	const aiScene* scene,
-	const aiMaterial* material,
-	ID3D11Device* device)
+	const aiMaterial* material, const ShaderProgram& shaderProgram)
 {
 	static constexpr int materialCbRegisterNumber = 2;
 	Material mat{ device, shaderProgram, materialCbRegisterNumber };
@@ -189,7 +193,7 @@ Material SceneLoader::ProcessMaterial(
 	{
 		if (const aiTexture* embeddedTex = scene->GetEmbeddedTexture(texturePath.C_Str()))
 		{
-			mat.texture = ProcessEmbededTexture(embeddedTex, device);
+			mat.texture = ProcessEmbededTexture(embeddedTex);
 		}
 		else
 		{
@@ -197,14 +201,14 @@ Material SceneLoader::ProcessMaterial(
 			if (!absoluteTexturePath.is_absolute())
 				absoluteTexturePath = materialPath / absoluteTexturePath;
 
-			mat.texture = textureManager.GetOrLoadFromFile(absoluteTexturePath.string(), device);
+			mat.texture = textureManager.GetOrLoadFromFile(absoluteTexturePath.string(), device).texture;
 		}
 	}
 
 	return mat;
 }
 
-ComPtr<ID3D11ShaderResourceView> SceneLoader::ProcessEmbededTexture(const aiTexture* embeddedTex, ID3D11Device* device)
+ComPtr<ID3D11ShaderResourceView> SceneLoader::ProcessEmbededTexture(const aiTexture* embeddedTex)
 {
 	ComPtr<ID3D11ShaderResourceView> shaderRessouceView;
 
