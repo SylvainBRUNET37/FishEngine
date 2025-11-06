@@ -10,10 +10,14 @@
 namespace ShapeFactory
 {
 	[[nodiscard]] JPH::Body* CreateCube(const Transform& transform);
+	[[nodiscard]] JPH::Body* CreateCube(const Transform& transform, const Mesh& mesh);
 	[[nodiscard]] JPH::Body* CreatePlane(const Transform& transform);
 	[[nodiscard]] JPH::Body* CreatePlane(const Transform& transform, const Mesh& mesh);
 	[[nodiscard]] JPH::Body* CreateCapsule(const Transform& transform);
-	[[nodiscard]] JPH::Body* CreateSphere(const Transform& transform, const DirectX::XMFLOAT3& direction);
+	[[nodiscard]] JPH::Body* CreateVerticalCapsule(const Transform& transform, const Mesh& mesh);
+	[[nodiscard]] JPH::Body* CreateHorizontalCapsule(const Transform& transform, const Mesh& mesh);
+	[[nodiscard]] JPH::Body* CreateSphereWithVelocity(const Transform& transform, const DirectX::XMFLOAT3& direction);
+	[[nodiscard]] JPH::Body* CreateFloor();
 }
 
 #endif

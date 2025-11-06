@@ -48,7 +48,39 @@ Body* ShapeFactory::CreateCube(const Transform& transform)
     return body;
 }
 
-Body* ShapeFactory::CreateSphere(const Transform& transform, const XMFLOAT3& direction)
+Body* ShapeFactory::CreateCube(const Transform& transform, const Mesh& mesh)
+{
+    // Apply scale to the box
+    Vec3 size = MeshUtils::getApproximateSize(mesh);
+    auto halfExtents = size * 0.5;
+    halfExtents *= Vec3(transform.scale.x, transform.scale.y, transform.scale.z);
+
+    const RefConst shape = new BoxShape(halfExtents);
+
+    // Convert mesh type of position and rotation to jolt's ones
+    const RVec3 position(transform.position.x, transform.position.y, transform.position.z);
+    const Quat rotation(transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w);
+
+    BodyCreationSettings boxSettings(
+        shape,
+        position,
+        rotation,
+        EMotionType::Dynamic,
+        Layers::MOVING
+    );
+
+    boxSettings.mLinearDamping = 1.f;
+
+    BodyInterface& bodyInterface = JoltSystem::GetBodyInterface();
+    Body* body = bodyInterface.CreateBody(boxSettings);
+    bodyInterface.AddBody(body->GetID(), EActivation::Activate);
+
+    body->SetFriction(0.6f);
+
+    return body;
+}
+
+Body* ShapeFactory::CreateSphereWithVelocity(const Transform& transform, const XMFLOAT3& direction)
 {
     // Apply scale to the sphere... but Thierry does not know how to do this or what this multiplication by 0.5 is for...
     /*auto halfExtents = Vec3(0.5f, 0.5f, 0.5f);
@@ -81,6 +113,28 @@ Body* ShapeFactory::CreateSphere(const Transform& transform, const XMFLOAT3& dir
     bodyInterface.SetLinearVelocity(body->GetID(), velocity);
     bodyInterface.SetRestitution(body->GetID(), 0.5f);
     body->SetFriction(0.6f);
+
+    return body;
+}
+
+JPH::Body* ShapeFactory::CreateFloor()
+{
+    const RefConst shape = new PlaneShape(Plane(Vec4Arg(0.0f, 1.0f, 0.0f, 0.0f)));
+    const RVec3 position(0.f, 0.f, 0.f);
+    const Quat rotation(0.f, 0.f, 0.f, 1.f);
+
+
+    const BodyCreationSettings floorSettings(
+        shape,
+        position,
+        rotation,
+        EMotionType::Static,
+        Layers::NON_MOVING
+    );
+
+    BodyInterface& bodyInterface = JoltSystem::GetBodyInterface();
+    Body* body = bodyInterface.CreateBody(floorSettings);
+    bodyInterface.AddBody(body->GetID(), EActivation::Activate);
 
     return body;
 }
@@ -176,3 +230,60 @@ Body* ShapeFactory::CreateCapsule(const Transform& transform)
     return body;
 }
 
+Body* ShapeFactory::CreateVerticalCapsule(const Transform& transform, const Mesh& mesh)
+{
+    Vec3 size = MeshUtils::getApproximateSize(mesh);
+
+    //Below assumes a vertically aligned capsule...
+    const float radius = transform.scale.x * max(size.GetX(), size.GetZ()) / 2;
+    const float halfHeight = transform.scale.y * size.GetY() / 2;
+
+    const RefConst shape = new CapsuleShape(halfHeight, radius);
+
+    const RVec3 position(transform.position.x, transform.position.y, transform.position.z);
+    const Quat rotation(transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w);
+
+    const BodyCreationSettings capsuleSettings(
+        shape,
+        position,
+        rotation,
+        EMotionType::Static,
+        Layers::SENSOR
+    );
+
+    BodyInterface& bodyInterface = JoltSystem::GetBodyInterface();
+    Body* body = bodyInterface.CreateBody(capsuleSettings);
+    bodyInterface.AddBody(body->GetID(), EActivation::Activate);
+    body->SetIsSensor(true);
+
+    return body;
+}
+
+Body* ShapeFactory::CreateHorizontalCapsule(const Transform& transform, const Mesh& mesh)
+{
+    Vec3 size = MeshUtils::getApproximateSize(mesh);
+
+    //Below assumes a horizontally aligned capsule...
+    const float halfHeight = transform.scale.x * max(size.GetX(), size.GetZ()) / 2;
+    const float radius = transform.scale.y * size.GetY() / 2;
+
+    const RefConst shape = new CapsuleShape(halfHeight, radius);
+
+    const RVec3 position(transform.position.x, transform.position.y, transform.position.z);
+    const Quat rotation(transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w);
+
+    const BodyCreationSettings capsuleSettings(
+        shape,
+        position,
+        rotation,
+        EMotionType::Static,
+        Layers::SENSOR
+    );
+
+    BodyInterface& bodyInterface = JoltSystem::GetBodyInterface();
+    Body* body = bodyInterface.CreateBody(capsuleSettings);
+    bodyInterface.AddBody(body->GetID(), EActivation::Activate);
+    body->SetIsSensor(true);
+
+    return body;
+}

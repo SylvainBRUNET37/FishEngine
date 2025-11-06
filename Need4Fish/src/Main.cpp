@@ -95,12 +95,13 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 	auto& cameraComponent = entityManager.AddComponent<Camera>(cameraEntity, camera);
 
 	// Initialize the scene (it's a temporary way of doing it)
-	for (const auto& [entity, name] : entityManager.View<Name>())
+	for (const auto& [entity, name, mesh] : entityManager.View<Name, Mesh>())
 	{
 		if (name.name == "Cube")
 		{
 			const auto transform = entityManager.Get<Transform>(entity);
-			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCube(transform));
+			const auto mesh = entityManager.Get<Mesh>(entity);
+			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCube(transform, mesh));
 			entityManager.AddComponent<Controllable>(entity, 100.0f);
 
 			// Link camera to the cube
@@ -114,7 +115,8 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 		else if (name.name == "Plane")
 		{
 			const auto transform = entityManager.Get<Transform>(entity);
-			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreatePlane(transform));
+			//entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreatePlane(transform));
+			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateFloor());
 		}
 	}
 
