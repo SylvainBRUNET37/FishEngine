@@ -59,6 +59,7 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 	/////	Physics System	 /////
 	JoltSystem::Init();
 	auto& physicsSystem = JoltSystem::GetPhysicSystem();
+	//physicsSystem.SetGravity(Vec3(0, 9.80, 0));
 
 #ifndef NDEBUG
 	AssertFailed = JoltUtils::AssertFailedImpl;
