@@ -3,7 +3,7 @@
 #include "systems/RenderSystem.h"
 #include "rendering/culling/FrustumCuller.h"
 
-#include "GameEngine.h"
+#include "GameState.h"
 
 using namespace DirectX;
 using namespace std;
@@ -17,7 +17,7 @@ RenderSystem::RenderSystem(RenderContext* renderContext, std::vector<Material>&&
 
 void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 {
-	const auto currentCamera = entityManager.Get<Camera>(GameEngine::currentCameraEntity);
+	const auto currentCamera = entityManager.Get<Camera>(GameState::currentCameraEntity);
 
 	RenderScene();
 

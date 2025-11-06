@@ -1,27 +1,18 @@
-﻿#ifndef GAMESTATE_H
-#define GAMESTATE_H
-#include "Windows.h"
+﻿#ifndef GAME_STATE_H
+#define GAME_STATE_H
+
 #include "systems/CameraSystem.h"
 
-struct GameState {
-    inline static bool isPaused = false;
+struct GameState
+{
+    enum State : uint8_t
+    {
+	    PLAYING,
+        PAUSED
+    };
+
+    inline static Entity currentCameraEntity = INVALID_ENTITY;
+    inline static auto currentState = PLAYING;
 };
 
-inline void ChangePauseStatus() {
-    if (GameState::isPaused) //Sortie de pause : recapture
-    {        
-        CameraSystem::SetMouseCursor();
-        GameState::isPaused = false;
-    }
-    else //Mise en pause : libération
-    {
-        ShowCursor(TRUE);
-        Camera::isMouseCaptured = false;
-
-        ClipCursor(nullptr);
-        ReleaseCapture();
-
-        GameState::isPaused = true;
-    }
-}
 #endif

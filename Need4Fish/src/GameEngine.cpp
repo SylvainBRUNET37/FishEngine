@@ -1,7 +1,9 @@
 #include "pch.h"
 #include "GameEngine.h"
 
+#include "GameState.h"
 #include "rendering/application/WindowsApplication.h"
+#include "rendering/texture/TextureLoader.h"
 
 void GameEngine::Run()
 {
@@ -10,10 +12,16 @@ void GameEngine::Run()
 
 	while (shouldContinue)
 	{
-		const DWORD frameStartTime = GetTickCount();
+		// Pause/Unpause the game if ESC is pressed for exemple
+		HandleGameState();
 
-		const double elapsedTime = (frameStartTime - prevTime) / 1000.0;
-		prevTime = frameStartTime;
+		const DWORD frameStartTime = GetTickCount();
+		const auto isGamePaused = GameState::currentState == GameState::PAUSED;
+
+		const double elapsedTime = isGamePaused ? 0.0 : (frameStartTime - prevTime) / 1000.0;
+
+		if (not isGamePaused) [[likely]]
+			prevTime = frameStartTime;
 
 		// End the loop if Windows want to terminate the program (+ process messages)
 		shouldContinue = WindowsApplication::ProcessWindowsMessages();
@@ -32,4 +40,62 @@ void GameEngine::WaitBeforeNextFrame(const DWORD frameStartTime)
 
 	if (frameDuration < FRAME_TIME)
 		Sleep(static_cast<DWORD>(FRAME_TIME - frameDuration));
+}
+
+void GameEngine::HandleGameState()
+{
+	static bool wasEscapePressed = false;
+	const bool isEscapePressed = GetAsyncKeyState(VK_ESCAPE) & 0x8000;
+
+	if (isEscapePressed && !wasEscapePressed)
+		ChangeGameStatus();
+
+	wasEscapePressed = isEscapePressed;
+}
+
+void GameEngine::ChangeGameStatus()
+{
+	static Entity mainMenuEntity = entityManager.CreateEntity();
+
+	GameState::currentState == GameState::PAUSED
+		? PauseGame(mainMenuEntity)
+		: ResumeGame(mainMenuEntity);
+}
+
+void GameEngine::PauseGame(const Entity mainMenuEntity)
+{
+	CameraSystem::SetMouseCursor();
+	GameState::currentState = GameState::PLAYING;
+	entityManager.RemoveComponent<Sprite>(mainMenuEntity);
+}
+
+void GameEngine::ResumeGame(const Entity mainMenuEntity)
+{
+	ShowCursor(TRUE);
+	Camera::isMouseCaptured = false;
+
+	ClipCursor(nullptr);
+	ReleaseCapture();
+
+	GameState::currentState = GameState::PAUSED;
+
+	// TODO: refactor
+
+	const Texture texture
+	{
+		.texture = TextureLoader::LoadTextureFromFile("assets/pauseMenu.jpg", resourceManager.device),
+		.width = 1920,
+		.height = 1080
+	};
+	const ShaderProgram spriteShaderProgram
+	(
+		resourceManager.device,
+		resourceManager.shaderBank.Get<VertexShader>("shaders/SpriteVS.hlsl"),
+		resourceManager.shaderBank.Get<PixelShader>("shaders/SpritePS.hlsl")
+	);
+
+	Sprite sprite(spriteShaderProgram, texture, resourceManager.device);
+	entityManager.AddComponent<Sprite>(mainMenuEntity, std::move(sprite));
+
+	//
 }

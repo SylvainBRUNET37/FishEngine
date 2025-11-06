@@ -4,12 +4,15 @@
 
 using namespace DirectX;
 
-void CameraSystem::Update(double deltaTime, EntityManager& entityManager)
+void CameraSystem::Update(double, EntityManager& entityManager)
 {
-	for (const auto& [entity, camera] : entityManager.View<Camera>())
+	if (GameState::currentState != GameState::PAUSED)
 	{
-		HandleRotation(camera);
-		UpdateCameraMatrices(camera, entityManager);
+		for (const auto& [entity, camera] : entityManager.View<Camera>())
+		{
+			HandleRotation(camera);
+			UpdateCameraMatrices(camera, entityManager);
+		}
 	}
 }
 
@@ -78,17 +81,8 @@ void CameraSystem::HandleRotation(Camera& cameraData)
 	}
 
 	cameraData.cursorCoordinates = currentCursorCoordinates;*/
-	// Si en pause, ne pas traiter la rotation
-	if (GameState::isPaused)
-	{
-		return;
-	}
+
 	// Sortie de pause
-	if (!cameraData.isMouseCaptured)
-	{
-		SetMouseCursor();
-		return;
-	}
 
 	POINT currentCursorCoordinates;
 	if (!GetCursorPos(&currentCursorCoordinates))

@@ -3,15 +3,11 @@
 
 #include "ResourceManager.h"
 #include "entities/EntityManager.h"
-#include "systems/RenderSystem.h"
 #include "systems/System.h"
 
 class GameEngine
 {
 public:
-	// TODO: try to avoid this, globals are bad !
-	inline static Entity currentCameraEntity = INVALID_ENTITY;
-
 	explicit GameEngine(EntityManager&& entityManager, ResourceManager&& resourceManager,
 	                    std::vector<std::unique_ptr<System>>&& systems)
 		: systems{std::move(systems)},
@@ -32,6 +28,11 @@ private:
 	EntityManager entityManager;
 
 	static void WaitBeforeNextFrame(DWORD frameStartTime);
+
+	void HandleGameState();
+	void ChangeGameStatus();
+	void PauseGame(Entity mainMenuEntity);
+	void ResumeGame(Entity mainMenuEntity);
 };
 
 #endif

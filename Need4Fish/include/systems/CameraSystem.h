@@ -5,7 +5,7 @@
 
 class CameraSystem : public System
 {
-	void Update(double deltaTime, EntityManager& entityManager) override;
+	void Update(double, EntityManager& entityManager) override;
 
 	static void UpdateCameraMatrices(Camera& camera, const EntityManager& entityManager);
 
