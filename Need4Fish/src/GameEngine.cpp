@@ -1,6 +1,10 @@
 #include "pch.h"
 #include "GameEngine.h"
 
+#include <iostream>
+#include <tuple>
+#include <optional>
+#include <algorithm>
 #include "GameState.h"
 #include "entities/EntityManagerFactory.h"
 #include "PhysicsEngine/ShapeFactory.h"
@@ -48,17 +52,67 @@ void GameEngine::WaitBeforeNextFrame(const DWORD frameStartTime)
 
 void GameEngine::HandleGameState()
 {
+	// Check if things get eaten
+	HandleCollions();
+
 	static bool wasEscapePressed = false;
 	const bool isEscapePressed = GetAsyncKeyState(VK_ESCAPE) & 0x8000;
 
 	// Restart the game if has been was pressed
-	if (GetAsyncKeyState('R') & 0x8000)
+	if ((GetAsyncKeyState('R') & 0x8000) || GameState::currentState == GameState::DIED)
 		InitGame();
 
 	if (isEscapePressed && !wasEscapePressed)
 		ChangeGameStatus();
 
 	wasEscapePressed = isEscapePressed;
+}
+
+void GameEngine::HandleCollions() {
+	auto eatables = entityManager.View<RigidBody, Eatable>();
+	
+	auto isBodyEatable = [&](JPH::BodyID bodyId) -> std::optional<std::pair<Entity, Eatable>> {
+
+		auto it = std::find_if(eatables.begin(), eatables.end(),
+			[&](auto&& tuple)
+			{
+				auto& [entity, rigidBody, eatable] = tuple;
+				return rigidBody.body->GetID() == bodyId;
+			});
+
+		if (it != eatables.end())
+		{
+			const auto& [entity, _, eatable] = *it;
+			return std::make_pair(entity, eatable);
+		}
+
+		return std::nullopt;
+	};
+	
+	while (!GameState::detectedCollisions.empty())
+	{
+		auto& [bodyId1, bodyId2] = GameState::detectedCollisions.front();
+		GameState::detectedCollisions.pop();
+
+		// Check if the both objects is eatable
+		auto firstObject = isBodyEatable(bodyId1);
+		auto secondObject = isBodyEatable(bodyId2);
+		if (firstObject.has_value() && secondObject.has_value())
+		{
+			// Kill things if necessary
+			
+			// TODO: kill if not the player, otherwise DIE
+
+			if (firstObject.value().second.CanBeEatenBy(secondObject.value().second)) {
+				// Kill 1
+				entityManager.Kill(firstObject.value().first);
+			}
+			else if (secondObject.value().second.CanBeEatenBy(firstObject.value().second)) {
+				// Kill 2
+				entityManager.Kill(secondObject.value().first);
+			}
+		}
+	}
 }
 
 void GameEngine::ChangeGameStatus()
@@ -120,6 +174,7 @@ void GameEngine::InitGame()
 			const auto mesh = entityManager.Get<Mesh>(entity);
 			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCube(transform, mesh));
 			entityManager.AddComponent<Controllable>(entity, 100.0f);
+			entityManager.AddComponent<Eatable>(entity, 100.0f);
 
 			// Link camera to the mosasaur
 			cameraComponent.targetEntity = entity;
@@ -132,6 +187,9 @@ void GameEngine::InitGame()
 		}
 		else if (name.name == "Aquarium" || name.name == "Sphere" || name.name == "Caverne")
 		{
+			if (name.name == "Sphere") {
+				entityManager.AddComponent<Eatable>(entity, 80.0f); // eatable
+			}
 			const auto transform = entityManager.Get<Transform>(entity);
 			const auto mesh = entityManager.Get<Mesh>(entity);
 			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateMeshShape(transform, mesh));

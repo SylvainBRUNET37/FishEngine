@@ -15,8 +15,8 @@ void PhysicsSimulationSystem::Init() {
 	// Water init
 	surfacePoint = RVec3(0, 1000, 0);
 	waterBox = AABox(
-		-Vec3(500.0f, 500.0f, 500.0f),
-		Vec3(500.0f, 1000.0f, 500.0f)
+		-Vec3(5000.0f, 500.0f, 5000.0f),
+		Vec3(5000.0f, 1000.0f, 5000.0f)
 	);
 	// End Water init
 

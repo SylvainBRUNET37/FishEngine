@@ -1,18 +1,19 @@
 #ifndef COMPONENTS_H
 #define COMPONENTS_H
 
+#include <string>
 #include <tuple>
 #include <vector>
-#include <string>
 
 #include "camera/Camera.h"
 #include "entities/Entity.h"
+#include "gameplay/Eatable.h"
+#include "physics/RigidBody.h"
 #include "PhysicsEngine/JoltSystem.h"
 #include "rendering/core/Transform.h"
-#include "rendering/graphics/Mesh.h"
-#include "physics/RigidBody.h"
-#include "rendering/graphics/Sprite2D.h"
 #include "rendering/graphics/lights/PointLight.h"
+#include "rendering/graphics/Mesh.h"
+#include "rendering/graphics/Sprite2D.h"
 
 struct Name
 {
@@ -44,7 +45,8 @@ using Components = std::tuple
 	Controllable,
 	Camera,
 	PointLight,
-	Sprite2D
+	Sprite2D,
+	Eatable
 >;
 
 #endif

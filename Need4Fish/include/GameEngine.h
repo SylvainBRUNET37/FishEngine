@@ -36,6 +36,7 @@ private:
 	static void WaitBeforeNextFrame(DWORD frameStartTime);
 
 	void HandleGameState();
+	void HandleCollions();
 
 	void ChangeGameStatus();
 	void PauseGame(Entity mainMenuEntity);
