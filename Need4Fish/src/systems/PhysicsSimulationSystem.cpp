@@ -13,12 +13,11 @@ using namespace JPH;
 void PhysicsSimulationSystem::Init() {
 
 	// Water init
-	surfacePoint = RVec3(0, 100, 0);
+	surfacePoint = RVec3(0, 1000, 0);
 	waterBox = AABox(
-		-Vec3(300.0f, 300.0f, 300.0f),
-		Vec3(300.0f, 55.0f, 300.0f)
+		-Vec3(500.0f, 500.0f, 500.0f),
+		Vec3(500.0f, 1000.0f, 500.0f)
 	);
-	waterBox.Translate(Vec3(surfacePoint));
 	// End Water init
 
 	waterCollector = WaterCollector(surfacePoint, Vec3::sAxisY(), PHYSICS_UPDATE_RATE);
