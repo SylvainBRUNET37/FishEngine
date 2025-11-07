@@ -71,7 +71,7 @@ void GameEngine::HandleGameState()
 void GameEngine::HandleCollions() {
 	
 	
-	auto isBodyEatable = [&](JPH::BodyID bodyId) -> std::optional<std::pair<Entity, Eatable>> {
+	auto isBodyEatable = [&](JPH::BodyID bodyId) -> std::optional<std::pair<const Entity, Eatable&>> {
 		auto eatables = entityManager.View<RigidBody, Eatable>();
 		auto it = std::find_if(eatables.begin(), eatables.end(),
 			[&](auto&& tuple)
@@ -82,7 +82,8 @@ void GameEngine::HandleCollions() {
 		if (it != eatables.end())
 		{
 			const auto& [entity, _, eatable] = *it;
-			return std::make_pair(entity, eatable);
+			return std::pair<Entity, Eatable&>(entity, eatable);
+
 		}
 		return std::nullopt;
 	};
@@ -108,26 +109,32 @@ void GameEngine::HandleCollions() {
 		auto secondObject = isBodyEatable(bodyId2);
 		if (firstObject.has_value() && secondObject.has_value())
 		{
+			auto& [firstEntity, firstMass] = firstObject.value();
+			auto& [secondEntity, secondMass] = secondObject.value();
+
 			// Kill things if necessary
-			if (firstObject.value().second.CanBeEatenBy(secondObject.value().second)) {
-				// Kill 1
-				auto entity = firstObject.value().first;
-				if (isEntityAPlayer(entity))
+			if (firstMass.CanBeEatenBy(secondMass)) {
+				
+				if (isEntityAPlayer(firstEntity))
 				{
-					// Die
 					InitGame();
 				}
-				else entityManager.Kill(entity);
+				else
+				{
+					entityManager.Kill(firstEntity);
+					secondMass.mass += firstMass.mass;
+				}
 			}
-			else if (secondObject.value().second.CanBeEatenBy(firstObject.value().second)) {
-				// Kill 2
-				auto entity = secondObject.value().first;
-				if (isEntityAPlayer(entity))
+			else if (secondMass.CanBeEatenBy(firstMass)) {
+				if (isEntityAPlayer(secondEntity))
 				{
-					// Die
 					InitGame();
 				}
-				else entityManager.Kill(secondObject.value().first);
+				else
+				{
+					entityManager.Kill(secondEntity);
+					firstMass.mass += secondMass.mass;
+				}
 			}
 		}
 	}
@@ -206,7 +213,10 @@ void GameEngine::InitGame()
 		else if (name.name == "Aquarium" || name.name == "Sphere" || name.name == "Caverne")
 		{
 			if (name.name == "Sphere") {
-				entityManager.AddComponent<Eatable>(entity, 80.0f); // eatable
+				entityManager.AddComponent<Eatable>(entity, 105.0f);
+			}
+			else if (name.name == "Caverne") {
+				entityManager.AddComponent<Eatable>(entity, 8.0f);
 			}
 			const auto transform = entityManager.Get<Transform>(entity);
 			const auto mesh = entityManager.Get<Mesh>(entity);
