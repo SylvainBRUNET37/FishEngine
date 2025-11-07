@@ -11,7 +11,6 @@ struct GameState
     {
 	    PLAYING,
         PAUSED,
-        DIED
     };
 
     inline static std::queue<std::pair<JPH::BodyID, JPH::BodyID>> detectedCollisions;

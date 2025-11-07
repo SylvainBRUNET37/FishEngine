@@ -59,7 +59,7 @@ void GameEngine::HandleGameState()
 	const bool isEscapePressed = GetAsyncKeyState(VK_ESCAPE) & 0x8000;
 
 	// Restart the game if has been was pressed
-	if ((GetAsyncKeyState('R') & 0x8000) || GameState::currentState == GameState::DIED)
+	if ((GetAsyncKeyState('R') & 0x8000))
 		InitGame();
 
 	if (isEscapePressed && !wasEscapePressed)
