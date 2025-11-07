@@ -210,12 +210,6 @@ void GameEngine::InitGame()
 		}
 		else if (name.name == "Aquarium" || name.name.find("Monticule") != std::string::npos || name.name == "Caverne")
 		{
-			if (name.name == "Sphere") {
-				entityManager.AddComponent<Eatable>(entity, 105.0f);
-			}
-			else if (name.name == "Caverne") {
-				entityManager.AddComponent<Eatable>(entity, 8.0f);
-			}
 			const auto transform = entityManager.Get<Transform>(entity);
 			const auto mesh = entityManager.Get<Mesh>(entity);
 			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateMeshShape(transform, mesh));
