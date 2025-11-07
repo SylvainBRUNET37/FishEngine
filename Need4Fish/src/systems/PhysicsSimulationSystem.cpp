@@ -12,7 +12,7 @@ using namespace DirectX;
 void PhysicsSimulationSystem::Init() {
 
 	// Water init
-	surfacePoint = RVec3(0, 55, 0);
+	surfacePoint = RVec3(0, 100, 0);
 	waterBox = AABox(
 		-Vec3(300.0f, 300.0f, 300.0f),
 		Vec3(300.0f, 55.0f, 300.0f)
