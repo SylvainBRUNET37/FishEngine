@@ -114,7 +114,7 @@ void GameEngine::InitGame()
 	// Initialize the scene (it's a temporary way of doing it)
 	for (const auto& [entity, name] : entityManager.View<Name>())
 	{
-		if (name.name == "Cube")
+		if (name.name == "Cube" || /*name.name.find("Armature") > 0 ||*/ name.name.find("Mosasaur") != std::string::npos)
 		{
 			const auto transform = entityManager.Get<Transform>(entity);
 			const auto mesh = entityManager.Get<Mesh>(entity);
@@ -130,7 +130,7 @@ void GameEngine::InitGame()
 			//entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreatePlane(transform));
 			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateFloor());
 		}
-		else if (name.name == "Aquarium" || name.name == "Sphere" || name.name == "Caverne")
+		else if (name.name == "Aquarium" || name.name.find("Monticule") != std::string::npos || name.name == "Caverne")
 		{
 			const auto transform = entityManager.Get<Transform>(entity);
 			const auto mesh = entityManager.Get<Mesh>(entity);
