@@ -15,6 +15,9 @@ public:
 		mObjectToBroadPhase[Layers::NON_MOVING] = BroadPhaseLayers::NON_MOVING;
 		mObjectToBroadPhase[Layers::SENSOR] = BroadPhaseLayers::NON_MOVING;
 		mObjectToBroadPhase[Layers::MOVING] = BroadPhaseLayers::MOVING;
+		mObjectToBroadPhase[Layers::VEHICLE] = BroadPhaseLayers::MOVING;
+		mObjectToBroadPhase[Layers::FOOD_CHAIN] = BroadPhaseLayers::MOVING;
+		mObjectToBroadPhase[Layers::GOAL] = BroadPhaseLayers::MOVING;
 	}
 
 	[[nodiscard]] JPH::uint GetNumBroadPhaseLayers() const override

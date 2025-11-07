@@ -3,11 +3,12 @@
 
 #include "PhysicsEngine/JoltSystem.h"
 #include "GameState.h"
-#include "../../../RenderingEngine/src/rendering/application/WindowsApplication.cpp"
+#include "rendering/application/WindowsApplication.h"
 #include "PhysicsEngine/layers/Layers.h"
 #include "PhysicsEngine/layers/BroadPhaseLayers.h"
 
 using namespace DirectX;
+using namespace JPH;
 
 void PhysicsSimulationSystem::Init() {
 
@@ -20,7 +21,7 @@ void PhysicsSimulationSystem::Init() {
 	waterBox.Translate(Vec3(surfacePoint));
 	// End Water init
 
-	waterCollector = WaterCollector(&JoltSystem::GetPhysicSystem(), surfacePoint, Vec3::sAxisY(), PHYSICS_UPDATE_RATE);
+	waterCollector = WaterCollector(surfacePoint, Vec3::sAxisY(), PHYSICS_UPDATE_RATE);
 }
 
 void PhysicsSimulationSystem::Update(double, EntityManager& entityManager)
@@ -55,10 +56,10 @@ void PhysicsSimulationSystem::UpdateControllables(EntityManager& entityManager)
 		{
 			RotateTowardsCameraDirection(rigidBody, *activeCamera, forward, up);
 
-			if (mouseWheelDelta != 0) {
-				activeCamera->distance -= mouseWheelDelta * 0.01f * activeCamera->zoomSpeed;
+			if (WindowsApplication::mouseWheelDelta != 0) {
+				activeCamera->distance -= WindowsApplication::mouseWheelDelta * 0.01f * activeCamera->zoomSpeed;
 				activeCamera->distance = std::clamp(activeCamera->distance, activeCamera->minDistance, activeCamera->maxDistance);
-				mouseWheelDelta = 0; // reset
+				WindowsApplication::mouseWheelDelta = 0; // reset
 			}
 		}
 
@@ -97,16 +98,6 @@ void PhysicsSimulationSystem::UpdateControllables(EntityManager& entityManager)
 			if (newSpeed.Length() > controllable.maxSpeed) newSpeed = newSpeed.Normalized();
 			JoltSystem::GetBodyInterface().SetLinearVelocity(rigidBody.body->GetID(), newSpeed);
 		}
-		/*// Rotation manuelle retirée
-		bool rotatesPositive = GetAsyncKeyState('Q') & 0x8000;
-		if (rotatesPositive || GetAsyncKeyState('E') & 0x8000)
-		{
-			JPH::Quat delta = JPH::Quat::sRotation(up, .05f * (1 - 2 * !rotatesPositive)); // theta = 10
-			JoltSystem::GetBodyInterface().SetRotation(
-				rigidBody.body->GetID(),
-				(rigidBody.body->GetRotation() * delta).Normalized(),
-				JPH::EActivation::Activate);
-		}*/
 	}
 }
 

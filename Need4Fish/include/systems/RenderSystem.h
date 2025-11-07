@@ -3,10 +3,8 @@
 
 #include "System.h"
 #include "rendering/Renderer.h"
-#include "rendering/core/Transform.h"
 #include "rendering/device/RenderContext.h"
 #include "rendering/graphics/Material.h"
-#include "rendering/graphics/Mesh.h"
 
 class RenderSystem : public System
 {

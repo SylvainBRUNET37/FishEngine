@@ -117,16 +117,24 @@ void GameEngine::InitGame()
 		if (name.name == "Cube")
 		{
 			const auto transform = entityManager.Get<Transform>(entity);
-			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCube(transform));
+			const auto mesh = entityManager.Get<Mesh>(entity);
+			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCube(transform, mesh));
 			entityManager.AddComponent<Controllable>(entity, 100.0f);
 
-			// Link camera to the cube
+			// Link camera to the mosasaur
 			cameraComponent.targetEntity = entity;
 		}
 		else if (name.name == "Plane")
 		{
 			const auto transform = entityManager.Get<Transform>(entity);
-			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreatePlane(transform));
+			//entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreatePlane(transform));
+			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateFloor());
+		}
+		else if (name.name == "Aquarium" || name.name == "Sphere" || name.name == "Caverne")
+		{
+			const auto transform = entityManager.Get<Transform>(entity);
+			const auto mesh = entityManager.Get<Mesh>(entity);
+			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateMeshShape(transform, mesh));
 		}
 	}
 

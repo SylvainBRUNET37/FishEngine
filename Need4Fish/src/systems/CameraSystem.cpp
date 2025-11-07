@@ -28,7 +28,7 @@ void CameraSystem::ComputeCameraPosition(Camera& camera, const Transform& transf
 
 	// Yaw et pitch visés
 	const float totalYaw = targetYaw + camera.yawOffset;
-	camera.targetYaw = totalYaw;  // Pour la physique	
+	camera.targetYaw = totalYaw; // Pour la physique	
 	camera.targetPitch = camera.pitchAngle;
 
 	camera.focus = XMVectorAdd(targetPos, XMVectorSet(0, camera.heightOffset, 0, 0));
@@ -67,24 +67,6 @@ void CameraSystem::UpdateCameraMatrices(Camera& camera, const EntityManager& ent
 
 void CameraSystem::HandleRotation(Camera& cameraData)
 {
-	/*//Version avec clic
-	POINT currentCursorCoordinates;
-	if (!GetCursorPos(&currentCursorCoordinates))
-		return;
-
-	if (GetAsyncKeyState(VK_LBUTTON) & 0x8000) 
-	{
-		const auto deltaX = static_cast<float>(currentCursorCoordinates.x - cameraData.cursorCoordinates.x);
-		const auto deltaY = static_cast<float>(currentCursorCoordinates.y - cameraData.cursorCoordinates.y);
-
-		constexpr float mouseSensitivity = 0.002f;
-		Rotate(cameraData, deltaX * mouseSensitivity, -deltaY * mouseSensitivity);
-	}
-
-	cameraData.cursorCoordinates = currentCursorCoordinates;*/
-
-	// Sortie de pause
-
 	POINT currentCursorCoordinates;
 	if (!GetCursorPos(&currentCursorCoordinates))
 		return;
@@ -92,20 +74,20 @@ void CameraSystem::HandleRotation(Camera& cameraData)
 	const auto deltaX = static_cast<float>(currentCursorCoordinates.x - cameraData.cursorCoordinates.x);
 	const auto deltaY = static_cast<float>(currentCursorCoordinates.y - cameraData.cursorCoordinates.y);
 
-	constexpr float mouseSensitivity = 0.002f;
-	constexpr float deadzone = 2.0f;  // Pixels de tolérance
+	static constexpr float deadzone = 2.0f; // Pixels de tolérance
 
 	// Appliquer la rotation seulement si le mouvement dépasse la deadzone
 	if (std::abs(deltaX) > deadzone || std::abs(deltaY) > deadzone)
 	{
+		static constexpr float mouseSensitivity = 0.002f;
 		Rotate(cameraData, deltaX * mouseSensitivity, -deltaY * mouseSensitivity);
 	}
 	else
 	{
 		// Ramener progressivement vers zéro quand pas de mouvement
-		constexpr float returnSpeed = 0.02f;
 		if (std::abs(cameraData.yawOffset) > 0.001f)
 		{
+			static constexpr float returnSpeed = 0.02f;
 			const float returnStep = std::copysign(returnSpeed, -cameraData.yawOffset);
 			cameraData.yawOffset += returnStep;
 
@@ -117,8 +99,8 @@ void CameraSystem::HandleRotation(Camera& cameraData)
 		}
 	}
 
-	//Recentrer seulement si la souris s'éloigne suffisament du centre
-	constexpr float recenterThreshold = 100.0f;
+	// Recentrer seulement si la souris s'éloigne suffisament du centre
+	static constexpr float recenterThreshold = 100.0f;
 	const float distanceFromCenter = sqrtf(
 		powf(currentCursorCoordinates.x - cameraData.screenCenter.x, 2.0f) +
 		powf(currentCursorCoordinates.y - cameraData.screenCenter.y, 2.0f)
@@ -137,12 +119,8 @@ void CameraSystem::HandleRotation(Camera& cameraData)
 
 void CameraSystem::Rotate(Camera& cameraData, const float yawDelta, const float pitchDelta)
 {
-	/*//Version avec clic
-	cameraData.yawOffset += yawDelta;
-	cameraData.pitchAngle = std::clamp(cameraData.pitchAngle + pitchDelta, -XM_PIDIV2 + 0.1f, 0.0f);
-	*/
 	// Limiter la caméra
-	constexpr float maxOffset = XM_PIDIV4;      // ±45 degrés dans toutes les directions
+	constexpr float maxOffset = XM_PIDIV4; // ±45 degrés dans toutes les directions
 
 	cameraData.yawOffset = std::clamp(
 		cameraData.yawOffset + yawDelta,
@@ -162,7 +140,7 @@ void CameraSystem::SetMouseCursor()
 	ShowCursor(FALSE);
 	Camera::isMouseCaptured = true;
 
-	HWND hwnd = GetActiveWindow();
+	const HWND hwnd = GetActiveWindow();
 	if (!hwnd)
 		return;
 

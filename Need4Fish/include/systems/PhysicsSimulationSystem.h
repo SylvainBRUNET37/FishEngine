@@ -15,12 +15,10 @@ private:
 	static constexpr double PHYSICS_UPDATE_RATE = 1.0 / TARGET_UPDATES_PER_SECOND;
 
 	WaterCollector waterCollector;
+
 	// Water parameters
-	RVec3 surfacePoint; // = RVec3(0, 55, 0); // TODO: move this blud
-	AABox waterBox; // = AABox(
-	//	-Vec3(300.0f, 300.0f, 300.0f),
-	//	Vec3(300.0f, 55.0f, 300.0f)
-	//);
+	JPH::RVec3 surfacePoint;
+	JPH::AABox waterBox;
 
 	void Update(double, EntityManager& entityManager) override;
 
@@ -28,10 +26,10 @@ private:
 	static void UpdateTransforms(EntityManager& entityManager);
 	void UpdatePhysics();
 
-	//Pour ajustement vers le yaw et le pitch visés
+	// Pour ajustement vers le yaw et le pitch visés
 	static void RotateTowardsCameraDirection(RigidBody& rigidBody, const Camera& camera, JPH::Vec3 forward, JPH::Vec3 up);
 
-	//Pour effet de roulement sur le côté
+	// Pour effet de roulement sur le côté
 	static void UpdateRoll(RigidBody& rigidBody, float yawDiff, float inputRoll);
 };
 

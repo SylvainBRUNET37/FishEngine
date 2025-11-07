@@ -11,13 +11,19 @@ public:
 		switch (inLayer1)
 		{
 		case Layers::MOVING:
-			return inLayer2 == Layers::NON_MOVING;
+			return true;	//Collide with everything
 		case Layers::NON_MOVING:
-			return inLayer2 == Layers::MOVING;
+			return !(inLayer2 == Layers::NON_MOVING || inLayer2 == Layers::SENSOR);	//Collide with all except non-moving and sensor
 		case Layers::SENSOR:
-			return false;
+			return !(inLayer2 == Layers::NON_MOVING || inLayer2 == Layers::SENSOR);	//Collide with all except non-moving and sensor
+		case Layers::VEHICLE:
+			return true; //Collides with all except other vehicles, but there will only ever be one, so this works
+		case Layers::FOOD_CHAIN:
+			return !(inLayer2 == Layers::FOOD_CHAIN || inLayer2 == Layers::GOAL);	//Collides with all except Mommy and themselves
+		case Layers::GOAL:
+			return !(inLayer2 == Layers::FOOD_CHAIN);	//Collides with all but other members of the food chain. There is only ever one Mommy, so it's fine
 		default:
-			JPH_ASSERT(false);
+			JPH_ASSERT(false);	//If we are here, something has gone wrong
 			return false;
 		}
 	}

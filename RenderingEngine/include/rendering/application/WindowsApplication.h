@@ -7,6 +7,9 @@
 class WindowsApplication
 {
 public:
+	// For the zoom
+	inline static int mouseWheelDelta = 0;
+
 	~WindowsApplication() = default;
 	WindowsApplication(const WindowsApplication&) = delete;
 	WindowsApplication& operator=(const WindowsApplication&) = delete;

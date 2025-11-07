@@ -168,6 +168,8 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\physicsEngine\utils\ConversionUtil.cpp" />
+    <ClCompile Include="src\physicsEngine\utils\MeshUtil.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -179,6 +181,7 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     <ClCompile Include="src\GameEngine.cpp" />
     <ClCompile Include="src\physicsEngine\ShapeFactory.cpp" />
     <ClCompile Include="src\physicsEngine\JoltSystem.cpp" />
+    <ClCompile Include="src\physicsEngine\WaterCollector.cpp" />
     <ClCompile Include="src\ResourceManager.cpp" />
     <ClCompile Include="src\systems\CameraSystem.cpp" />
     <ClCompile Include="src\systems\PhysicsSimulationSystem.cpp" />
@@ -194,6 +197,7 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\physicsEngine\utils\ConversionUtil.h" />
     <ClInclude Include="include\CC.h" />
     <ClInclude Include="include\components\camera\Camera.h" />
     <ClInclude Include="include\components\Components.h" />
@@ -221,6 +225,7 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     <ClInclude Include="include\systems\PhysicsSimulationSystem.h" />
     <ClInclude Include="include\systems\RenderSystem.h" />
     <ClInclude Include="include\systems\System.h" />
+    <ClInclude Include="include\physicsEngine\utils\MeshUtil.h" />
     <ClInclude Include="include\UIManager.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
