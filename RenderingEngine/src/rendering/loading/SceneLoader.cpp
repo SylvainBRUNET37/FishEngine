@@ -177,12 +177,9 @@ Material SceneLoader::ProcessMaterial(
 	mat.name = material->GetName().C_Str();
 
 	aiColor4D color;
-	if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_AMBIENT, &color))
-		mat.ambient = XMFLOAT4(color.r, color.g, color.b, color.a);
-	if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &color))
-		mat.diffuse = XMFLOAT4(color.r, color.g, color.b, color.a);
-	if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_SPECULAR, &color))
-		mat.specular = XMFLOAT4(color.r, color.g, color.b, color.a);
+	mat.ambient = XMFLOAT4(0.32f, 0.32f, 0.32f, 0.32f);
+	mat.diffuse = XMFLOAT4(0.8f, 0.8f, 0.8f, 0.8f);
+	mat.specular = XMFLOAT4(0.5f, 0.5f, 0.5f, 0.5f);
 
 	float shininess = 0.0f;
 	if (AI_SUCCESS == aiGetMaterialFloat(material, AI_MATKEY_SHININESS, &shininess))
