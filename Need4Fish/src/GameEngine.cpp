@@ -59,7 +59,7 @@ void GameEngine::HandleGameState()
 	const bool isEscapePressed = GetAsyncKeyState(VK_ESCAPE) & 0x8000;
 
 	// Restart the game if has been was pressed
-	if ((GetAsyncKeyState('R') & 0x8000))
+	if (GetAsyncKeyState('R') & 0x8000 && GameState::currentState != GameState::PAUSED)
 		InitGame();
 
 	if (isEscapePressed && !wasEscapePressed)
@@ -141,18 +141,18 @@ void GameEngine::HandleCollions() {
 void GameEngine::ChangeGameStatus()
 {
 	GameState::currentState == GameState::PAUSED
-		? PauseGame(mainMenuEntity)
-		: ResumeGame(mainMenuEntity);
+		? ResumeGame(mainMenuEntity)
+		: PauseGame(mainMenuEntity);
 }
 
-void GameEngine::PauseGame(const Entity mainMenuEntity)
+void GameEngine::ResumeGame(const Entity mainMenuEntity)
 {
 	CameraSystem::SetMouseCursor();
 	GameState::currentState = GameState::PLAYING;
 	entityManager.RemoveComponent<Sprite2D>(mainMenuEntity);
 }
 
-void GameEngine::ResumeGame(const Entity mainMenuEntity)
+void GameEngine::PauseGame(const Entity mainMenuEntity)
 {
 	ShowCursor(TRUE);
 	Camera::isMouseCaptured = false;
@@ -180,8 +180,8 @@ void GameEngine::InitGame()
 	camera.focus = XMVectorSet(0, 0, 0, 1);
 	camera.up = XMVectorSet(0, 1, 0, 0);
 	camera.aspectRatio = static_cast<float>(1920) / static_cast<float>(1080);
-	camera.distance = 100.f;
-	camera.heightOffset = 30.f;
+	camera.distance = 4.f;
+	camera.heightOffset = 2.f;
 
 	const auto cameraEntity = entityManager.CreateEntity();
 	auto& cameraComponent = entityManager.AddComponent<Camera>(cameraEntity, camera);
@@ -191,7 +191,7 @@ void GameEngine::InitGame()
 	// Initialize the scene (it's a temporary way of doing it)
 	for (const auto& [entity, name] : entityManager.View<Name>())
 	{
-		if (name.name == "Cube" || /*name.name.find("Armature") > 0 ||*/ name.name.find("Mosasaur") != std::string::npos)
+		if (name.name == "Cube" || /*name.name.find("Armature") > 0 ||*/ name.name.find("Mosasaure") != std::string::npos)
 		{
 			const auto transform = entityManager.Get<Transform>(entity);
 			const auto mesh = entityManager.Get<Mesh>(entity);

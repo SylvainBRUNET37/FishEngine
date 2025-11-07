@@ -35,7 +35,7 @@ SceneResource ResourceManager::LoadScene()
 		shaderBank.Get<PixelShader>("shaders/MiniPhongPS.hlsl"),
 	};
 
-	const std::filesystem::path filePath = "assets\\OceanTest_Cavern_All_Applied.glb";
+	const std::filesystem::path filePath = "assets\\TestLandscape.glb";
 
 	return sceneLoader.LoadScene(filePath, shaderProgram);
 }

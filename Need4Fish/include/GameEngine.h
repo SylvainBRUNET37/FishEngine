@@ -39,8 +39,8 @@ private:
 	void HandleCollions();
 
 	void ChangeGameStatus();
-	void PauseGame(Entity mainMenuEntity);
 	void ResumeGame(Entity mainMenuEntity);
+	void PauseGame(Entity mainMenuEntity);
 
 	void InitGame();
 };
