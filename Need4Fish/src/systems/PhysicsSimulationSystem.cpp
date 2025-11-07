@@ -4,8 +4,24 @@
 #include "PhysicsEngine/JoltSystem.h"
 #include "GameState.h"
 #include "../../../RenderingEngine/src/rendering/application/WindowsApplication.cpp"
+#include "PhysicsEngine/layers/Layers.h"
+#include "PhysicsEngine/layers/BroadPhaseLayers.h"
 
 using namespace DirectX;
+
+void PhysicsSimulationSystem::Init() {
+
+	// Water init
+	surfacePoint = RVec3(0, 55, 0);
+	waterBox = AABox(
+		-Vec3(300.0f, 300.0f, 300.0f),
+		Vec3(300.0f, 55.0f, 300.0f)
+	);
+	waterBox.Translate(Vec3(surfacePoint));
+	// End Water init
+
+	waterCollector = WaterCollector(&JoltSystem::GetPhysicSystem(), surfacePoint, Vec3::sAxisY(), PHYSICS_UPDATE_RATE);
+}
 
 void PhysicsSimulationSystem::Update(double, EntityManager& entityManager)
 {
@@ -96,6 +112,13 @@ void PhysicsSimulationSystem::UpdateControllables(EntityManager& entityManager)
 
 void PhysicsSimulationSystem::UpdatePhysics()
 {
+	JoltSystem::GetPhysicSystem().GetBroadPhaseQuery().CollideAABox(
+		waterBox,
+		waterCollector,
+		SpecifiedBroadPhaseLayerFilter(BroadPhaseLayers::MOVING),
+		SpecifiedObjectLayerFilter(Layers::MOVING)
+	);
+
 	// Update physics
 	constexpr int collisionSteps = 1;
 	JoltSystem::GetPhysicSystem().Update(PHYSICS_UPDATE_RATE, collisionSteps,

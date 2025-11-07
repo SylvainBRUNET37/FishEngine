@@ -214,6 +214,7 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     <ClInclude Include="include\physicsEngine\JoltSystem.h" />
     <ClInclude Include="include\physicsEngine\utils\JoltUtils.h" />
     <ClInclude Include="include\entities\EntityManagerFactory.h" />
+    <ClInclude Include="include\physicsEngine\WaterCollector.h" />
     <ClInclude Include="include\ResourceManager.h" />
     <ClInclude Include="include\GameEngine.h" />
     <ClInclude Include="include\systems\CameraSystem.h" />
