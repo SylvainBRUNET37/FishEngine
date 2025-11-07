@@ -70,24 +70,24 @@ void PhysicsSimulationSystem::UpdateControllables(EntityManager& entityManager)
 
 		if (GetAsyncKeyState('W') & 0x8000)
 		{
-			newSpeed = newSpeed + 1.0f * forward;
+			newSpeed = newSpeed + 10.0f * forward;
 			speedChanged = true;
 		}
 		if (GetAsyncKeyState('S') & 0x8000)
 		{
-			newSpeed = newSpeed - 1.0f * forward;
+			newSpeed = newSpeed - 10.0f * forward;
 			speedChanged = true;
 		}
 		if (GetAsyncKeyState('D') & 0x8000)
 		{
-			newSpeed = newSpeed - 1.0f * right;
+			newSpeed = newSpeed - 5.0f * right;
 			speedChanged = true;
 			float inputRoll = 0.2f;
 			UpdateRoll(rigidBody, 0.0f, inputRoll);
 		}
 		if (GetAsyncKeyState('A') & 0x8000)
 		{
-			newSpeed = newSpeed + 1.0f * right;
+			newSpeed = newSpeed + 5.0f * right;
 			speedChanged = true;
 			float inputRoll = -0.2f;
 			UpdateRoll(rigidBody, 0.0f, inputRoll);
@@ -95,8 +95,9 @@ void PhysicsSimulationSystem::UpdateControllables(EntityManager& entityManager)
 
 		if (speedChanged)
 		{
-			if (newSpeed.Length() > controllable.maxSpeed) newSpeed = newSpeed.Normalized();
-			JoltSystem::GetBodyInterface().SetLinearVelocity(rigidBody.body->GetID(), newSpeed);
+			if (newSpeed.Length() > controllable.maxSpeed)
+				newSpeed = newSpeed.Normalized() * controllable.maxSpeed;
+			JoltSystem::GetBodyInterface().SetLinearVelocity(rigidBody.body->GetID(), newSpeed);			
 		}
 	}
 }
