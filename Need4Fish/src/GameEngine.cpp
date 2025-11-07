@@ -69,25 +69,34 @@ void GameEngine::HandleGameState()
 }
 
 void GameEngine::HandleCollions() {
-	auto eatables = entityManager.View<RigidBody, Eatable>();
+	
 	
 	auto isBodyEatable = [&](JPH::BodyID bodyId) -> std::optional<std::pair<Entity, Eatable>> {
-
+		auto eatables = entityManager.View<RigidBody, Eatable>();
 		auto it = std::find_if(eatables.begin(), eatables.end(),
 			[&](auto&& tuple)
 			{
 				auto& [entity, rigidBody, eatable] = tuple;
 				return rigidBody.body->GetID() == bodyId;
 			});
-
 		if (it != eatables.end())
 		{
 			const auto& [entity, _, eatable] = *it;
 			return std::make_pair(entity, eatable);
 		}
-
 		return std::nullopt;
 	};
+
+	auto isEntityAPlayer = [&](Entity SearchedEntity) -> bool {
+		auto watchables = entityManager.View<Controllable>();
+		auto it = std::find_if(watchables.begin(), watchables.end(),
+			[&](auto&& tuple)
+			{
+				auto& [entity, _] = tuple;
+				return entity.index == SearchedEntity.index;
+			});
+		return it != watchables.end();
+		};
 	
 	while (!GameState::detectedCollisions.empty())
 	{
@@ -100,16 +109,25 @@ void GameEngine::HandleCollions() {
 		if (firstObject.has_value() && secondObject.has_value())
 		{
 			// Kill things if necessary
-			
-			// TODO: kill if not the player, otherwise DIE
-
 			if (firstObject.value().second.CanBeEatenBy(secondObject.value().second)) {
 				// Kill 1
-				entityManager.Kill(firstObject.value().first);
+				auto entity = firstObject.value().first;
+				if (isEntityAPlayer(entity))
+				{
+					// Die
+					InitGame();
+				}
+				else entityManager.Kill(entity);
 			}
 			else if (secondObject.value().second.CanBeEatenBy(firstObject.value().second)) {
 				// Kill 2
-				entityManager.Kill(secondObject.value().first);
+				auto entity = secondObject.value().first;
+				if (isEntityAPlayer(entity))
+				{
+					// Die
+					InitGame();
+				}
+				else entityManager.Kill(secondObject.value().first);
 			}
 		}
 	}
