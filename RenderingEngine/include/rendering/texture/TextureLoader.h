@@ -32,7 +32,7 @@ private:
 	[[nodiscard]] static ComPtr<ID3D11Texture2D> CreateTexture(ID3D11Device* device, const PictureData& pictureData,
 	                                                           const D3D11_TEXTURE2D_DESC& desc);
 	[[nodiscard]] static ComPtr<ID3D11ShaderResourceView> CreateTextureView(
-		ID3D11Device* device, const ComPtr<ID3D11Texture2D>& texture, const D3D11_TEXTURE2D_DESC& desc);
+		ID3D11Device* device, const ComPtr<ID3D11Texture2D>& texture);
 };
 
 #endif

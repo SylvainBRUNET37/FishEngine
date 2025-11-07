@@ -22,7 +22,7 @@ D3D11_TEXTURE2D_DESC DepthBuffer::CreateDepthTextureDesc(const WindowData& windo
 
 	desc.Width = static_cast<UINT>(windowData.screenWidth);
 	desc.Height = static_cast<UINT>(windowData.screenHeight);
-	desc.MipLevels = 1;
+	desc.MipLevels = 0;
 	desc.ArraySize = 1;
 	desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	desc.SampleDesc.Count = 1;
