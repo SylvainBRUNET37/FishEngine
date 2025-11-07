@@ -1,6 +1,10 @@
 #include "pch.h"
 #include "rendering/application/WindowsApplication.h"
 
+
+//Pour le zoom
+int mouseWheelDelta = 0;
+
 bool WindowsApplication::Init()
 {
 	if (!RegisterWindowClass())
@@ -83,6 +87,12 @@ LRESULT WindowsApplication::ProcessWindowMessage(const HWND hWnd, const UINT msg
 	case WM_DESTROY:
 		PostQuitMessage(MESSAGE_HANDLED);
 		break;
+	case WM_MOUSEWHEEL:
+	{
+		int delta = GET_WHEEL_DELTA_WPARAM(wp);
+		mouseWheelDelta += delta;              
+		return MESSAGE_HANDLED;
+	}
 	default:
 		return DefWindowProcW(hWnd, msg, wp, lp);
 	}

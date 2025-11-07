@@ -23,7 +23,6 @@ private:
 
 	//Pour effet de roulement sur le côté
 	static void UpdateRoll(RigidBody& rigidBody, float yawDiff, float inputRoll);
-
 };
 
 #endif

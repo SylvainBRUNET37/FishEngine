@@ -3,6 +3,7 @@
 
 #include "PhysicsEngine/JoltSystem.h"
 #include "GameState.h"
+#include "../../../RenderingEngine/src/rendering/application/WindowsApplication.cpp"
 
 using namespace DirectX;
 
@@ -24,7 +25,7 @@ void PhysicsSimulationSystem::UpdateControllables(EntityManager& entityManager)
 	{
 		activeCamera = &camera;
 		break;
-	}
+	}	
 
 	for (const auto& [entity, rigidBody, controllable] : entityManager.View<RigidBody, Controllable>())
 	{
@@ -37,6 +38,12 @@ void PhysicsSimulationSystem::UpdateControllables(EntityManager& entityManager)
 		if (activeCamera)
 		{
 			RotateTowardsCameraDirection(rigidBody, *activeCamera, forward, up);
+
+			if (mouseWheelDelta != 0) {
+				activeCamera->distance -= mouseWheelDelta * 0.01f * activeCamera->zoomSpeed;
+				activeCamera->distance = std::clamp(activeCamera->distance, activeCamera->minDistance, activeCamera->maxDistance);
+				mouseWheelDelta = 0; // reset
+			}
 		}
 
 		JPH::Vec3 currentSpeed = JoltSystem::GetBodyInterface().GetLinearVelocity(rigidBody.body->GetID());
@@ -74,7 +81,6 @@ void PhysicsSimulationSystem::UpdateControllables(EntityManager& entityManager)
 			if (newSpeed.Length() > controllable.maxSpeed) newSpeed = newSpeed.Normalized();
 			JoltSystem::GetBodyInterface().SetLinearVelocity(rigidBody.body->GetID(), newSpeed);
 		}
-
 		/*// Rotation manuelle retirée
 		bool rotatesPositive = GetAsyncKeyState('Q') & 0x8000;
 		if (rotatesPositive || GetAsyncKeyState('E') & 0x8000)

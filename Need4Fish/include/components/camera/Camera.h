@@ -25,6 +25,11 @@ struct Camera : public BaseCameraData
 	// Pour limiter/capturer la souris
 	inline static POINT screenCenter;
 	inline static bool isMouseCaptured = false;	
+
+	// Pour zoomer/dézoomer
+	float minDistance = 50.0f;
+	float maxDistance = 170.0f;
+	float zoomSpeed = 1.0f;
 };
 #endif
 
