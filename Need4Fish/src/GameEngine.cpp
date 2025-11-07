@@ -180,8 +180,8 @@ void GameEngine::InitGame()
 	camera.focus = XMVectorSet(0, 0, 0, 1);
 	camera.up = XMVectorSet(0, 1, 0, 0);
 	camera.aspectRatio = static_cast<float>(1920) / static_cast<float>(1080);
-	camera.distance = 4.f;
-	camera.heightOffset = 2.f;
+	camera.distance = 80.f;
+	camera.heightOffset = 30.f;
 
 	const auto cameraEntity = entityManager.CreateEntity();
 	auto& cameraComponent = entityManager.AddComponent<Camera>(cameraEntity, camera);
@@ -191,28 +191,44 @@ void GameEngine::InitGame()
 	// Initialize the scene (it's a temporary way of doing it)
 	for (const auto& [entity, name] : entityManager.View<Name>())
 	{
-		if (name.name == "Cube" || /*name.name.find("Armature") > 0 ||*/ name.name.find("Mosasaure") != std::string::npos)
+		if (name.name == "Cube" || name.name.find("Mosasaure") != std::string::npos)
 		{
 			const auto transform = entityManager.Get<Transform>(entity);
 			const auto mesh = entityManager.Get<Mesh>(entity);
 			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCube(transform, mesh));
 			entityManager.AddComponent<Eatable>(entity, 100.0f);
-			entityManager.AddComponent<Controllable>(entity, 500.0f);
+			entityManager.AddComponent<Controllable>(entity, 100.0f);
 
 			// Link camera to the mosasaur
 			cameraComponent.targetEntity = entity;
-		}
-		else if (name.name == "Plane")
-		{
-			const auto transform = entityManager.Get<Transform>(entity);
-			//entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreatePlane(transform));
-			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateFloor());
 		}
 		else if (name.name == "Aquarium" || name.name.find("Monticule") != std::string::npos || name.name == "Caverne")
 		{
 			const auto transform = entityManager.Get<Transform>(entity);
 			const auto mesh = entityManager.Get<Mesh>(entity);
 			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateMeshShape(transform, mesh));
+		}
+		// Eatable fish part
+		else if (name.name.find("BasicFish") != std::string::npos)
+		{
+			const auto transform = entityManager.Get<Transform>(entity);
+			const auto mesh = entityManager.Get<Mesh>(entity);
+			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCube(transform, mesh));
+			entityManager.AddComponent<Eatable>(entity, 75.f);
+		}
+		else if (name.name.find("CoralFish") != std::string::npos)
+		{
+			const auto transform = entityManager.Get<Transform>(entity);
+			const auto mesh = entityManager.Get<Mesh>(entity);
+			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCube(transform, mesh));
+			entityManager.AddComponent<Eatable>(entity, 150.f);
+		}
+		else if (name.name.find("Momsasaure") != std::string::npos) // Mom
+		{
+			const auto transform = entityManager.Get<Transform>(entity);
+			const auto mesh = entityManager.Get<Mesh>(entity);
+			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCube(transform, mesh));
+			entityManager.AddComponent<Eatable>(entity, 250.f);
 		}
 	}
 
