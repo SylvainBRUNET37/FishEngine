@@ -69,8 +69,6 @@ void GameEngine::HandleGameState()
 }
 
 void GameEngine::HandleCollions() {
-	
-	
 	auto isBodyEatable = [&](JPH::BodyID bodyId) -> std::optional<std::pair<const Entity, Eatable&>> {
 		auto eatables = entityManager.View<RigidBody, Eatable>();
 		auto it = std::find_if(eatables.begin(), eatables.end(),
@@ -98,7 +96,7 @@ void GameEngine::HandleCollions() {
 			});
 		return it != watchables.end();
 		};
-	
+
 	while (!GameState::detectedCollisions.empty())
 	{
 		auto& [bodyId1, bodyId2] = GameState::detectedCollisions.front();
@@ -114,7 +112,7 @@ void GameEngine::HandleCollions() {
 
 			// Kill things if necessary
 			if (firstMass.CanBeEatenBy(secondMass)) {
-				
+
 				if (isEntityAPlayer(firstEntity))
 				{
 					InitGame();
@@ -166,7 +164,7 @@ void GameEngine::ResumeGame(const Entity mainMenuEntity)
 
 	entityManager.AddComponent<Sprite2D>
 	(
-		mainMenuEntity, 
+		mainMenuEntity,
 		uiManager.LoadSprite("assets/pauseMenu.jpg", resourceManager)
 	);
 }
@@ -193,13 +191,13 @@ void GameEngine::InitGame()
 	// Initialize the scene (it's a temporary way of doing it)
 	for (const auto& [entity, name] : entityManager.View<Name>())
 	{
-		if (name.name == "Cube")
+		if (name.name == "Cube" || /*name.name.find("Armature") > 0 ||*/ name.name.find("Mosasaur") != std::string::npos)
 		{
 			const auto transform = entityManager.Get<Transform>(entity);
 			const auto mesh = entityManager.Get<Mesh>(entity);
 			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCube(transform, mesh));
-			entityManager.AddComponent<Controllable>(entity, 100.0f);
 			entityManager.AddComponent<Eatable>(entity, 100.0f);
+			entityManager.AddComponent<Controllable>(entity, 500.0f);
 
 			// Link camera to the mosasaur
 			cameraComponent.targetEntity = entity;
@@ -210,7 +208,7 @@ void GameEngine::InitGame()
 			//entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreatePlane(transform));
 			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateFloor());
 		}
-		else if (name.name == "Aquarium" || name.name == "Sphere" || name.name == "Caverne")
+		else if (name.name == "Aquarium" || name.name.find("Monticule") != std::string::npos || name.name == "Caverne")
 		{
 			if (name.name == "Sphere") {
 				entityManager.AddComponent<Eatable>(entity, 105.0f);

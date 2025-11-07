@@ -7,7 +7,7 @@
 - Alexandre Gagnon (gaga1716)
 - Nell Truong (trun8382)
 
-## Étapes à suivre pour Thomas
+## Étapes à suivre pour les profs
 
 1. Exécuter :
    ```bash
@@ -19,10 +19,14 @@
 
 ## Contrôles
 
+- ESC pour mettre le jeu en pause (et récupérer la souris) ou sorrtir de pause
+- R pour redémarrer la partie
+
+- Mouvements de la souris pour pivoter dans la direction désirée
 - W et S pour avancer et reculer
 - A et D pour "strafe" à gauche et à droite
-- Q et E pour pivoter
-- Barre d'espace pour tirer les balles
+
+- Roulette de la souris pour ajuster le zoom de la caméra
 
 ## Étapes à suivre pour cloner (devs)
 
