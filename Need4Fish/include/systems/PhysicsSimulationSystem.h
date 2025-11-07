@@ -18,9 +18,12 @@ private:
 	static void UpdateTransforms(EntityManager& entityManager);
 	static void UpdatePhysics();
 
-	//Pour ajustement vers le yaw visé
+	//Pour ajustement vers le yaw et le pitch visés
 	static void RotateTowardsCameraDirection(RigidBody& rigidBody, const Camera& camera, JPH::Vec3 forward, JPH::Vec3 up);
-	static JPH::Vec3 RotateVectorByQuat(const JPH::Quat& q, const JPH::Vec3& v);
+
+	//Pour effet de roulement sur le côté
+	static void UpdateRoll(RigidBody& rigidBody, float yawDiff, float inputRoll);
+
 };
 
 #endif
