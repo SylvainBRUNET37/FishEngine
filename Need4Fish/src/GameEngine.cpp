@@ -187,7 +187,7 @@ void GameEngine::PauseGame(const Entity mainMenuEntity)
 	entityManager.AddComponent<Sprite2D>
 	(
 		mainMenuEntity,
-		uiManager.LoadSprite("assets/pauseMenu.jpg", resourceManager)
+		uiManager.LoadSprite("assets/pauseTitle.png", resourceManager)
 	);
 }
 
@@ -199,7 +199,7 @@ void GameEngine::EndGame(const Entity mainMenuEntity)
 	ClipCursor(nullptr);
 	ReleaseCapture();
 
-	auto sprite = (GameState::currentState == GameState::DIED) ?  "assets/death_title.png" : "assets/win_title.png";
+	auto sprite = (GameState::currentState == GameState::DIED) ?  "assets/deathTitle.png" : "assets/winTitle.png";
 
 	entityManager.AddComponent<Sprite2D>
 		(
