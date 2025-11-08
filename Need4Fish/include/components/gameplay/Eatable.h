@@ -6,6 +6,7 @@ class Eatable
 public:
     
     float mass;
+    bool isApex = false;
 
     [[nodiscard]] bool CanBeEatenBy(Eatable other) const;
 

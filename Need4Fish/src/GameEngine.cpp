@@ -111,37 +111,37 @@ void GameEngine::HandleCollions() {
 		auto secondObject = isBodyEatable(bodyId2);
 		if (firstObject.has_value() && secondObject.has_value())
 		{
-			auto& [firstEntity, firstMass] = firstObject.value();
-			auto& [secondEntity, secondMass] = secondObject.value();
+			auto& [firstEntity, firstEatable] = firstObject.value();
+			auto& [secondEntity, secondEatable] = secondObject.value();
 
 			// Kill things if necessary
-			if (firstMass.CanBeEatenBy(secondMass)) {
-
+			if (firstEatable.CanBeEatenBy(secondEatable)) {
 				if (isEntityAPlayer(firstEntity))
 				{
 					//InitGame();
 					GameState::currentState = GameState::DIED;
-					ChangeGameStatus();
 				}
 				else
 				{
+					if (firstEatable.isApex) GameState::currentState = GameState::WON;
 					entityManager.Kill(firstEntity);
-					secondMass.mass += firstMass.mass;
+					secondEatable.mass += firstEatable.mass;
 				}
 			}
-			else if (secondMass.CanBeEatenBy(firstMass)) {
+			else if (secondEatable.CanBeEatenBy(firstEatable)) {
 				if (isEntityAPlayer(secondEntity))
 				{
 					//InitGame();
 					GameState::currentState = GameState::DIED;
-					ChangeGameStatus();
 				}
 				else
 				{
+					if (secondEatable.isApex) GameState::currentState = GameState::WON;
 					entityManager.Kill(secondEntity);
-					firstMass.mass += secondMass.mass;
+					firstEatable.mass += secondEatable.mass;
 				}
 			}
+			if (GameState::currentState != GameState::PLAYING) ChangeGameStatus();
 		}
 	}
 }
@@ -267,7 +267,7 @@ void GameEngine::InitGame()
 			const auto transform = entityManager.Get<Transform>(entity);
 			const auto mesh = entityManager.Get<Mesh>(entity);
 			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCube(transform, mesh));
-			entityManager.AddComponent<Eatable>(entity, 250.f);
+			entityManager.AddComponent<Eatable>(entity, 250.f, true);
 		}
 	}
 
