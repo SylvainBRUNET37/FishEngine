@@ -25,7 +25,7 @@ void PhysicsSimulationSystem::Init() {
 
 void PhysicsSimulationSystem::Update(double, EntityManager& entityManager)
 {
-	if (GameState::currentState != GameState::PAUSED)
+	if (GameState::currentState == GameState::PLAYING)
 	{
 		UpdateControllables(entityManager);
 		UpdatePhysics();

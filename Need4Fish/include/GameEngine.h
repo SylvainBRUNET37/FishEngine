@@ -41,6 +41,7 @@ private:
 	void ChangeGameStatus();
 	void ResumeGame(Entity mainMenuEntity);
 	void PauseGame(Entity mainMenuEntity);
+	void EndGame(Entity mainMenuEntity);
 
 	void InitGame();
 };

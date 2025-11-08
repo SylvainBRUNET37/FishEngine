@@ -24,7 +24,7 @@ void GameEngine::Run()
 		HandleGameState();
 
 		const DWORD frameStartTime = GetTickCount();
-		const auto isGamePaused = GameState::currentState == GameState::PAUSED;
+		const auto isGamePaused = GameState::currentState != GameState::PLAYING;
 
 		const double elapsedTime = isGamePaused ? 0.0 : (frameStartTime - prevTime) / 1000.0;
 
@@ -60,7 +60,11 @@ void GameEngine::HandleGameState()
 
 	// Restart the game if has been was pressed
 	if (GetAsyncKeyState('R') & 0x8000 && GameState::currentState != GameState::PAUSED)
+	{
+		ResumeGame(mainMenuEntity);
 		InitGame();
+	}
+	
 
 	if (isEscapePressed && !wasEscapePressed)
 		ChangeGameStatus();
@@ -115,7 +119,9 @@ void GameEngine::HandleCollions() {
 
 				if (isEntityAPlayer(firstEntity))
 				{
-					InitGame();
+					//InitGame();
+					GameState::currentState = GameState::DIED;
+					ChangeGameStatus();
 				}
 				else
 				{
@@ -126,7 +132,9 @@ void GameEngine::HandleCollions() {
 			else if (secondMass.CanBeEatenBy(firstMass)) {
 				if (isEntityAPlayer(secondEntity))
 				{
-					InitGame();
+					//InitGame();
+					GameState::currentState = GameState::DIED;
+					ChangeGameStatus();
 				}
 				else
 				{
@@ -140,9 +148,23 @@ void GameEngine::HandleCollions() {
 
 void GameEngine::ChangeGameStatus()
 {
-	GameState::currentState == GameState::PAUSED
+	switch (GameState::currentState)
+	{
+	case GameState::PAUSED:
+		ResumeGame(mainMenuEntity);
+		break;
+	case GameState::PLAYING:
+		PauseGame(mainMenuEntity);
+		break;
+	case GameState::WON:
+	case GameState::DIED:
+		EndGame(mainMenuEntity);
+		break;
+	}
+
+	/*GameState::currentState == GameState::PAUSED
 		? ResumeGame(mainMenuEntity)
-		: PauseGame(mainMenuEntity);
+		: PauseGame(mainMenuEntity);*/
 }
 
 void GameEngine::ResumeGame(const Entity mainMenuEntity)
@@ -167,6 +189,23 @@ void GameEngine::PauseGame(const Entity mainMenuEntity)
 		mainMenuEntity,
 		uiManager.LoadSprite("assets/pauseMenu.jpg", resourceManager)
 	);
+}
+
+void GameEngine::EndGame(const Entity mainMenuEntity)
+{
+	ShowCursor(TRUE);
+	Camera::isMouseCaptured = false;
+
+	ClipCursor(nullptr);
+	ReleaseCapture();
+
+	auto sprite = (GameState::currentState == GameState::DIED) ?  "assets/death_title.png" : "assets/win_title.png";
+
+	entityManager.AddComponent<Sprite2D>
+		(
+			mainMenuEntity,
+			uiManager.LoadSprite(sprite, resourceManager)
+		);
 }
 
 // TODO: Init it properly

@@ -6,7 +6,7 @@ using namespace DirectX;
 
 void CameraSystem::Update(double, EntityManager& entityManager)
 {
-	if (GameState::currentState != GameState::PAUSED)
+	if (GameState::currentState == GameState::PLAYING)
 	{
 		for (const auto& [entity, camera] : entityManager.View<Camera>())
 		{
