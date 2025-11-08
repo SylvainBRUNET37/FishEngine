@@ -161,10 +161,6 @@ void GameEngine::ChangeGameStatus()
 		EndGame(mainMenuEntity);
 		break;
 	}
-
-	/*GameState::currentState == GameState::PAUSED
-		? ResumeGame(mainMenuEntity)
-		: PauseGame(mainMenuEntity);*/
 }
 
 void GameEngine::ResumeGame(const Entity mainMenuEntity)
