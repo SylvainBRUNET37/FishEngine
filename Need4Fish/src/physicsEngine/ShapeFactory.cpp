@@ -294,13 +294,18 @@ Body* ShapeFactory::CreateHorizontalCapsule(const Transform& transform, const Me
 //Creates a Jolt AABB that perfectly matches the mesh, based on it's triangles (polygons)
 JPH::Body* ShapeFactory::CreateMeshShape(const Transform& transform, const Mesh& mesh)
 {
-    TriangleList triangleList = MeshUtil::generateMeshTriangleList(mesh);
+    const TriangleList triangleList = MeshUtil::generateMeshTriangleList(mesh);
 
     const RVec3 position(transform.position.x, transform.position.y, transform.position.z);
     const Quat rotation(transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w);
 
+    const auto meshSettings = new MeshShapeSettings(triangleList);
+
+    // Prevent dynamic objects from crossing the object
+    meshSettings->mActiveEdgeCosThresholdAngle = cos(90);
+
     const RefConst scaledShapeSettings = new ScaledShapeSettings(
-        new MeshShapeSettings(triangleList), ConversionUtil::XMFloat3ToVec3Arg(transform.scale)
+        meshSettings, ConversionUtil::XMFloat3ToVec3Arg(transform.scale)
     );
 
     const BodyCreationSettings meshBodySettings(

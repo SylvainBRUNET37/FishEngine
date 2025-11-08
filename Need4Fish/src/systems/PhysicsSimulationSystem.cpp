@@ -111,7 +111,7 @@ void PhysicsSimulationSystem::UpdatePhysics()
 	);
 
 	// Update physics
-	constexpr int collisionSteps = 1;
+	constexpr int collisionSteps = 4;
 	JoltSystem::GetPhysicSystem().Update(PHYSICS_UPDATE_RATE, collisionSteps,
 	                                     &JoltSystem::GetTempAllocator(),
 	                                     &JoltSystem::GetJobSystem());
