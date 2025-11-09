@@ -77,7 +77,7 @@ void GameEngine::HandleGameState()
 	// Restart the game if has been was pressed
 	if (GetAsyncKeyState('R') & 0x8000 && GameState::currentState != GameState::PAUSED)
 	{
-		ResumeGame();
+		if (GameState::currentState != GameState::PLAYING) ResumeGame();
 		InitGame();
 	}
 	
