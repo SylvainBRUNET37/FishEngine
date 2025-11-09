@@ -72,7 +72,9 @@ Body* ShapeFactory::CreateCube(const Transform& transform, const Mesh& mesh)
         Layers::MOVING
     );
 
-    boxSettings.mLinearDamping = 1.f;
+    boxSettings.mLinearDamping = 0.9f;
+    boxSettings.mAngularDamping = 0.9f;
+    boxSettings.mRestitution = 0.75f;
 
     BodyInterface& bodyInterface = JoltSystem::GetBodyInterface();
     Body* body = bodyInterface.CreateBody(boxSettings);

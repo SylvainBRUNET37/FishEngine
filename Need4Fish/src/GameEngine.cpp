@@ -230,33 +230,40 @@ void GameEngine::InitGame()
 		{
 			const auto transform = entityManager.Get<Transform>(entity);
 			const auto mesh = entityManager.Get<Mesh>(entity);
-			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCube(transform, mesh));
+			auto& en = entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCube(transform, mesh));
 			entityManager.AddComponent<Eatable>(entity, 100.0f);
 			entityManager.AddComponent<Controllable>(entity, 100.0f);
 
 			// Link camera to the mosasaur
 			cameraComponent.targetEntity = entity;
+
+			std::cout << "created rigid body " << name.name << " with ID: " << en.body->GetID().GetIndexAndSequenceNumber() << std::endl;
 		}
 		else if (name.name == "Aquarium" || name.name.find("Monticule") != std::string::npos || name.name == "Caverne")
 		{
 			const auto transform = entityManager.Get<Transform>(entity);
 			const auto mesh = entityManager.Get<Mesh>(entity);
-			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateMeshShape(transform, mesh));
+			auto& en = entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateMeshShape(transform, mesh));
+			std::cout << "created rigid body " << name.name << " with ID: " << en.body->GetID().GetIndexAndSequenceNumber() << std::endl;
 		}
 		// Eatable fish part
 		else if (name.name.find("BasicFish") != std::string::npos)
 		{
 			const auto transform = entityManager.Get<Transform>(entity);
 			const auto mesh = entityManager.Get<Mesh>(entity);
-			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCube(transform, mesh));
+			auto& en = entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCube(transform, mesh));
 			entityManager.AddComponent<Eatable>(entity, 75.f);
+
+			std::cout << "created rigid body " << name.name << " with ID: " << en.body->GetID().GetIndexAndSequenceNumber() << std::endl;
 		}
 		else if (name.name.find("CoralFish") != std::string::npos)
 		{
 			const auto transform = entityManager.Get<Transform>(entity);
 			const auto mesh = entityManager.Get<Mesh>(entity);
-			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCube(transform, mesh));
+			auto& en = entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCube(transform, mesh));
 			entityManager.AddComponent<Eatable>(entity, 150.f);
+
+			std::cout << "created rigid body " << name.name << " with ID: " << en.body->GetID().GetIndexAndSequenceNumber() << std::endl;
 		}
 		else if (name.name.find("Momsasaure") != std::string::npos) // Mom
 		{

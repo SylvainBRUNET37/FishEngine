@@ -89,7 +89,7 @@ FrameBuffer RenderSystem::AddDirectionLightToFrameBuffer()
             .diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 0.8f),
 			.specular = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
 
-            .direction = XMFLOAT3(-0.5f, -1.0f, -0.5f),
+            .direction = XMFLOAT3(-0.5f, -1.0f, 0.5f),
             .pad = 0.0f
         },
     };
