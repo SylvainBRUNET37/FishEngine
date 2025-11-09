@@ -57,6 +57,7 @@ void GameEngine::HandleGameState()
 
 	static bool wasEscapePressed = false;
 	const bool isEscapePressed = GetAsyncKeyState(VK_ESCAPE) & 0x8000;
+	const bool isPausableOrResumable = GameState::currentState == GameState::PLAYING || GameState::currentState == GameState::PAUSED;
 
 	// Restart the game if has been was pressed
 	if (GetAsyncKeyState('R') & 0x8000 && GameState::currentState != GameState::PAUSED)
@@ -66,7 +67,8 @@ void GameEngine::HandleGameState()
 	}
 	
 
-	if (isEscapePressed && !wasEscapePressed)
+	//if (isEscapePressed && !wasEscapePressed)
+	if (isEscapePressed && !wasEscapePressed && isPausableOrResumable)
 		ChangeGameStatus();
 
 	wasEscapePressed = isEscapePressed;
