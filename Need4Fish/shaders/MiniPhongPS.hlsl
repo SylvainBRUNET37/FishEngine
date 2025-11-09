@@ -71,61 +71,117 @@ struct VSOutput
 Texture2D textureEntree : register(t0);
 SamplerState SampleState : register(s0);
 
-float3 ComputeDirLight(float3 N, float3 V)
+float3 ComputeDirLight(float3 surfaceNormal, float3 viewDirection)
 {
-    float3 L = normalize(-dirLight.direction);
-    float diff = saturate(dot(N, L));
-    float3 R = reflect(-L, N);
-    float spec = pow(saturate(dot(R, V)), puissance);
+	// Calculate light direction
+    float3 lightDirection = normalize(-dirLight.direction);
+    float diffuseIntensity = saturate(dot(surfaceNormal, lightDirection));
 
+    // Calculate specular reflection
+    float3 reflectionDirection = reflect(-lightDirection, surfaceNormal);
+    float specularIntensity = pow(saturate(dot(reflectionDirection, viewDirection)), puissance);
+
+    // Combine material and light properties
     float3 ambient = dirLight.ambient.rgb * vAMat.rgb;
-    float3 diffuse = dirLight.diffuse.rgb * vDMat.rgb * diff;
-    float3 specular = dirLight.specular.rgb * vSMat.rgb * spec;
+    float3 diffuse = dirLight.diffuse.rgb * vDMat.rgb * diffuseIntensity;
+    float3 specular = dirLight.specular.rgb * vSMat.rgb * specularIntensity;
 
     return ambient + diffuse + specular;
 }
 
-float3 ComputePointLight(PointLight L, float3 N, float3 V, float3 P)
+float3 ComputePointLight(PointLight pointLight, float3 surfaceNormal, float3 viewDirection, float3 worldPosition)
 {
-    float3 lightVec = L.position - P;
-    float dist = length(lightVec);
-    float3 Lnorm = normalize(lightVec);
+	// Calculate light vector and distance
+    float3 lightVec = pointLight.position - worldPosition;
+    float lightDistance = length(lightVec);
+    float3 lightDirection = normalize(lightVec);
 
-    float diff = saturate(dot(N, Lnorm));
-    float3 R = reflect(-Lnorm, N);
-    float spec = pow(saturate(dot(R, V)), puissance);
+    float diffuseFactor = saturate(dot(surfaceNormal, lightDirection));
 
-    float att = 1.0f / dot(L.attenuation, float3(1.0f, dist, dist * dist));
+    // Calculate specular reflection
+    float3 attenuationFactor = reflect(-lightDirection, surfaceNormal);
+    float specularIntensity = pow(saturate(dot(attenuationFactor, viewDirection)), puissance);
 
-    float3 ambient = L.ambient.rgb * vAMat.rgb;
-    float3 diffuse = L.diffuse.rgb * vDMat.rgb * diff;
-    float3 specular = L.specular.rgb * vSMat.rgb * spec;
+    // Attenuation = 1 / (Kc + Kl*d + Kq*d²)
+    float attenuation = 1.0f / dot(pointLight.attenuation, float3(1.0f, lightDistance, lightDistance * lightDistance));
 
-    return (ambient + diffuse + specular) * att;
+    // Combine material and light properties
+    float3 ambient = pointLight.ambient.rgb * vAMat.rgb;
+    float3 diffuse = pointLight.diffuse.rgb * vDMat.rgb * diffuseFactor;
+    float3 specular = pointLight.specular.rgb * vSMat.rgb * specularIntensity;
+
+    return (ambient + diffuse + specular) * attenuation;
 }
 
-float4 MiniPhongPS(VSOutput vin) : SV_Target
-{
-    float3 N = normalize(vin.normal);
-    float3 V = normalize(vCamera.xyz - vin.worldPosition);
+// =====================================
+// Underwater effects
+// =====================================
 
-    float3 result = float3(0, 0, 0);
+float3 ApplyUnderwaterAttenuation(float3 color, float3 worldPos, float3 cameraPos)
+{
+    const float3 waterColorAbsorption = float3(0.06f, 0.03f, 0.015f);
+    const float waterDensity = 0.020f;
+
+    float distanceFromCamera = length(cameraPos - worldPos);
+
+    const float waterStartDistance = 6.0f; // distance at which the effect start
+    const float waterFullDistance = 40.0f; // distance from which the effect is complete
+
+    float depthFactor = saturate((distanceFromCamera - waterStartDistance) / waterFullDistance);
+
+    // Apply Beer-Lambert attenuation : https://en.wikipedia.org/wiki/Beer%E2%80%93Lambert_law
+    float3 attenuation = exp(-waterColorAbsorption * waterDensity * distanceFromCamera * depthFactor);
+
+    return color * attenuation;
+}
+
+float3 ApplyUnderwaterFog(float3 color, float3 worldPos, float3 cameraPos)
+{
+    const float3 fogColor = float3(0.0f, 0.2f, 0.4f);
+    const float fogDensity = 0.001f;
+
+    float distanceFromCamera = length(cameraPos - worldPos);
+
+    // Exponential fog : https://rovecoder.net/article/directx-11/fog
+    float fogFactor = 1.0f - exp(-pow(fogDensity * distanceFromCamera, 2.0f));
+    fogFactor = saturate(fogFactor);
+
+    return lerp(color, fogColor, fogFactor);
+}
+
+// TODO: caustics :
+// https://developer.nvidia.com/gpugems/gpugems/part-i-natural-effects/chapter-2-rendering-water-caustics
+
+// =====================================
+// Main pixel shader
+// =====================================
+
+float4 MiniPhongPS(VSOutput input) : SV_Target
+{
+    float3 surfaceNormal = normalize(input.normal);
+    float3 viewDirection = normalize(vCamera.xyz - input.worldPosition);
+
+    float3 finalColor = float3(0, 0, 0);
 
     // Directional light
-    result += ComputeDirLight(N, V);
+    finalColor += ComputeDirLight(surfaceNormal, viewDirection);
 
     // Point lights
     for (int i = 0; i < MAX_POINT_LIGHTS; i++)
     {
-        result += ComputePointLight(pointLights[i], N, V, vin.worldPosition);
+        finalColor += ComputePointLight(pointLights[i], surfaceNormal, viewDirection, input.worldPosition);
     }
 
-    // Texture modulation
+    // Apply texture
     if (bTex > 0.5f)
     {
-        float3 texColor = textureEntree.Sample(SampleState, vin.textCoord).rgb;
-        result *= texColor;
+        float3 texColor = textureEntree.Sample(SampleState, input.textCoord).rgb;
+        finalColor *= texColor;
     }
 
-    return float4(result, 1.0f);
+    // Apply underwater effects
+    finalColor = ApplyUnderwaterAttenuation(finalColor, input.worldPosition, vCamera.xyz);
+    finalColor = ApplyUnderwaterFog(finalColor, input.worldPosition, vCamera.xyz);
+
+    return float4(finalColor, 1.0f);
 }

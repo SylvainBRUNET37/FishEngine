@@ -212,11 +212,14 @@ void GameEngine::InitGame()
 	entityManager = EntityManagerFactory::Create(resourceManager.LoadScene());
 
 	// TODO: revise this
+	int screenWidth = GetSystemMetrics(SM_CXSCREEN);
+	int screenHeight = GetSystemMetrics(SM_CYSCREEN);
+
 	Camera camera;
 	camera.position = XMVectorSet(0, 5, -10, 1);
 	camera.focus = XMVectorSet(0, 0, 0, 1);
 	camera.up = XMVectorSet(0, 1, 0, 0);
-	camera.aspectRatio = static_cast<float>(1920) / static_cast<float>(1080);
+	camera.aspectRatio = static_cast<float>(screenWidth) / static_cast<float>(screenHeight);
 	camera.distance = 80.f;
 	camera.heightOffset = 30.f;
 

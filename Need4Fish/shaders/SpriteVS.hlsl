@@ -27,12 +27,12 @@ struct VSOutput
 // Algorithm
 // =====================================
 
-VSOutput SpriteVS(VSInput vin) // rename it to SpriteVS
+VSOutput SpriteVS(VSInput input)
 {
     VSOutput output;
 
-    output.pos = mul(float4(vin.pos, 1.0f), matProj);
-    output.uv = vin.uv;
+    output.pos = mul(float4(input.pos, 1.0f), matProj);
+    output.uv = input.uv;
 
     return output;
 }

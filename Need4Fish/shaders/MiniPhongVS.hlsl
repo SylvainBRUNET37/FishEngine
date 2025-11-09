@@ -75,19 +75,19 @@ struct VSOutput
 // Algorithm
 // =====================================
 
-VSOutput MiniPhongVS(VSInput vin)
+VSOutput MiniPhongVS(VSInput input)
 {
-    VSOutput vout = (VSOutput) 0;
+    VSOutput output = (VSOutput) 0;
 
-    float4 worldPos = mul(float4(vin.POSITION, 1.0f), matWorld);
+    float4 worldPos = mul(float4(input.POSITION, 1.0f), matWorld);
 
-    vout.position = mul(worldPos, matViewProj);
-    vout.worldPosition = worldPos.xyz;
+    output.position = mul(worldPos, matViewProj);
+    output.worldPosition = worldPos.xyz;
 
-    float3 normalWorld = mul((float3x3) matWorld, vin.NORMAL);
-    vout.normal = normalize(normalWorld);
+    float3 normalWorld = mul((float3x3) matWorld, input.NORMAL);
+    output.normal = normalize(normalWorld);
 
-    vout.textCoord = vin.TEXCOORD;
+    output.textCoord = input.TEXCOORD;
 
-    return vout;
+    return output;
 }
