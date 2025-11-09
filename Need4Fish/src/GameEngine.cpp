@@ -234,7 +234,7 @@ void GameEngine::InitGame()
 			const auto mesh = entityManager.Get<Mesh>(entity);
 			auto& en = entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCube(transform, mesh));
 			entityManager.AddComponent<Eatable>(entity, 100.0f);
-			entityManager.AddComponent<Controllable>(entity, 100.0f);
+			entityManager.AddComponent<Controllable>(entity, 200.0f);
 
 			// Link camera to the mosasaur
 			cameraComponent.targetEntity = entity;
