@@ -77,7 +77,7 @@ void GameEngine::HandleGameState()
 	// Restart the game if has been was pressed
 	if (GetAsyncKeyState('R') & 0x8000 && GameState::currentState != GameState::PAUSED)
 	{
-		ResumeGame(mainMenuEntity);
+		ResumeGame();
 		InitGame();
 	}
 	
@@ -168,26 +168,26 @@ void GameEngine::ChangeGameStatus()
 	switch (GameState::currentState)
 	{
 	case GameState::PAUSED:
-		ResumeGame(mainMenuEntity);
+		ResumeGame();
 		break;
 	case GameState::PLAYING:
-		PauseGame(mainMenuEntity);
+		PauseGame();
 		break;
 	case GameState::WON:
 	case GameState::DIED:
-		EndGame(mainMenuEntity);
+		EndGame();
 		break;
 	}
 }
 
-void GameEngine::ResumeGame(const Entity mainMenuEntity)
+void GameEngine::ResumeGame()
 {
 	CameraSystem::SetMouseCursor();
 	GameState::currentState = GameState::PLAYING;
 	entityManager.RemoveComponent<Sprite2D>(mainMenuEntity);
 }
 
-void GameEngine::PauseGame(const Entity mainMenuEntity)
+void GameEngine::PauseGame()
 {
 	ShowCursor(TRUE);
 	Camera::isMouseCaptured = false;
@@ -204,7 +204,7 @@ void GameEngine::PauseGame(const Entity mainMenuEntity)
 	);
 }
 
-void GameEngine::EndGame(const Entity mainMenuEntity)
+void GameEngine::EndGame()
 {
 	ShowCursor(TRUE);
 	Camera::isMouseCaptured = false;

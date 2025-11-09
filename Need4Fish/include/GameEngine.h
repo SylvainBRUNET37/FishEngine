@@ -4,7 +4,6 @@
 #include "ResourceManager.h"
 #include "UIManager.h"
 #include "entities/EntityManager.h"
-#include "systems/CameraSystem.h"
 #include "systems/PhysicsSimulationSystem.h"
 #include "systems/RenderSystem.h"
 #include "systems/System.h"
@@ -34,9 +33,9 @@ private:
 	void HandleCollions();
 
 	void ChangeGameStatus();
-	void ResumeGame(Entity mainMenuEntity);
-	void PauseGame(Entity mainMenuEntity);
-	void EndGame(Entity mainMenuEntity);
+	void ResumeGame();
+	void PauseGame();
+	void EndGame();
 
 	void InitGame();
 };
