@@ -51,7 +51,7 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 		// Init physics
 		JoltSystem joltSystem;
 
-		// Init game engine & run main loop !
+		// Init game engine & run the main loop !
 		GameEngine gameEngine{ &renderContext };
 		gameEngine.Run();
 

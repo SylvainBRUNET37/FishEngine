@@ -9,13 +9,14 @@
 
 ## Étapes à suivre pour les profs
 
-1. Exécuter :
+1. Dans le répertoire "FishEngine", exécuter :
    ```bash
    ./build.bat
    ```
-2. Choisir "Samples\Devoir3" comme projet de démarrage
-3. Compiler le projet
-4. Lancer le projet
+2. Aller faire un café (~5min de build pour Assimp + Jolt)
+3. Lancer la solution "FishEngine.sln"
+4. Choisir "Need4Fish" comme projet de démarrage
+5. Lancer le projet (Debug ou Release)
 
 ## Contrôles
 
@@ -27,6 +28,7 @@
 - A et D pour "strafe" à gauche et à droite
 
 - Roulette de la souris pour ajuster le zoom de la caméra
+- ALT + Entrée pour activer/désactiver le mode pleine écran
 
 ## Gameplay loop
 
@@ -37,7 +39,8 @@
 - S'il y a égalité, l'autre se fait "pousser".
 - Si l'autre a plus de masse, l'écran de fin de jeu apparaît et il faut recommencer ('R').
 
-- Dans le moment, il n'est pas possible de savoir si on a plus de masse que l'autre avant d'entrer en contact.
+- Dans le moment, il n'est pas possible de savoir si on a plus de masse que l'autre avant d'entrer en contact. 
+- De plus, le joueur ne grandit pas encore lorqu'il mange des proies.
 
 ## Étapes à suivre pour cloner (devs)
 
