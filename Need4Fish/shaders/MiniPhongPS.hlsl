@@ -138,7 +138,7 @@ float3 ApplyUnderwaterAttenuation(float3 color, float3 worldPos, float3 cameraPo
 float3 ApplyUnderwaterFog(float3 color, float3 worldPos, float3 cameraPos)
 {
     const float3 fogColor = float3(0.0f, 0.2f, 0.4f);
-    const float fogDensity = 0.001f;
+    const float fogDensity = 0.00075f;
 
     float distanceFromCamera = length(cameraPos - worldPos);
 
