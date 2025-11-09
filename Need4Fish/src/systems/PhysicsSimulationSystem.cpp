@@ -13,10 +13,10 @@ using namespace JPH;
 void PhysicsSimulationSystem::Init() {
 
 	// Water init
-	surfacePoint = RVec3(0, 1000, 0);
+	surfacePoint = RVec3(0, 4000, 0);
 	waterBox = AABox(
-		-Vec3(5000.0f, 500.0f, 5000.0f),
-		Vec3(5000.0f, 1000.0f, 5000.0f)
+		Vec3(-3500.0f, -100.0f, -3500),
+		Vec3(3500.0f, 4000.0f, 3500.0f)
 	);
 	// End Water init
 
