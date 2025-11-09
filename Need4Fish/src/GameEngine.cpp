@@ -261,7 +261,7 @@ void GameEngine::InitGame()
 			const auto transform = entityManager.Get<Transform>(entity);
 			const auto mesh = entityManager.Get<Mesh>(entity);
 			auto& en = entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCube(transform, mesh));
-			entityManager.AddComponent<Eatable>(entity, 150.f);
+			entityManager.AddComponent<Eatable>(entity, 100.f);
 
 			std::cout << "created rigid body " << name.name << " with ID: " << en.body->GetID().GetIndexAndSequenceNumber() << std::endl;
 		}
@@ -270,7 +270,7 @@ void GameEngine::InitGame()
 			const auto transform = entityManager.Get<Transform>(entity);
 			const auto mesh = entityManager.Get<Mesh>(entity);
 			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCube(transform, mesh));
-			entityManager.AddComponent<Eatable>(entity, 250.f, true);
+			entityManager.AddComponent<Eatable>(entity, 200.f, true);
 		}
 	}
 
