@@ -57,14 +57,5 @@ if errorlevel 1 (
     exit /b 1
 )
 
-popd
-popd
-
-echo ===========================================
-echo ===== Launch FishEngine.sln ====
-echo ===========================================
-start "./FishEngine.sln"
-start "./secret.mp3"
-
 endlocal
 pause

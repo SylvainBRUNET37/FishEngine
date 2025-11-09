@@ -18,6 +18,8 @@
 4. Choisir "Need4Fish" comme projet de démarrage
 5. Lancer le projet (Debug ou Release)
 
+Attention, un chemin de dossier trop long peut provoquer des erreurs !
+
 ## Contrôles
 
 - ESC pour mettre le jeu en pause (et récupérer la souris) ou sorrtir de pause
