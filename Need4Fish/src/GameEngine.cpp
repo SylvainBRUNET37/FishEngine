@@ -244,7 +244,7 @@ void GameEngine::InitGame()
 
 			std::cout << "created rigid body " << name.name << " with ID: " << en.body->GetID().GetIndexAndSequenceNumber() << std::endl;
 		}
-		else if (name.name == "Aquarium" || name.name.find("Monticule") != std::string::npos || name.name == "Caverne")
+		else if (name.name == "Aquarium" || name.name.find("Monticule") != std::string::npos || name.name == "Plane")
 		{
 			const auto transform = entityManager.Get<Transform>(entity);
 			const auto mesh = entityManager.Get<Mesh>(entity);

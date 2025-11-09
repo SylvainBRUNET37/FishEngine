@@ -138,7 +138,7 @@ float3 ApplyUnderwaterAttenuation(float3 color, float3 worldPos, float3 cameraPo
 float3 ApplyUnderwaterFog(float3 color, float3 worldPos, float3 cameraPos)
 {
     const float3 fogColor = float3(0.0f, 0.2f, 0.4f);
-    const float fogDensity = 0.00075f;
+    const float fogDensity = 0.001f;
 
     float distanceFromCamera = length(cameraPos - worldPos);
 
@@ -180,8 +180,11 @@ float4 MiniPhongPS(VSOutput input) : SV_Target
     }
 
     // Apply underwater effects
-    finalColor = ApplyUnderwaterAttenuation(finalColor, input.worldPosition, vCamera.xyz);
-    finalColor = ApplyUnderwaterFog(finalColor, input.worldPosition, vCamera.xyz);
+    if (vCamera.y < 2620) // 2620 = height of the water (TODO: do not hardcode if possible)
+    {
+        finalColor = ApplyUnderwaterAttenuation(finalColor, input.worldPosition, vCamera.xyz);
+        finalColor = ApplyUnderwaterFog(finalColor, input.worldPosition, vCamera.xyz);
+    }
 
     return float4(finalColor, 1.0f);
 }
