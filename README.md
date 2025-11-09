@@ -28,6 +28,17 @@
 
 - Roulette de la souris pour ajuster le zoom de la caméra
 
+## Gameplay loop
+
+- L'objectif est de manger le grand mosasaure à l'extérieur du monticule
+- Il faut manger d'autres poissons plus petits avant, sinon c'est le grand mosasaure qui VOUS mange
+- Pour manger : simplement entrer en contact avec les autres êtres vivants.
+- Si on a plus de masse, l'autre disparaît et on gagne en masse.
+- S'il y a égalité, l'autre se fait "pousser".
+- Si l'autre a plus de masse, l'écran de fin de jeu apparaît et il faut recommencer ('R').
+
+- Dans le moment, il n'est pas possible de savoir si on a plus de masse que l'autre avant d'entrer en contact.
+
 ## Étapes à suivre pour cloner (devs)
 
 1.  ```bash
