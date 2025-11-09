@@ -1,88 +1,65 @@
 #include "pch.h"
 
-#include <Jolt/RegisterTypes.h>
-
 #include "components/Components.h"
+#include "PhysicsEngine/JoltSystem.h"
 #include "PhysicsEngine/layers/BroadPhaseLayerInterfaceImpl.h"
 #include "PhysicsEngine/layers/BroadPhaseLayers.h"
-#include "PhysicsEngine/layers/ObjectLayerPairFilterImpl.h"
-#include "PhysicsEngine/layers/ObjectVsBroadPhaseLayerFilterImpl.h"
-#include "PhysicsEngine/listeners/BodyActivationListenerImpl.h"
-#include "PhysicsEngine/listeners/ContactListenerImpl.h"
-#include "PhysicsEngine/JoltSystem.h"
 #include "rendering/application/WindowsApplication.h"
 #include "rendering/device/DeviceBuilder.h"
 #include "rendering/device/RenderContext.h"
-#include "systems/RenderSystem.h"
 #include "ResourceManager.h"
 
-#include "entities/EntityManagerFactory.h"
 #include "GameEngine.h"
-#include <systems/PhysicsSimulationSystem.h>
-
-#include "PhysicsEngine/utils/JoltUtils.h"
-#include "systems/CameraSystem.h"
 
 using namespace JPH;
 using namespace JPH::literals;
 using namespace std;
 using namespace DirectX;
 
+namespace
+{
+	void CreateDebugConsoleWindow()
+	{
+		// Reference: https://stackoverflow.com/questions/16703835/how-can-i-see-cout-output-in-a-non-console-application
+		AllocConsole();
+		freopen("CONOUT$", "w", stdout);
+		freopen("CONOUT$", "w", stderr);
+	}
+}
+
 int APIENTRY _tWinMain(const HINSTANCE hInstance,
                        HINSTANCE,
                        LPTSTR,
                        int)
 {
-	// Source: https://stackoverflow.com/questions/16703835/how-can-i-see-cout-output-in-a-non-console-application
-	AllocConsole(); // D�commenter si la console est voulu
-	freopen("CONOUT$", "w", stdout);
-	freopen("CONOUT$", "w", stderr);
-
-	WindowsApplication application{hInstance, L"RenderingEngineSample", L"RenderingEngineSampleClass"};
-
-	if (!application.Init())
-		return EXIT_FAILURE;
-
-	const auto windowData = application.GetWindowData();
-
-	auto renderContext = DeviceBuilder::CreateRenderContext(application.GetMainWindow(), windowData);
-
-	ResourceManager resourceManager{renderContext.GetDevice()};
-	auto sceneResources = resourceManager.LoadScene();
-
-	/////	Physics System	 /////
-	JoltSystem::Init();
-	auto& physicsSystem = JoltSystem::GetPhysicSystem();
-	physicsSystem.SetGravity(Vec3(0, -500, 0));
-
+	try
+	{
 #ifndef NDEBUG
-	AssertFailed = JoltUtils::AssertFailedImpl;
+		CreateDebugConsoleWindow();
 #endif
 
-	const BroadPhaseLayerInterfaceImpl broadPhaseLayerInterface;
-	const ObjectVsBroadPhaseLayerFilterImpl objectVsBroadPhaseLayerFilter;
-	const ObjectLayerPairFilterImpl objectLayerPairFilter;
-	physicsSystem.Init(1024, 0, 1024, 1024,
-	                   broadPhaseLayerInterface, objectVsBroadPhaseLayerFilter, objectLayerPairFilter);
+		// Create the window
+		WindowsApplication application{ hInstance, L"Need4Fish", L"Need4FishClass" };
 
-	PhysicsSettings settings = physicsSystem.GetPhysicsSettings();
-	settings.mMinVelocityForRestitution = 0.01f;
-	physicsSystem.SetPhysicsSettings(settings);
+		if (!application.Init())
+			return EXIT_FAILURE;
 
-	BodyActivationListenerImpl bodyActivationListener;
-	physicsSystem.SetBodyActivationListener(&bodyActivationListener);
+		// Init render context
+		auto renderContext = 
+			DeviceBuilder::CreateRenderContext(application.GetMainWindow(), application.GetWindowData());
 
-	ContactListenerImpl contactListener;
-	physicsSystem.SetContactListener(&contactListener);
+		// Init physics
+		JoltSystem joltSystem;
 
-	//////////////////////////////
+		// Init game engine & run main loop !
+		GameEngine gameEngine{ &renderContext };
+		gameEngine.Run();
 
-	GameEngine gameEngine{&renderContext};
-
-	CameraSystem::SetMouseCursor();
-	gameEngine.Run();
-
-	UnregisterTypes();
-
-	return EXIT_SUCCESS;
+		return EXIT_SUCCESS;
+	}
+	catch (const std::exception& ex)
+	{
+		std::cout << "The following exception occured:\n" << ex.what() << '\n';
+		return EXIT_FAILURE;
+	}
 }

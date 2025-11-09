@@ -9,7 +9,7 @@
 
 using namespace JPH;
 
-void JoltSystem::Init()
+JoltSystem::JoltSystem()
 {
 	RegisterDefaultAllocator();
 
@@ -21,6 +21,21 @@ void JoltSystem::Init()
 	RegisterTypes();
 
 	physicsSystem = std::make_unique<PhysicsSystem>();
+	physicsSystem->SetGravity(Vec3(0, -500, 0));
+
+#ifndef NDEBUG
+	AssertFailed = JoltUtils::AssertFailedImpl;
+#endif
+
+	physicsSystem->Init(1024, 0, 1024, 1024,
+		broadPhaseLayerInterface, objectVsBroadPhaseLayerFilter, objectLayerPairFilter);
+
+	PhysicsSettings settings = physicsSystem->GetPhysicsSettings();
+	settings.mMinVelocityForRestitution = 0.01f;
+	physicsSystem->SetPhysicsSettings(settings);
+
+	physicsSystem->SetBodyActivationListener(&bodyActivationListener);
+	physicsSystem->SetContactListener(&contactListener);
 }
 
 JoltSystem::~JoltSystem()

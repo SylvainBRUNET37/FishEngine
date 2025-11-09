@@ -1,6 +1,9 @@
 #include "pch.h"
 
 #include "systems/RenderSystem.h"
+
+#include <format>
+
 #include "rendering/culling/FrustumCuller.h"
 
 #include "GameState.h"
@@ -37,7 +40,7 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 	for (const auto& [entity, pointLight] : entityManager.View<PointLight>())
 	{
 		if (lightCount >= FrameBuffer::MAX_POINT_LIGHTS)
-			throw runtime_error(format("Cannot exceed {} point light", FrameBuffer::MAX_POINT_LIGHTS));
+			throw runtime_error(std::format("Cannot exceed {} point light", FrameBuffer::MAX_POINT_LIGHTS));
 
 		frameBuffer.pointLights[lightCount++] = pointLight;
 	}

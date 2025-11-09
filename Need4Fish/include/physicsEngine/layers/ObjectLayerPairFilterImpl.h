@@ -21,7 +21,7 @@ public:
 		case Layers::FOOD_CHAIN:
 			return !(inLayer2 == Layers::FOOD_CHAIN || inLayer2 == Layers::GOAL);	//Collides with all except Mommy and themselves
 		case Layers::GOAL:
-			return !(inLayer2 == Layers::FOOD_CHAIN);	//Collides with all but other members of the food chain. There is only ever one Mommy, so it's fine
+			return inLayer2 != Layers::FOOD_CHAIN;	//Collides with all but other members of the food chain. There is only ever one Mommy, so it's fine
 		default:
 			JPH_ASSERT(false);	//If we are here, something has gone wrong
 			return false;

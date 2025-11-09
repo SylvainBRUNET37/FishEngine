@@ -115,12 +115,6 @@ void PhysicsSimulationSystem::UpdatePhysics()
 	JoltSystem::GetPhysicSystem().Update(PHYSICS_UPDATE_RATE, collisionSteps,
 	                                     &JoltSystem::GetTempAllocator(),
 	                                     &JoltSystem::GetJobSystem());
-
-	// Apply logic related to the physics simulation results
-	for (auto& task : JoltSystem::GetPostStepCallbacks())
-		task();
-
-	JoltSystem::GetPostStepCallbacks().clear();
 }
 
 void PhysicsSimulationSystem::RotateTowardsCameraDirection(

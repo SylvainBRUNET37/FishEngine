@@ -16,6 +16,8 @@ GameEngine::GameEngine(RenderContext* renderContext)
 	: uiManager{ renderContext->GetDevice() },
 	resourceManager{ renderContext->GetDevice() }
 {
+	CameraSystem::SetMouseCursor();
+
 	auto& sceneResources = resourceManager.LoadScene();
 
 	// Care about the order of construction, it will be the order of update calls

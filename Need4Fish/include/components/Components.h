@@ -9,7 +9,7 @@
 #include "entities/Entity.h"
 #include "gameplay/Eatable.h"
 #include "physics/RigidBody.h"
-#include "PhysicsEngine/JoltSystem.h"
+
 #include "rendering/core/Transform.h"
 #include "rendering/graphics/lights/PointLight.h"
 #include "rendering/graphics/Mesh.h"

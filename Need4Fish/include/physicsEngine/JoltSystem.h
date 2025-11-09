@@ -1,27 +1,29 @@
 #ifndef JOLT_INITIALISER_H
 #define JOLT_INITIALISER_H
 
-#include <functional>
 #include <cassert>
 
-#include <Jolt/Jolt.h>
 #include <Jolt/Core/JobSystemThreadPool.h>
 #include <Jolt/Core/TempAllocator.h>
 #include <Jolt/Physics/PhysicsSettings.h>
 #include <Jolt/Physics/PhysicsSystem.h>
 
+#include "PhysicsEngine/layers/BroadPhaseLayerInterfaceImpl.h"
+#include "PhysicsEngine/layers/ObjectLayerPairFilterImpl.h"
+#include "PhysicsEngine/layers/ObjectVsBroadPhaseLayerFilterImpl.h"
+#include "PhysicsEngine/listeners/ContactListenerImpl.h"
+#include "PhysicsEngine/listeners/BodyActivationListenerImpl.h"
+
 class JoltSystem
 {
 public:
-	using PostStepCallback = std::function<void()>;
-	using PostStepCallbacks = std::vector<PostStepCallback>;
+	JoltSystem();
+	~JoltSystem();
 
 	JoltSystem(const JoltSystem&) = delete;
 	JoltSystem& operator=(const JoltSystem&) = delete;
 	JoltSystem(JoltSystem&&) = delete;
 	JoltSystem& operator=(JoltSystem&&) = delete;
-
-	static void Init();
 
 	static JPH::TempAllocatorImpl& GetTempAllocator()
 	{
@@ -54,24 +56,17 @@ public:
 		return physicsSystem->GetBodyInterface();
 	}
 
-	static PostStepCallbacks& GetPostStepCallbacks()
-	{
-		return postStepCallbacks;
-	}
-
-	static void AddPostStepCallback(const PostStepCallback& callback)
-	{
-		postStepCallbacks.emplace_back(callback);
-	}
-
 private:
 	static constexpr size_t TEMP_ALLOCATOR_SIZE_MB = 10;
 	static constexpr size_t TEMP_ALLOCATOR_SIZE = TEMP_ALLOCATOR_SIZE_MB * 1024 * 1024;
 
 	inline static std::unique_ptr<JPH::PhysicsSystem> physicsSystem = nullptr;
-	inline static PostStepCallbacks postStepCallbacks{};
 
-	~JoltSystem();
+	BroadPhaseLayerInterfaceImpl broadPhaseLayerInterface;
+	ObjectVsBroadPhaseLayerFilterImpl objectVsBroadPhaseLayerFilter;
+	ObjectLayerPairFilterImpl objectLayerPairFilter;
+	ContactListenerImpl contactListener;
+	BodyActivationListenerImpl bodyActivationListener;
 };
 
 #endif
