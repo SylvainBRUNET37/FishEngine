@@ -50,8 +50,6 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 	ResourceManager resourceManager{renderContext.GetDevice()};
 	auto sceneResources = resourceManager.LoadScene();
 
-	auto entityManager = EntityManagerFactory::Create(sceneResources);
-
 	/////	Physics System	 /////
 	JoltSystem::Init();
 	auto& physicsSystem = JoltSystem::GetPhysicSystem();
@@ -79,22 +77,7 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 
 	//////////////////////////////
 
-	// Care about the order of construction, it will be the order of update calls
-	std::vector<std::unique_ptr<System>> systems;
-
-	auto physicsSimulationSystem = std::make_unique<PhysicsSimulationSystem>();
-	physicsSimulationSystem->Init();
-	systems.emplace_back(std::move(physicsSimulationSystem));
-	systems.emplace_back(std::make_unique<CameraSystem>());
-	systems.emplace_back(std::make_unique<RenderSystem>(&renderContext, std::move(sceneResources.materials)));
-
-	GameEngine gameEngine
-	{
-		std::move(entityManager),
-		std::move(resourceManager),
-		UIManager{renderContext.GetDevice()},
-		std::move(systems)
-	};
+	GameEngine gameEngine{&renderContext};
 
 	CameraSystem::SetMouseCursor();
 	gameEngine.Run();

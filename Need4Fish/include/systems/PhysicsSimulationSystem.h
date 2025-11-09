@@ -7,8 +7,7 @@
 class PhysicsSimulationSystem : public System
 {
 public:
-	PhysicsSimulationSystem() = default;
-	void Init();
+	PhysicsSimulationSystem();
 
 private:
 	static constexpr double TARGET_UPDATES_PER_SECOND = 60.0;

@@ -129,7 +129,7 @@ float3 ApplyUnderwaterAttenuation(float3 color, float3 worldPos, float3 cameraPo
 
     float depthFactor = saturate((distanceFromCamera - waterStartDistance) / waterFullDistance);
 
-    // Apply Beer-Lambert attenuation : https://en.wikipedia.org/wiki/Beer%E2%80%93Lambert_law
+	// Apply Beer-Lambert attenuation : https://en.wikipedia.org/wiki/Beer%E2%80%93Lambert_law
     float3 attenuation = exp(-waterColorAbsorption * waterDensity * distanceFromCamera * depthFactor);
 
     return color * attenuation;
@@ -142,7 +142,9 @@ float3 ApplyUnderwaterFog(float3 color, float3 worldPos, float3 cameraPos)
 
     float distanceFromCamera = length(cameraPos - worldPos);
 
-    // Exponential fog : https://rovecoder.net/article/directx-11/fog
+    // Exponential fog :
+    // https://learn.microsoft.com/en-us/windows/win32/direct3d9/fog-formulas
+    // https://rovecoder.net/article/directx-11/fog
     float fogFactor = 1.0f - exp(-pow(fogDensity * distanceFromCamera, 2.0f));
     fogFactor = saturate(fogFactor);
 
@@ -179,7 +181,7 @@ float4 MiniPhongPS(VSOutput input) : SV_Target
         finalColor *= texColor;
     }
 
-    // Apply underwater effects
+    // Apply underwater effects if in the water
     if (vCamera.y < 2620) // 2620 = height of the water (TODO: do not hardcode if possible)
     {
         finalColor = ApplyUnderwaterAttenuation(finalColor, input.worldPosition, vCamera.xyz);

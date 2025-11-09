@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "GameEngine.h"
 
-#include <iostream>
 #include <tuple>
 #include <optional>
 #include <algorithm>
@@ -12,6 +11,20 @@
 #include "rendering/texture/TextureLoader.h"
 
 using namespace DirectX;
+
+GameEngine::GameEngine(RenderContext* renderContext)
+	: uiManager{ renderContext->GetDevice() },
+	resourceManager{ renderContext->GetDevice() }
+{
+	auto& sceneResources = resourceManager.LoadScene();
+
+	// Care about the order of construction, it will be the order of update calls
+	systems.emplace_back(std::make_unique<PhysicsSimulationSystem>());
+	systems.emplace_back(std::make_unique<CameraSystem>());
+	systems.emplace_back(std::make_unique<RenderSystem>(renderContext, std::move(sceneResources.materials)));
+
+	InitGame();
+}
 
 void GameEngine::Run()
 {
@@ -197,7 +210,7 @@ void GameEngine::EndGame(const Entity mainMenuEntity)
 	ClipCursor(nullptr);
 	ReleaseCapture();
 
-	auto sprite = (GameState::currentState == GameState::DIED) ?  "assets/ui/deathTitle.png" : "assets/ui/winTitle.png";
+	const auto sprite = (GameState::currentState == GameState::DIED) ?  "assets/ui/deathTitle.png" : "assets/ui/winTitle.png";
 
 	entityManager.AddComponent<Sprite2D>
 		(
@@ -209,7 +222,7 @@ void GameEngine::EndGame(const Entity mainMenuEntity)
 // TODO: Init it properly
 void GameEngine::InitGame()
 {
-	entityManager = EntityManagerFactory::Create(resourceManager.LoadScene());
+	entityManager = EntityManagerFactory::Create(resourceManager.GetSceneResource());
 
 	// TODO: revise this
 	int screenWidth = GetSystemMetrics(SM_CXSCREEN);
@@ -277,14 +290,14 @@ void GameEngine::InitGame()
 		}
 	}
 
-	// Add light
+	// Add a point light in the monticule
 	PointLight pointLight =
 	{
 		.ambient = XMFLOAT4(0.02f, 0.02f, 0.02f, 1.0f),
 		.diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
 		.specular = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
 
-		.position = XMFLOAT3(2.0f, 20.0f, -20.0f),
+		.position = XMFLOAT3(0.0f, 650.0f, 0.0f),
 		.range = 50.0f,
 
 		.attenuation = XMFLOAT3(1.0f, 0.09f, 0.032f),

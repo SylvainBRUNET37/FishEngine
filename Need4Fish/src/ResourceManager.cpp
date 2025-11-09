@@ -25,7 +25,7 @@ void ResourceManager::InitShaderBank()
 	shaderBank = shaderFactory.CreateShaderBank(desc, device);
 } 
 
-SceneResource ResourceManager::LoadScene()
+SceneResource& ResourceManager::LoadScene()
 {
 	// TODO: Link shaders to Mesh (curently, every mesh use the same shaders)
 	const ShaderProgram shaderProgram
@@ -36,6 +36,7 @@ SceneResource ResourceManager::LoadScene()
 	};
 
 	const std::filesystem::path filePath = "assets\\MainScene_Volet2.glb";
+	sceneResource = sceneLoader.LoadScene(filePath, shaderProgram);
 
-	return sceneLoader.LoadScene(filePath, shaderProgram);
+	return sceneResource;
 }

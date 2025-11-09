@@ -4,20 +4,15 @@
 #include "ResourceManager.h"
 #include "UIManager.h"
 #include "entities/EntityManager.h"
+#include "systems/CameraSystem.h"
+#include "systems/PhysicsSimulationSystem.h"
+#include "systems/RenderSystem.h"
 #include "systems/System.h"
 
 class GameEngine
 {
 public:
-	explicit GameEngine(EntityManager&& entityManager, ResourceManager&& resourceManager, UIManager&& uiManager,
-	                    std::vector<std::unique_ptr<System>>&& systems)
-		: systems{std::move(systems)},
-		  uiManager{std::move(uiManager)},
-		  resourceManager{std::move(resourceManager)},
-		  entityManager{std::move(entityManager)}
-	{
-		InitGame();
-	}
+	explicit GameEngine(RenderContext* renderContext);
 
 	void Run();
 

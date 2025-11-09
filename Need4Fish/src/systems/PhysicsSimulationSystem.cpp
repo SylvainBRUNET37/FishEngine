@@ -10,8 +10,8 @@
 using namespace DirectX;
 using namespace JPH;
 
-void PhysicsSimulationSystem::Init() {
-
+PhysicsSimulationSystem::PhysicsSimulationSystem()
+{
 	// Water init
 	surfacePoint = RVec3(0, 2620.f, 0);
 	waterBox = AABox(
