@@ -1,10 +1,12 @@
 #ifndef ENTITY_MANAGER_H
 #define ENTITY_MANAGER_H
 
+#include <format>
+
 #include "Entity.h"
 #include "components/ComponentPool.h"
-#include "components/Components.h"
 #include "components/ComponentUtils.h"
+#include "rendering/utils/VerboseAssertion.h"
 
 class EntityManager
 {
@@ -49,7 +51,6 @@ public:
 
 		auto& componentPool = std::get<ComponentPool<Component>>(componentPools);
 
-		componentPool.ResizeIfOutOfBound(entity.index + 1);
 		return componentPool.Emplace(entity.index, std::forward<ComponentArgs>(args)...);
 	}
 
@@ -202,12 +203,8 @@ private:
 
 		generations.push_back(1); // Create a new generation for this index (1 = first gen)
 
-		// Resize every component pools to include the new entity
-		std::apply
-		(
-			[&](auto&... pools) { (pools.ResizeIfOutOfBound(index + 1), ...); },
-			componentPools
-		);
+		vassert(index < MAX_ENTITIES, 
+			std::format("Cannot create a new index: it is above the limit of {} entities.", MAX_ENTITIES));
 
 		return index;
 	}

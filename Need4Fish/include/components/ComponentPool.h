@@ -2,26 +2,19 @@
 #define COMPONENT_POOL_H
 
 #include <utility>
-#include <vector>
-#include <deque>
+#include <array>
 #include <optional>
 
 #include "Entity.h"
+
+// TODO: not the best way of doing it, using a sparse set would be better
+inline static constexpr size_t MAX_ENTITIES = 126;
 
 // A container for the given component
 template <typename Component>
 class ComponentPool
 {
 public:
-    void ResizeIfOutOfBound(const Entity::Index entityIndex)
-    {
-        // Expand the vector if needed
-        if (components.size() < entityIndex)
-        {
-            components.resize(entityIndex);
-        }
-    }
-
     [[nodiscard]] bool Has(const Entity::Index entityIndex) const noexcept
     {
         return entityIndex < components.size() && components[entityIndex].has_value();
@@ -30,8 +23,6 @@ public:
     template <typename... ComponentArgs>
     Component& Emplace(const Entity::Index entityIndex, ComponentArgs&&... componentArgs)
     {
-        ResizeIfOutOfBound(entityIndex + 1);
-
         // Construct the component with given args
         components[entityIndex].emplace(std::forward<ComponentArgs>(componentArgs)...);
         return *components[entityIndex];
@@ -56,8 +47,7 @@ public:
     }
 
 private:
-    // TODO: replace it for plf::colony? or use a kind of index table which avoid reference invalidation
-    std::deque<std::optional<Component>> components;
+    std::array<std::optional<Component>, MAX_ENTITIES> components;
 };
 
 #endif
