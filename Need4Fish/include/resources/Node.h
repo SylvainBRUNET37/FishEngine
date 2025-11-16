@@ -14,6 +14,8 @@ struct Node
     std::vector<uint32_t> children;
 
     Transform transform;
+
+    std::string componentsDatas;
 };
 
 #endif

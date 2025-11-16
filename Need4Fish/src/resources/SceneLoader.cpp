@@ -3,6 +3,8 @@
 
 #include <filesystem>
 #include <utility>
+#include <sstream>
+#include <iostream>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -98,6 +100,9 @@ void SceneLoader::ProcessNodeHierarchy(
 	Node node;
 	Transform transform;
 	const XMMATRIX nodeMatrix = AiToXMMatrix(aiNode->mTransformation);
+
+	if (aiString componentsDatas; aiNode->mMetaData && aiNode->mMetaData->Get("components", componentsDatas))
+		node.componentsDatas = componentsDatas.C_Str();
 
 	// Decompose the matrix
 	XMVECTOR scale, rotationQuat, translation;

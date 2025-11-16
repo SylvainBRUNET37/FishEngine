@@ -60,6 +60,9 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 	catch (const std::exception& ex)
 	{
 		std::cout << "The following exception occured:\n" << ex.what() << '\n';
+
+		MessageBoxA(nullptr, ex.what(), "An exception has been thrown", MB_ICONERROR | MB_OK);
+
 		return EXIT_FAILURE;
 	}
 }
