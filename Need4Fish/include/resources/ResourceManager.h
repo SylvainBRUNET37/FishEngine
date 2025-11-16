@@ -3,8 +3,8 @@
 
 #include <d3d11.h>
 
-#include "rendering/loading/Node.h"
-#include "rendering/loading/SceneLoader.h"
+#include "resources/Node.h"
+#include "resources/SceneLoader.h"
 #include "rendering/shaders/ShaderBank.h"
 
 class ResourceManager

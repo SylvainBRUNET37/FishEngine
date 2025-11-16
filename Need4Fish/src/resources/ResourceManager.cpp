@@ -1,10 +1,10 @@
 #include "pch.h"
-#include "ResourceManager.h"
+#include "resources/ResourceManager.h"
 
 #include "rendering/shaders/ShaderProgramDesc.h"
 #include "rendering/shaders/ShaderFactory.h"
 
-#include "rendering/loading/SceneLoader.h"
+#include "resources/SceneLoader.h"
 
 ResourceManager::ResourceManager(ID3D11Device* device) : device{device}, sceneLoader{device}
 {

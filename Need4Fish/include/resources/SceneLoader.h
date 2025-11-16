@@ -7,7 +7,7 @@
 
 #include "rendering/device/RenderContext.h"
 #include "rendering/texture/TextureManager.h"
-#include "Node.h"
+#include "SceneResource.h"
 
 class SceneLoader
 {

@@ -183,7 +183,8 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     <ClCompile Include="src\physicsEngine\ShapeFactory.cpp" />
     <ClCompile Include="src\physicsEngine\JoltSystem.cpp" />
     <ClCompile Include="src\physicsEngine\WaterCollector.cpp" />
-    <ClCompile Include="src\ResourceManager.cpp" />
+    <ClCompile Include="src\resources\ResourceManager.cpp" />
+    <ClCompile Include="src\resources\SceneLoader.cpp" />
     <ClCompile Include="src\systems\CameraSystem.cpp" />
     <ClCompile Include="src\systems\PhysicsSimulationSystem.cpp" />
     <ClCompile Include="src\systems\RenderSystem.cpp" />
@@ -221,8 +222,11 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     <ClInclude Include="include\physicsEngine\utils\JoltUtils.h" />
     <ClInclude Include="include\entities\EntityManagerFactory.h" />
     <ClInclude Include="include\physicsEngine\WaterCollector.h" />
-    <ClInclude Include="include\ResourceManager.h" />
+    <ClInclude Include="include\resources\Node.h" />
+    <ClInclude Include="include\resources\ResourceManager.h" />
     <ClInclude Include="include\GameEngine.h" />
+    <ClInclude Include="include\resources\SceneLoader.h" />
+    <ClInclude Include="include\resources\SceneResource.h" />
     <ClInclude Include="include\systems\CameraSystem.h" />
     <ClInclude Include="include\systems\PhysicsSimulationSystem.h" />
     <ClInclude Include="include\systems\RenderSystem.h" />

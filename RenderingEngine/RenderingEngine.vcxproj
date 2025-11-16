@@ -44,9 +44,7 @@
     <ClInclude Include="include\rendering\graphics\lights\PointLight.h" />
     <ClInclude Include="include\rendering\graphics\Sprite2D.h" />
     <ClInclude Include="include\rendering\graphics\VertexSprite.h" />
-    <ClInclude Include="include\rendering\loading\Node.h" />
     <ClInclude Include="include\rendering\Renderer.h" />
-    <ClInclude Include="include\rendering\loading\SceneLoader.h" />
     <ClInclude Include="include\rendering\shaders\Shader.h" />
     <ClInclude Include="include\rendering\shaders\ShaderBank.h" />
     <ClInclude Include="include\rendering\shaders\ShaderDesc.h" />
@@ -87,7 +85,6 @@
     <ClCompile Include="src\rendering\graphics\Mesh.cpp" />
     <ClCompile Include="src\rendering\graphics\Sprite2D.cpp" />
     <ClCompile Include="src\rendering\Renderer.cpp" />
-    <ClCompile Include="src\rendering\loading\SceneLoader.cpp" />
     <ClCompile Include="src\rendering\shaders\ShaderProgram.cpp" />
     <ClCompile Include="src\rendering\shaders\ShaderReflector.cpp" />
     <ClCompile Include="src\rendering\shaders\ShaderUtils.cpp" />

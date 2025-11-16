@@ -7,7 +7,7 @@
 #include "rendering/application/WindowsApplication.h"
 #include "rendering/device/DeviceBuilder.h"
 #include "rendering/device/RenderContext.h"
-#include "ResourceManager.h"
+#include "resources/ResourceManager.h"
 
 #include "GameEngine.h"
 

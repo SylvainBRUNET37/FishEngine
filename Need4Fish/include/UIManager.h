@@ -1,7 +1,7 @@
 #ifndef UI_MANAGER_H
 #define UI_MANAGER_H
 
-#include "ResourceManager.h"
+#include "resources/ResourceManager.h"
 #include "rendering/graphics/Sprite2D.h"
 
 class UIManager

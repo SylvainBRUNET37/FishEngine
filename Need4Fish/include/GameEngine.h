@@ -1,7 +1,7 @@
 #ifndef GAME_ENGINE_H
 #define GAME_ENGINE_H
 
-#include "ResourceManager.h"
+#include "resources/ResourceManager.h"
 #include "UIManager.h"
 #include "entities/EntityManager.h"
 #include "systems/PhysicsSimulationSystem.h"
