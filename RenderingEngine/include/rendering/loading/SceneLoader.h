@@ -38,6 +38,10 @@ private:
 	Material ProcessMaterial(const std::filesystem::path& materialPath, const aiScene* scene,
 	                         const aiMaterial* material, const ShaderProgram& shaderProgram);
 	ComPtr<ID3D11ShaderResourceView> ProcessEmbededTexture(const aiTexture* embeddedTex);
+
+	static void ProcessLights(const aiScene* scene, SceneResource& sceneRes);
+	static DirectionalLight ProcessDirectionalLights(const aiLight* light);
+	static PointLight ProcessPointLights(const aiLight* light, const aiScene* scene);
 };
 
 #endif

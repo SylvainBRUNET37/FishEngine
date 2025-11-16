@@ -24,7 +24,7 @@ struct PointLight
     float pad; // alignment
 };
 
-#define MAX_POINT_LIGHTS 1
+#define MAX_POINT_LIGHTS 2
 
 // Per-frame
 cbuffer FrameBuffer : register(b0)
@@ -99,8 +99,8 @@ float3 ComputePointLight(PointLight pointLight, float3 surfaceNormal, float3 vie
     float diffuseFactor = saturate(dot(surfaceNormal, lightDirection));
 
     // Calculate specular reflection
-    float3 attenuationFactor = reflect(-lightDirection, surfaceNormal);
-    float specularIntensity = pow(saturate(dot(attenuationFactor, viewDirection)), puissance);
+    float3 specularReflectionDirection = reflect(-lightDirection, surfaceNormal);
+    float specularIntensity = pow(saturate(dot(specularReflectionDirection, viewDirection)), puissance);
 
     // Attenuation = 1 / (Kc + Kl*d + Kq*d²)
     float attenuation = 1.0f / dot(pointLight.attenuation, float3(1.0f, lightDistance, lightDistance * lightDistance));

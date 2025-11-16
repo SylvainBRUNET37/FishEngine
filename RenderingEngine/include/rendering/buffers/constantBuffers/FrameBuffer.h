@@ -8,7 +8,7 @@
 
 struct alignas(16) FrameBuffer // b0 in the shader program
 {
-	static constexpr size_t MAX_POINT_LIGHTS = 1;
+	static constexpr size_t MAX_POINT_LIGHTS = 2; // should be the same in the shader program
 
 	DirectX::XMFLOAT4X4 matViewProj;
 	DirectX::XMFLOAT4 vCamera;

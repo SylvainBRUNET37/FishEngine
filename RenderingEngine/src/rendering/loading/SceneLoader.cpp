@@ -2,6 +2,7 @@
 #include "rendering/loading/SceneLoader.h"
 
 #include <filesystem>
+#include <utility>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -16,16 +17,32 @@
 using namespace std;
 using namespace DirectX;
 
+#undef max
+#undef min
+
 namespace
 {
 	XMMATRIX AiToXMMatrix(const aiMatrix4x4& aiMatrix)
 	{
-		return XMMATRIX(
+		return
+		{
 			aiMatrix.a1, aiMatrix.b1, aiMatrix.c1, aiMatrix.d1,
 			aiMatrix.a2, aiMatrix.b2, aiMatrix.c2, aiMatrix.d2,
 			aiMatrix.a3, aiMatrix.b3, aiMatrix.c3, aiMatrix.d3,
 			aiMatrix.a4, aiMatrix.b4, aiMatrix.c4, aiMatrix.d4
-		);
+		};
+	}
+
+	XMFLOAT4 AiColorToXMFLOAT4(const aiColor3D& color)
+	{
+		const float intensity = std::max({ color.r, color.g,	color.b });
+
+		return {color.r / intensity, color.g / intensity, color.b / intensity, 1.0f};
+	}
+
+	XMFLOAT3 AiColorToXMFLOAT3(const aiVector3D& vector3D)
+	{
+		return {vector3D.x, vector3D.y, vector3D.z};
 	}
 }
 
@@ -49,7 +66,8 @@ SceneResource SceneLoader::LoadScene(const filesystem::path& filePath, const Sha
 	// Load materials
 	sceneRes.materials.reserve(scene->mNumMaterials);
 	for (unsigned int i = 0; i < scene->mNumMaterials; i++)
-		sceneRes.materials.push_back(ProcessMaterial(filePath.parent_path(), scene, scene->mMaterials[i], shaderProgram));
+		sceneRes.materials.push_back(
+			ProcessMaterial(filePath.parent_path(), scene, scene->mMaterials[i], shaderProgram));
 
 	// Load meshes
 	sceneRes.meshes.reserve(scene->mNumMeshes);
@@ -57,8 +75,11 @@ SceneResource SceneLoader::LoadScene(const filesystem::path& filePath, const Sha
 		sceneRes.meshes.push_back(ProcessMesh(scene->mMeshes[i], XMMatrixIdentity()));
 
 	// Build node hierarchy
-	sceneRes.nodes.reserve(scene->mNumMeshes); // rough estimate
+	sceneRes.nodes.reserve(scene->mNumMeshes);
 	ProcessNodeHierarchy(scene->mRootNode, scene, UINT32_MAX, sceneRes);
+
+	// Process lights
+	ProcessLights(scene, sceneRes);
 
 	return sceneRes;
 }
@@ -103,7 +124,7 @@ void SceneLoader::ProcessNodeHierarchy(
 
 	// If this node has a mesh, store its index
 	if (aiNode->mNumMeshes > 0)
-		node.meshIndex = aiNode->mMeshes[0]; // assuming one mesh per node
+		node.meshIndex = aiNode->mMeshes[0]; // assume one mesh per node
 	else
 		node.meshIndex = UINT32_MAX;
 
@@ -144,9 +165,9 @@ Mesh SceneLoader::ProcessMesh(const aiMesh* mesh, const XMMATRIX& transform) con
 		if (mesh->mTextureCoords[0])
 		{
 			vertex.textureCoord = XMFLOAT2(
-			   mesh->mTextureCoords[0][i].x,
-			   1.0f - mesh->mTextureCoords[0][i].y
-		   );
+				mesh->mTextureCoords[0][i].x,
+				1.0f - mesh->mTextureCoords[0][i].y
+			);
 		}
 		else
 			vertex.textureCoord = XMFLOAT2(0.0f, 0.0f);
@@ -172,7 +193,7 @@ Material SceneLoader::ProcessMaterial(
 	const aiMaterial* material, const ShaderProgram& shaderProgram)
 {
 	static constexpr int materialCbRegisterNumber = 2;
-	Material mat{ device, shaderProgram, materialCbRegisterNumber };
+	Material mat{device, shaderProgram, materialCbRegisterNumber};
 
 	mat.name = material->GetName().C_Str();
 
@@ -226,4 +247,55 @@ ComPtr<ID3D11ShaderResourceView> SceneLoader::ProcessEmbededTexture(const aiText
 	}
 
 	return shaderRessouceView;
+}
+
+void SceneLoader::ProcessLights(const aiScene* scene, SceneResource& sceneRes)
+{
+	sceneRes.pointLights.reserve(scene->mNumLights);
+
+	for (unsigned i = 0; i < scene->mNumLights; ++i)
+	{
+		const aiLight* light = scene->mLights[i];
+
+		switch (light->mType)
+		{
+		case aiLightSource_DIRECTIONAL:
+			sceneRes.directionalLights.emplace_back(ProcessDirectionalLights(light));
+			break;
+		case aiLightSource_POINT:
+			sceneRes.pointLights.emplace_back(ProcessPointLights(light, scene));
+			break;
+		default:
+			throw std::runtime_error("The following light type is not handled: " + light->mType);
+		}
+	}
+}
+
+DirectionalLight SceneLoader::ProcessDirectionalLights(const aiLight* light)
+{
+	return
+	{
+		.ambient = AiColorToXMFLOAT4(light->mColorAmbient),
+		.diffuse = AiColorToXMFLOAT4(light->mColorDiffuse),
+		.specular = AiColorToXMFLOAT4(light->mColorSpecular),
+		.direction = AiColorToXMFLOAT3(light->mDirection)
+	};
+}
+
+PointLight SceneLoader::ProcessPointLights(const aiLight* light, const aiScene* scene)
+{
+	const auto node = scene->mRootNode->FindNode(light->mName);
+
+	aiVector3D scaling, position;
+	aiQuaternion rotation;
+	node->mTransformation.Decompose(scaling, rotation, position);
+
+	return
+	{
+		.ambient = AiColorToXMFLOAT4(light->mColorAmbient),
+		.diffuse = AiColorToXMFLOAT4(light->mColorDiffuse),
+		.specular = AiColorToXMFLOAT4(light->mColorSpecular),
+		.position = AiColorToXMFLOAT3(position),
+		.attenuation = { 1.f, 0.f, 0.f }
+	};
 }
