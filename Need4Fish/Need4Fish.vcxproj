@@ -77,7 +77,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>;include;include;$(ProjectDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>;include;include;$(ProjectDir);$(ProjectDir)external</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -100,7 +100,7 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>;include;include;$(ProjectDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>;include;include;$(ProjectDir);$(ProjectDir)external</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -121,7 +121,7 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;JPH_DEBUG_RENDERER;JPH_FLOATING_POINT_EXCEPTIONS_ENABLED;JPH_PROFILE_ENABLED;JPH_OBJECT_STREAM;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)RenderingEngine\include;$(SolutionDir)extern\assimp\include;%(AdditionalIncludeDirectories);$(SolutionDir)extern\JoltPhysics;include;$(ProjectDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)RenderingEngine\include;$(SolutionDir)extern\assimp\include;%(AdditionalIncludeDirectories);$(SolutionDir)extern\JoltPhysics;include;$(ProjectDir);$(ProjectDir)external</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -148,7 +148,7 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;JPH_DEBUG_RENDERER;JPH_FLOATING_POINT_EXCEPTIONS_ENABLED;JPH_PROFILE_ENABLED;JPH_OBJECT_STREAM;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)RenderingEngine\include;$(SolutionDir)extern\assimp\include;$(SolutionDir)extern\JoltPhysics;include;include;$(ProjectDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)RenderingEngine\include;$(SolutionDir)extern\assimp\include;$(SolutionDir)extern\JoltPhysics;include;include;$(ProjectDir);$(ProjectDir)external</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -169,6 +169,7 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\components\gameplay\Eatable.cpp" />
+    <ClCompile Include="src\entities\EntityManagerFactory.cpp" />
     <ClCompile Include="src\physicsEngine\utils\ConversionUtil.cpp" />
     <ClCompile Include="src\physicsEngine\utils\MeshUtil.cpp" />
     <ClCompile Include="pch.cpp">
@@ -183,6 +184,7 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     <ClCompile Include="src\physicsEngine\ShapeFactory.cpp" />
     <ClCompile Include="src\physicsEngine\JoltSystem.cpp" />
     <ClCompile Include="src\physicsEngine\WaterCollector.cpp" />
+    <ClCompile Include="src\resources\Parser.cpp" />
     <ClCompile Include="src\resources\ResourceManager.cpp" />
     <ClCompile Include="src\resources\SceneLoader.cpp" />
     <ClCompile Include="src\systems\CameraSystem.cpp" />
@@ -199,6 +201,8 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="external\json.hpp" />
+    <ClInclude Include="external\json_fwd.hpp" />
     <ClInclude Include="include\components\gameplay\Eatable.h" />
     <ClInclude Include="include\physicsEngine\utils\ConversionUtil.h" />
     <ClInclude Include="include\CC.h" />
@@ -223,6 +227,7 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     <ClInclude Include="include\entities\EntityManagerFactory.h" />
     <ClInclude Include="include\physicsEngine\WaterCollector.h" />
     <ClInclude Include="include\resources\Node.h" />
+    <ClInclude Include="include\resources\Parser.h" />
     <ClInclude Include="include\resources\ResourceManager.h" />
     <ClInclude Include="include\GameEngine.h" />
     <ClInclude Include="include\resources\SceneLoader.h" />
