@@ -290,13 +290,16 @@ PointLight SceneLoader::ProcessPointLights(const aiLight* light, const aiScene* 
 	aiQuaternion rotation;
 	node->mTransformation.Decompose(scaling, rotation, position);
 
+	const float intensity = std::max({ light->mColorAmbient.r, light->mColorAmbient.g,	light->mColorAmbient.b });
+
 	return
 	{
 		.ambient = AiColorToXMFLOAT4(light->mColorAmbient),
 		.diffuse = AiColorToXMFLOAT4(light->mColorDiffuse),
 		.specular = AiColorToXMFLOAT4(light->mColorSpecular),
 		.position = AiColorToXMFLOAT3(position),
-		// The world scale is high so quadratic attenuation is very low
-		.attenuation = { 1.0f, 0.0f, 0.000004f } 
+		// The world scale is high so quadratic attenuation should be very low
+		// The division per 100 is an ajustement to make the light attenuation look like Blender one
+		.attenuation = { 1.0f, 0.0f,  (intensity == 0 ? 0 : 1 / (intensity / 100)) }
 	};
 }
