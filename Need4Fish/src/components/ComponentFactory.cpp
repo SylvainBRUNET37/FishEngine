@@ -22,8 +22,8 @@ void ComponentFactory::CreateRigidBody(const nlohmann::json& componentData, Enti
 void ComponentFactory::CreateEatable(const nlohmann::json& componentData, EntityManager& entityManager,
 	const Entity& entity)
 {
-	entityManager.AddComponent<Eatable>(entity, componentData["mass"].get<float>());
-	entityManager.AddComponent<Eatable>(entity, componentData["isApex"].get<bool>());
+	auto& eatableComponent = entityManager.AddComponent<Eatable>(entity, componentData["mass"].get<float>());
+	eatableComponent.isApex = componentData["isApex"].get<bool>();
 }
 
 void ComponentFactory::CreateControllable(const nlohmann::json& componentData, EntityManager& entityManager,

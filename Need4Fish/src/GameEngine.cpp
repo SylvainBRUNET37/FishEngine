@@ -255,16 +255,8 @@ void GameEngine::InitGame()
 			entityManager.AddComponent<Eatable>(entity, 100.0f);
 			entityManager.AddComponent<Controllable>(entity, 200.0f);
 
-			// Link camera to the mosasaur
+			// Link camera to the mosasaure
 			cameraComponent.targetEntity = entity;
-		}
-		else if (name.name == "Momsasaure") // Mom
-		{
-			const auto& transform = entityManager.Get<Transform>(entity);
-			const auto& mesh = entityManager.Get<Mesh>(entity);
-
-			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCube(transform, mesh));
-			entityManager.AddComponent<Eatable>(entity, 200.f, true);
 		}
 	}
 
