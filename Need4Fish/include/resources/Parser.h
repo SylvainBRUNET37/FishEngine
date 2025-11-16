@@ -6,8 +6,7 @@
 #include <array>
 
 #include "components/Components.h"
-#include "components/factories/RigidBodyFactory.h"
-
+#include "components/ComponentFactory.h"
 #include "json_fwd.hpp"
 
 struct Entity;
@@ -32,7 +31,21 @@ private:
 				"rigidBody",
 				[](const nlohmann::json& componentData, EntityManager& entityManager, const Entity& entity)
 				{
-					RigidBodyFactory::CreateRigidBody(componentData, entityManager, entity);
+					ComponentFactory::CreateRigidBody(componentData, entityManager, entity);
+				}
+			},
+			{
+				"eatable",
+				[](const nlohmann::json& componentData, EntityManager& entityManager, const Entity& entity)
+				{
+					ComponentFactory::CreateEatable(componentData, entityManager, entity);
+				}
+			},
+			{
+				"controllable",
+				[](const nlohmann::json& componentData, EntityManager& entityManager, const Entity& entity)
+				{
+					ComponentFactory::CreateControllable(componentData, entityManager, entity);
 				}
 			},
 		}

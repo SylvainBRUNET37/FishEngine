@@ -1,0 +1,33 @@
+#include "pch.h"
+#include "components/ComponentFactory.h"
+
+#include "components/physics/RigidBody.h"
+#include "PhysicsEngine/ShapeFactory.h"
+#include "entities/EntityManager.h"
+
+#include "json.hpp"
+
+void ComponentFactory::CreateRigidBody(const nlohmann::json& componentData, EntityManager& entityManager,
+                                       const Entity& entity)
+{
+	const auto& transform = entityManager.Get<Transform>(entity);
+	const auto& mesh = entityManager.Get<Mesh>(entity);
+
+	if (componentData["type"] == "meshShape")
+		entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateMeshShape(transform, mesh));
+	else if (componentData["type"] == "boxShape")
+		entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCube(transform, mesh));
+}
+
+void ComponentFactory::CreateEatable(const nlohmann::json& componentData, EntityManager& entityManager,
+	const Entity& entity)
+{
+	entityManager.AddComponent<Eatable>(entity, componentData["mass"].get<float>());
+	entityManager.AddComponent<Eatable>(entity, componentData["isApex"].get<bool>());
+}
+
+void ComponentFactory::CreateControllable(const nlohmann::json& componentData, EntityManager& entityManager,
+	const Entity& entity)
+{
+	entityManager.AddComponent<Controllable>(entity, componentData["maxSpeed"].get<float>());
+}
