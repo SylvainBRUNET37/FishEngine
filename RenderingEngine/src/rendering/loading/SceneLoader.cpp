@@ -296,6 +296,7 @@ PointLight SceneLoader::ProcessPointLights(const aiLight* light, const aiScene* 
 		.diffuse = AiColorToXMFLOAT4(light->mColorDiffuse),
 		.specular = AiColorToXMFLOAT4(light->mColorSpecular),
 		.position = AiColorToXMFLOAT3(position),
-		.attenuation = { 1.f, 0.f, 0.f }
+		// The world scale is high so quadratic attenuation is very low
+		.attenuation = { 1.0f, 0.0f, 0.000004f } 
 	};
 }
