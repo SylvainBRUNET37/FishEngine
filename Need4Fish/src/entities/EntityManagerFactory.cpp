@@ -4,11 +4,6 @@
 #include "components/Components.h"
 #include "resources/Parser.h"
 
-EntityManager EntityManagerFactory::Create22222(const SceneResource& sceneResource)
-{
-	return {};
-}
-
 EntityManager EntityManagerFactory::Create(const SceneResource& sceneResource)
 {
 	EntityManager entityManager{};
@@ -33,9 +28,6 @@ EntityManager EntityManagerFactory::Create(const SceneResource& sceneResource)
 		const auto& node = sceneResource.nodes[nodeIndex];
 		const auto entity = entities[nodeIndex];
 
-		if (not node.componentsDatas.empty())
-			Parser::Parse(node.componentsDatas); // TODO: delete
-
 		entityManager.AddComponent<Transform>(entity, node.transform);
 		entityManager.AddComponent<Name>(entity, node.name);
 
@@ -49,6 +41,9 @@ EntityManager EntityManagerFactory::Create(const SceneResource& sceneResource)
 		// Add the children to the parent
 		auto& parentHierarchy = entityManager.Get<Hierarchy>(parentEntity);
 		parentHierarchy.children.push_back(entity);
+
+		if (not node.componentsDatas.empty())
+			Parser::Parse(node.componentsDatas, entityManager, entity);
 	}
 
 	for (size_t pointLightIndex = 0; pointLightIndex < sceneResource.pointLights.size(); ++pointLightIndex)

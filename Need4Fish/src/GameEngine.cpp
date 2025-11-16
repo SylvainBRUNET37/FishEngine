@@ -258,7 +258,7 @@ void GameEngine::InitGame()
 			// Link camera to the mosasaur
 			cameraComponent.targetEntity = entity;
 		}
-		else if (name.name == "Aquarium" || name.name.find("Monticule") != std::string::npos || name.name == "Ground")
+		else if (name.name == "Aquarium" || name.name.find("Monticule") != std::string::npos)
 		{
 			const auto& transform = entityManager.Get<Transform>(entity);
 			const auto& mesh = entityManager.Get<Mesh>(entity);

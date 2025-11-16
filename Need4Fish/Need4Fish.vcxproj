@@ -168,6 +168,7 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\components\factories\RigidBodyFactory.cpp" />
     <ClCompile Include="src\components\gameplay\Eatable.cpp" />
     <ClCompile Include="src\entities\EntityManagerFactory.cpp" />
     <ClCompile Include="src\physicsEngine\utils\ConversionUtil.cpp" />
@@ -203,6 +204,7 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
   <ItemGroup>
     <ClInclude Include="external\json.hpp" />
     <ClInclude Include="external\json_fwd.hpp" />
+    <ClInclude Include="include\components\factories\RigidBodyFactory.h" />
     <ClInclude Include="include\components\gameplay\Eatable.h" />
     <ClInclude Include="include\physicsEngine\utils\ConversionUtil.h" />
     <ClInclude Include="include\CC.h" />

@@ -1,23 +1,29 @@
 #include "pch.h"
 #include "resources/Parser.h"
 
-#include "json_fwd.hpp"
 #include "json.hpp"
 
 using namespace std;
 
-void Parser::Parse(const std::string& jsonString)
+void Parser::Parse(const std::string& componentData, EntityManager& entityManager, const Entity& entity)
 {
-	const auto components = nlohmann::json::parse(jsonString, nullptr);
+    const auto components = nlohmann::json::parse(componentData, nullptr);
 
-    if (components.contains("rigidBody")) 
+    for (const auto& [componentKey, componentData] : components.items())
     {
-        const auto& rigidBody = components["rigidBody"];
+        const auto factoryIt = ranges::find_if
+    	(
+            componentFactoryMethods,
+            [&](const auto& entry)
+            {
+                return entry.first == componentKey;
+            }
+        );
 
-        if (rigidBody.contains("type")) 
+        if (factoryIt != componentFactoryMethods.end())
         {
-            const auto type = rigidBody["type"].get<std::string>();
-            cout << "RigidBody type: " << type << std::endl;
+            const auto& factory = factoryIt->second;
+            factory(componentData, entityManager, entity);
         }
     }
 }

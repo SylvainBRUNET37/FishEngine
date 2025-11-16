@@ -12,9 +12,6 @@ public:
 		return EntityManager{};
 	}
 
-	[[nodiscard]] static EntityManager Create22222(const SceneResource& sceneResource);
-
-	// TODO: delete
 	[[nodiscard]] static EntityManager Create(const SceneResource& sceneResource);
 };
 
