@@ -258,23 +258,6 @@ void GameEngine::InitGame()
 			// Link camera to the mosasaur
 			cameraComponent.targetEntity = entity;
 		}
-		// Eatable fish part
-		else if (name.name.find("BasicFish") != std::string::npos)
-		{
-			const auto& transform = entityManager.Get<Transform>(entity);
-			const auto& mesh = entityManager.Get<Mesh>(entity);
-
-			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCube(transform, mesh));
-			entityManager.AddComponent<Eatable>(entity, 75.f);
-		}
-		else if (name.name.find("CoralFish") != std::string::npos)
-		{
-			const auto& transform = entityManager.Get<Transform>(entity);
-			const auto& mesh = entityManager.Get<Mesh>(entity);
-
-			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCube(transform, mesh));
-			entityManager.AddComponent<Eatable>(entity, 100.f);
-		}
 		else if (name.name == "Momsasaure") // Mom
 		{
 			const auto& transform = entityManager.Get<Transform>(entity);
