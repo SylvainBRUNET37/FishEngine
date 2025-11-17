@@ -1,5 +1,5 @@
-#ifndef PARSER_H
-#define PARSER_H
+#ifndef COMPONENT_LOADER_H
+#define COMPONENT_LOADER_H
 
 #include <string>
 #include <string_view>
@@ -12,17 +12,18 @@
 struct Entity;
 class EntityManager;
 
-class Parser
+class ComponentLoader
 {
 public:
-	static void Parse(const std::string& componentData, EntityManager& entityManager, const Entity& entity);
+	static void LoadComponent(const std::string& componentData, EntityManager& entityManager, const Entity& entity);
 
 private:
-	using ComponentFactoryMethod = void(*)(const nlohmann::json& componentData, EntityManager& entityManager,
+	using ComponentFactoryMethod = void(*)(const nlohmann::json& componentData,
+	                                       EntityManager& entityManager,
 	                                       const Entity& entity);
 
-	using ComponentFactoryMethods = 
-		std::array<std::pair<std::string_view, ComponentFactoryMethod>, std::tuple_size_v<Components>>;
+	using ComponentFactoryMethods =
+	std::array<std::pair<std::string_view, ComponentFactoryMethod>, std::tuple_size_v<Components>>;
 
 	static constexpr ComponentFactoryMethods componentFactoryMethods =
 	{

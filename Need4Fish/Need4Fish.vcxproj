@@ -185,7 +185,7 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     <ClCompile Include="src\physicsEngine\ShapeFactory.cpp" />
     <ClCompile Include="src\physicsEngine\JoltSystem.cpp" />
     <ClCompile Include="src\physicsEngine\WaterCollector.cpp" />
-    <ClCompile Include="src\resources\Parser.cpp" />
+    <ClCompile Include="src\resources\ComponentLoader.cpp" />
     <ClCompile Include="src\resources\ResourceManager.cpp" />
     <ClCompile Include="src\resources\SceneLoader.cpp" />
     <ClCompile Include="src\systems\CameraSystem.cpp" />
@@ -229,7 +229,7 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     <ClInclude Include="include\entities\EntityManagerFactory.h" />
     <ClInclude Include="include\physicsEngine\WaterCollector.h" />
     <ClInclude Include="include\resources\Node.h" />
-    <ClInclude Include="include\resources\Parser.h" />
+    <ClInclude Include="include\resources\ComponentLoader.h" />
     <ClInclude Include="include\resources\ResourceManager.h" />
     <ClInclude Include="include\GameEngine.h" />
     <ClInclude Include="include\resources\SceneLoader.h" />

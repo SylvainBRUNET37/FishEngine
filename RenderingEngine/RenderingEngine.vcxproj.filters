@@ -170,9 +170,6 @@
     <ClCompile Include="src\rendering\application\WindowsApplication.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\rendering\utils\DDSTextureLoader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\rendering\texture\TextureManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

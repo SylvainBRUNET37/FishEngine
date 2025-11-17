@@ -91,7 +91,6 @@
     <ClCompile Include="src\rendering\texture\TextureLoader.cpp" />
     <ClCompile Include="src\rendering\texture\TextureManager.cpp" />
     <ClCompile Include="src\rendering\utils\Clock.cpp" />
-    <ClCompile Include="src\rendering\utils\DDSTextureLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

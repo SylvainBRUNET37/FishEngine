@@ -2,7 +2,7 @@
 #include "entities/EntityManagerFactory.h"
 
 #include "components/Components.h"
-#include "resources/Parser.h"
+#include "resources/ComponentLoader.h"
 
 EntityManager EntityManagerFactory::Create(const SceneResource& sceneResource)
 {
@@ -43,7 +43,7 @@ EntityManager EntityManagerFactory::Create(const SceneResource& sceneResource)
 		parentHierarchy.children.push_back(entity);
 
 		if (not node.componentsDatas.empty())
-			Parser::Parse(node.componentsDatas, entityManager, entity);
+			ComponentLoader::LoadComponent(node.componentsDatas, entityManager, entity);
 	}
 
 	for (size_t pointLightIndex = 0; pointLightIndex < sceneResource.pointLights.size(); ++pointLightIndex)
