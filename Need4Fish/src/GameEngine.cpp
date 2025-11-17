@@ -9,6 +9,7 @@
 #include "PhysicsEngine/ShapeFactory.h"
 #include "rendering/application/WindowsApplication.h"
 #include "rendering/texture/TextureLoader.h"
+#include <Jolt/Physics/Collision/Shape/ScaledShape.h>
 
 using namespace DirectX;
 
@@ -90,19 +91,17 @@ void GameEngine::HandleGameState()
 }
 
 void GameEngine::HandleCollions() {
-	auto isBodyEatable = [&](JPH::BodyID bodyId) -> std::optional<std::pair<const Entity, Eatable&>> {
-		auto eatables = entityManager.View<RigidBody, Eatable>();
+	auto isBodyEatable = [&](JPH::BodyID bodyId) -> std::optional<std::tuple<const Entity, Eatable&, RigidBody&>> {
+		auto eatables = entityManager.View<Eatable, RigidBody>();
 		auto it = std::find_if(eatables.begin(), eatables.end(),
 			[&](auto&& tuple)
 			{
-				auto& [entity, rigidBody, eatable] = tuple;
+				auto& [entity, eatable, rigidBody] = tuple;
 				return rigidBody.body->GetID() == bodyId;
 			});
 		if (it != eatables.end())
 		{
-			const auto& [entity, _, eatable] = *it;
-			return std::pair<Entity, Eatable&>(entity, eatable);
-
+			return std::tuple<Entity, Eatable&, RigidBody&>(*it);
 		}
 		return std::nullopt;
 	};
@@ -128,8 +127,8 @@ void GameEngine::HandleCollions() {
 		auto secondObject = isBodyEatable(bodyId2);
 		if (firstObject.has_value() && secondObject.has_value())
 		{
-			auto& [firstEntity, firstEatable] = firstObject.value();
-			auto& [secondEntity, secondEatable] = secondObject.value();
+			auto& [firstEntity, firstEatable, firstBody] = firstObject.value();
+			auto& [secondEntity, secondEatable, secondBody] = secondObject.value();
 
 			// Kill things if necessary
 			if (firstEatable.CanBeEatenBy(secondEatable)) {
@@ -143,6 +142,25 @@ void GameEngine::HandleCollions() {
 					if (firstEatable.isApex) GameState::currentState = GameState::WON;
 					entityManager.Kill(firstEntity);
 					secondEatable.mass += firstEatable.mass;
+
+					// Shape scaling test
+					auto currentShape = secondBody.body->GetShape();
+					auto& bodyInterface = JoltSystem::GetPhysicSystem().GetBodyInterface();
+					JPH::Vec3 scale(2.0f, 2.0f, 2.0f);   // test scale // TODO changer ça + fonction
+					if (currentShape->GetSubType() == JPH::EShapeSubType::Box)
+					{
+						const JPH::BoxShape* box = static_cast<const JPH::BoxShape*>(currentShape);
+
+						JPH::Vec3 newHalfExtents = box->GetHalfExtent() * scale;
+
+						JPH::RefConst<JPH::Shape> newShape = new JPH::BoxShape(newHalfExtents);
+
+						bodyInterface.SetShape(bodyId2, newShape, true, JPH::EActivation::Activate);
+					}
+					else {
+						JPH::RefConst<JPH::Shape> newShape = new JPH::ScaledShape(currentShape, scale);
+						bodyInterface.SetShape(bodyId2, newShape, true, JPH::EActivation::Activate);
+					}
 				}
 			}
 			else if (secondEatable.CanBeEatenBy(firstEatable)) {
@@ -156,6 +174,25 @@ void GameEngine::HandleCollions() {
 					if (secondEatable.isApex) GameState::currentState = GameState::WON;
 					entityManager.Kill(secondEntity);
 					firstEatable.mass += secondEatable.mass;
+
+					// Shape scaling test
+					auto currentShape = firstBody.body->GetShape();
+					auto& bodyInterface = JoltSystem::GetPhysicSystem().GetBodyInterface();
+					JPH::Vec3 scale(2.0f, 2.0f, 2.0f);   // test scale // TODO: changer ça + fonction
+					if (currentShape->GetSubType() == JPH::EShapeSubType::Box)
+					{
+						const JPH::BoxShape* box = static_cast<const JPH::BoxShape*>(currentShape);
+
+						JPH::Vec3 newHalfExtents = box->GetHalfExtent() * scale;
+
+						JPH::RefConst<JPH::Shape> newShape = new JPH::BoxShape(newHalfExtents);
+
+						bodyInterface.SetShape(bodyId1, newShape, true, JPH::EActivation::Activate);
+					}
+					else {
+						JPH::RefConst<JPH::Shape> newShape = new JPH::ScaledShape(currentShape, scale);
+						bodyInterface.SetShape(bodyId1, newShape, true, JPH::EActivation::Activate);
+					}
 				}
 			}
 			if (GameState::currentState != GameState::PLAYING) ChangeGameStatus();
