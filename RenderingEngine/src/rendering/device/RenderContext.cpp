@@ -2,16 +2,17 @@
 #include "rendering/device/RenderContext.h"
 
 RenderContext::RenderContext(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context,
-                             const ComPtr<IDXGISwapChain>& swapChain, const WindowData& windowData)
+	const ComPtr<IDXGISwapChain>& swapChain, const WindowData& windowData)
 	: screenWidth(windowData.screenWidth),
-	  screenHeight(windowData.screenHeight),
-	  device(device),
-	  context(context),
-	  swapChain(swapChain),
-	  rasterizer(device, context),
-	  renderTarget(device, swapChain),
-	  depthBuffer(device, windowData),
-	  blendState(device)
+	screenHeight(windowData.screenHeight),
+	device(device),
+	context(context),
+	swapChain(swapChain),
+	rasterizer(device, context),
+	renderTarget(device, swapChain),
+	depthBuffer(device, windowData),
+	blendState(device),
+	postProcess(device, windowData.screenWidth, windowData.screenHeight)
 {
 	SetRenderTarget();
 	SetupViewPort();

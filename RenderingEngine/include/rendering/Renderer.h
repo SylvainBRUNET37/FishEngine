@@ -5,6 +5,7 @@
 #include "buffers/constantBuffers/ObjectBuffer.h"
 #include "buffers/constantBuffers/SpriteBuffer.h"
 #include "core/Transform.h"
+#include "device/RenderContext.h"
 #include "graphics/Material.h"
 #include "graphics/Mesh.h"
 #include "graphics/Sprite2D.h"
@@ -12,11 +13,12 @@
 class Renderer
 {
 public:
-	explicit Renderer(ID3D11Device* device, std::vector<Material>&& materials)
-		: materials{std::move(materials)},
-		  frameConstantBuffer{device, frameCbRegisterNumber},
-		  objectConstantBuffer{device, objectCbRegisterNumber},
-		  spriteConstantBuffer{device, spriteCbRegisterNumber}
+	explicit Renderer(RenderContext* renderContext, std::vector<Material>&& materials)
+		: renderContext{renderContext},
+	      materials{std::move(materials)},
+		  frameConstantBuffer{ renderContext->GetDevice(), frameCbRegisterNumber},
+		  objectConstantBuffer{ renderContext->GetDevice(), objectCbRegisterNumber},
+		  spriteConstantBuffer{ renderContext->GetDevice(), spriteCbRegisterNumber}
 	{
 	}
 
@@ -24,11 +26,14 @@ public:
 	void Render(const Mesh& mesh, ID3D11DeviceContext* context, const Transform& transform);
 	void Render(Sprite2D& sprite, ID3D11DeviceContext* context);
 	void RenderPostProcess();
+	void RenderScene() const;
 
 private:
 	static constexpr int frameCbRegisterNumber = 0;
 	static constexpr int objectCbRegisterNumber = 1;
 	static constexpr int spriteCbRegisterNumber = 0;
+
+	RenderContext* renderContext;
 
 	std::vector<Material> materials;
 	FrameBuffer frameBuffer{};
@@ -37,8 +42,8 @@ private:
 	ConstantBuffer<ObjectBuffer> objectConstantBuffer;
 	ConstantBuffer<SpriteBuffer> spriteConstantBuffer;
 
-	static void Draw(const Mesh& mesh, ID3D11DeviceContext* context);
-	static void Draw(const Sprite2D& sprite, ID3D11DeviceContext* context);
+	void Draw(const Mesh& mesh) const;
+	void Draw(const Sprite2D& sprite) const;
 
 	static ObjectBuffer BuildConstantObjectBuffer(const Transform& transform);
 	static MaterialBuffer BuildConstantMaterialBuffer(const Material& material);

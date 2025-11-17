@@ -156,6 +156,9 @@
     <ClInclude Include="include\rendering\buffers\constantBuffers\SpriteBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\rendering\device\PostProcess.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\rendering\device\RenderContext.cpp">
@@ -210,6 +213,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\rendering\graphics\Sprite2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\rendering\device\PostProcess.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

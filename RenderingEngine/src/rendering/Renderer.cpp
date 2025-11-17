@@ -27,7 +27,7 @@ void Renderer::Render(const Mesh& mesh,
 	// Bind material's texture of the mesh
 	context->PSSetShaderResources(0, 1, &material.texture);
 
-	Draw(mesh, context);
+	Draw(mesh);
 }
 
 void Renderer::Render(Sprite2D& sprite, ID3D11DeviceContext* context)
@@ -47,15 +47,29 @@ void Renderer::Render(Sprite2D& sprite, ID3D11DeviceContext* context)
 
 	context->PSSetShaderResources(0, 1, &sprite.texture.texture);
 
-	Draw(sprite, context);
+	Draw(sprite);
 }
 
 void Renderer::RenderPostProcess()
 {
-
+	//renderContext->GetPostProcess().Draw();
 }
 
-void Renderer::Draw(const Mesh& mesh, ID3D11DeviceContext* context)
+void Renderer::RenderScene() const
+{
+	ID3D11DeviceContext* context = renderContext->GetContext();
+	ID3D11RenderTargetView* renderTarget = renderContext->GetPostProcess().GetRenderTargetView();
+	ID3D11DepthStencilView* depthStencil = renderContext->GetDepthStencilView();
+
+	constexpr float backgroundColor[4] = { 0.0f, 0.2f, 0.4f, 1.0f };
+	context->ClearRenderTargetView(renderTarget, backgroundColor);
+	context->ClearDepthStencilView(depthStencil, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+	ID3D11RenderTargetView* renderTargetViews[] = { renderTarget };
+	context->OMSetRenderTargets(1, renderTargetViews, depthStencil);
+}
+
+void Renderer::Draw(const Mesh& mesh) const
 {
 	constexpr UINT stride = sizeof(Vertex);
 	constexpr UINT offset = 0;
@@ -63,13 +77,13 @@ void Renderer::Draw(const Mesh& mesh, ID3D11DeviceContext* context)
 	const auto rawVertexBuffer = mesh.vertexBuffer.Get();
 
 	// Bind vertex buffer
-	context->IASetVertexBuffers(0, 1, &rawVertexBuffer, &stride, &offset);
-	context->IASetIndexBuffer(mesh.indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	context->DrawIndexed(static_cast<UINT>(mesh.indices.size()), 0, 0);
+	renderContext->GetContext()->IASetVertexBuffers(0, 1, &rawVertexBuffer, &stride, &offset);
+	renderContext->GetContext()->IASetIndexBuffer(mesh.indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+	renderContext->GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	renderContext->GetContext()->DrawIndexed(static_cast<UINT>(mesh.indices.size()), 0, 0);
 }
 
-void Renderer::Draw(const Sprite2D& sprite, ID3D11DeviceContext* context)
+void Renderer::Draw(const Sprite2D& sprite) const
 {
 	// There is 2 triangle in a sprite, so 6 vertices
 	static constexpr UINT SPRITE_VERTICES_COUNT = 6;
@@ -80,9 +94,9 @@ void Renderer::Draw(const Sprite2D& sprite, ID3D11DeviceContext* context)
 	const auto rawVertexBuffer = sprite.vertexBuffer.Get();
 
 	// Bind vertex buffer
-	context->IASetVertexBuffers(0, 1, &rawVertexBuffer, &stride, &offset);
-	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	context->Draw(SPRITE_VERTICES_COUNT, 0);
+	renderContext->GetContext()->IASetVertexBuffers(0, 1, &rawVertexBuffer, &stride, &offset);
+	renderContext->GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	renderContext->GetContext()->Draw(SPRITE_VERTICES_COUNT, 0);
 }
 
 ObjectBuffer Renderer::BuildConstantObjectBuffer(const Transform& transform)

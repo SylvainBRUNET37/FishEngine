@@ -12,7 +12,7 @@ using namespace DirectX;
 using namespace std;
 
 RenderSystem::RenderSystem(RenderContext* renderContext, std::vector<Material>&& materials)
-	: renderer(renderContext->GetDevice(), std::move(materials)),
+	: renderer(renderContext, std::move(materials)),
 	  frameBuffer(AddDirectionLightToFrameBuffer()),
 	  renderContext(renderContext)
 {
@@ -33,7 +33,7 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 {
 	const auto currentCamera = entityManager.Get<Camera>(GameState::currentCameraEntity);
 
-	RenderScene();
+	renderer.RenderScene();
 
 	// Add point lights to the frame buffer
 	int lightCount = 0;
@@ -65,28 +65,9 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 	for (const auto& [entity, sprite] : entityManager.View<Sprite2D>())
 		renderer.Render(sprite, renderContext->GetContext());
 
-	RenderPostProcesses();
+	renderer.RenderPostProcess();
 
 	Present();
-}
-
-void RenderSystem::RenderScene() const
-{
-	ID3D11DeviceContext* context = renderContext->GetContext();
-	ID3D11RenderTargetView* renderTarget = renderContext->GetRenderTargetView();
-	ID3D11DepthStencilView* depthStencil = renderContext->GetDepthStencilView();
-
-	constexpr float backgroundColor[4] = { 0.0f, 0.2f, 0.4f, 1.0f};
-	context->ClearRenderTargetView(renderTarget, backgroundColor);
-	context->ClearDepthStencilView(depthStencil, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-
-	ID3D11RenderTargetView* rtvs[] = {renderTarget};
-	context->OMSetRenderTargets(1, rtvs, depthStencil);
-}
-
-void RenderSystem::RenderPostProcesses()
-{
-
 }
 
 FrameBuffer RenderSystem::AddDirectionLightToFrameBuffer()

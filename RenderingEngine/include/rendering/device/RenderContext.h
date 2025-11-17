@@ -3,6 +3,7 @@
 
 #include "BlendState.h"
 #include "DepthBuffer.h"
+#include "PostProcess.h"
 #include "Rasterizer.h"
 #include "RenderTarget.h"
 #include "rendering/utils/ComPtr.h"
@@ -25,6 +26,11 @@ public:
 		return renderTarget.GetRenderTargetView();
 	}
 
+	[[nodiscard]] PostProcess& GetPostProcess() noexcept
+	{
+		return postProcess;
+	}
+
 	[[nodiscard]] ID3D11DepthStencilView* GetDepthStencilView() const noexcept { return depthBuffer.GetStencilView(); }
 
 	[[nodiscard]] size_t GetScreenWidth() const noexcept { return screenWidth; }
@@ -40,6 +46,7 @@ public:
 		context->OMSetBlendState(blendState.GetAlphaBlendDisabled(), nullptr, 0xffffffff);
 	}
 
+
 private:
 	size_t screenWidth;
 	size_t screenHeight;
@@ -52,6 +59,7 @@ private:
 	RenderTarget renderTarget;
 	DepthBuffer depthBuffer;
 	BlendState blendState;
+	PostProcess postProcess;
 
 	void SetRenderTarget() const;
 	void SetupViewPort() const;
