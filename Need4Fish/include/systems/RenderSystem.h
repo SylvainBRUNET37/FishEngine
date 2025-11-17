@@ -22,6 +22,7 @@ private:
 
 	void Present() const { renderContext->Present(); }
 	void RenderScene() const;
+	void RenderPostProcesses();
 
 	static FrameBuffer AddDirectionLightToFrameBuffer();
 };

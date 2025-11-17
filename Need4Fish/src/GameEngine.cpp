@@ -6,19 +6,18 @@
 #include <algorithm>
 #include "GameState.h"
 #include "entities/EntityManagerFactory.h"
-#include "PhysicsEngine/ShapeFactory.h"
+#include "Locator.h"
 #include "rendering/application/WindowsApplication.h"
 #include "rendering/texture/TextureLoader.h"
 
 using namespace DirectX;
 
 GameEngine::GameEngine(RenderContext* renderContext)
-	: uiManager{ renderContext->GetDevice() },
-	resourceManager{ renderContext->GetDevice() }
+	: uiManager{ renderContext->GetDevice() }
 {
 	CameraSystem::SetMouseCursor();
 
-	auto& sceneResources = resourceManager.LoadScene();
+	auto& sceneResources = Locator::Get<ResourceManager>().LoadScene();
 
 	// Care about the order of construction, it will be the order of update calls
 	systems.emplace_back(std::make_unique<PhysicsSimulationSystem>());
@@ -200,7 +199,7 @@ void GameEngine::PauseGame()
 	entityManager.AddComponent<Sprite2D>
 	(
 		mainMenuEntity,
-		uiManager.LoadSprite("assets/ui/pauseTitle.png", resourceManager)
+		uiManager.LoadSprite("assets/ui/pauseTitle.png")
 	);
 }
 
@@ -217,14 +216,14 @@ void GameEngine::EndGame()
 	entityManager.AddComponent<Sprite2D>
 		(
 			mainMenuEntity,
-			uiManager.LoadSprite(sprite, resourceManager)
+			uiManager.LoadSprite(sprite)
 		);
 }
 
 // TODO: Init it properly
 void GameEngine::InitGame()
 {
-	entityManager = EntityManagerFactory::Create(resourceManager.GetSceneResource());
+	entityManager = EntityManagerFactory::Create(Locator::Get<ResourceManager>().GetSceneResource());
 
 	// TODO: revise this
 	const int screenWidth = GetSystemMetrics(SM_CXSCREEN);

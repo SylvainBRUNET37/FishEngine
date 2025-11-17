@@ -168,6 +168,12 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="shaders\PostProcessPS.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="shaders\PostProcessVS.hlsl">
+      <FileType>Document</FileType>
+    </None>
     <ClCompile Include="src\components\ComponentFactory.cpp" />
     <ClCompile Include="src\components\gameplay\Eatable.cpp" />
     <ClCompile Include="src\entities\EntityManagerFactory.cpp" />
@@ -206,6 +212,7 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     <ClInclude Include="external\json_fwd.hpp" />
     <ClInclude Include="include\components\ComponentFactory.h" />
     <ClInclude Include="include\components\gameplay\Eatable.h" />
+    <ClInclude Include="include\Locator.h" />
     <ClInclude Include="include\physicsEngine\utils\ConversionUtil.h" />
     <ClInclude Include="include\CC.h" />
     <ClInclude Include="include\components\camera\Camera.h" />

@@ -32,8 +32,6 @@ void Renderer::Render(const Mesh& mesh,
 
 void Renderer::Render(Sprite2D& sprite, ID3D11DeviceContext* context)
 {
-	context->OMSetDepthStencilState(nullptr, 0); // TODO: delete
-
 	// Orthographic projection to display the sprite in 2D "from the screne"
 	const XMMATRIX matOrtho = XMMatrixOrthographicOffCenterRH
 	(
@@ -50,6 +48,11 @@ void Renderer::Render(Sprite2D& sprite, ID3D11DeviceContext* context)
 	context->PSSetShaderResources(0, 1, &sprite.texture.texture);
 
 	Draw(sprite, context);
+}
+
+void Renderer::RenderPostProcess()
+{
+
 }
 
 void Renderer::Draw(const Mesh& mesh, ID3D11DeviceContext* context)

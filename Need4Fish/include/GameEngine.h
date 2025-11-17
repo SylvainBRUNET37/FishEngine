@@ -1,7 +1,6 @@
 #ifndef GAME_ENGINE_H
 #define GAME_ENGINE_H
 
-#include "resources/ResourceManager.h"
 #include "UIManager.h"
 #include "entities/EntityManager.h"
 #include "systems/PhysicsSimulationSystem.h"
@@ -24,7 +23,6 @@ private:
 	Entity mainMenuEntity;
 
 	UIManager uiManager;
-	ResourceManager resourceManager;
 	EntityManager entityManager;
 
 	static void WaitBeforeNextFrame(DWORD frameStartTime);

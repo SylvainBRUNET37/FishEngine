@@ -65,6 +65,8 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 	for (const auto& [entity, sprite] : entityManager.View<Sprite2D>())
 		renderer.Render(sprite, renderContext->GetContext());
 
+	RenderPostProcesses();
+
 	Present();
 }
 
@@ -80,6 +82,11 @@ void RenderSystem::RenderScene() const
 
 	ID3D11RenderTargetView* rtvs[] = {renderTarget};
 	context->OMSetRenderTargets(1, rtvs, depthStencil);
+}
+
+void RenderSystem::RenderPostProcesses()
+{
+
 }
 
 FrameBuffer RenderSystem::AddDirectionLightToFrameBuffer()

@@ -10,6 +10,7 @@
 #include "resources/ResourceManager.h"
 
 #include "GameEngine.h"
+#include "Locator.h"
 
 using namespace JPH;
 using namespace JPH::literals;
@@ -51,7 +52,10 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 		// Init physics
 		JoltSystem joltSystem;
 
-		// Init game engine & run the main loop !
+		// Add services in the locator
+		Locator::Set(make_shared<ResourceManager>(renderContext.GetDevice()));
+
+		// Init game engine and run the main loop !
 		GameEngine gameEngine{ &renderContext };
 		gameEngine.Run();
 

@@ -23,6 +23,7 @@ public:
 	void UpdateFrameBuffer(const FrameBuffer& frameBuffer_) { frameBuffer = frameBuffer_; };
 	void Render(const Mesh& mesh, ID3D11DeviceContext* context, const Transform& transform);
 	void Render(Sprite2D& sprite, ID3D11DeviceContext* context);
+	void RenderPostProcess();
 
 private:
 	static constexpr int frameCbRegisterNumber = 0;
