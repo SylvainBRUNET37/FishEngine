@@ -227,8 +227,8 @@ void GameEngine::InitGame()
 	entityManager = EntityManagerFactory::Create(resourceManager.GetSceneResource());
 
 	// TODO: revise this
-	int screenWidth = GetSystemMetrics(SM_CXSCREEN);
-	int screenHeight = GetSystemMetrics(SM_CYSCREEN);
+	const int screenWidth = GetSystemMetrics(SM_CXSCREEN);
+	const int screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
 	Camera camera;
 	camera.position = XMVectorSet(0, 5, -10, 1);
@@ -243,21 +243,14 @@ void GameEngine::InitGame()
 
 	GameState::currentCameraEntity = cameraEntity;
 
-	// Initialize the scene (it's a temporary way of doing it)
-	for (const auto& [entity, name] : entityManager.View<Name>())
+	// Assign the controllable entity to the camera (it's not a pretty way of doing it but it works)
+	unsigned short nbControllable = 0;
+	for (const auto& [entity, controllable] : entityManager.View<Controllable>())
 	{
-		if (name.name == "Mosasaure")
-		{
-			const auto& transform = entityManager.Get<Transform>(entity);
-			const auto& mesh = entityManager.Get<Mesh>(entity);
+		++nbControllable;
+		vassert(nbControllable == 1, "Currently, it's only possible to have 1 controllable entity.");
 
-			entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCube(transform, mesh));
-			entityManager.AddComponent<Eatable>(entity, 100.0f);
-			entityManager.AddComponent<Controllable>(entity, 200.0f);
-
-			// Link camera to the mosasaure
-			cameraComponent.targetEntity = entity;
-		}
+		cameraComponent.targetEntity = entity;
 	}
 
 	mainMenuEntity = entityManager.CreateEntity();
