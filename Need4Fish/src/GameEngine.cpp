@@ -11,6 +11,9 @@
 #include "rendering/texture/TextureLoader.h"
 #include <Jolt/Physics/Collision/Shape/ScaledShape.h>
 
+#include <iostream>
+#include <fstream>
+
 using namespace DirectX;
 
 GameEngine::GameEngine(RenderContext* renderContext)
@@ -157,10 +160,11 @@ void GameEngine::HandleCollions() {
 
 						bodyInterface.SetShape(bodyId2, newShape, true, JPH::EActivation::Activate);
 					}
-					else {
-						JPH::RefConst<JPH::Shape> newShape = new JPH::ScaledShape(currentShape, scale);
-						bodyInterface.SetShape(bodyId2, newShape, true, JPH::EActivation::Activate);
-					}
+					// Scale mesh
+					auto& trans = entityManager.Get<Transform>(secondEntity);
+					trans.scale.x *= 2;
+					trans.scale.y *= 2;
+					trans.scale.z *= 2;
 				}
 			}
 			else if (secondEatable.CanBeEatenBy(firstEatable)) {
@@ -189,10 +193,12 @@ void GameEngine::HandleCollions() {
 
 						bodyInterface.SetShape(bodyId1, newShape, true, JPH::EActivation::Activate);
 					}
-					else {
-						JPH::RefConst<JPH::Shape> newShape = new JPH::ScaledShape(currentShape, scale);
-						bodyInterface.SetShape(bodyId1, newShape, true, JPH::EActivation::Activate);
-					}
+					// Scale mesh
+					auto& mesh = entityManager.Get<Mesh>(firstEntity);
+					auto& trans = entityManager.Get<Transform>(firstEntity);
+					trans.scale.x *= 2;
+					trans.scale.y *= 2;
+					trans.scale.z *= 2;
 				}
 			}
 			if (GameState::currentState != GameState::PLAYING) ChangeGameStatus();
