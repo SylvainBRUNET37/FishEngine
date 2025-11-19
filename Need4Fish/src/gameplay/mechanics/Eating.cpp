@@ -3,7 +3,13 @@
 #include <Jolt/Physics/Body/Body.h>
 #include "GameEngine.h"
 
-static std::optional<std::tuple<const Entity, Eatable&, RigidBody&>> GetEatableAndRigidBodyFromBody(
+[[nodiscard]] static float CalculateGrowthFactor(const float predatorMass, const float preyMass) {
+	// Linear proportionnal growth
+	return (predatorMass + preyMass) / predatorMass;
+}
+
+
+[[nodiscard]] static std::optional<std::tuple<const Entity, Eatable&, RigidBody&>> GetEatableAndRigidBodyFromBody(
 	EntityManager& entityManager,
 	JPH::BodyID bodyId
 ) {
@@ -22,7 +28,7 @@ static std::optional<std::tuple<const Entity, Eatable&, RigidBody&>> GetEatableA
 }
 
 
-static bool IsEntityAPlayer(EntityManager& entityManager, Entity SearchedEntity) {
+[[nodiscard]] static bool IsEntityAPlayer(EntityManager& entityManager, Entity SearchedEntity) {
 	auto watchables = entityManager.View<Controllable>();
 	auto it = std::find_if(
 		watchables.begin(),
@@ -45,11 +51,12 @@ static void AcuallyEat(
 	Eatable& preyEatable
 )
 {
+	float scaleFactor = CalculateGrowthFactor(predatorEatable.mass, preyEatable.mass);
+	
+	// Eat and kill
 	if (preyEatable.isApex) GameState::currentState = GameState::WON;
 	predatorEatable.mass += preyEatable.mass;
 	entityManager.Kill(preyEntity);
-
-	float scaleFactor = 2.0f; // TODO = func(???)
 
 	// Grow the hitbox
 	auto currentShape = predatorBody.body->GetShape();
