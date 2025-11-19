@@ -50,9 +50,12 @@ void Renderer::Render(Sprite2D& sprite, ID3D11DeviceContext* context)
 	Draw(sprite);
 }
 
-void Renderer::RenderPostProcess()
+void Renderer::RenderPostProcess(ID3D11VertexShader* postProcessVertexShader, ID3D11PixelShader* postProcessPixelShader) const
 {
-	//renderContext->GetPostProcess().Draw();
+	ID3D11DeviceContext* context = renderContext->GetContext();
+	ID3D11RenderTargetView* renderTarget = renderContext->GetRenderTargetView();
+
+	renderContext->GetPostProcess().Draw(context, renderTarget, postProcessVertexShader, postProcessPixelShader);
 }
 
 void Renderer::RenderScene() const

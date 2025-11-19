@@ -29,8 +29,13 @@ void PostProcess::Draw(ID3D11DeviceContext* context, ID3D11RenderTargetView* bac
     context->VSSetShader(postProcessVertexShader, nullptr, 0);
     context->PSSetShader(postProcessPixelShader, nullptr, 0);
 
-    // Draw
+    // Bind scene texture as input
     context->PSSetShaderResources(0, 1, &sceneShaderResourceView);
+
+    // Render without vertex buffer
     context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    //context->Draw(); TODO
+    context->IASetInputLayout(nullptr);
+
+    // Draw
+    context->Draw(3, 0);
 }

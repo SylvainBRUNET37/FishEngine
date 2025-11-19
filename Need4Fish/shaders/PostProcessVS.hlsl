@@ -2,12 +2,6 @@
 // Inputs / Outputs
 // =====================================
 
-struct VSInput
-{
-	float3 pos : POSITION;
-	float2 uv : TEXCOORD0;
-};
-
 struct VSOutput
 {
 	float4 pos : SV_POSITION;
@@ -18,12 +12,30 @@ struct VSOutput
 // Algorithm
 // =====================================
 
-VSOutput PostProcessVS(VSInput input)
+VSOutput PostProcessVS(uint vertexId : SV_VertexID)
 {
-	VSOutput output;
+    VSOutput output;
 
-	output.pos = float4(input.pos, 1.0f);
-	output.uv = input.uv;
+    // Assign the correct position for each 3 vertices to create a big triangle
+    // Vertex 1 : (-1, +1)
+    // Vertex 2 : (-1, -3)
+    // Vertex 3 : (+3, +1)
+    float2 vertexPosition = float2
+	(
+        (vertexId == 2) ? 3.0 : -1.0,
+        (vertexId == 1) ? -3.0 : 1.0
+    );
 
-	return output;
+    output.pos = float4(vertexPosition, 0.0, 1.0);
+
+    // Convert clip space coordinates to UV coordinates
+    output.uv = float2
+	(
+        vertexPosition.x * 0.5 + 0.5,
+        -vertexPosition.y * 0.5 + 0.5
+    );
+
+    return output;
 }
+
+

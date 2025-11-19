@@ -7,6 +7,8 @@
 #include "rendering/culling/FrustumCuller.h"
 
 #include "GameState.h"
+#include "Locator.h"
+#include "resources/ResourceManager.h"
 
 using namespace DirectX;
 using namespace std;
@@ -46,7 +48,7 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 	}
 
 	// Update frame buffer
-    XMStoreFloat4x4(&frameBuffer.matViewProj, XMMatrixTranspose(currentCamera.matView * currentCamera.matProj));
+	XMStoreFloat4x4(&frameBuffer.matViewProj, XMMatrixTranspose(currentCamera.matView * currentCamera.matProj));
 	XMStoreFloat4(&frameBuffer.vCamera, currentCamera.position);
 	renderer.UpdateFrameBuffer(frameBuffer);
 
@@ -55,7 +57,7 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 	for (const auto& [entity, transform, mesh] : entityManager.View<Transform, Mesh>())
 	{
 		// Check if the mesh should be rendered or not
-        if (FrustumCuller::IsMeshCulled(mesh, transform, static_cast<BaseCameraData>(currentCamera))) 
+		if (FrustumCuller::IsMeshCulled(mesh, transform, static_cast<BaseCameraData>(currentCamera)))
 			continue;
 
 		renderer.Render(mesh, renderContext->GetContext(), transform);
@@ -65,24 +67,29 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 	for (const auto& [entity, sprite] : entityManager.View<Sprite2D>())
 		renderer.Render(sprite, renderContext->GetContext());
 
-	renderer.RenderPostProcess();
+	const auto& shaderBank = Locator::Get<ResourceManager>().GetShaderBank();
+
+	renderer.RenderPostProcess
+	(
+		shaderBank.Get<VertexShader>("shaders/PostProcessVS.hlsl").shader,
+		shaderBank.Get<PixelShader>("shaders/PostProcessPS.hlsl").shader
+	);
 
 	Present();
 }
 
 FrameBuffer RenderSystem::AddDirectionLightToFrameBuffer()
 {
-    return
-    {
-        .dirLight =
-        {
-            .ambient = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
-            .diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 0.8f),
+	return
+	{
+		.dirLight =
+		{
+			.ambient = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
+			.diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 0.8f),
 			.specular = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
 
-            .direction = XMFLOAT3(-0.5f, -1.0f, 0.5f),
-            .pad = 0.0f
-        },
-    };
+			.direction = XMFLOAT3(-0.5f, -1.0f, 0.5f),
+			.pad = 0.0f
+		},
+	};
 }
-

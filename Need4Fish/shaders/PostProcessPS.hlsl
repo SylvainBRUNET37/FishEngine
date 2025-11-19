@@ -1,24 +1,6 @@
 // =====================================
-// Constant buffers datas
-// =====================================
-
-cbuffer VignetteParams : register(b0)
-{
-	float radius; // Where effect begins
-	float softness; // Smoothness of the falloff
-	float strength; // Darkness strength
-	float2 padding; // Alignement
-};
-
-// =====================================
 // Inputs / Outputs
 // =====================================
-
-struct VSInput
-{
-    float3 pos : POSITION;
-    float2 uv : TEXCOORD0;
-};
 
 struct VSOutput
 {
@@ -26,25 +8,32 @@ struct VSOutput
     float2 uv : TEXCOORD0;
 };
 
-Texture2D sceneTexture : register(t0);
-SamplerState samp : register(s0);
-
 // =====================================
 // Algorithm
 // =====================================
 
-float4 PostProcessPS(VSInput input) : SV_TARGET
+Texture2D sceneTexture : register(t0);
+SamplerState samp : register(s0);
+
+// Harcoded vignette parameters, could be given with CB if needed
+// Vignette effect: https://www.youtube.com/watch?v=GiQ5OvDN8dE
+static const float radius = 0.8; // distance from the center where the effect begins
+static const float softness = 0.5; // transition softness between the zone with and without the effect
+static const float strength = 0.5; // intensity of the color (it's like an alpha channel)
+
+float4 PostProcessPS(VSOutput input) : SV_TARGET
 {
-    float2 pos = input.uv * 2.0 - 1.0;
-	float dist = length(pos);
+    float2 position = input.uv * 2.0 - 1.0;
+    float distance = length(position);
 
-    // Vignette falloff
-	float vignette = smoothstep(radius, radius - softness, dist);
+    // The vignette effect
+    float vignetteMask = smoothstep(radius, radius + softness, distance);
 
-    float4 color = sceneTexture.Sample(samp, input.uv);
+    // Retrieve the color of the pixel of the scene
+    float4 vignetteColor = sceneTexture.Sample(samp, input.uv);
 
-    // Darken edges
-	color.rgb *= lerp(1.0, 1.0 - strength, vignette);
+    // Apply vignette
+    vignetteColor.rgb *= lerp(1.0, 1.0 - strength, vignetteMask);
 
-	return color;
+    return vignetteColor;
 }
