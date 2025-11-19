@@ -2,8 +2,12 @@
 #include "gameplay/mechanics/Eating.h"
 #include <Jolt/Physics/Body/Body.h>
 #include "GameEngine.h"
+#include "DirectXMath.h"
 
-[[nodiscard]] static float CalculateGrowthFactor(const float predatorMass, const float preyMass) {
+using namespace DirectX;
+
+[[nodiscard]] static float CalculateGrowthFactor(const float predatorMass, const float preyMass)
+{
 	// Linear proportionnal growth
 	return (predatorMass + preyMass) / predatorMass;
 }
@@ -12,9 +16,12 @@
 [[nodiscard]] static std::optional<std::tuple<const Entity, Eatable&, RigidBody&>> GetEatableAndRigidBodyFromBody(
 	EntityManager& entityManager,
 	JPH::BodyID bodyId
-) {
+)
+{
 	auto eatables = entityManager.View<Eatable, RigidBody>();
-	auto it = std::find_if(eatables.begin(), eatables.end(),
+	auto it = std::find_if(
+		eatables.begin(),
+		eatables.end(),
 		[&](auto&& tuple)
 		{
 			auto& [entity, eatable, rigidBody] = tuple;
@@ -28,7 +35,8 @@
 }
 
 
-[[nodiscard]] static bool IsEntityAPlayer(EntityManager& entityManager, Entity SearchedEntity) {
+[[nodiscard]] static bool IsEntityAPlayer(EntityManager& entityManager, Entity SearchedEntity)
+{
 	auto watchables = entityManager.View<Controllable>();
 	auto it = std::find_if(
 		watchables.begin(),
@@ -72,9 +80,9 @@ static void AcuallyEat(
 
 	// Scale mesh
 	auto& trans = entityManager.Get<Transform>(predatorEntity);
-	trans.scale.x *= scaleFactor;
-	trans.scale.y *= scaleFactor;
-	trans.scale.z *= scaleFactor;
+	trans.deltaScale.x = scaleFactor;
+	trans.deltaScale.y = scaleFactor;
+	trans.deltaScale.z = scaleFactor;
 }
 
 static void LoseOrEat(
@@ -92,27 +100,57 @@ static void LoseOrEat(
 	}
 	else
 	{
+		if (IsEntityAPlayer(entityManager, predatorEntity)) GameState::isGrowing = true; // TODO (maybe) also grow fishes ?
 		AcuallyEat(entityManager, predatorEntity, predatorEatable, predatorBody, preyEntity, preyEatable);
 	}
 }
 
 
-void Eating::Eat(EntityManager& entityManager, JPH::BodyID bodyId1, JPH::BodyID bodyId2) {
-		// Check if the both objects is eatable
-		auto firstObject = GetEatableAndRigidBodyFromBody(entityManager, bodyId1);
-		auto secondObject = GetEatableAndRigidBodyFromBody(entityManager, bodyId2);
+void Eating::Eat(EntityManager& entityManager, JPH::BodyID bodyId1, JPH::BodyID bodyId2)
+{
+	// Check if the both objects is eatable
+	auto firstObject = GetEatableAndRigidBodyFromBody(entityManager, bodyId1);
+	auto secondObject = GetEatableAndRigidBodyFromBody(entityManager, bodyId2);
 
-		if (firstObject.has_value() && secondObject.has_value())
+	if (firstObject.has_value() && secondObject.has_value())
+	{
+		auto& [firstEntity, firstEatable, firstBody] = firstObject.value();
+		auto& [secondEntity, secondEatable, secondBody] = secondObject.value();
+
+		// Kill things if necessary
+		if (firstEatable.CanBeEatenBy(secondEatable)) {
+			LoseOrEat(entityManager, secondEntity, secondEatable, secondBody,  firstEntity, firstEatable);
+		}
+		else if (secondEatable.CanBeEatenBy(firstEatable)) {
+			LoseOrEat(entityManager, firstEntity, firstEatable, firstBody, secondEntity, secondEatable);
+		}
+	}
+}
+
+void Eating::UpdatePlayerScale(EntityManager& entityManager)
+{
+	const float F_GROWTH_STEPS = 60.0f;
+
+	for (const auto& [entity, _, transform] : entityManager.View<Controllable, Transform>())
+	{
+		if (XMVector3NotEqual(
+				XMLoadFloat3(&transform.deltaScale),
+				XMVectorZero()
+			)
+		)
 		{
-			auto& [firstEntity, firstEatable, firstBody] = firstObject.value();
-			auto& [secondEntity, secondEatable, secondBody] = secondObject.value();
-
-			// Kill things if necessary
-			if (firstEatable.CanBeEatenBy(secondEatable)) {
-				LoseOrEat(entityManager, secondEntity, secondEatable, secondBody,  firstEntity, firstEatable);
-			}
-			else if (secondEatable.CanBeEatenBy(firstEatable)) {
-				LoseOrEat(entityManager, firstEntity, firstEatable, firstBody, secondEntity, secondEatable);
+			float* delta = &transform.deltaScale.x;
+			float* scale = &transform.scale.x;
+			for (int i = 0; i < 3; ++i) {
+				float step = delta[i] / F_GROWTH_STEPS;
+				delta[i] -= step;
+				if (delta[i] < 0.0f) delta[i] = 0.0f;
+				scale[i] += step;
 			}
 		}
+		else
+		{
+			GameState::isGrowing = false;
+		}
+	}
 }

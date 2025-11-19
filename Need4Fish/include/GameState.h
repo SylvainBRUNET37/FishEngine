@@ -19,6 +19,8 @@ struct GameState
 
     inline static Entity currentCameraEntity = INVALID_ENTITY;
     inline static auto currentState = PLAYING;
+
+    inline static bool isGrowing = false;
 };
 
 #endif

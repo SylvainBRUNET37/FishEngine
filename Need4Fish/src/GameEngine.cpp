@@ -68,6 +68,9 @@ void GameEngine::WaitBeforeNextFrame(const DWORD frameStartTime)
 
 void GameEngine::HandleGameState()
 {
+	if (GameState::isGrowing)
+		Eating::UpdatePlayerScale(entityManager);
+
 	// Check if things get eaten
 	HandleCollions();
 
