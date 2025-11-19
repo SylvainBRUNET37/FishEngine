@@ -81,8 +81,6 @@ void GameEngine::HandleGameState()
 		InitGame();
 	}
 	
-
-	//if (isEscapePressed && !wasEscapePressed)
 	if (isEscapePressed && !wasEscapePressed && isPausableOrResumable)
 		ChangeGameStatus();
 
