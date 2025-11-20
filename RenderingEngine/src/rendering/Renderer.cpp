@@ -1,7 +1,30 @@
 #include "pch.h"
 #include "rendering/Renderer.h"
 
+#include "rendering/texture/TextureLoader.h"
+
 using namespace DirectX;
+
+Renderer::Renderer(RenderContext* renderContext, std::vector<Material>&& materials)
+	: renderContext{ renderContext },
+	materials{ std::move(materials) },
+	frameConstantBuffer{ renderContext->GetDevice(), frameCbRegisterNumber },
+	objectConstantBuffer{ renderContext->GetDevice(), objectCbRegisterNumber },
+	spriteConstantBuffer{ renderContext->GetDevice(), spriteCbRegisterNumber },
+	causticTexture{TextureLoader::LoadTextureFromFile("assets/textures/caustics.png", renderContext->GetDevice())}
+{
+	D3D11_SAMPLER_DESC sampDesc = {};
+	sampDesc.Filter = D3D11_FILTER_ANISOTROPIC;
+	sampDesc.MaxAnisotropy = 16;
+	sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+	sampDesc.MinLOD = 0;
+	sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
+
+	DXEssayer(renderContext->GetDevice()->CreateSamplerState(&sampDesc, &samplerState));
+}
 
 void Renderer::Render(const Mesh& mesh,
                       ID3D11DeviceContext* context,
@@ -24,8 +47,11 @@ void Renderer::Render(const Mesh& mesh,
 	frameConstantBuffer.Update(context, frameBuffer);
 	frameConstantBuffer.Bind(context);
 
-	// Bind material's texture of the mesh
+	// Bind textures and samplers
 	context->PSSetShaderResources(0, 1, &material.texture);
+	context->PSSetShaderResources(1, 1, &causticTexture.texture);
+	context->PSSetSamplers(0, 1, &samplerState);
+	context->PSSetSamplers(1, 1, &samplerState);
 
 	Draw(mesh);
 }

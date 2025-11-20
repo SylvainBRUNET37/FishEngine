@@ -13,14 +13,7 @@
 class Renderer
 {
 public:
-	explicit Renderer(RenderContext* renderContext, std::vector<Material>&& materials)
-		: renderContext{renderContext},
-	      materials{std::move(materials)},
-		  frameConstantBuffer{ renderContext->GetDevice(), frameCbRegisterNumber},
-		  objectConstantBuffer{ renderContext->GetDevice(), objectCbRegisterNumber},
-		  spriteConstantBuffer{ renderContext->GetDevice(), spriteCbRegisterNumber}
-	{
-	}
+	explicit Renderer(RenderContext* renderContext, std::vector<Material>&& materials);
 
 	void UpdateFrameBuffer(const FrameBuffer& frameBuffer_) { frameBuffer = frameBuffer_; };
 	void Render(const Mesh& mesh, ID3D11DeviceContext* context, const Transform& transform);
@@ -34,6 +27,7 @@ private:
 	static constexpr int spriteCbRegisterNumber = 0;
 
 	RenderContext* renderContext;
+	ID3D11SamplerState* samplerState;
 
 	std::vector<Material> materials;
 	FrameBuffer frameBuffer{};
@@ -41,6 +35,8 @@ private:
 	ConstantBuffer<FrameBuffer> frameConstantBuffer;
 	ConstantBuffer<ObjectBuffer> objectConstantBuffer;
 	ConstantBuffer<SpriteBuffer> spriteConstantBuffer;
+
+	Texture causticTexture;
 
 	void Draw(const Mesh& mesh) const;
 	void Draw(const Sprite2D& sprite) const;

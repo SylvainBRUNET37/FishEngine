@@ -72,8 +72,14 @@ struct VSOutput
 // Algorithm
 // =====================================
 
+static const float WATER_INDICE_OF_REFRACTION = 1.3;
+static const float WATER_HEIGHT = 2620.0; // (TODO: do not hardcodeif possible)
+
 Texture2D textureEntree : register(t0);
 SamplerState SampleState : register(s0);
+
+Texture2D CausticsTex : register(t1);
+SamplerState CausticsSampler : register(s1);
 
 float3 ComputeDirLight(float3 surfaceNormal, float3 viewDirection)
 {
@@ -155,8 +161,47 @@ float3 ApplyUnderwaterFog(float3 color, float3 worldPos, float3 cameraPos)
     return lerp(color, fogColor, fogFactor);
 }
 
-// TODO: caustics :
-// https://developer.nvidia.com/gpugems/gpugems/part-i-natural-effects/chapter-2-rendering-water-caustics
+// =====================================
+// Caustics : https://developer.nvidia.com/gpugems/gpugems/part-i-natural-effects/chapter-2-rendering-water-caustics
+// =====================================
+
+float ApplyCaustics(float3 worldPos)
+{
+	// Horizontal positon of the ocean
+    const float2 surfXZ = worldPos.xz;
+
+    // Get the water surface height and normal
+    float waterY = GetWaveHeight(surfXZ); // TODO
+    float3 waveNormal = GetWaveNormal(surfXZ); // TODO
+
+    // Check if the floor is below water
+    if (worldPos.y > waterY)
+        return 0.0f;
+
+    // Raycast which goes toward the sky
+    const float3 UP_RAY = float3(0, 1, 0);
+
+    // Refract the ray into air
+    // Snell law: https://en.wikipedia.org/wiki/Snell%27s_law
+    const float ETA = 1.0f / WATER_INDICE_OF_REFRACTION;
+    float3 refracted = refract(-UP_RAY, waveNormal, ETA);
+
+    // Sun direction
+    const float3 sunDir = normalize(-dirLight.direction);
+
+    // Compute the alignement/difference between the reracted ray and the sun dir
+    float alignment = saturate(dot(normalize(refracted), sunDir));
+
+    // Add intensity to the caustic effect
+    const float STRENGTH = 8.0;
+    float intensity = pow(alignment, STRENGTH);
+
+    // Apply caustic texture patterns
+    const float UV_SCALE = 0.1; // TODO: tweak it since it may be too low for the size of our world
+    float tex = CausticsTex.Sample(CausticsSampler, surfXZ * UV_SCALE).r;
+
+    return intensity * tex;
+}
 
 // =====================================
 // Main pixel shader
@@ -186,7 +231,7 @@ float4 MiniPhongPS(VSOutput input) : SV_Target
     }
 
     // Apply underwater effects if in the water
-    if (vCamera.y < 2620) // 2620 = height of the water (TODO: do not hardcode if possible)
+    if (vCamera.y < WATER_HEIGHT)
     {
         finalColor = ApplyUnderwaterAttenuation(finalColor, input.worldPosition, vCamera.xyz);
         finalColor = ApplyUnderwaterFog(finalColor, input.worldPosition, vCamera.xyz);

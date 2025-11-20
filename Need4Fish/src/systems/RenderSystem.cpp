@@ -18,17 +18,7 @@ RenderSystem::RenderSystem(RenderContext* renderContext, std::vector<Material>&&
 	  frameBuffer(AddDirectionLightToFrameBuffer()),
 	  renderContext(renderContext)
 {
-	D3D11_SAMPLER_DESC sampDesc = {};
-	sampDesc.Filter = D3D11_FILTER_ANISOTROPIC;
-	sampDesc.MaxAnisotropy = 16;
-	sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-	sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-	sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
-	sampDesc.MinLOD = 0;
-	sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
-	DXEssayer(renderContext->GetDevice()->CreateSamplerState(&sampDesc, &samplerState));
 }
 
 void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
@@ -54,8 +44,6 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 	XMStoreFloat4x4(&frameBuffer.matViewProj, XMMatrixTranspose(currentCamera.matView * currentCamera.matProj));
 	XMStoreFloat4(&frameBuffer.vCamera, currentCamera.position);
 	renderer.UpdateFrameBuffer(frameBuffer);
-
-	renderContext->GetContext()->PSSetSamplers(0, 1, &samplerState);
 
 	for (const auto& [entity, transform, mesh] : entityManager.View<Transform, Mesh>())
 	{
