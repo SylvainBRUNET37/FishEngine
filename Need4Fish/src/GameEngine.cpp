@@ -134,11 +134,15 @@ void GameEngine::PauseGame()
 	ReleaseCapture();
 
 	GameState::currentState = GameState::PAUSED;
+	
+	// Position
+	float positionX = 200.0f;
+	float positionY = 200.0f;
 
 	entityManager.AddComponent<Sprite2D>
 	(
 		mainMenuEntity,
-		uiManager.LoadSprite("assets/ui/pauseTitle.png")
+		uiManager.LoadSprite("assets/ui/pauseTitle.png", positionX, positionY)
 	);
 }
 

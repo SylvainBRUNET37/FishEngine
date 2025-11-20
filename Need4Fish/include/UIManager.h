@@ -10,6 +10,7 @@ public:
 	explicit UIManager(ID3D11Device* device);
 
 	[[nodiscard]] Sprite2D LoadSprite(const std::string& filePath) const;
+	[[nodiscard]] Sprite2D LoadSprite(const std::string& filePath, float positionX, float positionY) const;
 
 private:
 	ID3D11Device* device;

@@ -16,6 +16,8 @@ struct Sprite2D
 
     explicit Sprite2D(const ShaderProgram& shaderProgram, const Texture& texture, ID3D11Device* device);
 
+    explicit Sprite2D(const ShaderProgram& shaderProgram, const Texture& texture, SpritePosition position, ID3D11Device* device);
+
     Texture texture;
     SpritePosition position;
 
