@@ -24,7 +24,7 @@ struct PointLight
     float pad; // alignment
 };
 
-#define MAX_POINT_LIGHTS 2
+#define MAX_POINT_LIGHTS 16
 
 // Per-frame
 cbuffer FrameBuffer : register(b0)
@@ -32,6 +32,10 @@ cbuffer FrameBuffer : register(b0)
     float4x4 matViewProj;
     float4 vCamera; // camera position
     DirectionLight dirLight;
+
+    int pointLightCount;
+    float3 padding_;
+
     PointLight pointLights[MAX_POINT_LIGHTS];
 };
 
@@ -169,7 +173,7 @@ float4 MiniPhongPS(VSOutput input) : SV_Target
     finalColor += ComputeDirLight(surfaceNormal, viewDirection);
 
     // Point lights
-    for (int i = 0; i < MAX_POINT_LIGHTS; i++)
+    for (int i = 0; i < pointLightCount; i++)
     {
         finalColor += ComputePointLight(pointLights[i], surfaceNormal, viewDirection, input.worldPosition);
     }

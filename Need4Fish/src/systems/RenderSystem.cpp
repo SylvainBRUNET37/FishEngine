@@ -38,13 +38,16 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 	renderer.RenderScene();
 
 	// Add point lights to the frame buffer
-	int lightCount = 0;
+	frameBuffer.pointLightCount = 0;
 	for (const auto& [entity, pointLight] : entityManager.View<PointLight>())
 	{
-		if (lightCount >= FrameBuffer::MAX_POINT_LIGHTS)
-			throw runtime_error(std::format("Cannot exceed {} point light", FrameBuffer::MAX_POINT_LIGHTS));
+		if (frameBuffer.pointLightCount >= FrameBuffer::MAX_POINT_LIGHTS)
+			throw runtime_error(
+				std::format(
+					"Cannot exceed {} point light, change the number in the C++ and in the shader if you want more lights",
+					FrameBuffer::MAX_POINT_LIGHTS));
 
-		frameBuffer.pointLights[lightCount++] = pointLight;
+		frameBuffer.pointLights[frameBuffer.pointLightCount++] = pointLight;
 	}
 
 	// Update frame buffer
