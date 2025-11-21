@@ -61,7 +61,11 @@ float4 ComputeChromaticAberration(float2 uv)
 
 float4 PostProcessPS(VSOutput input) : SV_TARGET
 {
-    const float4 chromaColor = ComputeChromaticAberration(input.uv);
+	// This code apply Vingette + CA
+    // const float4 chromaColor = ComputeChromaticAberration(input.uv);
+    // return ApplyVignette(chromaColor, input.uv);
 
-    return ApplyVignette(chromaColor, input.uv);
+    // Apply only Vignette effect
+    float4 pixelColor = sceneTexture.Sample(sampleState, input.uv);
+    return ApplyVignette(pixelColor, input.uv);
 }
