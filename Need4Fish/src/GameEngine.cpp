@@ -77,6 +77,10 @@ void GameEngine::HandleGameState()
 	const bool isEscapePressed = GetAsyncKeyState(VK_ESCAPE) & 0x8000;
 	const bool isPausableOrResumable = GameState::currentState == GameState::PLAYING || GameState::currentState == GameState::PAUSED;
 
+	// Handle clicks
+	if (GetAsyncKeyState(VK_LBUTTON) & 0x8000 && GameState::currentState != GameState::PLAYING)
+		uiManager->HandleClick();
+
 	// Restart the game if has been was pressed
 	if (GetAsyncKeyState('R') & 0x8000 && GameState::currentState != GameState::PAUSED)
 	{
@@ -141,6 +145,8 @@ void GameEngine::PauseGame()
 	float positionY = 200.0f;
 
 	uiManager->AddSprite("assets/ui/pauseTitle.png", positionX, positionY);
+	uiManager->AddHoverSprite("assets/ui/pauseTitle.png", "assets/ui/deathTitle.png");
+	uiManager->AddClickSprite("assets/ui/pauseTitle.png", "assets/ui/winTitle.png");
 }
 
 void GameEngine::EndGame()

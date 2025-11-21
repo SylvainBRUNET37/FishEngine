@@ -43,7 +43,8 @@
     <ClInclude Include="include\rendering\graphics\camera\BaseCamera.h" />
     <ClInclude Include="include\rendering\graphics\lights\DirectionalLight.h" />
     <ClInclude Include="include\rendering\graphics\lights\PointLight.h" />
-    <ClInclude Include="include\rendering\graphics\Sprite2D.h" />
+    <ClInclude Include="include\rendering\graphics\ui\Sprite2D.h" />
+    <ClInclude Include="include\rendering\graphics\ui\SpriteElement.h" />
     <ClInclude Include="include\rendering\graphics\VertexSprite.h" />
     <ClInclude Include="include\rendering\Renderer.h" />
     <ClInclude Include="include\rendering\shaders\Shader.h" />

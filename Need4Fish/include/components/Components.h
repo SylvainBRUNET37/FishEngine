@@ -13,7 +13,6 @@
 #include "rendering/core/Transform.h"
 #include "rendering/graphics/lights/PointLight.h"
 #include "rendering/graphics/Mesh.h"
-#include "rendering/graphics/Sprite2D.h"
 
 struct Name
 {
@@ -45,7 +44,6 @@ using Components = std::tuple
 	Controllable,
 	Camera,
 	PointLight,
-	Sprite2D,
 	Eatable
 >;
 

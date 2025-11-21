@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "UIManager.h"
 #include "Locator.h"
-
 #include "rendering/texture/TextureLoader.h"
 
 UIManager::UIManager(ID3D11Device* device) : device{device}
@@ -28,10 +27,10 @@ Sprite2D UIManager::LoadSprite(const std::string& filePath, float positionX, flo
 	return Sprite2D{ spriteShaderProgram, texture, { positionX, positionY }, device };
 }
 
-[[nodiscard]] std::vector<Sprite2D> UIManager::GetSprites() {
+[[nodiscard]] std::vector<Sprite2D> UIManager::GetSprites(const double deltaTime) {
 	std::vector<Sprite2D> displayedSprites{};
-	for (const auto& pair : sprites)
-		displayedSprites.emplace_back(pair.second.sprite);
+	for (auto& pair : sprites)
+		displayedSprites.emplace_back(pair.second.UpdateAndGetDisplayedSprite(deltaTime));
 	return displayedSprites;
 }
 
@@ -53,4 +52,29 @@ void UIManager::RemoveSprite(std::string& filePath)
 void UIManager::Clear()
 {
 	sprites.clear();
+}
+
+void UIManager::AddHoverSprite(const std::string& filePath, const std::string& hoverFilePath)
+{
+	auto it = sprites.find(filePath);
+	if (it == sprites.end())
+		return;
+
+	Sprite2D hoverSprite = LoadSprite(hoverFilePath);
+	it->second.SetHoverSprite(hoverSprite);
+}
+
+void UIManager::AddClickSprite(const std::string& filePath, const std::string& clickFilePath)
+{
+	auto it = sprites.find(filePath);
+	if (it == sprites.end())
+		return;
+
+	Sprite2D clickSprite = LoadSprite(clickFilePath);
+	it->second.SetClickSprite(clickSprite);
+}
+
+void UIManager::HandleClick() {
+	for (auto& pair : sprites)
+		pair.second.onClick([]{}); // TODO : give the element a setter to change the onclick or something
 }

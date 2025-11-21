@@ -144,7 +144,7 @@
     <ClInclude Include="include\rendering\culling\FrustumCuller.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\rendering\graphics\Sprite2D.h">
+    <ClInclude Include="include\rendering\graphics\ui\Sprite2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\rendering\graphics\VertexSprite.h">
@@ -157,6 +157,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\rendering\device\PostProcess.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\rendering\graphics\ui\SpriteElement.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
