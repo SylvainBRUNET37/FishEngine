@@ -31,18 +31,34 @@ void CameraSystem::ComputeCameraPosition(Camera& camera, const Transform& transf
 	camera.targetYaw = totalYaw; // Pour la physique	
 	camera.targetPitch = camera.pitchAngle;
 
-	camera.focus = XMVectorAdd(targetPos, XMVectorSet(0, camera.heightOffset, 0, 0));
+	if (camera.mode == Camera::CameraMode::FIRST_PERSON)
+	{
+		// Position à l'intérieur/devant le mosasaure
+		const XMVECTOR fpOffset = XMLoadFloat3(&camera.firstPersonOffset);
 
-	const float horizontalDist = camera.distance * cosf(camera.pitchAngle);
-	const float verticalDist = camera.distance * sinf(camera.pitchAngle);
+		// Position selon la rotation avec l'offset
+		const XMVECTOR rotatedOffset = XMVector3Transform(fpOffset, targetRotMat);
+		camera.position = XMVectorAdd(targetPos, rotatedOffset);
 
-	camera.position = XMVectorSet
-	(
-		XMVectorGetX(camera.focus) - horizontalDist * sinf(totalYaw),
-		XMVectorGetY(camera.focus) + verticalDist + camera.heightOffset,
-		XMVectorGetZ(camera.focus) - horizontalDist * cosf(totalYaw),
-		1.0f
-	);
+		// On utilise directement le forward vector du mosasaure
+		const XMVECTOR lookDirection = XMVector3Normalize(forward);
+		camera.focus = XMVectorAdd(camera.position, XMVectorScale(lookDirection, 100.0f));
+	}
+	else // THIRD_PERSON
+	{
+		camera.focus = XMVectorAdd(targetPos, XMVectorSet(0, camera.heightOffset, 0, 0));
+
+		const float horizontalDist = camera.distance * cosf(camera.pitchAngle);
+		const float verticalDist = camera.distance * sinf(camera.pitchAngle);
+
+		camera.position = XMVectorSet
+		(
+			XMVectorGetX(camera.focus) - horizontalDist * sinf(totalYaw),
+			XMVectorGetY(camera.focus) + verticalDist + camera.heightOffset,
+			XMVectorGetZ(camera.focus) - horizontalDist * cosf(totalYaw),
+			1.0f
+		);
+	}
 }
 
 void CameraSystem::ComputeCameraOrientation(Camera& camera)
@@ -79,15 +95,26 @@ void CameraSystem::HandleRotation(Camera& cameraData)
 	// Appliquer la rotation seulement si le mouvement dépasse la deadzone
 	if (std::abs(deltaX) > deadzone || std::abs(deltaY) > deadzone)
 	{
-		static constexpr float mouseSensitivity = 0.002f;
+		// Sensibilité ajustée selon le mode
+		float yawSensitivity, pitchSensitivity;
+		if (cameraData.mode == Camera::CameraMode::FIRST_PERSON)
+		{
+			yawSensitivity = 0.00005f;
+			pitchSensitivity = 0.00020f;
+		}
+		else
+		{
+			yawSensitivity = 0.002f;
+			pitchSensitivity = 0.002f;
+		}
 
 		// Inversion si true
 		const float yawMultiplier = cameraData.invertCamRotation ? -1.0f : 1.0f;
 		const float pitchMultiplier = cameraData.invertCamRotation ? 1.0f : -1.0f;
 
-		Rotate(cameraData, 
-			deltaX * mouseSensitivity * yawMultiplier, 
-			deltaY * mouseSensitivity * pitchMultiplier);
+		Rotate(cameraData,
+			deltaX * yawSensitivity * yawMultiplier,
+			deltaY * pitchSensitivity * pitchMultiplier);
 	}
 	else
 	{

@@ -8,6 +8,11 @@
 
 struct Camera : public BaseCameraData
 {
+	enum class CameraMode {
+		FIRST_PERSON,
+		THIRD_PERSON
+	};
+
 	// 3rd person
 	Entity targetEntity = INVALID_ENTITY;
 	float distance{};
@@ -33,6 +38,12 @@ struct Camera : public BaseCameraData
 
 	// Inversion des contrôles/caméra
 	bool invertCamRotation = false;
+
+	// Mode de caméra actuel
+	CameraMode mode = CameraMode::THIRD_PERSON;
+
+	// Offset pour que la caméra 1ère personne soit bien placée (à ajuster potentiellement)
+	DirectX::XMFLOAT3 firstPersonOffset = { 0.0f,-1.5f,35.0f };
 };
 #endif
 
