@@ -21,8 +21,6 @@ private:
 	FrameBuffer frameBuffer;
 	RenderContext* renderContext;
 
-	ID3D11SamplerState* samplerState;
-
 	void Present() const { renderContext->Present(); }
 
 	static FrameBuffer AddDirectionLightToFrameBuffer();
