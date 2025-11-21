@@ -13,8 +13,9 @@
 using namespace DirectX;
 using namespace std;
 
-RenderSystem::RenderSystem(RenderContext* renderContext, std::vector<Material>&& materials)
+RenderSystem::RenderSystem(RenderContext* renderContext, std::shared_ptr<UIManager> uiManager, std::vector<Material>&& materials)
 	: renderer(renderContext, std::move(materials)),
+	  uiManager(uiManager),
 	  frameBuffer(AddDirectionLightToFrameBuffer()),
 	  renderContext(renderContext)
 {
@@ -64,7 +65,8 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 	}
 
 	// Render sprites
-	for (const auto& [entity, sprite] : entityManager.View<Sprite2D>())
+	cout << uiManager->GetSprites().size() << endl;
+	for (auto& sprite : uiManager->GetSprites())
 		renderer.Render(sprite, renderContext->GetContext());
 
 	const auto& shaderBank = Locator::Get<ResourceManager>().GetShaderBank();

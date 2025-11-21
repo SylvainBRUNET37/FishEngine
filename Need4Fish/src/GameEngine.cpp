@@ -14,7 +14,7 @@
 using namespace DirectX;
 
 GameEngine::GameEngine(RenderContext* renderContext)
-	: uiManager{ renderContext->GetDevice() }
+	: uiManager(std::make_shared<UIManager>(renderContext->GetDevice()))
 {
 	CameraSystem::SetMouseCursor();
 
@@ -23,7 +23,7 @@ GameEngine::GameEngine(RenderContext* renderContext)
 	// Care about the order of construction, it will be the order of update calls
 	systems.emplace_back(std::make_unique<PhysicsSimulationSystem>());
 	systems.emplace_back(std::make_unique<CameraSystem>());
-	systems.emplace_back(std::make_unique<RenderSystem>(renderContext, std::move(sceneResources.materials)));
+	systems.emplace_back(std::make_unique<RenderSystem>(renderContext, uiManager, std::move(sceneResources.materials)));
 
 	InitGame();
 }
@@ -122,11 +122,12 @@ void GameEngine::ResumeGame()
 {
 	CameraSystem::SetMouseCursor();
 	GameState::currentState = GameState::PLAYING;
-	entityManager.RemoveComponent<Sprite2D>(mainMenuEntity);
+	uiManager->Clear();
 }
 
 void GameEngine::PauseGame()
 {
+	uiManager->Clear();
 	ShowCursor(TRUE);
 	Camera::isMouseCaptured = false;
 
@@ -139,28 +140,20 @@ void GameEngine::PauseGame()
 	float positionX = 200.0f;
 	float positionY = 200.0f;
 
-	entityManager.AddComponent<Sprite2D>
-	(
-		mainMenuEntity,
-		uiManager.LoadSprite("assets/ui/pauseTitle.png", positionX, positionY)
-	);
+	uiManager->AddSprite("assets/ui/pauseTitle.png", positionX, positionY);
 }
 
 void GameEngine::EndGame()
 {
+	uiManager->Clear();
 	ShowCursor(TRUE);
 	Camera::isMouseCaptured = false;
 
 	ClipCursor(nullptr);
 	ReleaseCapture();
 
-	const auto sprite = (GameState::currentState == GameState::DIED) ?  "assets/ui/deathTitle.png" : "assets/ui/winTitle.png";
-
-	entityManager.AddComponent<Sprite2D>
-		(
-			mainMenuEntity,
-			uiManager.LoadSprite(sprite)
-		);
+	const std::string sprite = (GameState::currentState == GameState::DIED) ?  "assets/ui/deathTitle.png" : "assets/ui/winTitle.png";
+	uiManager->AddSprite(sprite);
 }
 
 // TODO: Init it properly
