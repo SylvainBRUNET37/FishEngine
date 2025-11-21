@@ -80,7 +80,14 @@ void CameraSystem::HandleRotation(Camera& cameraData)
 	if (std::abs(deltaX) > deadzone || std::abs(deltaY) > deadzone)
 	{
 		static constexpr float mouseSensitivity = 0.002f;
-		Rotate(cameraData, deltaX * mouseSensitivity, -deltaY * mouseSensitivity);
+
+		// Inversion si true
+		const float yawMultiplier = cameraData.invertCamRotation ? -1.0f : 1.0f;
+		const float pitchMultiplier = cameraData.invertCamRotation ? 1.0f : -1.0f;
+
+		Rotate(cameraData, 
+			deltaX * mouseSensitivity * yawMultiplier, 
+			deltaY * mouseSensitivity * pitchMultiplier);
 	}
 	else
 	{

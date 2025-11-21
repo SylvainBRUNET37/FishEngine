@@ -30,6 +30,9 @@ struct Camera : public BaseCameraData
 	float minDistance = 50.0f;
 	float maxDistance = 170.0f;
 	float zoomSpeed = 1.0f;
+
+	// Inversion des contrôles/caméra
+	bool invertCamRotation = false;
 };
 #endif
 
