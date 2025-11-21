@@ -167,11 +167,11 @@ float3 ApplyUnderwaterFog(float3 color, float3 worldPos, float3 cameraPos)
 // https://developer.nvidia.com/gpugems/gpugems/part-i-natural-effects/chapter-2-rendering-water-caustics
 // =====================================
 
-static const float VTXSIZE = 0.01f;
-static const float WAVESIZE = 5.0f;
-static const float FACTOR = 1.0f;
-static const float SPEED = 2.0f;
-static const int OCTAVES = 5;
+static const float VTXSIZE = 0.0f;
+static const float WAVESIZE = 0.0f;
+static const float FACTOR = 0.0f;
+static const float SPEED = 0.0f;
+static const int OCTAVES = 0;
 
 float GetWaveHeight(float x, float y, float timer)
 {
@@ -297,9 +297,9 @@ float4 MiniPhongPS(VSOutput input) : SV_Target
     // Apply underwater effects if in the water
     if (vCamera.y < WATER_HEIGHT)
     {
+        finalColor += ApplyCaustics(input.worldPosition, elapsedTime);
         finalColor = ApplyUnderwaterAttenuation(finalColor, input.worldPosition, vCamera.xyz);
         finalColor = ApplyUnderwaterFog(finalColor, input.worldPosition, vCamera.xyz);
-        finalColor += ApplyCaustics(input.worldPosition, 0);
     }
 
     return float4(finalColor, 1.0f);
