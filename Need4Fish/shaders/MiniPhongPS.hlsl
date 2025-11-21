@@ -239,10 +239,6 @@ float ApplyCaustics(float3 worldPos, float timer)
     float waterY = GetWaveHeight(surfXZ.x, surfXZ.y, timer);
     float3 waveNormal = GetWaveNormal(surfXZ, timer);
 
-    // Check if the floor is below water
-    if (worldPos.y > waterY)
-        return 0.0f;
-
     // Raycast which goes toward the sky
     const float3 UP_RAY = float3(0, 1, 0);
 
