@@ -43,6 +43,7 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 	// Update frame buffer
 	XMStoreFloat4x4(&frameBuffer.matViewProj, XMMatrixTranspose(currentCamera.matView * currentCamera.matProj));
 	XMStoreFloat4(&frameBuffer.vCamera, currentCamera.position);
+	frameBuffer.deltaTime = deltaTime;
 	renderer.UpdateFrameBuffer(frameBuffer);
 
 	for (const auto& [entity, transform, mesh] : entityManager.View<Transform, Mesh>())

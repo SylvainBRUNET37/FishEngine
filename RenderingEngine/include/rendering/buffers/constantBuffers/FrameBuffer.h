@@ -15,7 +15,8 @@ struct alignas(16) FrameBuffer // b0 in the shader program
     DirectionalLight dirLight;
 
 	int pointLightCount{};
-	DirectX::XMFLOAT3 padding_{};
+	float deltaTime{};
+	DirectX::XMFLOAT2 padding_{};
 
     PointLight pointLights[MAX_POINT_LIGHTS];
 };

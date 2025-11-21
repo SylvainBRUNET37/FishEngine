@@ -34,7 +34,8 @@ cbuffer FrameBuffer : register(b0)
     DirectionLight dirLight;
 
     int pointLightCount;
-    float3 padding_;
+    float deltaTime;
+    float2 padding_;
 
     PointLight pointLights[MAX_POINT_LIGHTS];
 };
@@ -162,17 +163,81 @@ float3 ApplyUnderwaterFog(float3 color, float3 worldPos, float3 cameraPos)
 }
 
 // =====================================
-// Caustics : https://developer.nvidia.com/gpugems/gpugems/part-i-natural-effects/chapter-2-rendering-water-caustics
+// Caustics :
+// https://developer.nvidia.com/gpugems/gpugems/part-i-natural-effects/chapter-2-rendering-water-caustics
 // =====================================
 
-float ApplyCaustics(float3 worldPos)
+static const float VTXSIZE = 0.01f;
+static const float WAVESIZE = 10.0f;
+static const float FACTOR = 1.0f;
+static const float SPEED = 2.0f;
+static const int OCTAVES = 5;
+
+float GetWaveHeight(float x, float y, float timer)
+{
+    float z = 0.0f;
+    float octaves = OCTAVES;
+    float factor = FACTOR;
+    float d = sqrt(x * x + y * y);
+
+    do
+    {
+        float angle = timer * SPEED + (1.0f / factor) * x * y * WAVESIZE;
+        z -= factor * cos(angle);
+
+        factor *= 0.5f; // divide by 2
+        octaves--;
+    }
+    while (octaves > 0);
+
+    return 2.0f * VTXSIZE * d * z;
+}
+
+float2 ComputeGradWave(float x, float y, float timer)
+{
+    float dZx = 0.0f;
+    float dZy = 0.0f;
+
+    float oct = OCTAVES;
+    float factor = FACTOR;
+
+    float d = sqrt(x * x + y * y);
+
+    do
+    {
+        float angle = timer * SPEED + (1.0f / factor) * x * y * WAVESIZE;
+        float sinA = sin(angle);
+        float cosA = cos(angle);
+
+        dZx += d * sinA * y * WAVESIZE - factor * cosA * (x / d);
+        dZy += d * sinA * x * WAVESIZE - factor * cosA * (y / d);
+
+        factor *= 0.5f;
+        oct--;
+    }
+    while (oct > 0);
+
+    return float2(2.0f * VTXSIZE * dZx, 2.0f * VTXSIZE * dZy);
+}
+
+float3 GetWaveNormal(float2 posXZ, float timer)
+{
+    float2 gradWave = ComputeGradWave(posXZ.x, posXZ.y, timer);
+
+    // Convert to: (-dZ/dx, 1, -dZ/dy)
+    float3 waveNormal = normalize(float3(-gradWave.x, 1.0f, -gradWave.y));
+
+    return waveNormal;
+}
+
+float ApplyCaustics(float3 worldPos, float timer)
 {
 	// Horizontal positon of the ocean
     const float2 surfXZ = worldPos.xz;
 
     // Get the water surface height and normal
-    float waterY = GetWaveHeight(surfXZ); // TODO
-    float3 waveNormal = GetWaveNormal(surfXZ); // TODO
+    float waterY = GetWaveHeight(surfXZ.x, surfXZ.y, timer);
+    float3 waveNormal = GetWaveNormal(surfXZ, timer);
 
     // Check if the floor is below water
     if (worldPos.y > waterY)
@@ -235,6 +300,11 @@ float4 MiniPhongPS(VSOutput input) : SV_Target
     {
         finalColor = ApplyUnderwaterAttenuation(finalColor, input.worldPosition, vCamera.xyz);
         finalColor = ApplyUnderwaterFog(finalColor, input.worldPosition, vCamera.xyz);
+        
+        static float elapsedTime = 0;
+        elapsedTime += deltaTime;
+
+        finalColor += ApplyCaustics(input.worldPosition, elapsedTime);
     }
 
     return float4(finalColor, 1.0f);
