@@ -34,7 +34,7 @@ cbuffer FrameBuffer : register(b0)
     DirectionLight dirLight;
 
     int pointLightCount;
-    float deltaTime;
+    float elapsedTime;
     float2 padding_;
 
     PointLight pointLights[MAX_POINT_LIGHTS];
@@ -168,7 +168,7 @@ float3 ApplyUnderwaterFog(float3 color, float3 worldPos, float3 cameraPos)
 // =====================================
 
 static const float VTXSIZE = 0.01f;
-static const float WAVESIZE = 10.0f;
+static const float WAVESIZE = 5.0f;
 static const float FACTOR = 1.0f;
 static const float SPEED = 2.0f;
 static const int OCTAVES = 5;
@@ -252,7 +252,7 @@ float ApplyCaustics(float3 worldPos, float timer)
     float3 refracted = refract(-UP_RAY, waveNormal, ETA);
 
     // Sun direction
-    const float3 sunDir = normalize(-dirLight.direction);
+    const float3 sunDir = normalize(dirLight.direction);
 
     // Compute the alignement/difference between the reracted ray and the sun dir
     float alignment = saturate(dot(normalize(refracted), sunDir));
@@ -262,8 +262,11 @@ float ApplyCaustics(float3 worldPos, float timer)
     float intensity = pow(alignment, STRENGTH);
 
     // Apply caustic texture patterns
-    const float UV_SCALE = 0.1; // TODO: tweak it since it may be too low for the size of our world
-    float tex = CausticsTex.Sample(CausticsSampler, surfXZ * UV_SCALE).r;
+    float depth = waterY - worldPos.y;
+    float3 proj = worldPos + refracted * depth;
+
+    const float UV_SCALE = 0.005;
+    float tex = CausticsTex.Sample(CausticsSampler, proj.xz * UV_SCALE).r;
 
     return intensity * tex;
 }
@@ -300,11 +303,7 @@ float4 MiniPhongPS(VSOutput input) : SV_Target
     {
         finalColor = ApplyUnderwaterAttenuation(finalColor, input.worldPosition, vCamera.xyz);
         finalColor = ApplyUnderwaterFog(finalColor, input.worldPosition, vCamera.xyz);
-        
-        static float elapsedTime = 0;
-        elapsedTime += deltaTime;
-
-        finalColor += ApplyCaustics(input.worldPosition, elapsedTime);
+        finalColor += ApplyCaustics(input.worldPosition, 0);
     }
 
     return float4(finalColor, 1.0f);

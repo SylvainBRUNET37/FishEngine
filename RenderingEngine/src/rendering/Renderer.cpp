@@ -13,17 +13,29 @@ Renderer::Renderer(RenderContext* renderContext, std::vector<Material>&& materia
 	spriteConstantBuffer{ renderContext->GetDevice(), spriteCbRegisterNumber },
 	causticTexture{TextureLoader::LoadTextureFromFile("assets/textures/caustics.png", renderContext->GetDevice())}
 {
-	D3D11_SAMPLER_DESC sampDesc = {};
-	sampDesc.Filter = D3D11_FILTER_ANISOTROPIC;
-	sampDesc.MaxAnisotropy = 16;
-	sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-	sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-	sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
-	sampDesc.MinLOD = 0;
-	sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	D3D11_SAMPLER_DESC textureSamplerDesc{};
+	textureSamplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
+	textureSamplerDesc.MaxAnisotropy = 16;
+	textureSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	textureSamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	textureSamplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	textureSamplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+	textureSamplerDesc.MinLOD = 0;
+	textureSamplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
-	DXEssayer(renderContext->GetDevice()->CreateSamplerState(&sampDesc, &samplerState));
+	DXEssayer(renderContext->GetDevice()->CreateSamplerState(&textureSamplerDesc, &textureSampler));
+
+	D3D11_SAMPLER_DESC causticSamplerDesc{};
+	causticSamplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	causticSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	causticSamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	causticSamplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	causticSamplerDesc.MinLOD = -FLT_MAX;
+	causticSamplerDesc.MaxLOD = FLT_MAX;
+	causticSamplerDesc.MipLODBias = -1.0f;
+	causticSamplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+
+	DXEssayer(renderContext->GetDevice()->CreateSamplerState(&causticSamplerDesc, &causticSampler));
 }
 
 void Renderer::Render(const Mesh& mesh,
@@ -50,8 +62,8 @@ void Renderer::Render(const Mesh& mesh,
 	// Bind textures and samplers
 	context->PSSetShaderResources(0, 1, &material.texture);
 	context->PSSetShaderResources(1, 1, &causticTexture.texture);
-	context->PSSetSamplers(0, 1, &samplerState);
-	context->PSSetSamplers(1, 1, &samplerState);
+	context->PSSetSamplers(0, 1, &textureSampler);
+	context->PSSetSamplers(1, 1, &causticSampler);
 
 	Draw(mesh);
 }

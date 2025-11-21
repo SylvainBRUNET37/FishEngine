@@ -27,7 +27,8 @@ private:
 	static constexpr int spriteCbRegisterNumber = 0;
 
 	RenderContext* renderContext;
-	ID3D11SamplerState* samplerState;
+	ID3D11SamplerState* textureSampler;
+	ID3D11SamplerState* causticSampler;
 
 	std::vector<Material> materials;
 	FrameBuffer frameBuffer{};
