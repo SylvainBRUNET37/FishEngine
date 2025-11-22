@@ -23,13 +23,14 @@ private:
 
 	static void UpdateControllables(EntityManager& entityManager);
 	static void UpdateTransforms(EntityManager& entityManager);
+	
 	void UpdatePhysics();
 
 	// Pour ajustement vers le yaw et le pitch visés
-	static void RotateTowardsCameraDirection(RigidBody& rigidBody, const Camera& camera, JPH::Vec3 forward, JPH::Vec3 up);
+	static void RotateTowardsCameraDirection(RigidBody& rigidBody, const Camera& camera, JPH::Vec3 forward, float inputRoll);
 
 	// Pour effet de roulement sur le côté
-	static void UpdateRoll(RigidBody& rigidBody, float yawDiff, float inputRoll);
+	static float GetTargetRoll(float yawDiff, float inputRoll);
 };
 
 #endif

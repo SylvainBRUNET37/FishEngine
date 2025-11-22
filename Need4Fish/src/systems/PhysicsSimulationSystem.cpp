@@ -50,14 +50,28 @@ void PhysicsSimulationSystem::UpdateControllables(EntityManager& entityManager)
 		JPH::Vec3 up = transform.GetColumn3(1).Normalized();
 		JPH::Vec3 forward = transform.GetColumn3(2).Normalized();
 
+		// Pour le roll sur A et D
+		static float inputRoll = 0.0f;
+
 		// Rotation progressive vers la direction de la caméra
 		if (activeCamera)
 		{
-			RotateTowardsCameraDirection(rigidBody, *activeCamera, forward, up);
+			RotateTowardsCameraDirection(rigidBody, *activeCamera, forward, inputRoll);
 
 			if (WindowsApplication::mouseWheelDelta != 0) {
+				const float oldDistance = activeCamera->distance;
+
 				activeCamera->distance -= WindowsApplication::mouseWheelDelta * 0.01f * activeCamera->zoomSpeed;
 				activeCamera->distance = std::clamp(activeCamera->distance, activeCamera->minDistance, activeCamera->maxDistance);
+				
+				if (oldDistance > activeCamera->minDistance && activeCamera->distance <= activeCamera->minDistance)
+				{
+					activeCamera->mode = Camera::CameraMode::FIRST_PERSON;
+				}
+				else if (oldDistance <= activeCamera->minDistance && activeCamera->distance > activeCamera->minDistance)
+				{
+					activeCamera->mode = Camera::CameraMode::THIRD_PERSON;
+				}
 				WindowsApplication::mouseWheelDelta = 0; // reset
 			}
 		}
@@ -66,6 +80,8 @@ void PhysicsSimulationSystem::UpdateControllables(EntityManager& entityManager)
 		JPH::Vec3 newSpeed = currentSpeed;
 		bool speedChanged = false;
 
+		// Reset du roll
+		inputRoll = 0.0f;
 
 		if (GetAsyncKeyState('W') & 0x8000)
 		{
@@ -81,15 +97,13 @@ void PhysicsSimulationSystem::UpdateControllables(EntityManager& entityManager)
 		{
 			newSpeed = newSpeed - 5.0f * right;
 			speedChanged = true;
-			float inputRoll = 0.2f;
-			UpdateRoll(rigidBody, 0.0f, inputRoll);
+			inputRoll = 0.1f;
 		}
 		if (GetAsyncKeyState('A') & 0x8000)
 		{
 			newSpeed = newSpeed + 5.0f * right;
 			speedChanged = true;
-			float inputRoll = -0.2f;
-			UpdateRoll(rigidBody, 0.0f, inputRoll);
+			inputRoll = -0.1f;
 		}
 
 		if (speedChanged)
@@ -121,7 +135,7 @@ void PhysicsSimulationSystem::RotateTowardsCameraDirection(
 	RigidBody& rigidBody,
 	const Camera& camera,
 	JPH::Vec3 forward,
-	JPH::Vec3 /*up*/)
+	float inputRoll)
 {
 	const JPH::Vec3 worldUp(0.0f, 1.0f, 0.0f);
 
@@ -131,7 +145,7 @@ void PhysicsSimulationSystem::RotateTowardsCameraDirection(
 	// Calcul des angles actuels
 	const float currentYaw = atan2f(forward.GetX(), forward.GetZ());
 
-	// Différence entre les angles
+	// Pour calculer yawDiff pour le roll
 	auto shortestAngle = [](float from, float to) {
 		float d = to - from;
 		while (d > JPH::JPH_PI) d -= 2.0f * JPH::JPH_PI;
@@ -139,33 +153,54 @@ void PhysicsSimulationSystem::RotateTowardsCameraDirection(
 		return d;
 		};
 
-	float yawDiff = shortestAngle(currentYaw, camera.targetYaw);
-	float pitchDiff = shortestAngle(currentPitch, camera.targetPitch);
+	float newYaw, newPitch;
+	float yawDiff = 0.0f; //Pour les roll
 
-	// Limiter vitesse rotation
-	constexpr float maxYawStep = 0.02f;
-	constexpr float maxPitchStep = 0.02f;
-	float yawStep = std::clamp(yawDiff, -maxYawStep, maxYawStep);
-	float pitchStep = std::clamp(pitchDiff, -maxPitchStep, maxPitchStep);
+	// En première personne : rotation instantanée
+	if (camera.mode == Camera::CameraMode::FIRST_PERSON)
+	{
+		newYaw = currentYaw + camera.yawOffset;
+		newPitch = camera.pitchAngle;
+		currentPitch = newPitch; // Pour éviter un saut lors du retour en 3e personne
+	
+		yawDiff = camera.yawOffset;
+	}
+	else // En troisième personne : rotation progressive
+	{
+		yawDiff = shortestAngle(currentYaw, camera.targetYaw);
 
-	float newYaw = currentYaw + yawStep;
-	currentPitch += pitchStep; // interpolation progressive du pitch
+		float pitchDiff = shortestAngle(currentPitch, camera.targetPitch);
+
+		// Limiter vitesse rotation
+		constexpr float maxYawStep = 0.02f;
+		constexpr float maxPitchStep = 0.02f;
+		float yawStep = std::clamp(yawDiff, -maxYawStep, maxYawStep);
+		float pitchStep = std::clamp(pitchDiff, -maxPitchStep, maxPitchStep);
+
+		newYaw = currentYaw + yawStep;
+		currentPitch += pitchStep;
+		newPitch = currentPitch;
+	}
 
 	// Quats de rotation
 	JPH::Quat yawQuat = JPH::Quat::sRotation(worldUp, newYaw);
 	JPH::Vec3 right = yawQuat * JPH::Vec3::sAxisX();
 	JPH::Quat pitchQuat = JPH::Quat::sRotation(right, currentPitch);
 
-	// Appliquer rotation finale
+	// Rotation combinée yaw + pitch
 	JPH::Quat finalRotation = (pitchQuat * yawQuat).Normalized();
+
+	// Appliquer le roll ensuite (souris + A et D)
+	JPH::Vec3 forwardAxis = finalRotation * JPH::Vec3::sAxisZ();
+	JPH::Quat rollQuat = JPH::Quat::sRotation(forwardAxis, GetTargetRoll(yawDiff, inputRoll));
+
+	finalRotation = (rollQuat * finalRotation).Normalized();
+
 	JoltSystem::GetBodyInterface().SetRotation(
 		rigidBody.body->GetID(),
 		finalRotation,
 		JPH::EActivation::Activate
 	);
-
-	// Roll avec la souris
-	UpdateRoll(rigidBody, yawDiff, 0.0f);
 }
 
 
@@ -191,31 +226,19 @@ void PhysicsSimulationSystem::UpdateTransforms(EntityManager& entityManager)
 	}
 }
 
-void PhysicsSimulationSystem::UpdateRoll(RigidBody& rigidBody, float yawDiff, float inputRoll = 0.0f)
+float PhysicsSimulationSystem::GetTargetRoll(float yawDiff, float inputRoll)
 {
 	constexpr float maxRollAngle = 0.2f;
 	static float currentRoll = 0.0f;
 
-	// Roll cible
+	// Roll cible basé sur le yawDiff
 	float targetRoll = std::clamp(-yawDiff * 0.5f + inputRoll, -maxRollAngle, maxRollAngle);
 
-	// Progressif
+	// Interpolation progressive
 	constexpr float rollInterpSpeed = 0.05f;
 	float rollDelta = targetRoll - currentRoll;
 	rollDelta = std::clamp(rollDelta, -rollInterpSpeed, rollInterpSpeed);
 	currentRoll += rollDelta;
 
-	// Pour appliquer roll après yaw/pitch
-	const JPH::Quat currentRotation = rigidBody.body->GetRotation();
-	// forward local après yaw/pitch
-	JPH::Vec3 forward = currentRotation * JPH::Vec3::sAxisZ();
-	JPH::Quat rollQuat = JPH::Quat::sRotation(forward, currentRoll);
-
-	// Appliquer rotation finale
-	JPH::Quat finalRotation = (rollQuat * currentRotation).Normalized();
-	JoltSystem::GetBodyInterface().SetRotation(
-		rigidBody.body->GetID(),
-		finalRotation,
-		JPH::EActivation::Activate
-	);
+	return currentRoll;
 }

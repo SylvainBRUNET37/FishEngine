@@ -8,9 +8,14 @@
 
 struct Camera : public BaseCameraData
 {
+	enum class CameraMode {
+		FIRST_PERSON,
+		THIRD_PERSON
+	};
+
 	// 3rd person
 	Entity targetEntity = INVALID_ENTITY;
-	float distance{};
+	inline static float distance{};
 	float heightOffset{};
 	float yawOffset = 0.0f;
 	float pitchAngle = -0.1f;
@@ -27,9 +32,18 @@ struct Camera : public BaseCameraData
 	inline static bool isMouseCaptured = false;	
 
 	// Pour zoomer/dézoomer
-	float minDistance = 50.0f;
-	float maxDistance = 170.0f;
-	float zoomSpeed = 1.0f;
+	inline static float minDistance;
+	inline static float maxDistance;
+	inline static float zoomSpeed;
+
+	// Inversion des contrôles/caméra
+	bool invertCamRotation = false;
+
+	// Mode de caméra actuel
+	CameraMode mode = CameraMode::THIRD_PERSON;
+
+	// Offset pour que la caméra 1ère personne soit bien placée (à ajuster potentiellement)
+	inline static DirectX::XMFLOAT3 firstPersonOffset;
 };
 #endif
 

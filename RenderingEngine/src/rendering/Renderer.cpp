@@ -1,7 +1,42 @@
 #include "pch.h"
 #include "rendering/Renderer.h"
 
+#include "rendering/texture/TextureLoader.h"
+
 using namespace DirectX;
+
+Renderer::Renderer(RenderContext* renderContext, std::vector<Material>&& materials)
+	: renderContext{ renderContext },
+	materials{ std::move(materials) },
+	frameConstantBuffer{ renderContext->GetDevice(), frameCbRegisterNumber },
+	objectConstantBuffer{ renderContext->GetDevice(), objectCbRegisterNumber },
+	spriteConstantBuffer{ renderContext->GetDevice(), spriteCbRegisterNumber },
+	causticTexture{TextureLoader::LoadTextureFromFile("assets/textures/caustics.png", renderContext->GetDevice())}
+{
+	D3D11_SAMPLER_DESC textureSamplerDesc{};
+	textureSamplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
+	textureSamplerDesc.MaxAnisotropy = 16;
+	textureSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	textureSamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	textureSamplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	textureSamplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+	textureSamplerDesc.MinLOD = 0;
+	textureSamplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+
+	DXEssayer(renderContext->GetDevice()->CreateSamplerState(&textureSamplerDesc, &textureSampler));
+
+	D3D11_SAMPLER_DESC causticSamplerDesc{};
+	causticSamplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	causticSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	causticSamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	causticSamplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	causticSamplerDesc.MinLOD = -FLT_MAX;
+	causticSamplerDesc.MaxLOD = FLT_MAX;
+	causticSamplerDesc.MipLODBias = -1.0f;
+	causticSamplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+
+	DXEssayer(renderContext->GetDevice()->CreateSamplerState(&causticSamplerDesc, &causticSampler));
+}
 
 void Renderer::Render(const Mesh& mesh,
                       ID3D11DeviceContext* context,
@@ -24,8 +59,11 @@ void Renderer::Render(const Mesh& mesh,
 	frameConstantBuffer.Update(context, frameBuffer);
 	frameConstantBuffer.Bind(context);
 
-	// Bind material's texture of the mesh
+	// Bind textures and samplers
 	context->PSSetShaderResources(0, 1, &material.texture);
+	context->PSSetShaderResources(1, 1, &causticTexture.texture);
+	context->PSSetSamplers(0, 1, &textureSampler);
+	context->PSSetSamplers(1, 1, &causticSampler);
 
 	Draw(mesh);
 }
