@@ -17,6 +17,7 @@ class CameraSystem : public System
 
 public:
 	static void SetMouseCursor();
+	static void ScaleCamera(float scaleFactor);
 };
 
 #endif

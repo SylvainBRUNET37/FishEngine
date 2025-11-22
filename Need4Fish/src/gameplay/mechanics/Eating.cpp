@@ -78,15 +78,7 @@ static void AcuallyEat(
 		bodyInterface.SetShape(predatorBody.body->GetID(), newShape, true, JPH::EActivation::Activate);
 	}
 
-	// Ajuster les paramètres de caméra
-	Camera::minDistance *= scaleFactor;
-	Camera::maxDistance *= scaleFactor;
-	Camera::zoomSpeed *= scaleFactor;	
-	Camera::distance *= scaleFactor; // À changer pour une version progressive
-	Camera::firstPersonOffset = XMFLOAT3(
-		Camera::firstPersonOffset.x * scaleFactor, 
-		Camera::firstPersonOffset.y * scaleFactor, 
-		Camera::firstPersonOffset.z * scaleFactor); // À changer pour une version progressive
+	CameraSystem::ScaleCamera(scaleFactor);
 
 	// Scale mesh
 	auto& trans = entityManager.Get<Transform>(predatorEntity);

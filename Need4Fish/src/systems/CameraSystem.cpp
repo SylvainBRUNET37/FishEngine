@@ -203,3 +203,16 @@ void CameraSystem::SetMouseCursor()
 	// Initialiser les coordonnées de la caméra
 	Camera::cursorCoordinates = Camera::screenCenter;
 }
+
+void CameraSystem::ScaleCamera(float scaleFactor){
+	Camera::minDistance *= scaleFactor;
+	Camera::maxDistance *= scaleFactor;
+	Camera::zoomSpeed *= scaleFactor;
+	Camera::position *= scaleFactor;
+	Camera::heightOffset *= scaleFactor;
+	Camera::distance *= scaleFactor; // À changer pour une version progressive
+	Camera::firstPersonOffset = XMFLOAT3(
+		Camera::firstPersonOffset.x * scaleFactor,
+		Camera::firstPersonOffset.y * scaleFactor,
+		Camera::firstPersonOffset.z * scaleFactor); // À changer pour une version progressive
+}
