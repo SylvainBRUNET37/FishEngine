@@ -130,6 +130,7 @@ void Eating::Eat(EntityManager& entityManager, JPH::BodyID bodyId1, JPH::BodyID 
 void Eating::UpdatePlayerScale(EntityManager& entityManager)
 {
 	const float F_GROWTH_STEPS = 60.0f;
+	const float MINIMAL_GROWTH = 0.01f;
 
 	for (const auto& [entity, _, transform] : entityManager.View<Controllable, Transform>())
 	{
@@ -143,7 +144,7 @@ void Eating::UpdatePlayerScale(EntityManager& entityManager)
 			float* scale = &transform.scale.x;
 			for (int i = 0; i < 3; ++i) {
 				float step = delta[i] / F_GROWTH_STEPS;
-				delta[i] -= step;
+				delta[i] -= (step > MINIMAL_GROWTH) ? step : MINIMAL_GROWTH;
 				if (delta[i] < 0.0f) delta[i] = 0.0f;
 				scale[i] += step;
 			}
