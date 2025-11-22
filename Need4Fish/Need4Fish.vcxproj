@@ -180,6 +180,12 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     <None Include="shaders\VignettePS.hlsl">
       <FileType>Document</FileType>
     </None>
+    <None Include="shaders\UnderwaterAttenuation.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="shaders\UnderwaterFog.hlsl">
+      <FileType>Document</FileType>
+    </None>
     <ClCompile Include="src\components\ComponentFactory.cpp" />
     <ClCompile Include="src\components\gameplay\Eatable.cpp" />
     <ClCompile Include="src\entities\EntityManagerFactory.cpp" />
@@ -256,6 +262,9 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     <ClInclude Include="include\physicsEngine\utils\MeshUtil.h" />
     <ClInclude Include="include\UIManager.h" />
     <ClInclude Include="pch.h" />
+    <None Include="shaders\Caustics.hlsl">
+      <FileType>Document</FileType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\MiniPhongPS.hlsl">
