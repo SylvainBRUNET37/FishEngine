@@ -178,6 +178,7 @@ void GameEngine::InitGame()
 	Camera::minDistance = 50.0f;
 	Camera::maxDistance = 170.0f;
 	Camera::zoomSpeed = 1.0f;
+	Camera::firstPersonOffset = { 0.0f,-1.7f,35.0f };
 
 	const auto cameraEntity = entityManager.CreateEntity();
 	auto& cameraComponent = entityManager.AddComponent<Camera>(cameraEntity, camera);

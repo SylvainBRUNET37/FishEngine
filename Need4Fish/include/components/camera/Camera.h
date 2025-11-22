@@ -43,7 +43,7 @@ struct Camera : public BaseCameraData
 	CameraMode mode = CameraMode::THIRD_PERSON;
 
 	// Offset pour que la caméra 1ère personne soit bien placée (à ajuster potentiellement)
-	inline static DirectX::XMFLOAT3 firstPersonOffset = { 0.0f,-1.7f,35.0f };
+	inline static DirectX::XMFLOAT3 firstPersonOffset;
 };
 #endif
 
