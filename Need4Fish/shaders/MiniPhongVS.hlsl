@@ -2,54 +2,14 @@
 // Constant buffers datas
 // =====================================
 
-struct DirectionLight
-{
-    float4 ambient;
-    float4 diffuse;
-    float4 specular;
-
-    float3 direction;
-    float pad; // alignment
-};
-
-struct PointLight
-{
-    float4 ambient;
-    float4 diffuse;
-    float4 specular;
-
-    float3 position;
-    float range; // not used yet but may be useful in the future
-    float3 attenuation;
-    float pad; // alignment
-};
-
-#define MAX_POINT_LIGHTS 1
-
-// Per-frame
 cbuffer FrameBuffer : register(b0)
 {
     float4x4 matViewProj;
-    float4 vCamera; // camera position
-    DirectionLight dirLight;
-    PointLight pointLights[MAX_POINT_LIGHTS];
 };
 
-// Per-object
 cbuffer ObjectBuffer : register(b1)
 {
     float4x4 matWorld;
-};
-
-// Per-material
-cbuffer MaterialBuffer : register(b2)
-{
-    float4 vAMat;
-    float4 vDMat;
-    float4 vSMat;
-    float puissance;
-    float bTex;
-    float2 padding;
 };
 
 // =====================================
@@ -58,17 +18,17 @@ cbuffer MaterialBuffer : register(b2)
 
 struct VSInput
 {
-    float3 POSITION : POSITION;
+    float3 POS : POSITION;
     float3 NORMAL : NORMAL;
-    float2 TEXCOORD : TEXCOORD;
+    float2 UV : TEXCOORD;
 };
 
 struct VSOutput
 {
-    float4 position : SV_Position;
+    float4 pos : SV_Position;
     float3 normal : TEXCOORD0;
     float3 worldPosition : TEXCOORD1;
-    float2 textCoord : TEXCOORD2;
+    float2 uv : TEXCOORD2;
 };
 
 // =====================================
@@ -77,17 +37,17 @@ struct VSOutput
 
 VSOutput MiniPhongVS(VSInput input)
 {
-    VSOutput vout = (VSOutput) 0;
+    VSOutput output;
 
-    float4 worldPos = mul(float4(input.POSITION, 1.0f), matWorld);
+    float4 worldPos = mul(float4(input.POS, 1.0f), matWorld);
 
-    vout.position = mul(worldPos, matViewProj);
-    vout.worldPosition = worldPos.xyz;
+    output.pos = mul(worldPos, matViewProj);
+    output.worldPosition = worldPos.xyz;
 
     float3 normalWorld = mul((float3x3) matWorld, input.NORMAL);
-    vout.normal = normalize(normalWorld);
+    output.normal = normalize(normalWorld);
 
-    vout.textCoord = input.TEXCOORD;
+    output.uv = input.UV;
 
-    return vout;
+    return output;
 }

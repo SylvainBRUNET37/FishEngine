@@ -30,7 +30,7 @@ struct PointLight
 cbuffer FrameBuffer : register(b0)
 {
     float4x4 matViewProj;
-    float4 vCamera; // camera position
+    float4 vCamera; // camera pos
     DirectionLight dirLight;
 
     int pointLightCount;
