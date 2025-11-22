@@ -83,16 +83,16 @@ static void AcuallyEat(
 	Camera::maxDistance *= scaleFactor;
 	Camera::zoomSpeed *= scaleFactor;	
 	Camera::distance *= scaleFactor; // À changer pour une version progressive
-	Camera::firstPersonOffset = XMFLOAT3(
-		Camera::firstPersonOffset.x * scaleFactor, 
-		Camera::firstPersonOffset.y * scaleFactor, 
-		Camera::firstPersonOffset.z * scaleFactor); // À changer pour une version progressive
 
 	// Scale mesh
 	auto& trans = entityManager.Get<Transform>(predatorEntity);
 	trans.deltaScale.x = scaleFactor;
 	trans.deltaScale.y = scaleFactor;
 	trans.deltaScale.z = scaleFactor;
+
+	const float F_GROWTH_STEPS = 60.0f;
+
+	trans.scaleStep = scaleFactor / F_GROWTH_STEPS;
 }
 
 static void LoseOrEat(
@@ -139,8 +139,6 @@ void Eating::Eat(EntityManager& entityManager, JPH::BodyID bodyId1, JPH::BodyID 
 
 void Eating::UpdatePlayerScale(EntityManager& entityManager)
 {
-	const float F_GROWTH_STEPS = 60.0f;
-	const float MINIMAL_GROWTH = 0.01f;
 
 	for (const auto& [entity, _, transform] : entityManager.View<Controllable, Transform>())
 	{
@@ -153,10 +151,14 @@ void Eating::UpdatePlayerScale(EntityManager& entityManager)
 			float* delta = &transform.deltaScale.x;
 			float* scale = &transform.scale.x;
 			for (int i = 0; i < 3; ++i) {
-				float step = delta[i] / F_GROWTH_STEPS;
-				delta[i] -= (step > MINIMAL_GROWTH) ? step : MINIMAL_GROWTH;
-				if (delta[i] < 0.0f) delta[i] = 0.0f;
-				scale[i] += step;
+				if (delta[i] < transform.scaleStep) {
+					scale[i] += delta[i];
+					delta[i] = 0.0f;
+				}
+				else {
+					delta[i] -= transform.scaleStep;
+					scale[i] += transform.scaleStep;
+				}
 			}
 		}
 		else

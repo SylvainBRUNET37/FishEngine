@@ -34,8 +34,10 @@ void CameraSystem::ComputeCameraPosition(Camera& camera, const Transform& transf
 	if (camera.mode == Camera::CameraMode::FIRST_PERSON)
 	{
 		// Position à l'intérieur/devant le mosasaure
-		const XMVECTOR fpOffset = XMLoadFloat3(&camera.firstPersonOffset);
-
+		XMVECTOR fpOffset = XMLoadFloat3(&camera.firstPersonOffset);
+		XMVECTOR s = XMLoadFloat3(&transform.scale);
+		fpOffset = XMVectorMultiply(fpOffset, s);
+		
 		// Position selon la rotation avec l'offset
 		const XMVECTOR rotatedOffset = XMVector3Transform(fpOffset, targetRotMat);
 		camera.position = XMVectorAdd(targetPos, rotatedOffset);
