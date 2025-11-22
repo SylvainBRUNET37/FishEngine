@@ -49,7 +49,7 @@ using namespace DirectX;
 	return it != watchables.end();
 }
 
-// TODO: utiliser des getters dans l'ECS plutôt qu'avoir 280000 arguments
+// TODO: utiliser des getters dans l'ECS plutï¿½t qu'avoir 280000 arguments
 static void AcuallyEat(
 	EntityManager& entityManager,
 	const Entity& predatorEntity,
@@ -78,11 +78,7 @@ static void AcuallyEat(
 		bodyInterface.SetShape(predatorBody.body->GetID(), newShape, true, JPH::EActivation::Activate);
 	}
 
-	// Ajuster les paramètres de caméra
-	Camera::minDistance *= scaleFactor;
-	Camera::maxDistance *= scaleFactor;
-	Camera::zoomSpeed *= scaleFactor;	
-	Camera::distance *= scaleFactor; // À changer pour une version progressive
+	CameraSystem::ScaleCamera(scaleFactor);
 
 	// Scale mesh
 	auto& trans = entityManager.Get<Transform>(predatorEntity);

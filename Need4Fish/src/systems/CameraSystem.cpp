@@ -101,8 +101,8 @@ void CameraSystem::HandleRotation(Camera& cameraData)
 		float yawSensitivity, pitchSensitivity;
 		if (cameraData.mode == Camera::CameraMode::FIRST_PERSON)
 		{
-			yawSensitivity = 0.000025f;
-			pitchSensitivity = 0.00020f;
+			yawSensitivity = 0.00005f;
+			pitchSensitivity = 0.0002f;
 		}
 		else
 		{
@@ -123,7 +123,16 @@ void CameraSystem::HandleRotation(Camera& cameraData)
 		// Ramener progressivement vers zéro quand pas de mouvement
 		if (std::abs(cameraData.yawOffset) > 0.001f)
 		{
-			static constexpr float returnSpeed = 0.02f;
+			float returnSpeed;
+			if (cameraData.mode == Camera::CameraMode::FIRST_PERSON)
+			{
+				returnSpeed = 0.005f;
+			}
+			else
+			{
+				returnSpeed = 0.02f;
+			}
+
 			const float returnStep = std::copysign(returnSpeed, -cameraData.yawOffset);
 			cameraData.yawOffset += returnStep;
 
@@ -133,6 +142,7 @@ void CameraSystem::HandleRotation(Camera& cameraData)
 				cameraData.yawOffset = 0.0f;
 			}
 		}
+		
 	}
 
 	// Recentrer seulement si la souris s'éloigne suffisament du centre
@@ -194,4 +204,13 @@ void CameraSystem::SetMouseCursor()
 
 	// Initialiser les coordonnées de la caméra
 	Camera::cursorCoordinates = Camera::screenCenter;
+}
+
+void CameraSystem::ScaleCamera(float scaleFactor){
+	Camera::minDistance *= scaleFactor;
+	Camera::maxDistance *= scaleFactor;
+	Camera::zoomSpeed *= scaleFactor;
+	Camera::position *= scaleFactor;
+	Camera::heightOffset *= scaleFactor;
+	Camera::distance *= scaleFactor; // À changer pour une version progressive
 }

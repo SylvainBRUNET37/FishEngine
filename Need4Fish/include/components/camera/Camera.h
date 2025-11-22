@@ -16,7 +16,7 @@ struct Camera : public BaseCameraData
 	// 3rd person
 	Entity targetEntity = INVALID_ENTITY;
 	inline static float distance{};
-	float heightOffset{};
+	inline static float heightOffset{};
 	float yawOffset = 0.0f;
 	float pitchAngle = -0.1f;
 

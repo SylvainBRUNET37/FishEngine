@@ -5,7 +5,7 @@
 
 struct BaseCameraData
 {
-	DirectX::XMVECTOR position{};
+	inline static DirectX::XMVECTOR position{};
 	DirectX::XMVECTOR focus{};
 	DirectX::XMVECTOR up{};
 
