@@ -3,18 +3,19 @@
 
 #include <filesystem>
 #include <utility>
-#include <sstream>
-#include <iostream>
+#include <fstream>
+#include <format>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
 #include "rendering/texture/TextureManager.h"
 #include "rendering/device/RenderContext.h"
-#include "rendering/utils/VerboseAssertion.h"
 #include "rendering/graphics/Mesh.h"
 #include "rendering/graphics/Material.h"
 #include "resources/Node.h"
+#include "rendering/shaders/ShaderBank.h"
+#include "rendering/utils/VerboseAssertion.h"
 
 using namespace std;
 using namespace DirectX;
@@ -37,7 +38,7 @@ namespace
 
 	XMFLOAT4 AiColorToXMFLOAT4(const aiColor3D& color)
 	{
-		const float intensity = std::max({ color.r, color.g,	color.b });
+		const float intensity = std::max({color.r, color.g, color.b});
 
 		return {color.r / intensity, color.g / intensity, color.b / intensity, 1.0f};
 	}
@@ -48,7 +49,7 @@ namespace
 	}
 }
 
-SceneResource SceneLoader::LoadScene(const filesystem::path& filePath, const ShaderProgram& shaderProgram)
+SceneResource SceneLoader::LoadScene(const filesystem::path& filePath, const ShaderBank& shaderBank)
 {
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(
@@ -65,16 +66,19 @@ SceneResource SceneLoader::LoadScene(const filesystem::path& filePath, const Sha
 	SceneResource sceneRes;
 	sceneRes.name = filePath.stem().string();
 
-	// Load materials
-	sceneRes.materials.reserve(scene->mNumMaterials);
-	for (unsigned int i = 0; i < scene->mNumMaterials; i++)
-		sceneRes.materials.push_back(
-			ProcessMaterial(filePath.parent_path(), scene, scene->mMaterials[i], shaderProgram));
+	// Retrieve material meta data (their shaders)
+	ReadSceneMetaDatas(scene);
 
 	// Load meshes
 	sceneRes.meshes.reserve(scene->mNumMeshes);
 	for (unsigned int i = 0; i < scene->mNumMeshes; i++)
 		sceneRes.meshes.push_back(ProcessMesh(scene->mMeshes[i], XMMatrixIdentity()));
+
+	// Load materials
+	sceneRes.materials.reserve(scene->mNumMaterials);
+	for (unsigned int i = 0; i < scene->mNumMaterials; i++)
+			sceneRes.materials.push_back(
+			ProcessMaterial(filePath.parent_path(), scene, scene->mMaterials[i], shaderBank));
 
 	// Build node hierarchy
 	sceneRes.nodes.reserve(scene->mNumMeshes);
@@ -146,6 +150,20 @@ void SceneLoader::ProcessNodeHierarchy(
 	}
 }
 
+void SceneLoader::ReadSceneMetaDatas(const aiScene* scene)
+{
+	using json = nlohmann::json;
+
+	const std::ifstream ifs("assets/MainScene_Volet2_MetaData.json");
+	std::ostringstream ss;
+	ss << ifs.rdbuf();
+	std::string contents = ss.str();
+
+	json metaDatas = json::parse(contents);
+
+	sceneMetaData = metaDatas["materials"];
+}
+
 Mesh SceneLoader::ProcessMesh(const aiMesh* mesh, const XMMATRIX& transform) const
 {
 	std::vector<Vertex> vertices;
@@ -195,14 +213,29 @@ Mesh SceneLoader::ProcessMesh(const aiMesh* mesh, const XMMATRIX& transform) con
 Material SceneLoader::ProcessMaterial(
 	const filesystem::path& materialPath,
 	const aiScene* scene,
-	const aiMaterial* material, const ShaderProgram& shaderProgram)
+	const aiMaterial* material,
+	const ShaderBank& shaderBank)
 {
 	static constexpr int materialCbRegisterNumber = 2;
+
+	const char* materialName = material->GetName().C_Str();
+
+	vassert(sceneMetaData.contains(materialName), 
+		std::format("Cannot load material '{}', no shaders has been assigned to it in scene meta data", materialName));
+
+	auto& matMetaData = sceneMetaData[materialName];
+
+	const ShaderProgram shaderProgram
+	{
+		device,
+		shaderBank.Get<VertexShader>(matMetaData["vs"]),
+		shaderBank.Get<PixelShader>(matMetaData["ps"]),
+	};
+
 	Material mat{device, shaderProgram, materialCbRegisterNumber};
 
 	mat.name = material->GetName().C_Str();
 
-	aiColor4D color;
 	mat.ambient = XMFLOAT4(0.32f, 0.32f, 0.32f, 0.32f);
 	mat.diffuse = XMFLOAT4(0.8f, 0.8f, 0.8f, 0.8f);
 	mat.specular = XMFLOAT4(0.5f, 0.5f, 0.5f, 0.5f);
@@ -295,7 +328,7 @@ PointLight SceneLoader::ProcessPointLights(const aiLight* light, const aiScene* 
 	aiQuaternion rotation;
 	node->mTransformation.Decompose(scaling, rotation, position);
 
-	const float intensity = std::max({ light->mColorAmbient.r, light->mColorAmbient.g,	light->mColorAmbient.b });
+	const float intensity = std::max({light->mColorAmbient.r, light->mColorAmbient.g, light->mColorAmbient.b});
 
 	return
 	{
@@ -305,6 +338,6 @@ PointLight SceneLoader::ProcessPointLights(const aiLight* light, const aiScene* 
 		.position = AiColorToXMFLOAT3(position),
 		// The world scale is high so quadratic attenuation should be very low
 		// The division per 100 is an ajustement to make the light attenuation look like Blender one
-		.attenuation = { 1.0f, 0.0f,  (intensity == 0 ? 0 : 1 / (intensity / 100)) }
+		.attenuation = {1.0f, 0.0f, (intensity == 0 ? 0 : 1 / (intensity / 100))}
 	};
 }

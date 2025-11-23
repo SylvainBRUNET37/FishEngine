@@ -1,0 +1,12 @@
+{
+  "materials": {
+    "": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongWaterPS.hlsl" },
+    "AquariumMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
+    "BasicFishMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongWaterPS.hlsl" },
+    "CoralFishMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongWaterPS.hlsl" },
+    "GroundMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
+    "MonticuleMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
+    "MosasaureMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongWaterPS.hlsl" },
+    "WaterMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongWaterPS.hlsl" }
+  }
+}
