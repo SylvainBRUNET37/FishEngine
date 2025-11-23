@@ -171,12 +171,12 @@ void GameEngine::InitGame()
 	const int screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
 	Camera camera;
-	camera.position = XMVectorSet(0, 5, -10, 1);
+	Camera::position = XMVectorSet(0, 5, -10, 1);
 	camera.focus = XMVectorSet(0, 0, 0, 1);
 	camera.up = XMVectorSet(0, 1, 0, 0);
 	camera.aspectRatio = static_cast<float>(screenWidth) / static_cast<float>(screenHeight);
 	Camera::distance = 80.f;
-	camera.heightOffset = 30.f;
+	Camera::heightOffset = 30.f;
 	Camera::minDistance = 50.0f;
 	Camera::maxDistance = 170.0f;
 	Camera::zoomSpeed = 1.0f;
@@ -186,6 +186,7 @@ void GameEngine::InitGame()
 	auto& cameraComponent = entityManager.AddComponent<Camera>(cameraEntity, camera);
 
 	GameState::currentCameraEntity = cameraEntity;
+	GameState::postProcessSettings = {};
 
 	// Assign the controllable entity to the camera (it's not a pretty way of doing it but it works)
 	unsigned short nbControllable = 0;
