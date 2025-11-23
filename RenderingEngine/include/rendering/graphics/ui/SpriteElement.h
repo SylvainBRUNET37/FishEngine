@@ -5,6 +5,9 @@
 #include <optional>
 #include <functional>
 
+// Temp
+#include <iostream>
+
 class SpriteElement {
 	Sprite2D sprite;
 
@@ -38,8 +41,8 @@ public:
 		clickSprite = cs;
 	}
 
-	Sprite2D UpdateAndGetDisplayedSprite(const double deltaTime) {
-		remainingDelay -= (deltaTime > 0.0f) ? deltaTime : 1.0f / 60.0f; // ignoble
+	Sprite2D UpdateAndGetDisplayedSprite() {
+		remainingDelay -= 1.0f / 60.0f; // ignoble
 		if (clickSprite.has_value() && remainingDelay > 0.0f)
 			return clickSprite.value();
 		else if (hoverSprite.has_value() && isHovered())
@@ -59,11 +62,24 @@ public:
 private:
 	bool isHovered() {
 		POINT currentCursorCoordinates;
+
 		if (!GetCursorPos(&currentCursorCoordinates))
 			return false;
 
 		const auto cursorX = currentCursorCoordinates.x;
 		const auto cursorY = currentCursorCoordinates.y;
+
+		/// TEMP
+		auto a = (cursorX >= sprite.position.x
+			&& cursorX <= sprite.position.x + sprite.texture.width
+			&& cursorY >= sprite.position.y
+			&& cursorY <= sprite.position.y + sprite.texture.height);
+
+		std::cout << "Cursor : (" << currentCursorCoordinates.x << ", " << currentCursorCoordinates.y << ")" << std::endl;
+		std::cout << "Sprite : (" << sprite.position.x << ", " << sprite.position.y << ")" << std::endl;
+		std::cout << "Sprite : (" << sprite.position.x + sprite.texture.width << ", " << sprite.position.y + sprite.texture.height << ")" << std::endl;
+		std::cout << "Is hovering? " << (a ? "Yes" : "No") << std::endl;
+		////////
 
 		return (cursorX >= sprite.position.x
 			&& cursorX <= sprite.position.x + sprite.texture.width

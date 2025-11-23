@@ -27,10 +27,10 @@ Sprite2D UIManager::LoadSprite(const std::string& filePath, float positionX, flo
 	return Sprite2D{ spriteShaderProgram, texture, { positionX, positionY }, device };
 }
 
-[[nodiscard]] std::vector<Sprite2D> UIManager::GetSprites(const double deltaTime) {
+[[nodiscard]] std::vector<Sprite2D> UIManager::GetSprites() {
 	std::vector<Sprite2D> displayedSprites{};
 	for (auto& pair : sprites)
-		displayedSprites.emplace_back(pair.second.UpdateAndGetDisplayedSprite(deltaTime));
+		displayedSprites.emplace_back(pair.second.UpdateAndGetDisplayedSprite());
 	return displayedSprites;
 }
 

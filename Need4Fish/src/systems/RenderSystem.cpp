@@ -61,8 +61,7 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 	}
 
 	// Render sprites
-	cout << deltaTime << endl;
-	for (auto& sprite : uiManager->GetSprites(deltaTime))
+	for (auto& sprite : uiManager->GetSprites())
 		renderer.Render(sprite, renderContext->GetContext());
 
 	const auto& shaderBank = Locator::Get<ResourceManager>().GetShaderBank();

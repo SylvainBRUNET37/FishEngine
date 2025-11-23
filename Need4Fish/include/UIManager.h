@@ -15,7 +15,7 @@ class UIManager
 public:
 	explicit UIManager(ID3D11Device* device);
 
-	[[nodiscard]] std::vector<Sprite2D> GetSprites(const double deltaTime);
+	[[nodiscard]] std::vector<Sprite2D> GetSprites();
 
 	void AddSprite(const std::string& filePath, float positionX, float positionY);
 	void AddSprite(const std::string& filePath);
