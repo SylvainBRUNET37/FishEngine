@@ -82,8 +82,6 @@ float3 GetWaveNormal(float2 worldPosXZ, float elapsedTime)
 
 float ApplyCaustics(
 	float3 worldPos, 
-	Texture2D causticsTex, 
-	SamplerState causticSamp,
 	float3 dirLightDirection, 
 	float elapsedTime
 )
@@ -118,7 +116,7 @@ float ApplyCaustics(
 	float3 proj = worldPos + refracted * depth;
 
 	const float UV_SCALE = 0.005;
-	float causticTexture = causticsTex.Sample(causticSamp, proj.xz * UV_SCALE).r;
+	float causticTexture = causticTex.Sample(causticSamp, proj.xz * UV_SCALE).r;
 
 	return intensity * causticTexture;
 }

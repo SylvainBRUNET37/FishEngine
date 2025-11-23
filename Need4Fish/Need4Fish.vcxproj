@@ -180,10 +180,17 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     <None Include="shaders\VignettePS.hlsl">
       <FileType>Document</FileType>
     </None>
-    <None Include="shaders\UnderwaterAttenuation.hlsl">
+    <None Include="shaders\UnderwaterAttenuationPS.hlsl">
       <FileType>Document</FileType>
     </None>
-    <None Include="shaders\UnderwaterFog.hlsl">
+    <None Include="shaders\UnderwaterFogPS.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="shaders\LightningPS.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="shaders\BlingPhongPS.hlsl" />
+    <None Include="shaders\MainBuffers.hlsl">
       <FileType>Document</FileType>
     </None>
     <ClCompile Include="src\components\ComponentFactory.cpp" />
@@ -262,7 +269,7 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     <ClInclude Include="include\physicsEngine\utils\MeshUtil.h" />
     <ClInclude Include="include\UIManager.h" />
     <ClInclude Include="pch.h" />
-    <None Include="shaders\Caustics.hlsl">
+    <None Include="shaders\CausticsPS.hlsl">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>
