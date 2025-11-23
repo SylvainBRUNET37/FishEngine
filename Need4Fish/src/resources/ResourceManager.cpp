@@ -32,16 +32,8 @@ void ResourceManager::InitShaderBank()
 
 SceneResource& ResourceManager::LoadScene()
 {
-	// TODO: Link shaders to Mesh (curently, every mesh use the same shaders)
-	const ShaderProgram shaderProgram
-	{
-		device,
-		shaderBank.Get<VertexShader>("shaders/MainVS.hlsl"),
-		shaderBank.Get<PixelShader>("shaders/PhongCausticsPS.hlsl"),
-	};
-
 	const std::filesystem::path filePath = "assets\\MainScene_Volet2.glb";
-	sceneResource = sceneLoader.LoadScene(filePath, shaderProgram);
+	sceneResource = sceneLoader.LoadScene(filePath, shaderBank);
 
 	return sceneResource;
 }

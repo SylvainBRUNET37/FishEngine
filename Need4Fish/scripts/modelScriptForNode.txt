@@ -1,0 +1,21 @@
+import bpy
+import json
+
+obj = bpy.context.active_object
+
+data = {
+    "components": {
+        "rigidBody": {
+            "type": "boxShape"
+        },
+        "eatable": {
+            "mass": 100.0,
+            "isApex": False
+        },
+        "controllable": {
+            "maxSpeed": 200.0
+        }
+    }
+}
+
+obj["components"] = json.dumps(data["components"])
