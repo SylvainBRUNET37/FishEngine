@@ -5,6 +5,8 @@
 #include "systems/CameraSystem.h"
 #include <queue>
 
+#include "rendering/postProcessing/PostProcessSettings.h"
+
 struct GameState
 {
     enum State : uint8_t
@@ -14,6 +16,8 @@ struct GameState
         DIED,
         WON
     };
+
+    inline static PostProcessSettings postProcessSettings{};
 
     inline static std::queue<std::pair<JPH::BodyID, JPH::BodyID>> detectedCollisions;
 

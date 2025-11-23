@@ -3,9 +3,9 @@
 
 #include "BlendState.h"
 #include "DepthBuffer.h"
-#include "PostProcess.h"
 #include "Rasterizer.h"
 #include "RenderTarget.h"
+#include "rendering/postProcessing/PostProcess.h"
 #include "rendering/utils/ComPtr.h"
 
 class RenderContext

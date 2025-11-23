@@ -1,6 +1,6 @@
-static const float2 RED_OFFSET = float2(0.01, 0.0);
-static const float2 GREEN_OFFSET = float2(0.02, 0.0);
-static const float2 BLUE_OFFSET = float2(-0.01, 0.0);
+static const float2 RED_OFFSET = float2(0.015, 0.0);
+static const float2 GREEN_OFFSET = float2(-0.015, 0.0);
+static const float2 BLUE_OFFSET = float2(0.03, 0.0);
 
 float4 ComputeChromaticAberration(Texture2D sceneTex, SamplerState samp, float2 uv)
 {

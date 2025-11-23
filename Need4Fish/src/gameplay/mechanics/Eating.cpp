@@ -3,6 +3,8 @@
 #include <Jolt/Physics/Body/Body.h>
 #include "GameEngine.h"
 #include "DirectXMath.h"
+#include "components/PowerSource.h"
+#include "systems/PowerSystem.h"
 
 using namespace DirectX;
 
@@ -60,6 +62,10 @@ static void AcuallyEat(
 )
 {
 	float scaleFactor = CalculateGrowthFactor(predatorEatable.mass, preyEatable.mass);
+
+	// Apply power effect of the killed entity
+	if (entityManager.HasComponent<PowerSource>(preyEntity))
+		PowerSystem::AddEffect(entityManager.Get<PowerSource>(preyEntity));
 	
 	// Eat and kill
 	if (preyEatable.isApex) GameState::currentState = GameState::WON;
@@ -89,6 +95,8 @@ static void AcuallyEat(
 	const float F_GROWTH_STEPS = 60.0f;
 
 	trans.scaleStep = scaleFactor / F_GROWTH_STEPS;
+
+
 }
 
 static void LoseOrEat(

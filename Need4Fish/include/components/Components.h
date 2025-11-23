@@ -5,6 +5,7 @@
 #include <tuple>
 #include <vector>
 
+#include "PowerSource.h"
 #include "camera/Camera.h"
 #include "entities/Entity.h"
 #include "gameplay/Eatable.h"
@@ -44,7 +45,8 @@ using Components = std::tuple
 	Controllable,
 	Camera,
 	PointLight,
-	Eatable
+	Eatable,
+	PowerSource
 >;
 
 #endif

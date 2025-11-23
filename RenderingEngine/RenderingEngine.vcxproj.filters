@@ -156,7 +156,10 @@
     <ClInclude Include="include\rendering\buffers\constantBuffers\SpriteBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\rendering\device\PostProcess.h">
+    <ClInclude Include="include\rendering\postProcessing\PostProcess.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\rendering\postProcessing\PostProcessSettings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\rendering\graphics\ui\SpriteElement.h">

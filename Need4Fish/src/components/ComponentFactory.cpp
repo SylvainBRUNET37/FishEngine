@@ -31,3 +31,11 @@ void ComponentFactory::CreateControllable(const nlohmann::json& componentData, E
 {
 	entityManager.AddComponent<Controllable>(entity, componentData["maxSpeed"].get<float>());
 }
+
+void ComponentFactory::CreatePowerSource(const nlohmann::json& componentData, EntityManager& entityManager,
+	const Entity& entity)
+{
+	auto& powerSource = entityManager.AddComponent<PowerSource>(entity, PowerSource{});
+	powerSource.power = static_cast<Power>(componentData["power"].get<int>());
+	powerSource.effectDuration = componentData["effectDuration"].get<double>();
+}

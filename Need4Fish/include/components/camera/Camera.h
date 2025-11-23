@@ -40,7 +40,7 @@ struct Camera : public BaseCameraData
 	bool invertCamRotation = false;
 
 	// Mode de caméra actuel
-	CameraMode mode = CameraMode::THIRD_PERSON;
+	inline static CameraMode mode = CameraMode::THIRD_PERSON;
 
 	// Offset pour que la caméra 1ère personne soit bien placée (à ajuster potentiellement)
 	inline static DirectX::XMFLOAT3 firstPersonOffset;

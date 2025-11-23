@@ -9,6 +9,7 @@
 #include "graphics/Material.h"
 #include "graphics/Mesh.h"
 #include "graphics/ui/Sprite2D.h"
+#include "postProcessing/PostProcessSettings.h"
 
 class Renderer
 {
@@ -18,13 +19,16 @@ public:
 	void UpdateFrameBuffer(const FrameBuffer& frameBuffer_) { frameBuffer = frameBuffer_; };
 	void Render(const Mesh& mesh, ID3D11DeviceContext* context, const Transform& transform);
 	void Render(Sprite2D& sprite, ID3D11DeviceContext* context);
-	void RenderPostProcess(ID3D11VertexShader* postProcessVertexShader, ID3D11PixelShader* postProcessPixelShader) const;
+	void RenderPostProcess(ID3D11VertexShader* postProcessVertexShader, 
+		                   ID3D11PixelShader* postProcessPixelShader,
+	                       const PostProcessSettings& parameters);
 	void RenderScene() const;
 
 private:
 	static constexpr int frameCbRegisterNumber = 0;
 	static constexpr int objectCbRegisterNumber = 1;
 	static constexpr int spriteCbRegisterNumber = 0;
+	static constexpr int postProcessCbRegisterNumber = 0;
 
 	RenderContext* renderContext;
 	ID3D11SamplerState* textureSampler;
@@ -36,6 +40,7 @@ private:
 	ConstantBuffer<FrameBuffer> frameConstantBuffer;
 	ConstantBuffer<ObjectBuffer> objectConstantBuffer;
 	ConstantBuffer<SpriteBuffer> spriteConstantBuffer;
+	ConstantBuffer<PostProcessSettings> postProcessSettingsBuffer;
 
 	Texture causticTexture;
 
