@@ -35,7 +35,7 @@ struct VSOutput
 // Algorithm
 // =====================================
 
-VSOutput MiniPhongVS(VSInput input)
+VSOutput MainVS(VSInput input)
 {
     VSOutput output;
 

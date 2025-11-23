@@ -189,8 +189,11 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     <None Include="shaders\LightningPS.hlsl">
       <FileType>Document</FileType>
     </None>
-    <None Include="shaders\BlingPhongPS.hlsl" />
+    <None Include="shaders\BlingPhongBasePS.hlsl" />
     <None Include="shaders\MainBuffers.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="shaders\PhongCausticsPS.hlsl">
       <FileType>Document</FileType>
     </None>
     <ClCompile Include="src\components\ComponentFactory.cpp" />
@@ -274,10 +277,10 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\MiniPhongPS.hlsl">
+    <None Include="shaders\PhongWaterPS.hlsl">
       <FileType>Document</FileType>
     </None>
-    <None Include="shaders\MiniPhongVS.hlsl">
+    <None Include="shaders\MainVS.hlsl">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>
