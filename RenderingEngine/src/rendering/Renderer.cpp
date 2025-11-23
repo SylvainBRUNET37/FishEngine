@@ -11,6 +11,7 @@ Renderer::Renderer(RenderContext* renderContext, std::vector<Material>&& materia
 	frameConstantBuffer{ renderContext->GetDevice(), frameCbRegisterNumber },
 	objectConstantBuffer{ renderContext->GetDevice(), objectCbRegisterNumber },
 	spriteConstantBuffer{ renderContext->GetDevice(), spriteCbRegisterNumber },
+	postProcessSettingsBuffer{ renderContext->GetDevice(), postProcessCbRegisterNumber },
 	causticTexture{TextureLoader::LoadTextureFromFile("assets/textures/caustics.png", renderContext->GetDevice())}
 {
 	D3D11_SAMPLER_DESC textureSamplerDesc{};
@@ -88,10 +89,17 @@ void Renderer::Render(Sprite2D& sprite, ID3D11DeviceContext* context)
 	Draw(sprite);
 }
 
-void Renderer::RenderPostProcess(ID3D11VertexShader* postProcessVertexShader, ID3D11PixelShader* postProcessPixelShader) const
+void Renderer::RenderPostProcess(
+	ID3D11VertexShader* postProcessVertexShader, 
+	ID3D11PixelShader* postProcessPixelShader, 
+	const PostProcessSettings& parameters
+)
 {
 	ID3D11DeviceContext* context = renderContext->GetContext();
 	ID3D11RenderTargetView* renderTarget = renderContext->GetRenderTargetView();
+
+	postProcessSettingsBuffer.Update(context, parameters);
+	postProcessSettingsBuffer.Bind(context);
 
 	renderContext->GetPostProcess().Draw(context, renderTarget, postProcessVertexShader, postProcessPixelShader);
 }

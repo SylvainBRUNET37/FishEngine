@@ -11,6 +11,18 @@ struct VSOutput
     float2 uv : TEXCOORD0;
 };
 
+// =====================================
+// Constant buffers
+// =====================================
+
+cbuffer PostProcessSettings : register(b0)
+{
+    int enableVignette;
+    int enableChromaticAberration;
+    int pad1;
+    int pad2;
+};
+
 Texture2D sceneTex : register(t0);
 SamplerState sampleState : register(s0);
 
@@ -20,11 +32,13 @@ SamplerState sampleState : register(s0);
 
 float4 PostProcessPS(VSOutput input) : SV_TARGET
 {
-	// This code apply Vingette + CA
-    //const float4 chromaColor = ComputeChromaticAberration(sceneTex, sampleState, input.uv);
-    //return ApplyVignette(chromaColor, input.uv);
+    float4 color = sceneTex.Sample(sampleState, input.uv);
 
-    // Apply only Vignette effect
-    float4 pixelColor = sceneTex.Sample(sampleState, input.uv);
-    return ApplyVignette(pixelColor, input.uv);
+    if (enableChromaticAberration)
+        color = ComputeChromaticAberration(sceneTex, sampleState, input.uv);
+
+    if (enableVignette)
+        color = ApplyVignette(color, input.uv);
+
+    return color;
 }

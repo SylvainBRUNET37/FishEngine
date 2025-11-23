@@ -32,7 +32,7 @@
     <ClInclude Include="include\rendering\device\BlendState.h" />
     <ClInclude Include="include\rendering\device\DepthBuffer.h" />
     <ClInclude Include="include\rendering\device\DeviceBuilder.h" />
-    <ClInclude Include="include\rendering\device\PostProcess.h" />
+    <ClInclude Include="include\rendering\postProcessing\PostProcess.h" />
     <ClInclude Include="include\rendering\device\RenderContext.h" />
     <ClInclude Include="include\rendering\buffers\Buffer.h" />
     <ClInclude Include="include\rendering\buffers\constantBuffers\ConstantBuffer.h" />
@@ -45,6 +45,7 @@
     <ClInclude Include="include\rendering\graphics\lights\PointLight.h" />
     <ClInclude Include="include\rendering\graphics\Sprite2D.h" />
     <ClInclude Include="include\rendering\graphics\VertexSprite.h" />
+    <ClInclude Include="include\rendering\postProcessing\PostProcessSettings.h" />
     <ClInclude Include="include\rendering\Renderer.h" />
     <ClInclude Include="include\rendering\shaders\Shader.h" />
     <ClInclude Include="include\rendering\shaders\ShaderBank.h" />

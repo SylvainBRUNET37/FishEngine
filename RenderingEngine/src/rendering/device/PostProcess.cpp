@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "rendering/device/PostProcess.h"
+#include "rendering/postProcessing/PostProcess.h"
 
 #include "rendering/utils/Util.h"
 
