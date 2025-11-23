@@ -5,9 +5,6 @@
 #include <optional>
 #include <functional>
 
-// Temp
-#include <iostream>
-
 class SpriteElement {
 	Sprite2D sprite;
 
@@ -60,7 +57,7 @@ public:
 	}
 
 private:
-	bool isHovered() {
+	bool isHovered() const {
 		POINT currentCursorCoordinates;
 
 		if (!GetCursorPos(&currentCursorCoordinates))
@@ -68,18 +65,6 @@ private:
 
 		const auto cursorX = currentCursorCoordinates.x;
 		const auto cursorY = currentCursorCoordinates.y;
-
-		/// TEMP
-		auto a = (cursorX >= sprite.position.x
-			&& cursorX <= sprite.position.x + sprite.texture.width
-			&& cursorY >= sprite.position.y
-			&& cursorY <= sprite.position.y + sprite.texture.height);
-
-		std::cout << "Cursor : (" << currentCursorCoordinates.x << ", " << currentCursorCoordinates.y << ")" << std::endl;
-		std::cout << "Sprite : (" << sprite.position.x << ", " << sprite.position.y << ")" << std::endl;
-		std::cout << "Sprite : (" << sprite.position.x + sprite.texture.width << ", " << sprite.position.y + sprite.texture.height << ")" << std::endl;
-		std::cout << "Is hovering? " << (a ? "Yes" : "No") << std::endl;
-		////////
 
 		return (cursorX >= sprite.position.x
 			&& cursorX <= sprite.position.x + sprite.texture.width

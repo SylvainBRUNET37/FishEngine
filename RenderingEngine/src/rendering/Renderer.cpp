@@ -3,6 +3,8 @@
 
 #include "rendering/texture/TextureLoader.h"
 
+#include <iostream>
+
 using namespace DirectX;
 
 Renderer::Renderer(RenderContext* renderContext, std::vector<Material>&& materials)
@@ -70,11 +72,15 @@ void Renderer::Render(const Mesh& mesh,
 
 void Renderer::Render(Sprite2D& sprite, ID3D11DeviceContext* context)
 {
+
+	const int screenWidth = GetSystemMetrics(SM_CXSCREEN);
+	const int screenHeight = GetSystemMetrics(SM_CYSCREEN);
+
 	// Orthographic projection to display the sprite in 2D "from the screne"
 	const XMMATRIX matOrtho = XMMatrixOrthographicOffCenterRH
 	(
-		0.f, 1920.f,
-		1080.f, 0.f,
+		0.f, static_cast<float>(screenWidth),
+		static_cast<float>(screenHeight), 0.f,
 		0.f, 1.f
 	);
 
