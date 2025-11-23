@@ -65,17 +65,13 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 
 	const auto& shaderBank = Locator::Get<ResourceManager>().GetShaderBank();
 
-	const PostProcessSettings postProcessSettings
-	{
-		.enableVignette = Camera::mode == Camera::CameraMode::FIRST_PERSON ? 1 : 0,
-		.enableChromaticAberration = 0
-	};
+	GameState::postProcessSettings.enableVignette = Camera::mode == Camera::CameraMode::FIRST_PERSON ? 1 : 0;
 
 	renderer.RenderPostProcess
 	(
 		shaderBank.Get<VertexShader>("shaders/PostProcessVS.hlsl").shader,
 		shaderBank.Get<PixelShader>("shaders/PostProcessPS.hlsl").shader,
-		postProcessSettings
+		GameState::postProcessSettings
 	);
 
 	Present();

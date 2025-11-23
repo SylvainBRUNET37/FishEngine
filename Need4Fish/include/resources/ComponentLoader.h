@@ -49,6 +49,13 @@ private:
 					ComponentFactory::CreateControllable(componentData, entityManager, entity);
 				}
 			},
+			{
+				"powerSource",
+				[](const nlohmann::json& componentData, EntityManager& entityManager, const Entity& entity)
+				{
+					ComponentFactory::CreatePowerSource(componentData, entityManager, entity);
+				}
+			},
 		}
 	};
 };

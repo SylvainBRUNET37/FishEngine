@@ -10,6 +10,7 @@
 #include "rendering/application/WindowsApplication.h"
 #include "rendering/texture/TextureLoader.h"
 #include "gameplay/mechanics/Eating.h"
+#include "systems/PowerSystem.h"
 
 using namespace DirectX;
 
@@ -23,6 +24,7 @@ GameEngine::GameEngine(RenderContext* renderContext)
 	// Care about the order of construction, it will be the order of update calls
 	systems.emplace_back(std::make_unique<PhysicsSimulationSystem>());
 	systems.emplace_back(std::make_unique<CameraSystem>());
+	systems.emplace_back(std::make_unique<PowerSystem>());
 	systems.emplace_back(std::make_unique<RenderSystem>(renderContext, std::move(sceneResources.materials)));
 
 	InitGame();
