@@ -31,18 +31,36 @@ void CameraSystem::ComputeCameraPosition(Camera& camera, const Transform& transf
 	camera.targetYaw = totalYaw; // Pour la physique	
 	camera.targetPitch = camera.pitchAngle;
 
-	camera.focus = XMVectorAdd(targetPos, XMVectorSet(0, camera.heightOffset, 0, 0));
+	if (camera.mode == Camera::CameraMode::FIRST_PERSON)
+	{
+		// Position à l'intérieur/devant le mosasaure
+		XMVECTOR fpOffset = XMLoadFloat3(&camera.firstPersonOffset);
+		XMVECTOR s = XMLoadFloat3(&transform.scale);
+		fpOffset = XMVectorMultiply(fpOffset, s);
+		
+		// Position selon la rotation avec l'offset
+		const XMVECTOR rotatedOffset = XMVector3Transform(fpOffset, targetRotMat);
+		camera.position = XMVectorAdd(targetPos, rotatedOffset);
 
-	const float horizontalDist = camera.distance * cosf(camera.pitchAngle);
-	const float verticalDist = camera.distance * sinf(camera.pitchAngle);
+		// On utilise directement le forward vector du mosasaure
+		const XMVECTOR lookDirection = XMVector3Normalize(forward);
+		camera.focus = XMVectorAdd(camera.position, XMVectorScale(lookDirection, 100.0f));
+	}
+	else // THIRD_PERSON
+	{
+		camera.focus = XMVectorAdd(targetPos, XMVectorSet(0, camera.heightOffset, 0, 0));
 
-	camera.position = XMVectorSet
-	(
-		XMVectorGetX(camera.focus) - horizontalDist * sinf(totalYaw),
-		XMVectorGetY(camera.focus) + verticalDist + camera.heightOffset,
-		XMVectorGetZ(camera.focus) - horizontalDist * cosf(totalYaw),
-		1.0f
-	);
+		const float horizontalDist = camera.distance * cosf(camera.pitchAngle);
+		const float verticalDist = camera.distance * sinf(camera.pitchAngle);
+
+		camera.position = XMVectorSet
+		(
+			XMVectorGetX(camera.focus) - horizontalDist * sinf(totalYaw),
+			XMVectorGetY(camera.focus) + verticalDist + camera.heightOffset,
+			XMVectorGetZ(camera.focus) - horizontalDist * cosf(totalYaw),
+			1.0f
+		);
+	}
 }
 
 void CameraSystem::ComputeCameraOrientation(Camera& camera)
@@ -79,15 +97,42 @@ void CameraSystem::HandleRotation(Camera& cameraData)
 	// Appliquer la rotation seulement si le mouvement dépasse la deadzone
 	if (std::abs(deltaX) > deadzone || std::abs(deltaY) > deadzone)
 	{
-		static constexpr float mouseSensitivity = 0.002f;
-		Rotate(cameraData, deltaX * mouseSensitivity, -deltaY * mouseSensitivity);
+		// Sensibilité ajustée selon le mode
+		float yawSensitivity, pitchSensitivity;
+		if (cameraData.mode == Camera::CameraMode::FIRST_PERSON)
+		{
+			yawSensitivity = 0.00005f;
+			pitchSensitivity = 0.0002f;
+		}
+		else
+		{
+			yawSensitivity = 0.002f;
+			pitchSensitivity = 0.002f;
+		}
+
+		// Inversion si true
+		const float yawMultiplier = cameraData.invertCamRotation ? -1.0f : 1.0f;
+		const float pitchMultiplier = cameraData.invertCamRotation ? 1.0f : -1.0f;
+
+		Rotate(cameraData,
+			deltaX * yawSensitivity * yawMultiplier,
+			deltaY * pitchSensitivity * pitchMultiplier);
 	}
 	else
 	{
 		// Ramener progressivement vers zéro quand pas de mouvement
 		if (std::abs(cameraData.yawOffset) > 0.001f)
 		{
-			static constexpr float returnSpeed = 0.02f;
+			float returnSpeed;
+			if (cameraData.mode == Camera::CameraMode::FIRST_PERSON)
+			{
+				returnSpeed = 0.005f;
+			}
+			else
+			{
+				returnSpeed = 0.02f;
+			}
+
 			const float returnStep = std::copysign(returnSpeed, -cameraData.yawOffset);
 			cameraData.yawOffset += returnStep;
 
@@ -97,6 +142,7 @@ void CameraSystem::HandleRotation(Camera& cameraData)
 				cameraData.yawOffset = 0.0f;
 			}
 		}
+		
 	}
 
 	// Recentrer seulement si la souris s'éloigne suffisament du centre
@@ -158,4 +204,13 @@ void CameraSystem::SetMouseCursor()
 
 	// Initialiser les coordonnées de la caméra
 	Camera::cursorCoordinates = Camera::screenCenter;
+}
+
+void CameraSystem::ScaleCamera(float scaleFactor){
+	Camera::minDistance *= scaleFactor;
+	Camera::maxDistance *= scaleFactor;
+	Camera::zoomSpeed *= scaleFactor;
+	Camera::position *= scaleFactor;
+	Camera::heightOffset *= scaleFactor;
+	Camera::distance *= scaleFactor; // À changer pour une version progressive
 }

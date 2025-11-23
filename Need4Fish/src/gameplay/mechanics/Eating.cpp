@@ -49,7 +49,7 @@ using namespace DirectX;
 	return it != watchables.end();
 }
 
-// TODO: utiliser des getters dans l'ECS plutôt qu'avoir 280000 arguments
+// TODO: utiliser des getters dans l'ECS plutï¿½t qu'avoir 280000 arguments
 static void AcuallyEat(
 	EntityManager& entityManager,
 	const Entity& predatorEntity,
@@ -78,11 +78,17 @@ static void AcuallyEat(
 		bodyInterface.SetShape(predatorBody.body->GetID(), newShape, true, JPH::EActivation::Activate);
 	}
 
+	CameraSystem::ScaleCamera(scaleFactor);
+
 	// Scale mesh
 	auto& trans = entityManager.Get<Transform>(predatorEntity);
 	trans.deltaScale.x = scaleFactor;
 	trans.deltaScale.y = scaleFactor;
 	trans.deltaScale.z = scaleFactor;
+
+	const float F_GROWTH_STEPS = 60.0f;
+
+	trans.scaleStep = scaleFactor / F_GROWTH_STEPS;
 }
 
 static void LoseOrEat(
@@ -129,7 +135,6 @@ void Eating::Eat(EntityManager& entityManager, JPH::BodyID bodyId1, JPH::BodyID 
 
 void Eating::UpdatePlayerScale(EntityManager& entityManager)
 {
-	const float F_GROWTH_STEPS = 60.0f;
 
 	for (const auto& [entity, _, transform] : entityManager.View<Controllable, Transform>())
 	{
@@ -142,10 +147,14 @@ void Eating::UpdatePlayerScale(EntityManager& entityManager)
 			float* delta = &transform.deltaScale.x;
 			float* scale = &transform.scale.x;
 			for (int i = 0; i < 3; ++i) {
-				float step = delta[i] / F_GROWTH_STEPS;
-				delta[i] -= step;
-				if (delta[i] < 0.0f) delta[i] = 0.0f;
-				scale[i] += step;
+				if (delta[i] < transform.scaleStep) {
+					scale[i] += delta[i];
+					delta[i] = 0.0f;
+				}
+				else {
+					delta[i] -= transform.scaleStep;
+					scale[i] += transform.scaleStep;
+				}
 			}
 		}
 		else
