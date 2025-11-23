@@ -14,19 +14,23 @@ class SpriteElement {
 	const float clickDelay = 0.5f;
 	float remainingDelay = 0.0f;
 
+	std::function<void()> clickFunction = []{};
+
 public:
 	SpriteElement(const Sprite2D& sprite) : sprite(sprite) {}
-	SpriteElement(const Sprite2D& sprite, const Sprite2D& secondSprite, bool isHover) : sprite(sprite) {
+	SpriteElement(const Sprite2D& sprite, const Sprite2D& secondSprite, bool isHover) : sprite(sprite)
+	{
 		if (isHover)
 			hoverSprite = secondSprite;
 		else
 			clickSprite = secondSprite;
-
 	}
-	SpriteElement(const Sprite2D& sprite, const Sprite2D& hoverSprite, const Sprite2D& clickSprite)
+
+	SpriteElement(const Sprite2D& sprite, const Sprite2D& hoverSprite, const Sprite2D& clickSprite, std::function<void()> clickFunction)
 		: sprite(sprite),
 		hoverSprite(hoverSprite),
-		clickSprite(clickSprite)
+		clickSprite(clickSprite),
+		clickFunction(clickFunction)
 	{
 	}
 
@@ -36,6 +40,10 @@ public:
 
 	void SetClickSprite(const Sprite2D& cs) {
 		clickSprite = cs;
+	}
+
+	void SetClickFunction(std::function<void()> clickFunction_) {
+		clickFunction = clickFunction_;
 	}
 
 	Sprite2D UpdateAndGetDisplayedSprite() {
@@ -48,11 +56,12 @@ public:
 			return sprite;
 	}
 
-	void onClick(std::function<void()> f) {
+	void onClick() {
+
 		if (isHovered())
 		{
 			remainingDelay = clickDelay;
-			f();
+			clickFunction();
 		}
 	}
 

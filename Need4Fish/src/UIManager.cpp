@@ -54,6 +54,10 @@ void UIManager::Clear()
 	sprites.clear();
 }
 
+void UIManager::RequestClear() {
+	clearRequested = true;
+}
+
 void UIManager::AddHoverSprite(const std::string& filePath, const std::string& hoverFilePath)
 {
 	auto it = sprites.find(filePath);
@@ -74,7 +78,21 @@ void UIManager::AddClickSprite(const std::string& filePath, const std::string& c
 	it->second.SetClickSprite(clickSprite);
 }
 
+void UIManager::AddClickFunction(const std::string& filePath, std::function<void()> clickFunction)
+{
+	auto it = sprites.find(filePath);
+	if (it == sprites.end())
+		return;
+
+	it->second.SetClickFunction(clickFunction);
+}
+
 void UIManager::HandleClick() {
 	for (auto& pair : sprites)
-		pair.second.onClick([]{}); // TODO : give the element a setter to change the onclick or something
+		pair.second.onClick();
+	if (clearRequested)
+	{
+		clearRequested = false;
+		Clear();
+	}
 }

@@ -111,6 +111,7 @@ void GameEngine::ChangeGameStatus()
 	{
 	case GameState::PAUSED:
 		ResumeGame();
+		uiManager->Clear();
 		break;
 	case GameState::PLAYING:
 		PauseGame();
@@ -126,7 +127,6 @@ void GameEngine::ResumeGame()
 {
 	CameraSystem::SetMouseCursor();
 	GameState::currentState = GameState::PLAYING;
-	uiManager->Clear();
 }
 
 void GameEngine::PauseGame()
@@ -144,9 +144,9 @@ void GameEngine::PauseGame()
 	float positionX = 200.0f;
 	float positionY = 200.0f;
 
-	uiManager->AddSprite("assets/ui/pauseTitle.png", positionX, positionY);
-	uiManager->AddHoverSprite("assets/ui/pauseTitle.png", "assets/ui/deathTitle.png");
-	uiManager->AddClickSprite("assets/ui/pauseTitle.png", "assets/ui/winTitle.png");
+	uiManager->AddSprite("assets/ui/testPause.png");
+	uiManager->AddSprite("assets/ui/testResume.png", positionX, positionY);
+	uiManager->AddClickFunction("assets/ui/testResume.png", [this] { uiManager->RequestClear(); ResumeGame(); });
 }
 
 void GameEngine::EndGame()

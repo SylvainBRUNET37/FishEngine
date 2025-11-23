@@ -10,20 +10,25 @@ class UIManager
 
 	std::unordered_map<std::string, SpriteElement> sprites;
 
-	[[nodiscard]] Sprite2D LoadSprite(const std::string& filePath) const;
-	[[nodiscard]] Sprite2D LoadSprite(const std::string& filePath, float positionX, float positionY) const;
+	bool clearRequested = false;
+
 public:
 	explicit UIManager(ID3D11Device* device);
 
 	[[nodiscard]] std::vector<Sprite2D> GetSprites();
 
+	[[nodiscard]] Sprite2D LoadSprite(const std::string& filePath) const;
+	[[nodiscard]] Sprite2D LoadSprite(const std::string& filePath, float positionX, float positionY) const;
+	
 	void AddSprite(const std::string& filePath, float positionX, float positionY);
 	void AddSprite(const std::string& filePath);
 	void RemoveSprite(std::string& filePath);
 	void Clear();
+	void RequestClear();
 
 	void AddHoverSprite(const std::string& filePath, const std::string& hoverFilePath);
 	void AddClickSprite(const std::string& filePath, const std::string& clickFilePath);
+	void AddClickFunction(const std::string& filePath, std::function<void()>);
 
 	void HandleClick();
 
