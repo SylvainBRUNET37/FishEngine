@@ -8,6 +8,19 @@
 
 using namespace DirectX;
 
+static void KillRecursively(EntityManager& entityManager, const Entity preyEntity)
+{
+	if (entityManager.HasComponent<Hierarchy>(preyEntity))
+	{
+		const auto& hierarchy = entityManager.Get<Hierarchy>(preyEntity);
+
+		for (const Entity child : hierarchy.children)
+			KillRecursively(entityManager, child);
+	}
+
+	entityManager.Kill(preyEntity);
+}
+
 [[nodiscard]] static float CalculateGrowthFactor(const float predatorMass, const float preyMass)
 {
 	// Linear proportionnal growth
@@ -70,7 +83,8 @@ static void AcuallyEat(
 	// Eat and kill
 	if (preyEatable.isApex) GameState::currentState = GameState::WON;
 	predatorEatable.mass += preyEatable.mass;
-	entityManager.Kill(preyEntity);
+
+	KillRecursively(entityManager, preyEntity);
 
 	// Grow the hitbox
 	auto currentShape = predatorBody.body->GetShape();
