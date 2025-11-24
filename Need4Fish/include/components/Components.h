@@ -13,7 +13,6 @@
 
 #include "rendering/core/Transform.h"
 #include "rendering/graphics/lights/PointLight.h"
-#include "rendering/graphics/Mesh.h"
 #include "rendering/graphics/Sprite2D.h"
 
 struct Name
@@ -32,13 +31,18 @@ struct Controllable
 	float maxSpeed;
 };
 
+struct MeshInstance
+{
+	UINT meshIndex;
+};
+
 // ===============================================================
 // Add new component types here to register them with the engine
 // ===============================================================
 
 using Components = std::tuple
 <
-	Mesh,
+	MeshInstance,
 	RigidBody,
 	Transform,
 	Hierarchy,

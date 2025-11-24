@@ -29,7 +29,7 @@ EntityManager EntityManagerFactory::Create(const SceneResource& sceneResource)
 		entityManager.AddComponent<Name>(entity, node.name);
 
 		if (node.meshIndex != UINT32_MAX)
-			entityManager.AddComponent<Mesh>(entity, sceneResource.meshes[node.meshIndex]);
+			entityManager.AddComponent<MeshInstance>(entity, MeshInstance{ .meshIndex = node.meshIndex });
 
 		// Set parent entity to node parent or root entity if he is orphan
 		const Entity parentEntity = node.parentIndex == UINT32_MAX ? rootEntity : entities[node.parentIndex];

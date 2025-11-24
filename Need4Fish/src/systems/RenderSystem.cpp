@@ -60,9 +60,10 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 
 	renderer.UpdateFrameBuffer(frameBuffer);
 
-	for (const auto& [entity, transform, mesh] : entityManager.View<Transform, Mesh>())
+	for (const auto& [entity, transform, meshInstance] : entityManager.View<Transform, MeshInstance>())
 	{
 		// Check if the mesh should be rendered or not
+		auto& mesh = Locator::Get<ResourceManager>().GetMesh(meshInstance.meshIndex);
 		if (FrustumCuller::IsMeshCulled(mesh, transform, static_cast<BaseCameraData>(currentCamera)))
 			continue;
 

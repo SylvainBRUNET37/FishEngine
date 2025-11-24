@@ -6,12 +6,16 @@
 #include "entities/EntityManager.h"
 
 #include "json.hpp"
+#include "Locator.h"
+#include "resources/ResourceManager.h"
 
 void ComponentFactory::CreateRigidBody(const nlohmann::json& componentData, EntityManager& entityManager,
                                        const Entity& entity)
 {
 	const auto& transform = entityManager.Get<Transform>(entity);
-	const auto& mesh = entityManager.Get<Mesh>(entity);
+	const auto& meshInstance = entityManager.Get<MeshInstance>(entity);
+
+	const auto& mesh = Locator::Get<ResourceManager>().GetMesh(meshInstance.meshIndex);
 
 	if (componentData["type"] == "meshShape")
 		entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateMeshShape(transform, mesh));
