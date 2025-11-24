@@ -16,23 +16,6 @@ struct SpriteElement {
 
 	std::function<void()> clickFunction = []{};
 
-	/*SpriteElement(const Sprite2D& sprite) : sprite(sprite) {}
-	SpriteElement(const Sprite2D& sprite, const Sprite2D& secondSprite, bool isHover) : sprite(sprite)
-	{
-		if (isHover)
-			hoverSprite = secondSprite;
-		else
-			clickSprite = secondSprite;
-	}
-
-	SpriteElement(const Sprite2D& sprite, const Sprite2D& hoverSprite, const Sprite2D& clickSprite, std::function<void()> clickFunction)
-		: sprite(sprite),
-		hoverSprite(hoverSprite),
-		clickSprite(clickSprite),
-		clickFunction(clickFunction)
-	{
-	}*/
-
 	void SetHoverSprite(const Sprite2D& hs) {
 		hoverSprite = hs;
 	}
