@@ -115,6 +115,7 @@ void GameEngine::ChangeGameStatus()
 		ResumeGame();
 		break;
 	case GameState::PLAYING:
+		ShowCursor(TRUE);
 		PauseGame();
 		break;
 	case GameState::WON:
@@ -134,7 +135,7 @@ void GameEngine::ResumeGame()
 void GameEngine::PauseGame()
 {
 	uiManager->Clear();
-	ShowCursor(TRUE);
+	//ShowCursor(TRUE);
 	Camera::isMouseCaptured = false;
 
 	ClipCursor(nullptr);
@@ -142,18 +143,29 @@ void GameEngine::PauseGame()
 
 	GameState::currentState = GameState::PAUSED;
 	
-	// Position
-	float positionX = 400.0f;
-	float positionY = 400.0f;
-
 	uiManager->AddSprite({
 		.sprite = uiManager->LoadSprite("assets/ui/testPause.png"),
 		});
 
 	uiManager->AddSprite({
-		.sprite = uiManager->LoadSprite("assets/ui/testResume.png", positionX, positionY),
+		.sprite = uiManager->LoadSprite("assets/ui/testResume.png", 0.0f, 300.0f),
 		.clickFunction = [this] { ChangeGameStatus(); }
 	});
+
+	// TODO: revoir ça
+	uiManager->AddSprite({
+		.sprite = uiManager->LoadSprite("assets/ui/testOptions.png", 0.f, 600.0f),
+		.clickFunction = [this] {
+				uiManager->Clear();
+				uiManager->AddSprite({
+					.sprite = uiManager->LoadSprite("assets/ui/testOptions.png"),
+				});
+				uiManager->AddSprite({
+					.sprite = uiManager->LoadSprite("assets/ui/testBack.png", 800.0f, 500.0f),
+					.clickFunction = [this] { PauseGame(); }
+				});
+			}
+		});
 
 }
 
