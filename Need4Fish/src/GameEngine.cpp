@@ -148,21 +148,28 @@ void GameEngine::PauseGame()
 		});
 
 	uiManager->AddSprite({
-		.sprite = uiManager->LoadSprite("assets/ui/testResume.png", 0.0f, 300.0f),
-		.clickFunction = [this] { ChangeGameStatus(); }
+		.sprite = uiManager->LoadSprite("assets/ui/testResume.png", 0.0f, 300.0f, 0.0f),
+		.onClick = [this] { ChangeGameStatus(); }
 	});
 
 	// TODO: revoir ça
 	uiManager->AddSprite({
-		.sprite = uiManager->LoadSprite("assets/ui/testOptions.png", 0.f, 600.0f),
-		.clickFunction = [this] {
+		.sprite = uiManager->LoadSprite("assets/ui/testOptions.png", 0.f, 600.0f, 0.0f),
+		.onClick = [this] {
 				uiManager->Clear();
 				uiManager->AddSprite({
 					.sprite = uiManager->LoadSprite("assets/ui/testOptions.png"),
 				});
 				uiManager->AddSprite({
-					.sprite = uiManager->LoadSprite("assets/ui/testBack.png", 800.0f, 500.0f),
-					.clickFunction = [this] { PauseGame(); }
+					.sprite = uiManager->LoadSprite("assets/ui/testBack.png", 800.0f, 500.0f, 0.0f),
+					.onClick = [this] { PauseGame(); }
+					});
+				uiManager->AddSprite({
+					.sprite = uiManager->LoadSprite("assets/ui/testUnchecked.png", 800.0f, 200.0f, 0.0f),
+					.clickSprite = uiManager->LoadSprite("assets/ui/testChecked.png", 800.0f, 200.0f, 0.0f),
+					.clickDelay = 0.1f,
+					.onClick = [] { std::cout << "clicked" << std::endl; },
+					.isCheckBox = true,
 				});
 			}
 		});
@@ -187,9 +194,10 @@ void GameEngine::EndGame()
 
 	float positionX = 400.0f;
 	float positionY = 400.0f;
+	float positionZ = 0.0f;
 	uiManager->AddSprite({
-		.sprite = uiManager->LoadSprite("assets/ui/testRestart.png", positionX, positionY),
-		.clickFunction = [this] { RestartGame(); }
+		.sprite = uiManager->LoadSprite("assets/ui/testRestart.png", positionX, positionY, positionZ),
+		.onClick = [this] { RestartGame(); }
 		});
 
 }

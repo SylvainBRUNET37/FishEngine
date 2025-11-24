@@ -11,10 +11,13 @@ struct SpriteElement {
 	std::optional<Sprite2D> hoverSprite = std::nullopt;
 	std::optional<Sprite2D> clickSprite = std::nullopt;
 
-	const float CLICK_DELAY = 0.5f;
+	float clickDelay = 1.0f;
+
 	float remainingDelay = 0.0f;
 
-	std::function<void()> clickFunction = []{};
+	std::function<void()> onClick = []{};
+
+	bool isCheckBox = false;
 
 	void SetHoverSprite(const Sprite2D& hs) {
 		hoverSprite = hs;
@@ -25,26 +28,28 @@ struct SpriteElement {
 	}
 
 	void SetClickFunction(std::function<void()> clickFunction_) {
-		clickFunction = clickFunction_;
+		onClick = clickFunction_;
+	}
+
+	void InvertBaseAndClickSprites() {
+		if (clickSprite.has_value()) {
+			auto tmp = sprite;
+			sprite = clickSprite.value();
+			clickSprite = tmp;
+		}
 	}
 
 	Sprite2D UpdateAndGetDisplayedSprite() {
-		remainingDelay -= 1.0f / 60.0f; // ignoble
-		if (clickSprite.has_value() && remainingDelay > 0.0f)
+		//remainingDelay -= 1.0f / 60.0f; // ignoble
+		remainingDelay = (remainingDelay >= 1.0f / 60.0f) ? remainingDelay - 1.0f / 60.0f : 0.0f;
+		if (clickSprite.has_value() && remainingDelay > 0.0f && !isCheckBox)
+		{
 			return clickSprite.value();
+		}
 		else if (hoverSprite.has_value() && isHovered())
 			return hoverSprite.value();
 		else
 			return sprite;
-	}
-
-	void onClick() {
-
-		if (isHovered())
-		{
-			remainingDelay = CLICK_DELAY;
-			clickFunction();
-		}
 	}
 
 	bool isHovered() const {

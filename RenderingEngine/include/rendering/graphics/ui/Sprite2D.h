@@ -12,6 +12,7 @@ struct Sprite2D
     {
         float x;
         float y;
+        float z;
     };
 
     explicit Sprite2D(const ShaderProgram& shaderProgram, const Texture& texture, ID3D11Device* device);

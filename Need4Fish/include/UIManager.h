@@ -11,15 +11,13 @@ class UIManager
 
 	std::vector<SpriteElement> sprites;
 
-	bool clearRequested = false;
-
 public:
 	explicit UIManager(ID3D11Device* device);
 
 	[[nodiscard]] std::vector<Sprite2D> GetSprites();
 
 	[[nodiscard]] Sprite2D LoadSprite(const std::string& filePath) const;
-	[[nodiscard]] Sprite2D LoadSprite(const std::string& filePath, float positionX, float positionY) const;
+	[[nodiscard]] Sprite2D LoadSprite(const std::string& filePath, float positionX, float positionY, float positionZ) const;
 	
 	void AddSprite(const SpriteElement& sprite);
 	void Clear();
