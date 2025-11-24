@@ -86,8 +86,8 @@ void GameEngine::HandleGameState()
 	// Restart the game if has been was pressed
 	if (GetAsyncKeyState('R') & 0x8000 && GameState::currentState != GameState::PAUSED)
 	{
-		if (GameState::currentState != GameState::PLAYING) ResumeGame();
-		InitGame();
+		uiManager->Clear();
+		RestartGame();
 	}
 	
 	if (isEscapePressed && !wasEscapePressed && isPausableOrResumable)
@@ -143,8 +143,8 @@ void GameEngine::PauseGame()
 	GameState::currentState = GameState::PAUSED;
 	
 	// Position
-	float positionX = 200.0f;
-	float positionY = 200.0f;
+	float positionX = 400.0f;
+	float positionY = 400.0f;
 
 	uiManager->AddSprite("assets/ui/testPause.png");
 	uiManager->AddSprite("assets/ui/testResume.png", positionX, positionY);
@@ -160,8 +160,22 @@ void GameEngine::EndGame()
 	ClipCursor(nullptr);
 	ReleaseCapture();
 
-	const std::string sprite = (GameState::currentState == GameState::DIED) ?  "assets/ui/deathTitle.png" : "assets/ui/winTitle.png";
+	//const std::string sprite = (GameState::currentState == GameState::DIED) ?  "assets/ui/deathTitle.png" : "assets/ui/winTitle.png";
+	const std::string sprite = (GameState::currentState == GameState::DIED) ? "assets/ui/testDeath.png" : "assets/ui/testWin.png";
+
 	uiManager->AddSprite(sprite);
+	float positionX = 400.0f;
+	float positionY = 400.0f;
+	uiManager->AddSprite("assets/ui/testRestart.png", positionX, positionY);
+	uiManager->AddClickFunction("assets/ui/testRestart.png", [this] { uiManager->RequestClear(); RestartGame(); });
+	
+	uiManager->AddSprite(sprite);
+}
+
+void GameEngine::RestartGame()
+{
+	if (GameState::currentState != GameState::PLAYING) ResumeGame();
+	InitGame();
 }
 
 // TODO: Init it properly

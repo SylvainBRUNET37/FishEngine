@@ -34,6 +34,7 @@ private:
 	void ResumeGame();
 	void PauseGame();
 	void EndGame();
+	void RestartGame();
 
 	void InitGame();
 };
