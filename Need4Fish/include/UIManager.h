@@ -3,12 +3,13 @@
 
 #include "resources/ResourceManager.h"
 #include "rendering/graphics/ui/SpriteElement.h"
+#include <vector>
 
 class UIManager
 {
 	ID3D11Device* device;
 
-	std::unordered_map<std::string, SpriteElement> sprites;
+	std::vector<SpriteElement> sprites;
 
 	bool clearRequested = false;
 
@@ -20,16 +21,8 @@ public:
 	[[nodiscard]] Sprite2D LoadSprite(const std::string& filePath) const;
 	[[nodiscard]] Sprite2D LoadSprite(const std::string& filePath, float positionX, float positionY) const;
 	
-	void AddSprite(const std::string& filePath, float positionX, float positionY);
-	void AddSprite(const std::string& filePath);
-	void RemoveSprite(std::string& filePath);
+	void AddSprite(const SpriteElement& sprite);
 	void Clear();
-	void RequestClear();
-
-	void AddHoverSprite(const std::string& filePath, const std::string& hoverFilePath);
-	void AddClickSprite(const std::string& filePath, const std::string& clickFilePath);
-	void AddClickFunction(const std::string& filePath, std::function<void()>);
-
 	void HandleClick();
 
 };

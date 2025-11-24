@@ -29,24 +29,14 @@ Sprite2D UIManager::LoadSprite(const std::string& filePath, float positionX, flo
 
 [[nodiscard]] std::vector<Sprite2D> UIManager::GetSprites() {
 	std::vector<Sprite2D> displayedSprites{};
-	for (auto& pair : sprites)
-		displayedSprites.emplace_back(pair.second.UpdateAndGetDisplayedSprite());
+	for (auto& sprite : sprites)
+		displayedSprites.emplace_back(sprite.UpdateAndGetDisplayedSprite());
 	return displayedSprites;
 }
 
-void UIManager::AddSprite(const std::string& filePath, float positionX, float positionY)
+void UIManager::AddSprite(const SpriteElement& sprite)
 {
-	sprites.emplace(filePath, LoadSprite(filePath, positionX, positionY));
-}
-
-void UIManager::AddSprite(const std::string& filePath)
-{
-	AddSprite(filePath, 0.0f, 0.0f);
-}
-
-void UIManager::RemoveSprite(std::string& filePath)
-{
-	sprites.erase(filePath);
+	sprites.emplace_back(sprite);
 }
 
 void UIManager::Clear()
@@ -54,45 +44,9 @@ void UIManager::Clear()
 	sprites.clear();
 }
 
-void UIManager::RequestClear() {
-	clearRequested = true;
-}
-
-void UIManager::AddHoverSprite(const std::string& filePath, const std::string& hoverFilePath)
-{
-	auto it = sprites.find(filePath);
-	if (it == sprites.end())
-		return;
-
-	Sprite2D hoverSprite = LoadSprite(hoverFilePath);
-	it->second.SetHoverSprite(hoverSprite);
-}
-
-void UIManager::AddClickSprite(const std::string& filePath, const std::string& clickFilePath)
-{
-	auto it = sprites.find(filePath);
-	if (it == sprites.end())
-		return;
-
-	Sprite2D clickSprite = LoadSprite(clickFilePath);
-	it->second.SetClickSprite(clickSprite);
-}
-
-void UIManager::AddClickFunction(const std::string& filePath, std::function<void()> clickFunction)
-{
-	auto it = sprites.find(filePath);
-	if (it == sprites.end())
-		return;
-
-	it->second.SetClickFunction(clickFunction);
-}
-
 void UIManager::HandleClick() {
-	for (auto& pair : sprites)
-		pair.second.onClick();
-	if (clearRequested)
-	{
-		clearRequested = false;
-		Clear();
-	}
+	std::vector<SpriteElement> spritesCopy = sprites;
+
+	for (auto& sprite : spritesCopy)
+		sprite.onClick();
 }

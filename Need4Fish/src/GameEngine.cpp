@@ -113,7 +113,6 @@ void GameEngine::ChangeGameStatus()
 	{
 	case GameState::PAUSED:
 		ResumeGame();
-		uiManager->Clear();
 		break;
 	case GameState::PLAYING:
 		PauseGame();
@@ -129,6 +128,7 @@ void GameEngine::ResumeGame()
 {
 	CameraSystem::SetMouseCursor();
 	GameState::currentState = GameState::PLAYING;
+	uiManager->Clear();
 }
 
 void GameEngine::PauseGame()
@@ -146,9 +146,15 @@ void GameEngine::PauseGame()
 	float positionX = 400.0f;
 	float positionY = 400.0f;
 
-	uiManager->AddSprite("assets/ui/testPause.png");
-	uiManager->AddSprite("assets/ui/testResume.png", positionX, positionY);
-	uiManager->AddClickFunction("assets/ui/testResume.png", [this] { uiManager->RequestClear(); ResumeGame(); });
+	uiManager->AddSprite({
+		.sprite = uiManager->LoadSprite("assets/ui/testPause.png"),
+		});
+
+	uiManager->AddSprite({
+		.sprite = uiManager->LoadSprite("assets/ui/testResume.png", positionX, positionY),
+		.clickFunction = [this] { ChangeGameStatus(); }
+	});
+
 }
 
 void GameEngine::EndGame()
@@ -163,17 +169,22 @@ void GameEngine::EndGame()
 	//const std::string sprite = (GameState::currentState == GameState::DIED) ?  "assets/ui/deathTitle.png" : "assets/ui/winTitle.png";
 	const std::string sprite = (GameState::currentState == GameState::DIED) ? "assets/ui/testDeath.png" : "assets/ui/testWin.png";
 
-	uiManager->AddSprite(sprite);
+	uiManager->AddSprite({
+			.sprite = uiManager->LoadSprite(sprite),
+		});
+
 	float positionX = 400.0f;
 	float positionY = 400.0f;
-	uiManager->AddSprite("assets/ui/testRestart.png", positionX, positionY);
-	uiManager->AddClickFunction("assets/ui/testRestart.png", [this] { uiManager->RequestClear(); RestartGame(); });
-	
-	uiManager->AddSprite(sprite);
+	uiManager->AddSprite({
+		.sprite = uiManager->LoadSprite("assets/ui/testRestart.png", positionX, positionY),
+		.clickFunction = [this] { RestartGame(); }
+		});
+
 }
 
 void GameEngine::RestartGame()
 {
+	uiManager->Clear();
 	if (GameState::currentState != GameState::PLAYING) ResumeGame();
 	InitGame();
 }

@@ -5,19 +5,18 @@
 #include <optional>
 #include <functional>
 
-class SpriteElement {
+struct SpriteElement {
 	Sprite2D sprite;
 
 	std::optional<Sprite2D> hoverSprite = std::nullopt;
 	std::optional<Sprite2D> clickSprite = std::nullopt;
 
-	const float clickDelay = 0.5f;
+	const float CLICK_DELAY = 0.5f;
 	float remainingDelay = 0.0f;
 
 	std::function<void()> clickFunction = []{};
 
-public:
-	SpriteElement(const Sprite2D& sprite) : sprite(sprite) {}
+	/*SpriteElement(const Sprite2D& sprite) : sprite(sprite) {}
 	SpriteElement(const Sprite2D& sprite, const Sprite2D& secondSprite, bool isHover) : sprite(sprite)
 	{
 		if (isHover)
@@ -32,7 +31,7 @@ public:
 		clickSprite(clickSprite),
 		clickFunction(clickFunction)
 	{
-	}
+	}*/
 
 	void SetHoverSprite(const Sprite2D& hs) {
 		hoverSprite = hs;
@@ -60,12 +59,11 @@ public:
 
 		if (isHovered())
 		{
-			remainingDelay = clickDelay;
+			remainingDelay = CLICK_DELAY;
 			clickFunction();
 		}
 	}
 
-private:
 	bool isHovered() const {
 		POINT currentCursorCoordinates;
 
