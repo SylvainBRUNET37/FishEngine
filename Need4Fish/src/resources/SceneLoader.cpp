@@ -81,11 +81,14 @@ SceneResource SceneLoader::LoadScene(const filesystem::path& filePath, const Sha
 			ProcessMaterial(filePath.parent_path(), scene, scene->mMaterials[i], shaderBank));
 
 	// Build node hierarchy
+	nodes.reserve(scene->mNumMeshes);
 	sceneRes.nodes.reserve(scene->mNumMeshes);
 	ProcessNodeHierarchy(scene->mRootNode, scene, UINT32_MAX, sceneRes);
 
 	// Process lights
 	ProcessLights(scene, sceneRes);
+
+	nodes = {}; // reset node map
 
 	return sceneRes;
 }
@@ -140,6 +143,8 @@ void SceneLoader::ProcessNodeHierarchy(
 	// Add this node to scene and get its index
 	const uint32_t currentIndex = static_cast<uint32_t>(sceneRes.nodes.size());
 	sceneRes.nodes.push_back(node);
+
+	nodes.emplace(node.name, sceneRes.nodes.size() - 1); // store node name and place in a map
 
 	// Recursively process children
 	for (unsigned int i = 0; i < aiNode->mNumChildren; i++)
@@ -323,6 +328,10 @@ DirectionalLight SceneLoader::ProcessDirectionalLights(const aiLight* light)
 PointLight SceneLoader::ProcessPointLights(const aiLight* light, const aiScene* scene)
 {
 	const auto node = scene->mRootNode->FindNode(light->mName);
+	const auto nodeIt = nodes.find(light->mName.C_Str());
+
+	if (nodeIt == nodes.end())
+		throw std::runtime_error("SceneLoader::ProcessPointLights: Cannot find the node for a point light");
 
 	aiVector3D scaling, position;
 	aiQuaternion rotation;
@@ -338,6 +347,7 @@ PointLight SceneLoader::ProcessPointLights(const aiLight* light, const aiScene* 
 		.position = AiColorToXMFLOAT3(position),
 		// The world scale is high so quadratic attenuation should be very low
 		// The division per 100 is an ajustement to make the light attenuation look like Blender one
-		.attenuation = {1.0f, 0.0f, (intensity == 0 ? 0 : 1 / (intensity / 100))}
+		.attenuation = {1.0f, 0.0f, (intensity == 0 ? 0 : 1 / (intensity / 100))},
+		.nodeId = nodeIt->second // store the nodeId to add the light component to it
 	};
 }

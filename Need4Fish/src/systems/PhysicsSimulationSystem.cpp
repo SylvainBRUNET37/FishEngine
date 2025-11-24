@@ -41,14 +41,14 @@ void PhysicsSimulationSystem::UpdateControllables(EntityManager& entityManager)
 	{
 		activeCamera = &camera;
 		break;
-	}	
+	}
 
 	for (const auto& [entity, rigidBody, controllable] : entityManager.View<RigidBody, Controllable>())
 	{
 		const auto& transform = rigidBody.body->GetWorldTransform();
-		JPH::Vec3 right = transform.GetColumn3(0).Normalized();
-		JPH::Vec3 up = transform.GetColumn3(1).Normalized();
-		JPH::Vec3 forward = transform.GetColumn3(2).Normalized();
+		Vec3 right = transform.GetColumn3(0).Normalized();
+		Vec3 up = transform.GetColumn3(1).Normalized();
+		Vec3 forward = transform.GetColumn3(2).Normalized();
 
 		// Pour le roll sur A et D
 		static float inputRoll = 0.0f;
@@ -58,12 +58,14 @@ void PhysicsSimulationSystem::UpdateControllables(EntityManager& entityManager)
 		{
 			RotateTowardsCameraDirection(rigidBody, *activeCamera, forward, inputRoll);
 
-			if (WindowsApplication::mouseWheelDelta != 0) {
+			if (WindowsApplication::mouseWheelDelta != 0)
+			{
 				const float oldDistance = activeCamera->distance;
 
 				activeCamera->distance -= WindowsApplication::mouseWheelDelta * 0.01f * activeCamera->zoomSpeed;
-				activeCamera->distance = std::clamp(activeCamera->distance, activeCamera->minDistance, activeCamera->maxDistance);
-				
+				activeCamera->distance = std::clamp(activeCamera->distance, activeCamera->minDistance,
+				                                    activeCamera->maxDistance);
+
 				if (oldDistance > activeCamera->minDistance && activeCamera->distance <= activeCamera->minDistance)
 				{
 					activeCamera->mode = Camera::CameraMode::FIRST_PERSON;
@@ -76,8 +78,8 @@ void PhysicsSimulationSystem::UpdateControllables(EntityManager& entityManager)
 			}
 		}
 
-		JPH::Vec3 currentSpeed = JoltSystem::GetBodyInterface().GetLinearVelocity(rigidBody.body->GetID());
-		JPH::Vec3 newSpeed = currentSpeed;
+		Vec3 currentSpeed = JoltSystem::GetBodyInterface().GetLinearVelocity(rigidBody.body->GetID());
+		Vec3 newSpeed = currentSpeed;
 		bool speedChanged = false;
 
 		// Reset du roll
@@ -110,7 +112,7 @@ void PhysicsSimulationSystem::UpdateControllables(EntityManager& entityManager)
 		{
 			if (newSpeed.Length() > controllable.maxSpeed)
 				newSpeed = newSpeed.Normalized() * controllable.maxSpeed;
-			JoltSystem::GetBodyInterface().SetLinearVelocity(rigidBody.body->GetID(), newSpeed);			
+			JoltSystem::GetBodyInterface().SetLinearVelocity(rigidBody.body->GetID(), newSpeed);
 		}
 	}
 }
@@ -134,10 +136,10 @@ void PhysicsSimulationSystem::UpdatePhysics()
 void PhysicsSimulationSystem::RotateTowardsCameraDirection(
 	RigidBody& rigidBody,
 	const Camera& camera,
-	JPH::Vec3 forward,
+	Vec3 forward,
 	float inputRoll)
 {
-	const JPH::Vec3 worldUp(0.0f, 1.0f, 0.0f);
+	const Vec3 worldUp(0.0f, 1.0f, 0.0f);
 
 	// Stockage du pitch et roll entre les frames
 	static float currentPitch = 0.0f;
@@ -146,12 +148,13 @@ void PhysicsSimulationSystem::RotateTowardsCameraDirection(
 	const float currentYaw = atan2f(forward.GetX(), forward.GetZ());
 
 	// Pour calculer yawDiff pour le roll
-	auto shortestAngle = [](float from, float to) {
+	auto shortestAngle = [](float from, float to)
+	{
 		float d = to - from;
-		while (d > JPH::JPH_PI) d -= 2.0f * JPH::JPH_PI;
-		while (d < -JPH::JPH_PI) d += 2.0f * JPH::JPH_PI;
+		while (d > JPH_PI) d -= 2.0f * JPH_PI;
+		while (d < -JPH_PI) d += 2.0f * JPH_PI;
 		return d;
-		};
+	};
 
 	float newYaw, newPitch;
 	float yawDiff = 0.0f; //Pour les roll
@@ -162,7 +165,7 @@ void PhysicsSimulationSystem::RotateTowardsCameraDirection(
 		newYaw = currentYaw + camera.yawOffset;
 		newPitch = camera.pitchAngle;
 		currentPitch = newPitch; // Pour éviter un saut lors du retour en 3e personne
-	
+
 		yawDiff = camera.yawOffset;
 	}
 	else // En troisième personne : rotation progressive
@@ -183,35 +186,36 @@ void PhysicsSimulationSystem::RotateTowardsCameraDirection(
 	}
 
 	// Quats de rotation
-	JPH::Quat yawQuat = JPH::Quat::sRotation(worldUp, newYaw);
-	JPH::Vec3 right = yawQuat * JPH::Vec3::sAxisX();
-	JPH::Quat pitchQuat = JPH::Quat::sRotation(right, currentPitch);
+	Quat yawQuat = Quat::sRotation(worldUp, newYaw);
+	Vec3 right = yawQuat * Vec3::sAxisX();
+	Quat pitchQuat = Quat::sRotation(right, currentPitch);
 
 	// Rotation combinée yaw + pitch
-	JPH::Quat finalRotation = (pitchQuat * yawQuat).Normalized();
+	Quat finalRotation = (pitchQuat * yawQuat).Normalized();
 
 	// Appliquer le roll ensuite (souris + A et D)
-	JPH::Vec3 forwardAxis = finalRotation * JPH::Vec3::sAxisZ();
-	JPH::Quat rollQuat = JPH::Quat::sRotation(forwardAxis, GetTargetRoll(yawDiff, inputRoll));
+	Vec3 forwardAxis = finalRotation * Vec3::sAxisZ();
+	Quat rollQuat = Quat::sRotation(forwardAxis, GetTargetRoll(yawDiff, inputRoll));
 
 	finalRotation = (rollQuat * finalRotation).Normalized();
 
 	JoltSystem::GetBodyInterface().SetRotation(
 		rigidBody.body->GetID(),
 		finalRotation,
-		JPH::EActivation::Activate
+		EActivation::Activate
 	);
 }
 
 
 void PhysicsSimulationSystem::UpdateTransforms(EntityManager& entityManager)
 {
+	// Update transforms from physics
 	for (const auto& [entity, transform, rigidBody] : entityManager.View<Transform, RigidBody>())
 	{
 		// Get jolt transform data
-		const JPH::RMat44& joltTransform = rigidBody.body->GetWorldTransform();
-		const JPH::Vec3 joltPos = joltTransform.GetTranslation();
-		const JPH::Quat joltRot = joltTransform.GetQuaternion();
+		const RMat44& joltTransform = rigidBody.body->GetWorldTransform();
+		const Vec3 joltPos = joltTransform.GetTranslation();
+		const Quat joltRot = joltTransform.GetQuaternion();
 
 		transform.position = {joltPos.GetX(), joltPos.GetY(), joltPos.GetZ()};
 		transform.rotation = {joltRot.GetX(), joltRot.GetY(), joltRot.GetZ(), joltRot.GetW()};
@@ -223,6 +227,23 @@ void PhysicsSimulationSystem::UpdateTransforms(EntityManager& entityManager)
 		                                                   transform.position.z);
 
 		transform.world = scaleMatrix * rotationMatrix * translationMatrix;
+	}
+
+	// Update transform from hierarchy
+	for (const auto& [entity, transform, hierarchy] : entityManager.View<Transform, Hierarchy>())
+	{
+		if (hierarchy.parent == INVALID_ENTITY)
+			continue;
+
+		const auto& parentTransform = entityManager.Get<Transform>(hierarchy.parent);
+
+		// Compute local matrix elements
+		const XMMATRIX S = XMMatrixScaling(transform.scale.x, transform.scale.y, transform.scale.z);
+		const XMMATRIX R = XMMatrixRotationQuaternion(XMLoadFloat4(&transform.rotation));
+		const XMMATRIX T = XMMatrixTranslation(transform.position.x, transform.position.y, transform.position.z);
+
+		transform.world = S * R * T;
+		transform.world *= parentTransform.world;
 	}
 }
 

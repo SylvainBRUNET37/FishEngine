@@ -12,7 +12,7 @@ struct alignas(16) PointLight
     DirectX::XMFLOAT3 position;
     float range; // not used yet but may be useful in the future
     DirectX::XMFLOAT3 attenuation;
-    float pad; // alignment
+    uint32_t nodeId;
 };
 
 #endif

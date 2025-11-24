@@ -27,10 +27,20 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 
 	renderer.RenderScene();
 
-	// Add point lights to the frame buffer
+	// Add point lights to the frame buffer and update their position
 	frameBuffer.pointLightCount = 0;
-	for (const auto& [entity, pointLight] : entityManager.View<PointLight>())
+	for (const auto& [entity, pointLight, transform] : entityManager.View<PointLight, Transform>())
 	{
+		// Extract position
+		const XMVECTOR lightPos = transform.world.r[3];
+
+		// Store it as float3
+		XMFLOAT3 lightPosFloat3;
+		XMStoreFloat3(&lightPosFloat3, lightPos);
+
+		// Update position
+		pointLight.position = lightPosFloat3;
+
 		if (frameBuffer.pointLightCount >= FrameBuffer::MAX_POINT_LIGHTS)
 			throw runtime_error(
 				std::format(
