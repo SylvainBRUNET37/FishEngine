@@ -164,11 +164,20 @@ void GameEngine::PauseGame()
 					.sprite = uiManager->LoadSprite("assets/ui/testBack.png", 800.0f, 500.0f, 0.0f),
 					.onClick = [this] { PauseGame(); }
 					});
+
+				bool isChecked = Camera::invertCamRotation;
+
+				std::string spriteFile = (isChecked) ? "assets/ui/testChecked.png" : "assets/ui/testUnchecked.png";
+				std::string clickFile = (!isChecked) ? "assets/ui/testChecked.png" : "assets/ui/testUnchecked.png";
+
 				uiManager->AddSprite({
-					.sprite = uiManager->LoadSprite("assets/ui/testUnchecked.png", 800.0f, 200.0f, 0.0f),
-					.clickSprite = uiManager->LoadSprite("assets/ui/testChecked.png", 800.0f, 200.0f, 0.0f),
+					.sprite = uiManager->LoadSprite(spriteFile, 800.0f, 200.0f, 0.0f),
+					.clickSprite = uiManager->LoadSprite(clickFile, 800.0f, 200.0f, 0.0f),
 					.clickDelay = 0.1f,
-					.onClick = [] { std::cout << "clicked" << std::endl; },
+					.onClick = [] {
+						Camera::invertCamRotation ^= 1;
+						std::cout << Camera::invertCamRotation << std::endl;
+					}, // Theo's dark magic for boolean inversion
 					.isCheckBox = true,
 				});
 			}

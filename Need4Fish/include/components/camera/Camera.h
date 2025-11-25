@@ -37,7 +37,7 @@ struct Camera : public BaseCameraData
 	inline static float zoomSpeed;
 
 	// Inversion des contrôles/caméra
-	bool invertCamRotation = false;
+	inline static bool invertCamRotation = false;
 
 	// Mode de caméra actuel
 	inline static CameraMode mode = CameraMode::THIRD_PERSON;
