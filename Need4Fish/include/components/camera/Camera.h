@@ -44,6 +44,14 @@ struct Camera : public BaseCameraData
 
 	// Offset pour que la caméra 1ère personne soit bien placée (à ajuster potentiellement)
 	inline static DirectX::XMFLOAT3 firstPersonOffset;
+
+	// Pour les ajustements progressifs de la caméra
+	inline static float deltaDistance;
+	inline static float deltaHeightOffset;
+	inline static float deltaMinDistance;
+	inline static float deltaMaxDistance;
+	inline static float deltaZoomSpeed;
+	inline static float cameraScaleStep;
 };
 #endif
 
