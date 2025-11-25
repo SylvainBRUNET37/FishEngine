@@ -15,6 +15,9 @@ class CameraSystem : public System
 	static void HandleRotation(Camera& cameraData);
 	static void Rotate(Camera& cameraData, float yawDelta, float pitchDelta);
 
+	static float PerformSpringArmRaycast(const DirectX::XMVECTOR& start, const DirectX::XMVECTOR& end, float maxDistance);
+	static float Lerp(float a, float b, float t);
+
 public:
 	static void SetMouseCursor();
 	static void ScaleCamera(float scaleFactor);
