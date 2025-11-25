@@ -7,9 +7,9 @@ class CameraSystem : public System
 {
 	void Update(double, EntityManager& entityManager) override;
 
-	static void UpdateCameraMatrices(Camera& camera, const EntityManager& entityManager);
+	static void UpdateCameraMatrices(Camera& camera, const EntityManager& entityManager, float dt);
 
-	static void ComputeCameraPosition(Camera& camera, const Transform& transform);
+	static void ComputeCameraPosition(Camera& camera, const Transform& transform, float dt);
 	static void ComputeCameraOrientation(Camera& camera);
 
 	static void HandleRotation(Camera& cameraData);

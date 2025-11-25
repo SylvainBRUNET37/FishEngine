@@ -14,19 +14,19 @@
 
 using namespace DirectX;
 
-void CameraSystem::Update(double, EntityManager& entityManager)
+void CameraSystem::Update(double dt, EntityManager& entityManager)
 {
 	if (GameState::currentState == GameState::PLAYING)
 	{
 		for (const auto& [entity, camera] : entityManager.View<Camera>())
 		{
 			HandleRotation(camera);
-			UpdateCameraMatrices(camera, entityManager);
+			UpdateCameraMatrices(camera, entityManager, static_cast<float>(dt));
 		}
 	}
 }
 
-void CameraSystem::ComputeCameraPosition(Camera& camera, const Transform& transform)
+void CameraSystem::ComputeCameraPosition(Camera& camera, const Transform& transform, float dt)
 {
 	const XMVECTOR targetPos = XMLoadFloat3(&transform.position);
 	const XMVECTOR targetRotQuat = XMLoadFloat4(&transform.rotation);
@@ -74,21 +74,29 @@ void CameraSystem::ComputeCameraPosition(Camera& camera, const Transform& transf
 		if (camera.enableSpringArm)
 		{
 			const float desiredDistance = camera.distance;
+
+			if (Camera::currentDistance <= 0.0f)
+				Camera::currentDistance = desiredDistance;
 			float actualDistance = PerformSpringArmRaycast(camera.focus, idealCameraPos, desiredDistance);
 
 			// Interpolation progressive vers la nouvelle distance
-			Camera::currentDistance = Lerp(Camera::currentDistance, actualDistance, camera.springArmSpeed * 0.016f); // Assume ~60fps
+			const float t = std::clamp(camera.springArmSpeed * dt, 0.0f, 1.0f);
+			Camera::currentDistance = Lerp(Camera::currentDistance, actualDistance, t);
 
 			// Recalculer la position avec la distance ajustée
-			const float adjustedHorizontalDist = Camera::currentDistance * cosf(camera.pitchAngle);
-			const float adjustedVerticalDist = Camera::currentDistance * sinf(camera.pitchAngle);
-
-			camera.position = XMVectorSet(
-				XMVectorGetX(camera.focus) - adjustedHorizontalDist * sinf(totalYaw),
-				XMVectorGetY(camera.focus) + adjustedVerticalDist + camera.heightOffset,
-				XMVectorGetZ(camera.focus) - adjustedHorizontalDist * cosf(totalYaw),
-				1.0f
-			);
+			XMVECTOR dir = XMVectorSubtract(idealCameraPos, camera.focus);
+			const float dirLen = XMVectorGetX(XMVector3Length(dir));
+			if (dirLen > 0.0001f)
+			{
+				dir = XMVector3Normalize(dir);
+				XMVECTOR newPos = XMVectorAdd(camera.focus, XMVectorScale(dir, Camera::currentDistance));
+				camera.position = XMVectorSetW(newPos, 1.0f);
+			}
+			else
+			{
+				// fallback si dir très petit
+				camera.position = idealCameraPos;
+			}
 		}
 		else
 		{
@@ -106,11 +114,11 @@ void CameraSystem::ComputeCameraOrientation(Camera& camera)
 	camera.up = XMVector3Normalize(XMVector3Cross(forward, right));
 }
 
-void CameraSystem::UpdateCameraMatrices(Camera& camera, const EntityManager& entityManager)
+void CameraSystem::UpdateCameraMatrices(Camera& camera, const EntityManager& entityManager, float dt)
 {
 	const auto targetTransform = entityManager.Get<Transform>(camera.targetEntity);
 
-	ComputeCameraPosition(camera, targetTransform);
+	ComputeCameraPosition(camera, targetTransform, dt);
 	ComputeCameraOrientation(camera);
 
 	camera.matView = XMMatrixLookAtRH(camera.position, camera.focus, camera.up);

@@ -55,7 +55,7 @@ struct Camera : public BaseCameraData
 
 	// Pour le SpringArm
 	inline static float currentDistance;  // Distance actuelle < distance si collision
-	inline static float springArmSpeed = 10.0f;
+	inline static float springArmSpeed = 50.0f;
 	inline static bool enableSpringArm = true;
 	inline static float cameraRadius = 2.0f;
 	inline static float collisionOffset = 1.0f;
