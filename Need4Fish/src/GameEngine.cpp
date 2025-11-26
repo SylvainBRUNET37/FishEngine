@@ -208,8 +208,9 @@ void GameEngine::BuildPauseMenu()
 {
 	uiManager->Clear();
 	// Pause title
+	auto sprite = uiManager->LoadSprite("assets/ui/pauseTitle.png");
 	uiManager->AddSprite({
-		.sprite = uiManager->LoadSprite("assets/ui/testPause.png"),
+		.sprite = Sprite2D(sprite),
 	});
 
 	// Resume Button
