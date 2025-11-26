@@ -91,7 +91,7 @@ void GameEngine::HandleGameState()
 		uiManager->Clear();
 		RestartGame();
 	}
-	
+
 	if (isEscapePressed && !wasEscapePressed && isPausableOrResumable)
 		ChangeGameStatus();
 
@@ -99,7 +99,7 @@ void GameEngine::HandleGameState()
 }
 
 void GameEngine::HandleCollions() {
-	
+
 	while (!GameState::detectedCollisions.empty())
 	{
 		auto& [bodyId1, bodyId2] = GameState::detectedCollisions.front();
@@ -209,32 +209,45 @@ void GameEngine::BuildPauseMenu()
 	uiManager->Clear();
 	// Pause title
 	auto sprite = uiManager->LoadSprite("assets/ui/pauseTitle.png");
+	uiManager->AlignSpriteXY(sprite, "center", "center");
 	uiManager->AddSprite({
-		.sprite = Sprite2D(sprite),
+		.sprite = sprite,
 	});
 
 	// Resume Button
+	sprite = uiManager->LoadSprite("assets/ui/testResume.png", 0.f, 0.f, 1.0f);
+	uiManager->AlignSpriteXY(sprite, "center", "center");
 	uiManager->AddSprite({
-		.sprite = uiManager->LoadSprite("assets/ui/testResume.png", 0.0f, 300.0f, 0.0f),
+		.sprite = sprite,
 		.onClick = [this] { ChangeGameStatus(); }
 	});
 
-	// Option Button
-	uiManager->AddSprite({
-		.sprite = uiManager->LoadSprite("assets/ui/testOptions.png", 0.f, 600.0f, 0.0f),
-		.onClick = [this] { BuildOptionMenu(); }
-	});
-
 	// Restart Button
+	sprite = uiManager->LoadSprite("assets/ui/testRestart.png", 0.f, 0.f, 1.0f);
+	uiManager->AlignSpriteXY(sprite, "center", "center");
+	uiManager->TranslateSpriteX(sprite, - 1.1f * sprite.texture.width);
 	uiManager->AddSprite({
-		.sprite = uiManager->LoadSprite("assets/ui/testRestart.png", 800.0f, 300.0f, 0.0f),
+		.sprite = sprite,
 		.onClick = [this] { RestartGame(); }
 	});
 
 	// Quit Button
+	sprite = uiManager->LoadSprite("assets/ui/testQuit.png", 0.f, 0.f, 1.0f);
+	uiManager->AlignSpriteXY(sprite, "center", "center");
+	uiManager->TranslateSpriteX(sprite, 1.1f * sprite.texture.width);
 	uiManager->AddSprite({
-		.sprite = uiManager->LoadSprite("assets/ui/testQuit.png", 800.0f, 0.0f, 0.0f),
+		.sprite = sprite,
 		.onClick = [this] { GameState::currentState = GameState::FINISHED; }
+	});
+
+	// Option Button
+	auto oldHeigth = sprite.texture.height;
+	sprite = uiManager->LoadSprite("assets/ui/testOptions.png", 0.f, 0.f, 2.0f);
+	uiManager->AlignSpriteXY(sprite, "center", "center");
+	uiManager->TranslateSpriteY(sprite, sprite.texture.height / 2.f + oldHeigth / 2.f + 15.f);
+	uiManager->AddSprite({
+		.sprite = sprite,
+		.onClick = [this] { BuildOptionMenu(); }
 	});
 }
 
@@ -249,7 +262,7 @@ void GameEngine::BuildOptionMenu()
 
 	// Back button
 	uiManager->AddSprite({
-		.sprite = uiManager->LoadSprite("assets/ui/testBack.png", 800.0f, 500.0f, 0.0f),
+		.sprite = uiManager->LoadSprite("assets/ui/testBack.png", 900.0f, 500.0f, 0.0f),
 		.onClick = [this] { PauseGame(); }
 	});
 

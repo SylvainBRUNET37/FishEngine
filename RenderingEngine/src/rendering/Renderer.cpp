@@ -96,8 +96,8 @@ void Renderer::Render(Sprite2D& sprite, ID3D11DeviceContext* context)
 }
 
 void Renderer::RenderPostProcess(
-	ID3D11VertexShader* postProcessVertexShader, 
-	ID3D11PixelShader* postProcessPixelShader, 
+	ID3D11VertexShader* postProcessVertexShader,
+	ID3D11PixelShader* postProcessPixelShader,
 	const PostProcessSettings& parameters
 )
 {

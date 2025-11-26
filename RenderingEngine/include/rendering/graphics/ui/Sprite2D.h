@@ -25,7 +25,6 @@ struct Sprite2D
     VertexBuffer vertexBuffer;
     ShaderProgram shaderProgram;
 
-private:
     static std::vector<VertexSprite> ComputeVertices(const SpritePosition& position, const Texture& texture);
 };
 
