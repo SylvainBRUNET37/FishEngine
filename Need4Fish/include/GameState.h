@@ -14,7 +14,8 @@ struct GameState
 	    PLAYING,
         PAUSED,
         DIED,
-        WON
+        WON,
+        FINISHED
     };
 
     inline static PostProcessSettings postProcessSettings{};

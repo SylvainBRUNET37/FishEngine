@@ -40,6 +40,8 @@ void GameEngine::Run()
 		// Pause/Unpause the game if ESC is pressed for exemple
 		HandleGameState();
 
+		if (GameState::currentState == GameState::FINISHED) return;
+
 		const DWORD frameStartTime = GetTickCount();
 		const auto isGamePaused = GameState::currentState != GameState::PLAYING;
 
@@ -221,6 +223,18 @@ void GameEngine::BuildPauseMenu()
 		.sprite = uiManager->LoadSprite("assets/ui/testOptions.png", 0.f, 600.0f, 0.0f),
 		.onClick = [this] { BuildOptionMenu(); }
 	});
+
+	// Restart Button
+	uiManager->AddSprite({
+		.sprite = uiManager->LoadSprite("assets/ui/testRestart.png", 800.0f, 300.0f, 0.0f),
+		.onClick = [this] { RestartGame(); }
+	});
+
+	// Quit Button
+	uiManager->AddSprite({
+		.sprite = uiManager->LoadSprite("assets/ui/testQuit.png", 800.0f, 0.0f, 0.0f),
+		.onClick = [this] { GameState::currentState = GameState::FINISHED; }
+	});
 }
 
 void GameEngine::BuildOptionMenu()
@@ -269,5 +283,11 @@ void GameEngine::BuildEndMenu()
 	uiManager->AddSprite({
 		.sprite = uiManager->LoadSprite("assets/ui/testRestart.png", positionX, positionY, positionZ),
 		.onClick = [this] { RestartGame(); }
+	});
+
+	// Quit Button
+	uiManager->AddSprite({
+		.sprite = uiManager->LoadSprite("assets/ui/testQuit.png", 800.0f, 0.0f, 0.0f),
+		.onClick = [this] { GameState::currentState = GameState::FINISHED; }
 	});
 }
