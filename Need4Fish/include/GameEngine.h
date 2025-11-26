@@ -37,6 +37,10 @@ private:
 	void RestartGame();
 
 	void InitGame();
+
+	void BuildPauseMenu();
+	void BuildOptionMenu();
+	void BuildEndMenu();
 };
 
 #endif

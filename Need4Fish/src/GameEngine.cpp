@@ -134,81 +134,25 @@ void GameEngine::ResumeGame()
 
 void GameEngine::PauseGame()
 {
-	uiManager->Clear();
-	//ShowCursor(TRUE);
 	Camera::isMouseCaptured = false;
 
 	ClipCursor(nullptr);
 	ReleaseCapture();
 
 	GameState::currentState = GameState::PAUSED;
-	
-	uiManager->AddSprite({
-		.sprite = uiManager->LoadSprite("assets/ui/testPause.png"),
-		});
 
-	uiManager->AddSprite({
-		.sprite = uiManager->LoadSprite("assets/ui/testResume.png", 0.0f, 300.0f, 0.0f),
-		.onClick = [this] { ChangeGameStatus(); }
-	});
-
-	// TODO: revoir ça
-	uiManager->AddSprite({
-		.sprite = uiManager->LoadSprite("assets/ui/testOptions.png", 0.f, 600.0f, 0.0f),
-		.onClick = [this] {
-				uiManager->Clear();
-				uiManager->AddSprite({
-					.sprite = uiManager->LoadSprite("assets/ui/testOptions.png"),
-				});
-				uiManager->AddSprite({
-					.sprite = uiManager->LoadSprite("assets/ui/testBack.png", 800.0f, 500.0f, 0.0f),
-					.onClick = [this] { PauseGame(); }
-					});
-
-				bool isChecked = Camera::invertCamRotation;
-
-				std::string spriteFile = (isChecked) ? "assets/ui/testChecked.png" : "assets/ui/testUnchecked.png";
-				std::string clickFile = (!isChecked) ? "assets/ui/testChecked.png" : "assets/ui/testUnchecked.png";
-
-				uiManager->AddSprite({
-					.sprite = uiManager->LoadSprite(spriteFile, 800.0f, 200.0f, 0.0f),
-					.clickSprite = uiManager->LoadSprite(clickFile, 800.0f, 200.0f, 0.0f),
-					.clickDelay = 0.1f,
-					.onClick = [] {
-						Camera::invertCamRotation ^= 1;
-						std::cout << Camera::invertCamRotation << std::endl;
-					}, // Theo's dark magic for boolean inversion
-					.isCheckBox = true,
-				});
-			}
-		});
-
+	BuildPauseMenu();
 }
 
 void GameEngine::EndGame()
 {
-	uiManager->Clear();
 	ShowCursor(TRUE);
 	Camera::isMouseCaptured = false;
 
 	ClipCursor(nullptr);
 	ReleaseCapture();
 
-	//const std::string sprite = (GameState::currentState == GameState::DIED) ?  "assets/ui/deathTitle.png" : "assets/ui/winTitle.png";
-	const std::string sprite = (GameState::currentState == GameState::DIED) ? "assets/ui/testDeath.png" : "assets/ui/testWin.png";
-
-	uiManager->AddSprite({
-			.sprite = uiManager->LoadSprite(sprite),
-		});
-
-	float positionX = 400.0f;
-	float positionY = 400.0f;
-	float positionZ = 0.0f;
-	uiManager->AddSprite({
-		.sprite = uiManager->LoadSprite("assets/ui/testRestart.png", positionX, positionY, positionZ),
-		.onClick = [this] { RestartGame(); }
-		});
-
+	BuildEndMenu();
 }
 
 void GameEngine::RestartGame()
@@ -256,4 +200,74 @@ void GameEngine::InitGame()
 	}
 
 	mainMenuEntity = entityManager.CreateEntity();
+}
+
+void GameEngine::BuildPauseMenu()
+{
+	uiManager->Clear();
+	// Pause title
+	uiManager->AddSprite({
+		.sprite = uiManager->LoadSprite("assets/ui/testPause.png"),
+	});
+
+	// Resume Button
+	uiManager->AddSprite({
+		.sprite = uiManager->LoadSprite("assets/ui/testResume.png", 0.0f, 300.0f, 0.0f),
+		.onClick = [this] { ChangeGameStatus(); }
+	});
+
+	// Option Button
+	uiManager->AddSprite({
+		.sprite = uiManager->LoadSprite("assets/ui/testOptions.png", 0.f, 600.0f, 0.0f),
+		.onClick = [this] { BuildOptionMenu(); }
+	});
+}
+
+void GameEngine::BuildOptionMenu()
+{
+	uiManager->Clear();
+
+	// Option title
+	uiManager->AddSprite({
+		.sprite = uiManager->LoadSprite("assets/ui/testOptions.png"),
+	});
+
+	// Back button
+	uiManager->AddSprite({
+		.sprite = uiManager->LoadSprite("assets/ui/testBack.png", 800.0f, 500.0f, 0.0f),
+		.onClick = [this] { PauseGame(); }
+	});
+
+	// Camera inversion
+	bool isChecked = Camera::invertCamRotation;
+	std::string spriteFile = (isChecked) ? "assets/ui/testChecked.png" : "assets/ui/testUnchecked.png";
+	std::string clickFile = (!isChecked) ? "assets/ui/testChecked.png" : "assets/ui/testUnchecked.png";
+	uiManager->AddSprite({
+		.sprite = uiManager->LoadSprite(spriteFile, 800.0f, 200.0f, 0.0f),
+		.clickSprite = uiManager->LoadSprite(clickFile, 800.0f, 200.0f, 0.0f),
+		.clickDelay = 0.1f,
+		.onClick = [] {
+			Camera::invertCamRotation ^= 1;
+			std::cout << Camera::invertCamRotation << std::endl;
+		}, // Theo's dark magic for boolean inversion
+		.isCheckBox = true,
+	});
+}
+
+void GameEngine::BuildEndMenu()
+{
+	uiManager->Clear();
+
+	const std::string sprite = (GameState::currentState == GameState::DIED) ? "assets/ui/testDeath.png" : "assets/ui/testWin.png";
+	uiManager->AddSprite({
+			.sprite = uiManager->LoadSprite(sprite),
+	});
+
+	float positionX = 400.0f;
+	float positionY = 400.0f;
+	float positionZ = 0.0f;
+	uiManager->AddSprite({
+		.sprite = uiManager->LoadSprite("assets/ui/testRestart.png", positionX, positionY, positionZ),
+		.onClick = [this] { RestartGame(); }
+	});
 }
