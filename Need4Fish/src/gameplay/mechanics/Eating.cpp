@@ -8,6 +8,19 @@
 
 using namespace DirectX;
 
+static void KillRecursively(EntityManager& entityManager, const Entity preyEntity)
+{
+	if (entityManager.HasComponent<Hierarchy>(preyEntity))
+	{
+		const auto& hierarchy = entityManager.Get<Hierarchy>(preyEntity);
+
+		for (const Entity child : hierarchy.children)
+			KillRecursively(entityManager, child);
+	}
+
+	entityManager.Kill(preyEntity);
+}
+
 [[nodiscard]] static float CalculateGrowthFactor(const float predatorMass, const float preyMass)
 {
 	// Linear proportionnal growth
@@ -70,7 +83,8 @@ static void AcuallyEat(
 	// Eat and kill
 	if (preyEatable.isApex) GameState::currentState = GameState::WON;
 	predatorEatable.mass += preyEatable.mass;
-	entityManager.Kill(preyEntity);
+
+	KillRecursively(entityManager, preyEntity);
 
 	// Grow the hitbox
 	auto currentShape = predatorBody.body->GetShape();
@@ -164,6 +178,25 @@ void Eating::UpdatePlayerScale(EntityManager& entityManager)
 					scale[i] += transform.scaleStep;
 				}
 			}
+
+			// Mise à jour progressive de la caméra
+			auto applyDelta = [](float& target, float& delta, float step) {
+				if (std::abs(delta) < std::abs(step)) {
+					target += delta;
+					delta = 0.0f;
+				}
+				else {
+					const float actualStep = std::copysign(step, delta);
+					delta -= actualStep;
+					target += actualStep;
+				}
+				};
+
+			applyDelta(Camera::distance, Camera::deltaDistance, Camera::cameraScaleStep);
+			applyDelta(Camera::heightOffset, Camera::deltaHeightOffset, Camera::cameraScaleStep);
+			applyDelta(Camera::minDistance, Camera::deltaMinDistance, Camera::cameraScaleStep);
+			applyDelta(Camera::maxDistance, Camera::deltaMaxDistance, Camera::cameraScaleStep);
+			applyDelta(Camera::zoomSpeed, Camera::deltaZoomSpeed, Camera::cameraScaleStep);
 		}
 		else
 		{

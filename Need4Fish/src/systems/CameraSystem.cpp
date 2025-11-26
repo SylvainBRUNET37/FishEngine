@@ -206,11 +206,23 @@ void CameraSystem::SetMouseCursor()
 	Camera::cursorCoordinates = Camera::screenCenter;
 }
 
-void CameraSystem::ScaleCamera(float scaleFactor){
-	Camera::minDistance *= scaleFactor;
-	Camera::maxDistance *= scaleFactor;
-	Camera::zoomSpeed *= scaleFactor;
-	Camera::position *= scaleFactor;
-	Camera::heightOffset *= scaleFactor;
-	Camera::distance *= scaleFactor; // À changer pour une version progressive
+void CameraSystem::ScaleCamera(float scaleFactor)
+{
+	// Calculer les valeurs à atteindre
+	const float targetDistance = Camera::distance * scaleFactor;
+	const float targetHeightOffset = Camera::heightOffset * scaleFactor;
+	const float targetMinDistance = Camera::minDistance * scaleFactor;
+	const float targetMaxDistance = Camera::maxDistance * scaleFactor;
+	const float targetZoomSpeed = Camera::zoomSpeed * scaleFactor;
+
+	// Calculer les deltas
+	Camera::deltaDistance = targetDistance - Camera::distance;
+	Camera::deltaHeightOffset = targetHeightOffset - Camera::heightOffset;
+	Camera::deltaMinDistance = targetMinDistance - Camera::minDistance;
+	Camera::deltaMaxDistance = targetMaxDistance - Camera::maxDistance;
+	Camera::deltaZoomSpeed = targetZoomSpeed - Camera::zoomSpeed;
+
+	// Comme pour la croissance du personnage
+	const float F_GROWTH_STEPS = 60.0f;
+	Camera::cameraScaleStep = Camera::deltaDistance / F_GROWTH_STEPS;
 }

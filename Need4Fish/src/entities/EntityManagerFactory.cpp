@@ -8,12 +8,8 @@ EntityManager EntityManagerFactory::Create(const SceneResource& sceneResource)
 {
 	EntityManager entityManager{};
 
-	// Create the root entity
-	const auto rootEntity = entityManager.CreateEntity();
-	entityManager.AddComponent<Hierarchy>(rootEntity, Hierarchy{ INVALID_ENTITY, {} });
-
 	// Create an entity for every node
-	const size_t nbEntities = sceneResource.nodes.size() + sceneResource.pointLights.size();
+	const size_t nbEntities = sceneResource.nodes.size();
 	std::vector<Entity> entities;
 	entities.reserve(nbEntities);
 	for (size_t i = 0; i < nbEntities; ++i)
@@ -23,6 +19,7 @@ EntityManager EntityManagerFactory::Create(const SceneResource& sceneResource)
 
 	// Add componentPools and build hierarchy
 	size_t nodeIndex = 0;
+	const Entity rootEntity = entities[0];
 	for (; nodeIndex < sceneResource.nodes.size(); ++nodeIndex)
 	{
 		const auto& node = sceneResource.nodes[nodeIndex];
@@ -32,7 +29,7 @@ EntityManager EntityManagerFactory::Create(const SceneResource& sceneResource)
 		entityManager.AddComponent<Name>(entity, node.name);
 
 		if (node.meshIndex != UINT32_MAX)
-			entityManager.AddComponent<Mesh>(entity, sceneResource.meshes[node.meshIndex]);
+			entityManager.AddComponent<MeshInstance>(entity, MeshInstance{ .meshIndex = node.meshIndex });
 
 		// Set parent entity to node parent or root entity if he is orphan
 		const Entity parentEntity = node.parentIndex == UINT32_MAX ? rootEntity : entities[node.parentIndex];
@@ -49,7 +46,7 @@ EntityManager EntityManagerFactory::Create(const SceneResource& sceneResource)
 	for (size_t pointLightIndex = 0; pointLightIndex < sceneResource.pointLights.size(); ++pointLightIndex)
 	{
 		const auto& light = sceneResource.pointLights[pointLightIndex];
-		const auto entity = entities[nodeIndex + pointLightIndex];
+		const auto entity = entities[light.nodeId];
 
 		entityManager.AddComponent<PointLight>(entity, light);
 	}

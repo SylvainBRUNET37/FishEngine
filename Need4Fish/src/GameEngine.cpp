@@ -2,7 +2,6 @@
 #include "GameEngine.h"
 
 #include <tuple>
-#include <optional>
 #include <algorithm>
 #include "GameState.h"
 #include "entities/EntityManagerFactory.h"

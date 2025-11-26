@@ -3,7 +3,6 @@
 
 #include <d3d11.h>
 
-#include "resources/Node.h"
 #include "resources/SceneLoader.h"
 #include "rendering/shaders/ShaderBank.h"
 
@@ -15,6 +14,7 @@ public:
 	SceneResource& LoadScene();
 	[[nodiscard]] const ShaderBank& GetShaderBank() const { return shaderBank; }
 	[[nodiscard]] SceneResource& GetSceneResource() { return sceneResource; }
+	[[nodiscard]] Mesh& GetMesh(const UINT meshIndex) { return sceneResource.meshes[meshIndex]; }
 
 private:
 	ID3D11Device* device;

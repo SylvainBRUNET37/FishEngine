@@ -16,8 +16,6 @@ class ShaderBank;
 class SceneLoader
 {
 public:
-	// TODO: Link shader program to mesh.
-	// This method is a temporary solution, every mesh will be rendered using same shaders
 	explicit SceneLoader(ID3D11Device* device)
 		: device{device}
 	{
@@ -30,11 +28,15 @@ public:
 private:
 	nlohmann::json sceneMetaData;
 
+	// string = name, int = indice in SceneResource node list
+	// It is used to assign lights to the correct node
+	std::unordered_map<std::string, uint32_t> nodes;
+
 	TextureManager textureManager{};
 
 	ID3D11Device* device;
 
-	static void ProcessNodeHierarchy(const aiNode* aiNode,
+	void ProcessNodeHierarchy(const aiNode* aiNode,
 	                                 const aiScene* scene,
 	                                 uint32_t parentIndex,
 	                                 SceneResource& sceneRes);
@@ -47,9 +49,9 @@ private:
 	                         const aiMaterial* material, const ShaderBank& shaderBank);
 	ComPtr<ID3D11ShaderResourceView> ProcessEmbededTexture(const aiTexture* embeddedTex);
 
-	static void ProcessLights(const aiScene* scene, SceneResource& sceneRes);
+	void ProcessLights(const aiScene* scene, SceneResource& sceneRes);
 	static DirectionalLight ProcessDirectionalLights(const aiLight* light);
-	static PointLight ProcessPointLights(const aiLight* light, const aiScene* scene);
+	PointLight ProcessPointLights(const aiLight* light, const aiScene* scene);
 };
 
 #endif
