@@ -1,13 +1,23 @@
 #include "pch.h"
 #include "rendering/BillboardRenderer.h"
 
+#include "rendering/graphics/camera/BaseCamera.h"
+
+using namespace DirectX;
+
 BillboardRenderer::BillboardRenderer(ID3D11Device* device)
 	: billboardConstantBuffer{device, billboardCbRegisterNumber}
 {
 }
 
-void BillboardRenderer::Render(Billboard& billboard, ID3D11DeviceContext* context, const BillboardBuffer& billboardBuffer)
+void BillboardRenderer::Render(Billboard& billboard, ID3D11DeviceContext* context, const BaseCameraData& baseCameraData)
 {
+	BillboardBuffer billboardBuffer{};
+
+	XMStoreFloat4x4(&billboardBuffer.matWorld, XMMatrixTranspose(ComputeBillboardWorldMatrix(billboard)));
+	XMStoreFloat4x4(&billboardBuffer.matView, XMMatrixTranspose(baseCameraData.matView));
+	XMStoreFloat4x4(&billboardBuffer.matProj, XMMatrixTranspose(baseCameraData.matProj));
+
 	billboard.shaderProgram.Bind(context);
 
 	billboardConstantBuffer.Update(context, billboardBuffer);
@@ -28,4 +38,38 @@ void BillboardRenderer::Draw(const Billboard& billboard, ID3D11DeviceContext* co
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	context->Draw(6, 0);
+}
+
+XMMATRIX BillboardRenderer::ComputeBillboardWorldMatrix(const Billboard& billboard)
+{
+	// Compute the direction from billboard to camera
+	const XMVECTOR billboardPosition = XMLoadFloat3(&billboard.position);
+	const XMVECTOR billboardForward = XMVector3Normalize(BaseCameraData::position - billboardPosition);
+
+	static constexpr auto WORLD_UP = XMVECTOR{0, 1, 0, 0};
+	const XMVECTOR billboardRight = XMVector3Normalize(XMVector3Cross(WORLD_UP, billboardForward));
+
+	const XMVECTOR billboardUp = XMVector3Cross(billboardForward, billboardRight);
+
+	// Define the billboard orientation with right, up and forward
+	const XMMATRIX billboardRotation =
+	{
+		billboardRight,
+		billboardUp,
+		-billboardForward, // minus because we are right handed
+		XMVectorSet(0, 0, 0, 1)
+	};
+
+	// Build billboard world matrix (S * R * T)
+	const XMMATRIX billboardMatWorld =
+		XMMatrixScaling(billboard.scale.x, billboard.scale.y, 1.0f) *
+		billboardRotation *
+		XMMatrixTranslation
+		(
+			billboard.position.x,
+			billboard.position.y,
+			billboard.position.z
+		);
+
+	return billboardMatWorld;
 }

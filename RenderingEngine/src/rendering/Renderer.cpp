@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "rendering/Renderer.h"
 
+#include "rendering/graphics/camera/BaseCamera.h"
 #include "rendering/texture/TextureLoader.h"
 
 using namespace DirectX;
@@ -92,9 +93,9 @@ void Renderer::Render(Sprite2D& sprite, ID3D11DeviceContext* context)
 	Draw(sprite);
 }
 
-void Renderer::Render(Billboard& billboard, ID3D11DeviceContext* context, const BillboardBuffer& billboardBuffer)
+void Renderer::Render(Billboard& billboard, ID3D11DeviceContext* context, const BaseCameraData& baseCameraData)
 {
-	billboardRenderer.Render(billboard, context, billboardBuffer);
+	billboardRenderer.Render(billboard, context, baseCameraData);
 }
 
 void Renderer::RenderPostProcess(

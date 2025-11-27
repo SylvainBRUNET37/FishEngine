@@ -22,7 +22,7 @@ private:
 
 	void RenderBillboard(const Camera& currentCamera);
 
-	static FrameBuffer AddDirectionLightToFrameBuffer();
+	static FrameBuffer CreateDirectionnalLight();
 };
 
 #endif

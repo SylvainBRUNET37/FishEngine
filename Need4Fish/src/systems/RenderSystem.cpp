@@ -107,37 +107,7 @@ void RenderSystem::RenderBillboard(const Camera& currentCamera)
 		{ 50, 50 }
 	);
 
-	BillboardBuffer billboardBuffer{};
-
-	XMVECTOR billboardPosition = XMLoadFloat3(&deBillboard.position);
-	XMVECTOR billboardForward = XMVector3Normalize(Camera::position - billboardPosition);
-
-	static constexpr auto WORLD_UP = XMVECTOR{ 0, 1, 0, 0 };
-	XMVECTOR billboardRight =
-		XMVector3Normalize(
-			XMVector3Cross(WORLD_UP, billboardForward));
-
-	XMVECTOR billboardUp = XMVector3Cross(billboardForward, billboardRight);
-
-	XMMATRIX billboardRotation = 
-	{
-		billboardRight,
-		billboardUp,
-		-billboardForward, // minus because we are right handed
-		XMVectorSet(0, 0, 0, 1)
-	};
-
-	const XMMATRIX world =
-		XMMatrixScaling(deBillboard.scale.x, deBillboard.scale.y, 1.0f) * billboardRotation *
-		XMMatrixTranslation(deBillboard.position.x,
-			deBillboard.position.y,
-			deBillboard.position.z);
-
-	XMStoreFloat4x4(&billboardBuffer.matWorld, XMMatrixTranspose(world));
-	XMStoreFloat4x4(&billboardBuffer.matView, XMMatrixTranspose(currentCamera.matView));
-	XMStoreFloat4x4(&billboardBuffer.matProj, XMMatrixTranspose(currentCamera.matProj));
-
-	renderer.Render(deBillboard, renderContext->GetContext(), billboardBuffer);
+	renderer.Render(deBillboard, renderContext->GetContext(), currentCamera);
 }
 
 FrameBuffer RenderSystem::CreateDirectionnalLight()

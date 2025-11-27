@@ -12,6 +12,7 @@
 #include "graphics/Sprite2D.h"
 #include "postProcessing/PostProcessSettings.h"
 
+struct BaseCameraData;
 struct Billboard;
 struct BillboardCameraBuffer;
 
@@ -23,7 +24,7 @@ public:
 	void UpdateFrameBuffer(const FrameBuffer& frameBuffer_) { frameBuffer = frameBuffer_; };
 	void Render(const Mesh& mesh, ID3D11DeviceContext* context, const Transform& transform);
 	void Render(Sprite2D& sprite, ID3D11DeviceContext* context);
-	void Render(Billboard& billboard, ID3D11DeviceContext* context, const BillboardBuffer& billboardBuffer);
+	void Render(Billboard& billboard, ID3D11DeviceContext* context, const BaseCameraData& baseCameraData);
 	void RenderPostProcess(ID3D11VertexShader* postProcessVertexShader, 
 		                   ID3D11PixelShader* postProcessPixelShader,
 	                       const PostProcessSettings& parameters);

@@ -7,12 +7,14 @@
 #include "buffers/constantBuffers/ConstantBuffer.h"
 #include "graphics/Billboard.h"
 
+struct BaseCameraData;
+
 class BillboardRenderer
 {
 public:
 	explicit BillboardRenderer(ID3D11Device* device);
 
-	void Render(Billboard& billboard, ID3D11DeviceContext* context, const BillboardBuffer& billboardBuffer);
+	void Render(Billboard& billboard, ID3D11DeviceContext* context, const BaseCameraData& baseCameraData);
 
 private:
 	static constexpr int billboardCbRegisterNumber = 0;
@@ -20,6 +22,8 @@ private:
 	ConstantBuffer<BillboardBuffer> billboardConstantBuffer;
 
 	static void Draw(const Billboard& billboard, ID3D11DeviceContext* context);
+
+	[[nodiscard]] static DirectX::XMMATRIX ComputeBillboardWorldMatrix(const Billboard& billboard);
 };
 
 #endif
