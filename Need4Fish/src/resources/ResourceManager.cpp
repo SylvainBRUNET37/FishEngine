@@ -24,7 +24,10 @@ void ResourceManager::InitShaderBank()
 		.AddDesc<PixelShader>("shaders/SpritePS.hlsl", "SpritePS", "ps_5_0")
 
 		.AddDesc<VertexShader>("shaders/PostProcessVS.hlsl", "PostProcessVS", "vs_5_0")
-		.AddDesc<PixelShader>("shaders/PostProcessPS.hlsl", "PostProcessPS", "ps_5_0");
+		.AddDesc<PixelShader>("shaders/PostProcessPS.hlsl", "PostProcessPS", "ps_5_0")
+
+		.AddDesc<VertexShader>("shaders/SkyboxVertexShader.hlsl", "main", "vs_5_0")
+		.AddDesc<PixelShader>("shaders/SuperBasicPixelShader.hlsl", "main", "ps_5_0");
 
 	ShaderFactory<VertexShader, PixelShader> shaderFactory;
 	shaderBank = shaderFactory.CreateShaderBank(shaderDescriptions, device);
