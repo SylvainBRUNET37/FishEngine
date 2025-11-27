@@ -2,10 +2,31 @@
 #include "UIManager.h"
 #include "Locator.h"
 #include "rendering/texture/TextureLoader.h"
+#include "rendering/utils/Util.h"
 #include <limits>
+#include <Gdiplus.h>
+#include <DirectXMath.h>
+
+using namespace Gdiplus;
+using namespace DirectX;
 
 UIManager::UIManager(ID3D11Device* device) : device{device}
 {
+	// Text renderer
+	TextRenderer::Init();
+
+	// create a GDI+ font for the TextRenderer
+	const FontFamily family(L"Arial", nullptr);
+	textFont = std::make_unique<Gdiplus::Font>(&family, 24.0f, Gdiplus::FontStyleRegular, Gdiplus::UnitPixel);
+
+	textRenderer = std::make_unique<TextRenderer>(device, 256, 256,
+		textFont.get());
+}
+
+UIManager::~UIManager()
+{
+	TextRenderer::Close();
+
 }
 
 Sprite2D UIManager::LoadSprite(const std::string& filePath) const
@@ -166,4 +187,26 @@ void UIManager::TranslateSpriteXY(Sprite2D& sprite, const float translationX, co
 	float newX = sprite.position.x + translationX;
 	float newY = sprite.position.y + translationY;
 	EditSpritePosition(sprite, newX, newY, sprite.position.z);
+}
+
+void UIManager::RenderText(const std::wstring& text, ID3D11DeviceContext* context, float x, float y, float width, float height)
+{
+	if (!textRenderer) return;
+
+	// Write new text into the GDI+ bitmap and update the GPU texture
+	textRenderer->Ecrire(text);
+
+	Texture textTexture(ComPtr(textRenderer->GetTextureView()), textRenderer->GetTextWidth(), textRenderer->GetTextHeigth());
+
+	auto& shaderBank = Locator::Get<ResourceManager>().GetShaderBank();
+
+	const ShaderProgram spriteShaderProgram
+	(
+		device,
+		shaderBank.Get<VertexShader>("shaders/SpriteVS.hlsl"),
+		shaderBank.Get<PixelShader>("shaders/SpritePS.hlsl")
+	);
+	Sprite2D textSprite(spriteShaderProgram, textTexture, device);
+	AddSprite({ textSprite });
+
 }

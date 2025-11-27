@@ -212,13 +212,13 @@
     <ClCompile Include="src\rendering\shaders\ShaderReflector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\rendering\graphics\Mesh.cpp">
+    <ClCompile Include="src\rendering\graphics\ui\Mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\rendering\culling\FrustumCuller.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\rendering\graphics\Sprite2D.cpp">
+    <ClCompile Include="src\rendering\graphics\ui\Sprite2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\rendering\device\PostProcess.cpp">

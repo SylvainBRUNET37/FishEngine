@@ -200,6 +200,7 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     <ClCompile Include="src\components\gameplay\Eatable.cpp" />
     <ClCompile Include="src\entities\EntityManagerFactory.cpp" />
     <ClCompile Include="src\gameplay\mechanics\Eating.cpp" />
+    <ClCompile Include="src\graphics\TextRenderer.cpp" />
     <ClCompile Include="src\physicsEngine\utils\ConversionUtil.cpp" />
     <ClCompile Include="src\physicsEngine\utils\MeshUtil.cpp" />
     <ClCompile Include="pch.cpp">
@@ -237,6 +238,7 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     <ClInclude Include="include\components\ComponentFactory.h" />
     <ClInclude Include="include\components\gameplay\Eatable.h" />
     <ClInclude Include="include\components\PowerSource.h" />
+    <ClInclude Include="include\graphics\TextRenderer.h" />
     <ClInclude Include="include\Locator.h" />
     <ClInclude Include="include\gameplay\mechanics\Eating.h" />
     <ClInclude Include="include\physicsEngine\utils\ConversionUtil.h" />

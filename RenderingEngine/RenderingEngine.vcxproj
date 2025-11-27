@@ -86,8 +86,8 @@
     <ClCompile Include="src\rendering\device\RenderContext.cpp" />
     <ClCompile Include="src\rendering\device\RenderTarget.cpp" />
     <ClCompile Include="src\rendering\device\Rasterizer.cpp" />
-    <ClCompile Include="src\rendering\graphics\Mesh.cpp" />
-    <ClCompile Include="src\rendering\graphics\Sprite2D.cpp" />
+    <ClCompile Include="src\rendering\graphics\ui\Mesh.cpp" />
+    <ClCompile Include="src\rendering\graphics\ui\Sprite2D.cpp" />
     <ClCompile Include="src\rendering\Renderer.cpp" />
     <ClCompile Include="src\rendering\shaders\ShaderProgram.cpp" />
     <ClCompile Include="src\rendering\shaders\ShaderReflector.cpp" />

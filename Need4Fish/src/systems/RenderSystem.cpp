@@ -71,6 +71,9 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 		renderer.Render(mesh, renderContext->GetContext(), transform);
 	}
 
+	// Text ?
+	uiManager->RenderText(L"Lorem ipsum dolor sit amet", renderContext->GetContext(), 0.0f, 0.0f, 100.0f, 100.0f);
+
 	// Render sprites
 	for (auto& sprite : uiManager->GetSprites())
 		renderer.Render(sprite, renderContext->GetContext());

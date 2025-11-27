@@ -1,9 +1,12 @@
 #ifndef UI_MANAGER_H
 #define UI_MANAGER_H
 
+#include <gdiplus.h>
 #include "resources/ResourceManager.h"
 #include "rendering/graphics/ui/SpriteElement.h"
 #include <vector>
+#include "graphics/TextRenderer.h"
+#include <memory>
 
 class UIManager
 {
@@ -13,6 +16,8 @@ class UIManager
 
 public:
 	explicit UIManager(ID3D11Device* device);
+
+	~UIManager();
 
 	[[nodiscard]] std::vector<Sprite2D> GetSprites();
 
@@ -30,6 +35,13 @@ public:
 	void TranslateSpriteX(Sprite2D& sprite, const float translation);
 	void TranslateSpriteY(Sprite2D& sprite, const float translation);
 	void TranslateSpriteXY(Sprite2D& sprite, const float translationX, const float translationY);
+
+	void RenderText(const std::wstring& text, ID3D11DeviceContext* context, float x, float y, float width, float height);
+
+private:
+	// Text rendering
+	std::unique_ptr<TextRenderer> textRenderer;
+	std::unique_ptr<Gdiplus::Font> textFont;
 
 };
 
