@@ -6,13 +6,13 @@
 using namespace DirectX;
 
 Renderer::Renderer(RenderContext* renderContext, std::vector<Material>&& materials)
-	: renderContext{ renderContext },
-	materials{ std::move(materials) },
-	frameConstantBuffer{ renderContext->GetDevice(), frameCbRegisterNumber },
-	objectConstantBuffer{ renderContext->GetDevice(), objectCbRegisterNumber },
-	spriteConstantBuffer{ renderContext->GetDevice(), spriteCbRegisterNumber },
-	postProcessSettingsBuffer{ renderContext->GetDevice(), postProcessCbRegisterNumber },
-	causticTexture{TextureLoader::LoadTextureFromFile("assets/textures/caustics.png", renderContext->GetDevice())}
+	: renderContext{ renderContext }, billboardRenderer{renderContext->GetDevice()},
+	  materials{std::move(materials)},
+	  frameConstantBuffer{renderContext->GetDevice(), frameCbRegisterNumber},
+	  objectConstantBuffer{renderContext->GetDevice(), objectCbRegisterNumber},
+	  spriteConstantBuffer{renderContext->GetDevice(), spriteCbRegisterNumber},
+	  postProcessSettingsBuffer{renderContext->GetDevice(), postProcessCbRegisterNumber},
+	  causticTexture{TextureLoader::LoadTextureFromFile("assets/textures/caustics.png", renderContext->GetDevice())}
 {
 	D3D11_SAMPLER_DESC textureSamplerDesc{};
 	textureSamplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
@@ -71,11 +71,14 @@ void Renderer::Render(const Mesh& mesh,
 
 void Renderer::Render(Sprite2D& sprite, ID3D11DeviceContext* context)
 {
+	static const int screenWidth = GetSystemMetrics(SM_CXSCREEN);
+	static const int screenHeight = GetSystemMetrics(SM_CYSCREEN);
+
 	// Orthographic projection to display the sprite in 2D "from the screne"
 	const XMMATRIX matOrtho = XMMatrixOrthographicOffCenterRH
 	(
-		0.f, 1920.f,
-		1080.f, 0.f,
+		0.f, screenWidth,
+		screenHeight, 0.f,
 		0.f, 1.f
 	);
 
@@ -87,6 +90,11 @@ void Renderer::Render(Sprite2D& sprite, ID3D11DeviceContext* context)
 	context->PSSetShaderResources(0, 1, &sprite.texture.texture);
 
 	Draw(sprite);
+}
+
+void Renderer::Render(Billboard& billboard, ID3D11DeviceContext* context, const BillboardBuffer& billboardBuffer)
+{
+	billboardRenderer.Render(billboard, context, billboardBuffer);
 }
 
 void Renderer::RenderPostProcess(

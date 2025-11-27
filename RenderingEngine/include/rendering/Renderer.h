@@ -1,6 +1,7 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
+#include "BillboardRenderer.h"
 #include "buffers/constantBuffers/FrameBuffer.h"
 #include "buffers/constantBuffers/ObjectBuffer.h"
 #include "buffers/constantBuffers/SpriteBuffer.h"
@@ -11,6 +12,9 @@
 #include "graphics/Sprite2D.h"
 #include "postProcessing/PostProcessSettings.h"
 
+struct Billboard;
+struct BillboardCameraBuffer;
+
 class Renderer
 {
 public:
@@ -19,6 +23,7 @@ public:
 	void UpdateFrameBuffer(const FrameBuffer& frameBuffer_) { frameBuffer = frameBuffer_; };
 	void Render(const Mesh& mesh, ID3D11DeviceContext* context, const Transform& transform);
 	void Render(Sprite2D& sprite, ID3D11DeviceContext* context);
+	void Render(Billboard& billboard, ID3D11DeviceContext* context, const BillboardBuffer& billboardBuffer);
 	void RenderPostProcess(ID3D11VertexShader* postProcessVertexShader, 
 		                   ID3D11PixelShader* postProcessPixelShader,
 	                       const PostProcessSettings& parameters);
@@ -33,6 +38,8 @@ private:
 	RenderContext* renderContext;
 	ID3D11SamplerState* textureSampler;
 	ID3D11SamplerState* causticSampler;
+
+	BillboardRenderer billboardRenderer;
 
 	std::vector<Material> materials;
 	FrameBuffer frameBuffer{};

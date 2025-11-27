@@ -11,7 +11,7 @@ ComPtr<ID3DBlob> ShaderUtils::Compile(const std::wstring& filePath, const std::s
                                       const std::string& profile)
 {
 	UINT flags = D3DCOMPILE_ENABLE_STRICTNESS;
-#if defined( _DEBUG )
+#ifdef _DEBUG
 	flags |= D3DCOMPILE_DEBUG;
 #endif
 

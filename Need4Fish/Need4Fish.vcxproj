@@ -196,6 +196,12 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     <None Include="shaders\PhongCausticsPS.hlsl">
       <FileType>Document</FileType>
     </None>
+    <None Include="shaders\BillboardPS.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="shaders\BillboardVS.hlsl">
+      <FileType>Document</FileType>
+    </None>
     <ClCompile Include="src\components\ComponentFactory.cpp" />
     <ClCompile Include="src\components\gameplay\Eatable.cpp" />
     <ClCompile Include="src\entities\EntityManagerFactory.cpp" />

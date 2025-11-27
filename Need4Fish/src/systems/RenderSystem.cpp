@@ -8,6 +8,7 @@
 
 #include "GameState.h"
 #include "Locator.h"
+#include "rendering/texture/TextureLoader.h"
 #include "resources/ResourceManager.h"
 
 using namespace DirectX;
@@ -18,7 +19,6 @@ RenderSystem::RenderSystem(RenderContext* renderContext, std::vector<Material>&&
 	  frameBuffer(AddDirectionLightToFrameBuffer()),
 	  renderContext(renderContext)
 {
-
 }
 
 void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
@@ -70,14 +70,17 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 		renderer.Render(mesh, renderContext->GetContext(), transform);
 	}
 
+	// Render billboards
+	RenderBillboard(currentCamera);
+
 	// Render sprites
 	for (const auto& [entity, sprite] : entityManager.View<Sprite2D>())
 		renderer.Render(sprite, renderContext->GetContext());
 
-	const auto& shaderBank = Locator::Get<ResourceManager>().GetShaderBank();
 
 	GameState::postProcessSettings.enableVignette = Camera::mode == Camera::CameraMode::FIRST_PERSON ? 1 : 0;
 
+	const auto& shaderBank = Locator::Get<ResourceManager>().GetShaderBank();
 	renderer.RenderPostProcess
 	(
 		shaderBank.Get<VertexShader>("shaders/PostProcessVS.hlsl").shader,
@@ -86,6 +89,36 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 	);
 
 	Present();
+}
+
+void RenderSystem::RenderBillboard(const Camera& currentCamera)
+{
+	const auto& shaderBank = Locator::Get<ResourceManager>().GetShaderBank();
+	Billboard deBillboard
+	(
+		ShaderProgram
+		{
+			renderContext->GetDevice(), shaderBank.Get<VertexShader>("shaders/BillboardVS.hlsl"),
+			shaderBank.Get<PixelShader>("shaders/BillboardPS.hlsl")
+		},
+		TextureLoader::LoadTextureFromFile("assets/textures/de.png", renderContext->GetDevice()),
+		renderContext->GetDevice(),
+		{ 0.0f, 700.0f, 0.0f },
+		{ 50, 50 }
+	);
+	BillboardBuffer billboardBuffer{};
+
+	const XMMATRIX world =
+		XMMatrixScaling(deBillboard.scale.x, deBillboard.scale.y, 1.0f) *
+		XMMatrixTranslation(deBillboard.position.x,
+			deBillboard.position.y,
+			deBillboard.position.z);
+
+	XMStoreFloat4x4(&billboardBuffer.matWorld, XMMatrixTranspose(world));
+	XMStoreFloat4x4(&billboardBuffer.matView, XMMatrixTranspose(currentCamera.matView));
+	XMStoreFloat4x4(&billboardBuffer.matProj, XMMatrixTranspose(currentCamera.matProj));
+
+	renderer.Render(deBillboard, renderContext->GetContext(), billboardBuffer);
 }
 
 FrameBuffer RenderSystem::AddDirectionLightToFrameBuffer()
