@@ -16,7 +16,7 @@ using namespace std;
 
 RenderSystem::RenderSystem(RenderContext* renderContext, std::vector<Material>&& materials)
 	: renderer(renderContext, std::move(materials)),
-	  frameBuffer(AddDirectionLightToFrameBuffer()),
+	  frameBuffer(CreateDirectionnalLight()),
 	  renderContext(renderContext)
 {
 }
@@ -93,8 +93,8 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 
 void RenderSystem::RenderBillboard(const Camera& currentCamera)
 {
-	const auto& shaderBank = Locator::Get<ResourceManager>().GetShaderBank();
-	Billboard deBillboard
+	static const auto& shaderBank = Locator::Get<ResourceManager>().GetShaderBank();
+	static Billboard deBillboard
 	(
 		ShaderProgram
 		{
@@ -106,10 +106,29 @@ void RenderSystem::RenderBillboard(const Camera& currentCamera)
 		{ 0.0f, 700.0f, 0.0f },
 		{ 50, 50 }
 	);
+
 	BillboardBuffer billboardBuffer{};
 
+	XMVECTOR billboardPosition = XMLoadFloat3(&deBillboard.position);
+	XMVECTOR billboardForward = XMVector3Normalize(Camera::position - billboardPosition);
+
+	static constexpr auto WORLD_UP = XMVECTOR{ 0, 1, 0, 0 };
+	XMVECTOR billboardRight =
+		XMVector3Normalize(
+			XMVector3Cross(WORLD_UP, billboardForward));
+
+	XMVECTOR billboardUp = XMVector3Cross(billboardForward, billboardRight);
+
+	XMMATRIX billboardRotation = 
+	{
+		billboardRight,
+		billboardUp,
+		-billboardForward, // minus because we are right handed
+		XMVectorSet(0, 0, 0, 1)
+	};
+
 	const XMMATRIX world =
-		XMMatrixScaling(deBillboard.scale.x, deBillboard.scale.y, 1.0f) *
+		XMMatrixScaling(deBillboard.scale.x, deBillboard.scale.y, 1.0f) * billboardRotation *
 		XMMatrixTranslation(deBillboard.position.x,
 			deBillboard.position.y,
 			deBillboard.position.z);
@@ -121,7 +140,7 @@ void RenderSystem::RenderBillboard(const Camera& currentCamera)
 	renderer.Render(deBillboard, renderContext->GetContext(), billboardBuffer);
 }
 
-FrameBuffer RenderSystem::AddDirectionLightToFrameBuffer()
+FrameBuffer RenderSystem::CreateDirectionnalLight()
 {
 	return
 	{
