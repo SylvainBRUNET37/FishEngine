@@ -71,12 +71,12 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 	}
 
 	// Render billboards
-	RenderBillboard(currentCamera);
+	for (const auto& [entity, billboard] : entityManager.View<Billboard>())
+		renderer.Render(billboard, renderContext->GetContext(), currentCamera);
 
 	// Render sprites
 	for (const auto& [entity, sprite] : entityManager.View<Sprite2D>())
 		renderer.Render(sprite, renderContext->GetContext());
-
 
 	GameState::postProcessSettings.enableVignette = Camera::mode == Camera::CameraMode::FIRST_PERSON ? 1 : 0;
 
@@ -89,25 +89,6 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 	);
 
 	Present();
-}
-
-void RenderSystem::RenderBillboard(const Camera& currentCamera)
-{
-	static const auto& shaderBank = Locator::Get<ResourceManager>().GetShaderBank();
-	static Billboard deBillboard
-	(
-		ShaderProgram
-		{
-			renderContext->GetDevice(), shaderBank.Get<VertexShader>("shaders/BillboardVS.hlsl"),
-			shaderBank.Get<PixelShader>("shaders/BillboardPS.hlsl")
-		},
-		TextureLoader::LoadTextureFromFile("assets/textures/de.png", renderContext->GetDevice()),
-		renderContext->GetDevice(),
-		{ 0.0f, 700.0f, 0.0f },
-		{ 50, 50 }
-	);
-
-	renderer.Render(deBillboard, renderContext->GetContext(), currentCamera);
 }
 
 FrameBuffer RenderSystem::CreateDirectionnalLight()

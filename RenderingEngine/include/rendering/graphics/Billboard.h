@@ -9,7 +9,7 @@
 struct Billboard
 {
 	explicit Billboard(const ShaderProgram& shaderProgram_, const Texture& texture_, ID3D11Device* device,
-	                   DirectX::XMFLOAT3 position, DirectX::XMFLOAT2 scale);
+	                   DirectX::XMFLOAT3 position, DirectX::XMFLOAT2 scale, bool isCylindric = false);
 
 	DirectX::XMFLOAT3 position;
 	DirectX::XMFLOAT2 scale;
@@ -17,6 +17,8 @@ struct Billboard
 	Texture texture;
 	ShaderProgram shaderProgram;
 	VertexBuffer vertexBuffer;
+
+	bool isCylindric;
 
 private:
 	static std::vector<VertexSprite> ComputeVertices();

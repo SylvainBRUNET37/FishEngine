@@ -12,6 +12,7 @@
 #include "physics/RigidBody.h"
 
 #include "rendering/core/Transform.h"
+#include "rendering/graphics/Billboard.h"
 #include "rendering/graphics/lights/PointLight.h"
 #include "rendering/graphics/Sprite2D.h"
 
@@ -52,7 +53,8 @@ using Components = std::tuple
 	PointLight,
 	Sprite2D,
 	Eatable,
-	PowerSource
+	PowerSource,
+	Billboard
 >;
 
 #endif

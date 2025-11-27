@@ -20,8 +20,6 @@ private:
 
 	void Present() const { renderContext->Present(); }
 
-	void RenderBillboard(const Camera& currentCamera);
-
 	static FrameBuffer CreateDirectionnalLight();
 };
 
