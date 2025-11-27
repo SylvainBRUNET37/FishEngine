@@ -45,6 +45,7 @@ private:
 	Texture causticTexture;
 
 	void Draw(const Mesh& mesh) const;
+	void DoubleSidedDraw(const Mesh& mesh) const;
 	void Draw(const Sprite2D& sprite) const;
 
 	static ObjectBuffer BuildConstantObjectBuffer(const Transform& transform);

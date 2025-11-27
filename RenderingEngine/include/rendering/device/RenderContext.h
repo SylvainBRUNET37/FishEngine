@@ -46,6 +46,14 @@ public:
 		context->OMSetBlendState(blendState.GetAlphaBlendDisabled(), nullptr, 0xffffffff);
 	}
 
+	void SetCullModeCullNone() {
+		rasterizer.SetCullingToNone(device, context);
+	}
+
+	void SetCullModeCullBack() {
+		rasterizer.SetCullingToBack(device, context);
+	}
+
 
 private:
 	size_t screenWidth;

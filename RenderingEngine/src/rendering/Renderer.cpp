@@ -66,7 +66,12 @@ void Renderer::Render(const Mesh& mesh,
 	context->PSSetSamplers(0, 1, &textureSampler);
 	context->PSSetSamplers(1, 1, &causticSampler);
 
-	Draw(mesh);
+	if (material.name != "WaterMat") {
+		Draw(mesh);
+	}
+	else {
+		DoubleSidedDraw(mesh);
+	}
 }
 
 void Renderer::Render(Sprite2D& sprite, ID3D11DeviceContext* context)
@@ -130,6 +135,14 @@ void Renderer::Draw(const Mesh& mesh) const
 	renderContext->GetContext()->IASetIndexBuffer(mesh.indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 	renderContext->GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	renderContext->GetContext()->DrawIndexed(static_cast<UINT>(mesh.indices.size()), 0, 0);
+}
+
+void Renderer::DoubleSidedDraw(const Mesh& mesh) const
+{
+	renderContext->SetCullModeCullNone();
+	Draw(mesh);
+	renderContext->SetCullModeCullBack();
+
 }
 
 void Renderer::Draw(const Sprite2D& sprite) const
