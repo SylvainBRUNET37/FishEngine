@@ -40,8 +40,8 @@ public:
 
 private:
 	// Text rendering
-	std::unique_ptr<TextRenderer> textRenderer;
-	std::unique_ptr<Gdiplus::Font> textFont;
+	TextRenderer* textRenderer;
+	Gdiplus::Font* textFont;
 
 };
 

@@ -17,14 +17,15 @@ UIManager::UIManager(ID3D11Device* device) : device{device}
 
 	// create a GDI+ font for the TextRenderer
 	const FontFamily family(L"Arial", nullptr);
-	textFont = std::make_unique<Gdiplus::Font>(&family, 24.0f, Gdiplus::FontStyleRegular, Gdiplus::UnitPixel);
+	textFont = new Gdiplus::Font(&family, 24.0f, Gdiplus::FontStyleRegular, Gdiplus::UnitPixel);
 
-	textRenderer = std::make_unique<TextRenderer>(device, 512, 512,
-		textFont.get());
+	textRenderer = new TextRenderer(device, 512, 512, textFont);
 }
 
 UIManager::~UIManager()
 {
+	delete textRenderer;
+	delete textFont;
 	TextRenderer::Close();
 }
 
