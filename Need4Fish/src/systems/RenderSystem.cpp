@@ -71,8 +71,15 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 		renderer.Render(mesh, renderContext->GetContext(), transform);
 	}
 
-	// Text ?
-	uiManager->RenderText(L"Lorem ipsum dolor sit amet", renderContext->GetContext(), 0.0f, 0.0f, 100.0f, 100.0f);
+	// Text Addition (create sprite)
+	auto watchables = entityManager.View<Controllable, Eatable>();
+	int playerMass;
+	for (auto [_, __, eatable] : watchables) {
+		playerMass = eatable.mass;
+		break;
+	}
+	auto text = std::format(L"Player mass : {}", playerMass);
+	uiManager->RenderText(text, renderContext->GetContext(), 0.0f, 0.0f, 100.0f, 100.0f);
 
 	// Render sprites
 	for (auto& sprite : uiManager->GetSprites())
