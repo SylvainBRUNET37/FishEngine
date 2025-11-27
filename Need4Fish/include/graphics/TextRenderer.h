@@ -4,6 +4,8 @@
 #include <memory>
 #include <string>
 
+#include "rendering/utils/ComPtr.h"
+
 #pragma comment(lib, "gdiplus.lib")
 
 
@@ -14,7 +16,7 @@ public:
 		Gdiplus::Font* pPolice);
 	~TextRenderer();
 	void Ecrire(const std::wstring& s) const;
-	ID3D11ShaderResourceView* GetTextureView() const { return pTextureView; }
+	ComPtr<ID3D11ShaderResourceView> GetTextureView() const { return pTextureView; }
 	static void Init();
 	static void Close();
 	UINT GetTextWidth() const { return TexWidth; }
@@ -25,7 +27,7 @@ private:
 	UINT TexHeight;
 	ID3D11Texture2D* pTexture;
 	IDXGISurface1* pSurface;
-	ID3D11ShaderResourceView* pTextureView;
+	ComPtr<ID3D11ShaderResourceView> pTextureView;
 	ID3D11Device* pDispo;
 	Gdiplus::Font* pFont;
 	std::unique_ptr<Gdiplus::Bitmap> pCharBitmap;

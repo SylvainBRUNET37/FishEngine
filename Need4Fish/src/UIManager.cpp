@@ -19,14 +19,13 @@ UIManager::UIManager(ID3D11Device* device) : device{device}
 	const FontFamily family(L"Arial", nullptr);
 	textFont = std::make_unique<Gdiplus::Font>(&family, 24.0f, Gdiplus::FontStyleRegular, Gdiplus::UnitPixel);
 
-	textRenderer = std::make_unique<TextRenderer>(device, 256, 256,
+	textRenderer = std::make_unique<TextRenderer>(device, 512, 512,
 		textFont.get());
 }
 
 UIManager::~UIManager()
 {
 	TextRenderer::Close();
-
 }
 
 Sprite2D UIManager::LoadSprite(const std::string& filePath) const
@@ -196,7 +195,7 @@ void UIManager::RenderText(const std::wstring& text, ID3D11DeviceContext* contex
 	// Write new text into the GDI+ bitmap and update the GPU texture
 	textRenderer->Ecrire(text);
 
-	Texture textTexture(ComPtr(textRenderer->GetTextureView()), textRenderer->GetTextWidth(), textRenderer->GetTextHeigth());
+	const Texture textTexture(textRenderer->GetTextureView(), textRenderer->GetTextWidth(), textRenderer->GetTextHeigth());
 
 	auto& shaderBank = Locator::Get<ResourceManager>().GetShaderBank();
 
@@ -206,7 +205,6 @@ void UIManager::RenderText(const std::wstring& text, ID3D11DeviceContext* contex
 		shaderBank.Get<VertexShader>("shaders/SpriteVS.hlsl"),
 		shaderBank.Get<PixelShader>("shaders/SpritePS.hlsl")
 	);
-	Sprite2D textSprite(spriteShaderProgram, textTexture, device);
+	const Sprite2D textSprite(spriteShaderProgram, textTexture, device);
 	AddSprite({ textSprite });
-
 }

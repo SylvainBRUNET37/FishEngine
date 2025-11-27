@@ -73,6 +73,7 @@ void Renderer::Render(const Mesh& mesh,
 
 void Renderer::Render(Sprite2D& sprite, ID3D11DeviceContext* context)
 {
+	renderContext->EnableAlphaBlending();
 
 	const int screenWidth = GetSystemMetrics(SM_CXSCREEN);
 	const int screenHeight = GetSystemMetrics(SM_CYSCREEN);
@@ -93,6 +94,8 @@ void Renderer::Render(Sprite2D& sprite, ID3D11DeviceContext* context)
 	context->PSSetShaderResources(0, 1, &sprite.texture.texture);
 
 	Draw(sprite);
+
+	renderContext->DisableAlphaBlending();
 }
 
 void Renderer::RenderPostProcess(

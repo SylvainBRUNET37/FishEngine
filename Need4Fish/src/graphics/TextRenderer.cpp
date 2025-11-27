@@ -60,7 +60,7 @@ TextRenderer::TextRenderer(ID3D11Device* pDispositif, int largeur,
 		PixelFormat32bppARGB);
 	pCharGraphics = std::make_unique<Gdiplus::Graphics>(pCharBitmap.get());
 	// Paramètres de l’objet Graphics
-	pCharGraphics->SetCompositingMode(Gdiplus::CompositingModeSourceOver);
+	pCharGraphics->SetCompositingMode(Gdiplus::CompositingModeSourceCopy);
 	pCharGraphics->SetCompositingQuality(Gdiplus::CompositingQualityHighSpeed);
 	pCharGraphics->SetInterpolationMode(Gdiplus::InterpolationModeHighQuality);
 	pCharGraphics->SetPixelOffsetMode(Gdiplus::PixelOffsetModeHighSpeed);
@@ -72,7 +72,7 @@ TextRenderer::TextRenderer(ID3D11Device* pDispositif, int largeur,
 	// Un brosse noire pour le remplissage
 	// Notez que la brosse aurait pu être passée
 	// en paramètre pour plus de flexibilité
-	pBlackBrush = std::make_unique<Gdiplus::SolidBrush>(Gdiplus::Color(255, 0, 0, 0));
+	pBlackBrush = std::make_unique<Gdiplus::SolidBrush>(Gdiplus::Color(255, 255, 255, 255));
 	// On efface le bitmap (notez le NOIR TRANSPARENT...)
 	pCharGraphics->Clear(Gdiplus::Color(0, 0, 0, 0));
 	// Nous pourrions ici écrire une valeur initiale sur le bitmap
@@ -83,6 +83,7 @@ TextRenderer::TextRenderer(ID3D11Device* pDispositif, int largeur,
 	const auto rect = Gdiplus::Rect(0, 0, TexWidth, TexHeight);
 	pCharBitmap->LockBits(&rect,
 		Gdiplus::ImageLockModeRead, PixelFormat32bppARGB, &bmData);
+
 	// Création d’une texture de même dimension sur la carte graphique
 	D3D11_TEXTURE2D_DESC texDesc;
 	texDesc.Width = TexWidth;
@@ -92,11 +93,11 @@ TextRenderer::TextRenderer(ID3D11Device* pDispositif, int largeur,
 	texDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 	texDesc.SampleDesc.Count = 1;
 	texDesc.SampleDesc.Quality = 0;
-
 	texDesc.Usage = D3D11_USAGE_DEFAULT;
 	texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 	texDesc.CPUAccessFlags = 0;
 	texDesc.MiscFlags = 0;
+
 	D3D11_SUBRESOURCE_DATA data;
 	data.pSysMem = bmData.Scan0;
 	data.SysMemPitch = TexWidth * 4;
@@ -104,6 +105,7 @@ TextRenderer::TextRenderer(ID3D11Device* pDispositif, int largeur,
 	// Création de la texture à partir des données du bitmap
 	DXEssayer(pDispo->CreateTexture2D(&texDesc, &data,
 		&pTexture));
+
 	// Création d’un « resourve view » pour accéder facilement à la texture
 	// (comme pour les sprites)
 	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
