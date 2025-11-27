@@ -213,7 +213,8 @@ void GameEngine::InitGame()
 		TextureLoader::LoadTextureFromFile("assets/textures/de.png", renderContext->GetDevice()),
 		renderContext->GetDevice(),
 		{0.0f, 700.0f, 0.0f},
-		{50, 50}
+		{50, 50},
+		true
 	);
 
 	const auto dieBillboardEntity = entityManager.CreateEntity();
