@@ -1,14 +1,13 @@
 #include "pch.h"
 
+#include "GameState.h"
+#include "Locator.h"
+#include "rendering/culling/FrustumCuller.h"
+#include "resources/ResourceManager.h"
 #include "systems/RenderSystem.h"
 
 #include <format>
-
-#include "rendering/culling/FrustumCuller.h"
-
-#include "GameState.h"
-#include "Locator.h"
-#include "resources/ResourceManager.h"
+#include <Jolt/Physics/Body/Body.h>
 
 using namespace DirectX;
 using namespace std;
@@ -72,13 +71,15 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 	}
 
 	// Text Addition (create sprite)
-	auto watchables = entityManager.View<Controllable, Eatable>();
+	auto watchables = entityManager.View<Controllable, Eatable, RigidBody>();
 	int playerMass;
-	for (auto [_, __, eatable] : watchables) {
+	float playerSpeed;
+	for (const auto& [_, __, eatable, rigiBody] : watchables) {
 		playerMass = eatable.mass;
+		playerSpeed = rigiBody.body->GetLinearVelocity().Length();
 		break;
 	}
-	auto text = std::format(L"Player mass : {}", playerMass);
+	auto text = std::format(L"Player mass : {}\nPlayer speed {:.2f}", playerMass, playerSpeed);
 	uiManager->RenderText(text, renderContext->GetContext(), 0.0f, 0.0f, 100.0f, 100.0f);
 
 	// Render sprites
