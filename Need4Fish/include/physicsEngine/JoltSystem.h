@@ -17,6 +17,9 @@
 class JoltSystem
 {
 public:
+	using PostStepCallback = std::function<void()>;
+	using PostStepCallbacks = std::vector<PostStepCallback>;
+
 	JoltSystem();
 	~JoltSystem();
 
@@ -56,11 +59,25 @@ public:
 		return physicsSystem->GetBodyInterface();
 	}
 
+	// Should be cleared after calling callbacks
+	static PostStepCallbacks& GetPostStepCallbacks()
+	{
+		return postStepCallbacks;
+	}
+
+	static void AddPostStepCallback(const PostStepCallback& callback)
+	{
+		postStepCallbacks.emplace_back(callback);
+	}
+
 private:
 	static constexpr size_t TEMP_ALLOCATOR_SIZE_MB = 10;
 	static constexpr size_t TEMP_ALLOCATOR_SIZE = TEMP_ALLOCATOR_SIZE_MB * 1024 * 1024;
 
 	inline static std::unique_ptr<JPH::PhysicsSystem> physicsSystem = nullptr;
+
+	// Action to do after Jolt physics step because bodies are locked during it
+	inline static PostStepCallbacks postStepCallbacks{};
 
 	BroadPhaseLayerInterfaceImpl broadPhaseLayerInterface;
 	ObjectVsBroadPhaseLayerFilterImpl objectVsBroadPhaseLayerFilter;

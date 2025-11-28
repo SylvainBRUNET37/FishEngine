@@ -5,12 +5,24 @@
 #include "Jolt/Jolt.h"
 #include <Jolt/Math/Vec3.h>
 
-class MeshUtil
+struct Transform;
+
+namespace MeshUtil
 {
-public:
-	static JPH::Vec3 getApproximateSize(const Mesh);
-	static JPH::TriangleList generateMeshTriangleList(const Mesh);
-};
+    inline JPH::RVec3 ToJolt(const DirectX::XMFLOAT3& vector3)
+    {
+        return JPH::RVec3(vector3.x, vector3.y, vector3.z);
+    }
+
+    inline JPH::Quat ToJolt(const DirectX::XMFLOAT4& quaternion)
+    {
+        return JPH::Quat(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
+    }
+
+    JPH::RMat44 ToJolt(const Transform& transform);
+	JPH::Vec3 getApproximateSize(const Mesh&);
+	JPH::TriangleList generateMeshTriangleList(Mesh);
+}
 
 #endif
 

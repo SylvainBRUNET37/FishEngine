@@ -17,6 +17,7 @@ void ComponentFactory::CreateRigidBody(const nlohmann::json& componentData, Enti
 
 	const auto& mesh = Locator::Get<ResourceManager>().GetMesh(meshInstance.meshIndex);
 
+	// Create a unordered_map<string, function> if there is too much if statements
 	if (componentData["type"] == "meshShape")
 		entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateMeshShape(transform, mesh));
 	else if (componentData["type"] == "boxShape")

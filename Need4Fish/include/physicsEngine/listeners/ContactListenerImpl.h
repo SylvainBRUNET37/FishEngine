@@ -3,8 +3,10 @@
 
 #include <Jolt/Jolt.h>
 #include <Jolt/Physics/Collision/ContactListener.h>
+#include <Jolt/Physics/Body/Body.h>
 
 #include "GameState.h"
+#include "physicsEngine/layers/Layers.h"
 
 class ContactListenerImpl : public JPH::ContactListener
 {
@@ -19,12 +21,7 @@ public:
 	}
 
 	void OnContactAdded(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold,
-		JPH::ContactSettings& ioSettings) override
-	{
-		GameState::detectedCollisions.push({ inBody1.GetID(), inBody2.GetID() });
-		std::cout << "A contact was added between body1 in layer " << GetObjectLayerName(inBody1.GetObjectLayer()) << " and body2 in layer " << GetObjectLayerName(inBody2.GetObjectLayer()) << std::endl;
-		std::cout << "Body1 has ID=" << inBody1.GetID().GetIndexAndSequenceNumber() << " and Body2 has ID=" << inBody2.GetID().GetIndexAndSequenceNumber() << std::endl;
-	}
+		JPH::ContactSettings& ioSettings) override;
 
 	void OnContactPersisted(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold,
 		JPH::ContactSettings& ioSettings) override
@@ -38,7 +35,7 @@ public:
 
 private:
 	//This really should be in Layers.h, but then the compiler complained it was already defined for some reason
-	const char* GetObjectLayerName(JPH::ObjectLayer inLayer)
+	static const char* GetObjectLayerName(const JPH::ObjectLayer inLayer)
 	{
 		switch (inLayer)
 		{
@@ -51,6 +48,8 @@ private:
 		default:					JPH_ASSERT(false); return "INVALID";
 		}
 	}
+
+	static void LogBodyContact(const JPH::Body& inBody1, const JPH::Body& inBody2);
 };
 
 
