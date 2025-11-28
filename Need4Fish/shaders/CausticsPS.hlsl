@@ -1,5 +1,6 @@
 // https://developer.nvidia.com/gpugems/gpugems/part-i-natural-effects/chapter-2-rendering-water-caustics
 // https://developer.nvidia.com/gpugems/gpugems/part-i-natural-effects/chapter-1-effective-water-simulation-physical-models
+// https://thebookofshaders.com/13/?lan=fr
 
 static const float VTXSIZE = 0.15f;
 static const float WAVESIZE = 0.8f;
@@ -10,29 +11,11 @@ static const int OCTAVES = 4;
 static const float AIR_INDICE_OF_REFRACTION = 1.0f;
 static const float WATER_INDICE_OF_REFRACTION = 1.3f;
 
-float GetWaveHeight(float x, float y, float elapsedTime)
+// Simulate wave
+// https://developer.nvidia.com/gpugems/gpugems/part-i-natural-effects/chapter-2-rendering-water-caustics
+float2 ComputeWaveNoise(float2 worldPosXZ, float elapsedTime)
 {
-	float z = 0.0f;
-	float octaves = OCTAVES;
-	float factor = FACTOR;
-	float d = sqrt(x * x + y * y);
-
-	do
-	{
-		float angle = elapsedTime * SPEED + (1.0f / factor) * x * y * WAVESIZE;
-		z -= factor * cos(angle);
-
-		factor *= 0.5f; // divide by 2
-		octaves--;
-	}
-    while (octaves > 0);
-
-	return 2.0f * VTXSIZE * d * z;
-}
-
-float2 ComputeGradWave(float2 worldPosXZ, float elapsedTime)
-{
-    // Make wave largers
+    // Make "caustics waves" largers
 	worldPosXZ *= 0.01;
 
 	float2 gradiant = 0;
@@ -72,7 +55,7 @@ float2 ComputeGradWave(float2 worldPosXZ, float elapsedTime)
 
 float3 GetWaveNormal(float2 worldPosXZ, float elapsedTime)
 {
-	float2 gradWave = ComputeGradWave(worldPosXZ, elapsedTime);
+	float2 gradWave = ComputeWaveNoise(worldPosXZ, elapsedTime);
 
     // Convert to: (-dZ/dx, 1, -dZ/dy)
 	float3 waveNormal = normalize(float3(-gradWave.x, 1.0f, -gradWave.y));
@@ -89,11 +72,10 @@ float ApplyCaustics(
 	// Horizontal positon of the ocean
 	const float2 surfXZ = worldPos.xz;
 
-    // Get the water surface height and normal
-	float waterY = GetWaveHeight(surfXZ.x, surfXZ.y, elapsedTime);
+    // Get the water normal
 	float3 waveNormal = GetWaveNormal(surfXZ, elapsedTime);
 
-    // Raycast which goes toward the sky
+    // Direction which goes toward the sky
 	const float3 UP_RAY = float3(0, 1, 0);
 
     // Refract the ray into air
@@ -102,21 +84,23 @@ float ApplyCaustics(
 	float3 refracted = refract(-UP_RAY, waveNormal, ETA);
 
     // Sun direction
-	const float3 sunDir = normalize(dirLightDirection);
+	const float3 sunDirection = normalize(dirLightDirection);
 
     // Compute the alignement/difference between the reracted ray and the sun dir
-	float alignment = saturate(dot(normalize(refracted), sunDir));
+	float alignment = saturate(dot(normalize(refracted), sunDirection));
 
     // Add intensity to the caustic effect
-	const float STRENGTH = 8.0;
-	float intensity = pow(alignment, STRENGTH);
+	// The higher the sharpness is, the lower the caustic will be bright
+	// TODO: Sharpness could depend on the depth of the object relative to the water height
+    static const float SHARPNESS = 8.0;
+	float intensity = pow(alignment, SHARPNESS);
 
-    // Apply caustic texture patterns
-	float depth = waterY - worldPos.y;
-	float3 proj = worldPos + refracted * depth;
+	// Project the refracted ray onto the scene geometry
+	// It doesn't really work but it looks good
+    float3 projection = worldPos + refracted * worldPos.y;
 
 	const float UV_SCALE = 0.005;
-	float causticTexture = causticTex.Sample(causticSamp, proj.xz * UV_SCALE).r;
+	float causticTexture = causticTex.Sample(causticSamp, projection.xz * UV_SCALE).r;
 
 	return intensity * causticTexture;
 }
