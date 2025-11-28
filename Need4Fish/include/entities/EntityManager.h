@@ -81,7 +81,7 @@ public:
 		requires IsComponent<Component>
 	[[nodiscard]] Component& Get(const Entity entity)
 	{
-		if (not IsAlive(entity))
+		if (not IsAlive(entity) || not HasComponent<Component>(entity))
 			throw std::runtime_error("Invalid entity");
 
 		auto& componentPool = std::get<ComponentPool<Component>>(componentPools);

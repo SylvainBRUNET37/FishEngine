@@ -229,6 +229,7 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     <ClCompile Include="src\systems\PhysicsSimulationSystem.cpp" />
     <ClCompile Include="src\systems\PowerSystem.cpp" />
     <ClCompile Include="src\systems\RenderSystem.cpp" />
+    <ClCompile Include="src\systems\SensorSystem.cpp" />
     <ClCompile Include="src\UIManager.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -280,6 +281,7 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     <ClInclude Include="include\systems\PhysicsSimulationSystem.h" />
     <ClInclude Include="include\systems\PowerSystem.h" />
     <ClInclude Include="include\systems\RenderSystem.h" />
+    <ClInclude Include="include\systems\SensorSystem.h" />
     <ClInclude Include="include\systems\System.h" />
     <ClInclude Include="include\physicsEngine\utils\MeshUtil.h" />
     <ClInclude Include="include\UIManager.h" />

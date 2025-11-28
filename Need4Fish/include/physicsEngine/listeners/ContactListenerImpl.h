@@ -28,10 +28,7 @@ public:
 	{
 	}
 
-	void OnContactRemoved(const JPH::SubShapeIDPair& inSubShapePair) override
-	{
-		std::cout << "A contact was removed" << std::endl;
-	}
+	void OnContactRemoved(const JPH::SubShapeIDPair& inSubShapePair) override;
 
 private:
 	//This really should be in Layers.h, but then the compiler complained it was already defined for some reason

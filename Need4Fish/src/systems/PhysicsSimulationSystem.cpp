@@ -134,15 +134,6 @@ void PhysicsSimulationSystem::UpdatePhysics()
 	JoltSystem::GetPhysicSystem().Update(PHYSICS_UPDATE_RATE, collisionSteps,
 	                                     &JoltSystem::GetTempAllocator(),
 	                                     &JoltSystem::GetJobSystem());
-
-	// Apply actions after Jolt physics step because bodies are locked during it
-	auto& postStepCallbacks = JoltSystem::GetPostStepCallbacks();
-	ranges::for_each(postStepCallbacks, [](auto& callback)
-	{
-		callback();
-	});
-
-	postStepCallbacks.clear();
 }
 
 void PhysicsSimulationSystem::RotateTowardsCameraDirection(

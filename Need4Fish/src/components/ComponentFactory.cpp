@@ -7,21 +7,34 @@
 
 #include "json.hpp"
 #include "Locator.h"
+#include "physicsEngine/SensorFactory.h"
 #include "resources/ResourceManager.h"
+
+using namespace std;
 
 void ComponentFactory::CreateRigidBody(const nlohmann::json& componentData, EntityManager& entityManager,
                                        const Entity& entity)
 {
 	const auto& transform = entityManager.Get<Transform>(entity);
-	const auto& meshInstance = entityManager.Get<MeshInstance>(entity);
 
-	const auto& mesh = Locator::Get<ResourceManager>().GetMesh(meshInstance.meshIndex);
+	const string type = componentData["type"];
 
-	// Create a unordered_map<string, function> if there is too much if statements
-	if (componentData["type"] == "meshShape")
-		entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateMeshShape(transform, mesh));
-	else if (componentData["type"] == "boxShape")
-		entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCube(transform, mesh));
+	if (type == "meshShape" || type == "boxShape")
+	{
+		const auto& meshInstance = entityManager.Get<MeshInstance>(entity);
+		const auto& mesh = Locator::Get<ResourceManager>().GetMesh(meshInstance.meshIndex);
+
+	if (type == "boxShape")
+		entityManager.AddComponent<RigidBody>(entity,
+			ShapeFactory::CreateCube(transform, mesh));
+		else if (type == "meshShape")
+			entityManager.AddComponent<RigidBody>(entity,
+				ShapeFactory::CreateMeshShape(transform, mesh));
+
+	}
+	else if (type == "currentSensor")
+		entityManager.AddComponent<RigidBody>(entity,
+			SensorFactory::CreateCubeCurrentSensor(transform));
 }
 
 void ComponentFactory::CreateEatable(const nlohmann::json& componentData, EntityManager& entityManager,

@@ -12,11 +12,10 @@ using namespace JPH;
 
 Body* SensorFactory::CreateCubeCurrentSensor(const Transform& transform)
 {
-	const RefConst<Shape> shape = new BoxShape{Vec3{1.f, 1.f, 1.f}};
+	auto halfExtents = Vec3(1.f, 1.f, 1.f);
+	halfExtents *= Vec3(transform.scale.x, transform.scale.y, transform.scale.z);
 
-	// Scale the shape
-	if (shape->ScaleShape(MeshUtil::ToJolt(transform.scale)).HasError())
-		throw std::runtime_error{"Could not scale the sensor"};
+	const RefConst shape = new BoxShape{Vec3{1.f, 1.f, 1.f} * halfExtents};
 
 	BodyCreationSettings sensorSettings
 	(
