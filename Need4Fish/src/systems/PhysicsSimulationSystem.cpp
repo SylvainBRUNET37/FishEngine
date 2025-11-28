@@ -79,7 +79,7 @@ void PhysicsSimulationSystem::UpdateControllables(EntityManager& entityManager)
 		}
 
 		Vec3 currentSpeed = JoltSystem::GetBodyInterface().GetLinearVelocity(rigidBody.body->GetID());
-		Vec3 newSpeed = currentSpeed;
+		Vec3 newSpeed = Vec3(0.0f, 0.0f, 0.0f);
 		bool speedChanged = false;
 
 		// Reset du roll
@@ -87,33 +87,33 @@ void PhysicsSimulationSystem::UpdateControllables(EntityManager& entityManager)
 
 		if (GetAsyncKeyState('W') & 0x8000)
 		{
-			newSpeed = newSpeed + 10.0f * forward;
+			newSpeed = 10.0f * forward;
 			speedChanged = true;
 		}
 		if (GetAsyncKeyState('S') & 0x8000)
 		{
-			newSpeed = newSpeed - 10.0f * forward;
+			newSpeed = - 10.0f * forward;
 			speedChanged = true;
 		}
 		if (GetAsyncKeyState('D') & 0x8000)
 		{
-			newSpeed = newSpeed - 5.0f * right;
+			newSpeed = - 5.0f * right;
 			speedChanged = true;
 			inputRoll = 0.1f;
 		}
 		if (GetAsyncKeyState('A') & 0x8000)
 		{
-			newSpeed = newSpeed + 5.0f * right;
+			newSpeed = 5.0f * right;
 			speedChanged = true;
 			inputRoll = -0.1f;
 		}
 
+		auto theoreticalSpeed = currentSpeed + newSpeed;
+		if ((theoreticalSpeed).Length() > controllable.maxSpeed)
+			newSpeed = theoreticalSpeed.Normalized() * controllable.maxSpeed - currentSpeed;
+
 		if (speedChanged)
-		{
-			if (newSpeed.Length() > controllable.maxSpeed)
-				newSpeed = newSpeed.Normalized() * controllable.maxSpeed;
-			JoltSystem::GetBodyInterface().SetLinearVelocity(rigidBody.body->GetID(), newSpeed);
-		}
+			JoltSystem::GetBodyInterface().SetLinearVelocity(rigidBody.body->GetID(), currentSpeed + newSpeed);
 	}
 }
 
