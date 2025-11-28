@@ -25,12 +25,14 @@ void SensorSystem::Update(double deltaTime, EntityManager& entityManager)
 		auto& bodyInterface = JoltSystem::GetBodyInterface();
 		vassert(bodyInterface.IsSensor(sensorId), "The key of activeContacts must be the sensor");
 
+		const auto sensorEntity = to_entity(bodyInterface.GetUserData(sensorId));
+		const auto& sensor = entityManager.Get<Sensor>(sensorEntity);
+
 		if (bodyInterface.GetMotionType(objectId) == EMotionType::Dynamic)
 		{
-			const Vec3 objectForward = bodyInterface.GetRotation(objectId).RotateAxisZ();
+			//const Vec3 objectForward = bodyInterface.GetRotation(objectId).RotateAxisZ();
 
-			constexpr float pushStrength = 50.0f;
-			const Vec3 impulse = objectForward * pushStrength;
+			const Vec3 impulse = sensor.direction * sensor.pushStrength;
 
 			bodyInterface.AddLinearVelocity(objectId, impulse);
 		}

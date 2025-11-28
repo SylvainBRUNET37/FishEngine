@@ -11,47 +11,56 @@
 #include "resources/ResourceManager.h"
 
 using namespace std;
+using namespace JPH;
 
 void ComponentFactory::CreateRigidBody(const nlohmann::json& componentData, EntityManager& entityManager,
                                        const Entity& entity)
 {
 	const auto& transform = entityManager.Get<Transform>(entity);
+	const auto& meshInstance = entityManager.Get<MeshInstance>(entity);
+	const auto& mesh = Locator::Get<ResourceManager>().GetMesh(meshInstance.meshIndex);
 
-	const string type = componentData["type"];
+	if (componentData["type"] == "boxShape")
+		entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCube(transform, mesh));
+	else if (componentData["type"] == "meshShape")
+		entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateMeshShape(transform, mesh));
+}
 
-	if (type == "meshShape" || type == "boxShape")
+void ComponentFactory::CreateSensor(const nlohmann::json& componentData, EntityManager& entityManager,
+                                    const Entity& entity)
+{
+	const auto& transform = entityManager.Get<Transform>(entity);
+
+	const Sensor sensor
 	{
-		const auto& meshInstance = entityManager.Get<MeshInstance>(entity);
-		const auto& mesh = Locator::Get<ResourceManager>().GetMesh(meshInstance.meshIndex);
+		.direction = 
+		{
+			componentData["direction"]["x"].get<float>(),
+			componentData["direction"]["y"].get<float>(),
+			componentData["direction"]["z"].get<float>()
+		},
+		.body = SensorFactory::CreateCubeCurrentSensor(transform, entity),
+		.pushStrength = componentData["pushStrength"].get<float>()
+	};
 
-	if (type == "boxShape")
-		entityManager.AddComponent<RigidBody>(entity,
-			ShapeFactory::CreateCube(transform, mesh));
-		else if (type == "meshShape")
-			entityManager.AddComponent<RigidBody>(entity,
-				ShapeFactory::CreateMeshShape(transform, mesh));
-
-	}
-	else if (type == "currentSensor")
-		entityManager.AddComponent<RigidBody>(entity,
-			SensorFactory::CreateCubeCurrentSensor(transform));
+	entityManager.AddComponent<Sensor>(entity, std::move(sensor));
 }
 
 void ComponentFactory::CreateEatable(const nlohmann::json& componentData, EntityManager& entityManager,
-	const Entity& entity)
+                                     const Entity& entity)
 {
 	auto& eatableComponent = entityManager.AddComponent<Eatable>(entity, componentData["mass"].get<float>());
 	eatableComponent.isApex = componentData["isApex"].get<bool>();
 }
 
 void ComponentFactory::CreateControllable(const nlohmann::json& componentData, EntityManager& entityManager,
-	const Entity& entity)
+                                          const Entity& entity)
 {
 	entityManager.AddComponent<Controllable>(entity, componentData["maxSpeed"].get<float>());
 }
 
 void ComponentFactory::CreatePowerSource(const nlohmann::json& componentData, EntityManager& entityManager,
-	const Entity& entity)
+                                         const Entity& entity)
 {
 	auto& powerSource = entityManager.AddComponent<PowerSource>(entity, PowerSource{});
 	powerSource.power = static_cast<Power>(componentData["power"].get<int>());

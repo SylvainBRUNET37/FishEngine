@@ -245,6 +245,7 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     <ClInclude Include="external\json_fwd.hpp" />
     <ClInclude Include="include\components\ComponentFactory.h" />
     <ClInclude Include="include\components\gameplay\Eatable.h" />
+    <ClInclude Include="include\components\physics\Sensor.h" />
     <ClInclude Include="include\components\PowerSource.h" />
     <ClInclude Include="include\Locator.h" />
     <ClInclude Include="include\gameplay\mechanics\Eating.h" />

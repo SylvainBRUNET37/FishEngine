@@ -10,7 +10,7 @@
 
 using namespace JPH;
 
-Body* SensorFactory::CreateCubeCurrentSensor(const Transform& transform)
+Body* SensorFactory::CreateCubeCurrentSensor(const Transform& transform, const Entity& entity)
 {
 	auto halfExtents = Vec3(1.f, 1.f, 1.f);
 	halfExtents *= Vec3(transform.scale.x, transform.scale.y, transform.scale.z);
@@ -27,6 +27,7 @@ Body* SensorFactory::CreateCubeCurrentSensor(const Transform& transform)
 	);
 
 	sensorSettings.mIsSensor = true;
+	sensorSettings.mUserData = to_uint64(entity);
 
 	// Create sensor body
 	BodyInterface& bodyInterface = JoltSystem::GetBodyInterface();

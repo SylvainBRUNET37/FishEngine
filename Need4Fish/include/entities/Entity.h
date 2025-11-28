@@ -25,7 +25,7 @@ constexpr uint64_t to_uint64(const Entity& entity)
 	return static_cast<uint64_t>(entity.index) << 32 | static_cast<uint64_t>(entity.generation);
 }
 
-constexpr Entity from_uint64(const uint64_t value)
+constexpr Entity to_entity(const uint64_t value)
 {
 	Entity entity;
 

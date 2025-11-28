@@ -10,6 +10,7 @@
 #include "entities/Entity.h"
 #include "gameplay/Eatable.h"
 #include "physics/RigidBody.h"
+#include "physics/Sensor.h"
 
 #include "rendering/core/Transform.h"
 #include "rendering/graphics/Billboard.h"
@@ -54,7 +55,8 @@ using Components = std::tuple
 	Sprite2D,
 	Eatable,
 	PowerSource,
-	Billboard
+	Billboard,
+	Sensor
 >;
 
 #endif

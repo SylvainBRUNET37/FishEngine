@@ -1,6 +1,9 @@
 #ifndef RIGID_BODY_H
 #define RIGID_BODY_H
 
+#include <Jolt/Jolt.h>
+#include <Jolt/Physics/Body/Body.h>
+
 class RigidBody
 {
 public:
