@@ -1,22 +1,32 @@
 #include "pch.h"
 #include "systems/CameraSystem.h"
 #include "GameState.h"
+#include <physicsEngine/JoltSystem.h>
+
+// Pour le SpringArm
+#include <Jolt/Physics/Collision/RayCast.h>
+#include <Jolt/Physics/Collision/CastResult.h>
+#include <Jolt/Physics/Collision/CollideShape.h>
+#include <Jolt/Physics/Collision/BroadPhase/BroadPhaseLayer.h>
+#include <Jolt/Physics/Collision/ObjectLayer.h>
+#include <Jolt/Physics/Collision/Shape/SphereShape.h>
+#include <Jolt/Physics/Collision/ShapeCast.h>
 
 using namespace DirectX;
 
-void CameraSystem::Update(double, EntityManager& entityManager)
+void CameraSystem::Update(double dt, EntityManager& entityManager)
 {
 	if (GameState::currentState == GameState::PLAYING)
 	{
 		for (const auto& [entity, camera] : entityManager.View<Camera>())
 		{
 			HandleRotation(camera);
-			UpdateCameraMatrices(camera, entityManager);
+			UpdateCameraMatrices(camera, entityManager, static_cast<float>(dt));
 		}
 	}
 }
 
-void CameraSystem::ComputeCameraPosition(Camera& camera, const Transform& transform)
+void CameraSystem::ComputeCameraPosition(Camera& camera, const Transform& transform, float dt)
 {
 	const XMVECTOR targetPos = XMLoadFloat3(&transform.position);
 	const XMVECTOR targetRotQuat = XMLoadFloat4(&transform.rotation);
@@ -53,13 +63,45 @@ void CameraSystem::ComputeCameraPosition(Camera& camera, const Transform& transf
 		const float horizontalDist = camera.distance * cosf(camera.pitchAngle);
 		const float verticalDist = camera.distance * sinf(camera.pitchAngle);
 
-		camera.position = XMVectorSet
-		(
+		const XMVECTOR idealCameraPos = XMVectorSet(
 			XMVectorGetX(camera.focus) - horizontalDist * sinf(totalYaw),
 			XMVectorGetY(camera.focus) + verticalDist + camera.heightOffset,
 			XMVectorGetZ(camera.focus) - horizontalDist * cosf(totalYaw),
 			1.0f
 		);
+
+		// Détection de collision pour le Springarm
+		if (camera.enableSpringArm)
+		{
+			const float desiredDistance = camera.distance;
+
+			if (Camera::currentDistance <= 0.0f)
+				Camera::currentDistance = desiredDistance;
+			float actualDistance = PerformSpringArmRaycast(camera.focus, idealCameraPos, desiredDistance);
+
+			// Interpolation progressive vers la nouvelle distance
+			const float t = std::clamp(camera.springArmSpeed * dt, 0.0f, 1.0f);
+			Camera::currentDistance = Lerp(Camera::currentDistance, actualDistance, t);
+
+			// Recalculer la position avec la distance ajustée
+			XMVECTOR dir = XMVectorSubtract(idealCameraPos, camera.focus);
+			const float dirLen = XMVectorGetX(XMVector3Length(dir));
+			if (dirLen > 0.0001f)
+			{
+				dir = XMVector3Normalize(dir);
+				XMVECTOR newPos = XMVectorAdd(camera.focus, XMVectorScale(dir, Camera::currentDistance));
+				camera.position = XMVectorSetW(newPos, 1.0f);
+			}
+			else
+			{
+				// fallback si dir très petit
+				camera.position = idealCameraPos;
+			}
+		}
+		else
+		{
+			camera.position = idealCameraPos;
+		}
 	}
 }
 
@@ -72,11 +114,11 @@ void CameraSystem::ComputeCameraOrientation(Camera& camera)
 	camera.up = XMVector3Normalize(XMVector3Cross(forward, right));
 }
 
-void CameraSystem::UpdateCameraMatrices(Camera& camera, const EntityManager& entityManager)
+void CameraSystem::UpdateCameraMatrices(Camera& camera, const EntityManager& entityManager, float dt)
 {
 	const auto targetTransform = entityManager.Get<Transform>(camera.targetEntity);
 
-	ComputeCameraPosition(camera, targetTransform);
+	ComputeCameraPosition(camera, targetTransform, dt);
 	ComputeCameraOrientation(camera);
 
 	camera.matView = XMMatrixLookAtRH(camera.position, camera.focus, camera.up);
@@ -225,4 +267,122 @@ void CameraSystem::ScaleCamera(float scaleFactor)
 	// Comme pour la croissance du personnage
 	const float F_GROWTH_STEPS = 60.0f;
 	Camera::cameraScaleStep = Camera::deltaDistance / F_GROWTH_STEPS;
+}
+
+float CameraSystem::PerformSpringArmRaycast(const XMVECTOR& start, const XMVECTOR& end, float maxDistance)
+{
+	auto& physicSystem = JoltSystem::GetPhysicSystem();
+
+	// Convertir en Jolt
+	JPH::RVec3 rayStart(XMVectorGetX(start), XMVectorGetY(start), XMVectorGetZ(start));
+	JPH::RVec3 rayEnd(XMVectorGetX(end), XMVectorGetY(end), XMVectorGetZ(end));
+
+	JPH::Vec3 rayDirection = (rayEnd - rayStart).Normalized();
+	const float rayLength = (rayEnd - rayStart).Length();
+
+	if (rayLength < 0.001f)
+		return maxDistance;
+
+	// Créer un cast "épais" pour ne pas voir les "intérieurs" de côté
+	JPH::RefConst<JPH::SphereShape> sphere = new JPH::SphereShape(Camera::cameraRadius);
+
+	JPH::RShapeCast shapeCast = JPH::RShapeCast::sFromWorldTransform(
+		sphere,
+		JPH::Vec3::sReplicate(1.0f),  // Scale
+		JPH::RMat44::sTranslation(rayStart),  // Position de départ
+		rayDirection * rayLength  // Direction et longueur
+	);
+
+	// Hit le plus proche
+	class ClosestHitCollector : public JPH::CastShapeCollector
+	{
+	public:
+		virtual void AddHit(const JPH::ShapeCastResult& inResult) override
+		{
+			if (inResult.mFraction < mHit.mFraction)
+			{
+				mHit = inResult;
+			}
+		}
+
+		JPH::ShapeCastResult mHit;
+	};
+
+	ClosestHitCollector collector;
+	collector.mHit.mFraction = 1.0f;
+
+	// Collide sur NON_MOVING
+	class NonMovingOnlyBroadPhaseFilter : public JPH::BroadPhaseLayerFilter
+	{
+	public:
+		virtual bool ShouldCollide(JPH::BroadPhaseLayer inLayer) const override
+		{
+			return inLayer == BroadPhaseLayers::NON_MOVING;
+		}
+	};
+
+	class NonMovingOnlyObjectFilter : public JPH::ObjectLayerFilter
+	{
+	public:
+		virtual bool ShouldCollide(JPH::ObjectLayer inLayer) const override
+		{
+			return inLayer == Layers::NON_MOVING;
+		}
+	};
+
+	class AllBodyFilter : public JPH::BodyFilter
+	{
+	public:
+		virtual bool ShouldCollide([[maybe_unused]] const JPH::BodyID& inBodyID) const override
+		{
+			return true;
+		}
+	};
+
+	class NoShapeFilter : public JPH::ShapeFilter
+	{
+	public:
+		virtual bool ShouldCollide([[maybe_unused]] const JPH::Shape* inShape2, [[maybe_unused]] const JPH::SubShapeID& inSubShapeIDOfShape2) const override
+		{
+			return true;
+		}
+	};
+
+	NonMovingOnlyBroadPhaseFilter broadPhaseFilter;
+	NonMovingOnlyObjectFilter objectLayerFilter;
+	AllBodyFilter bodyFilter;
+	NoShapeFilter shapeFilter;
+
+	JPH::ShapeCastSettings settings;
+	settings.mUseShrunkenShapeAndConvexRadius = true;
+	settings.mReturnDeepestPoint = false;
+
+	// Effectuer le cast
+	physicSystem.GetNarrowPhaseQuery().CastShape(
+		shapeCast,
+		settings,
+		JPH::RVec3::sZero(),
+		collector,
+		broadPhaseFilter,
+		objectLayerFilter,
+		bodyFilter,
+		shapeFilter
+	);
+
+	if (collector.mHit.mFraction < 1.0f)
+	{
+		const float hitDistance = collector.mHit.mFraction * rayLength;
+
+		// Offset pour tenir compte de la sphère
+		const float COLLISION_OFFSET = Camera::cameraRadius + Camera::collisionOffset;
+		return max(hitDistance - COLLISION_OFFSET, 0.1f);
+	}
+
+	return maxDistance;
+}
+
+// Pour l'interpolation
+float CameraSystem::Lerp(float a, float b, float t)
+{
+	return a + (b - a) * std::clamp(t, 0.0f, 1.0f);
 }
