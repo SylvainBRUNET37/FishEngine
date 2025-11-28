@@ -1,7 +1,7 @@
 #ifndef SPRITE_ELEMENT_H
 #define SPRITE_ELEMENT_H
 
-#include "rendering/graphics/ui/Sprite2D.h"
+#include "rendering/graphics/Sprite2D.h"
 #include <optional>
 #include <functional>
 

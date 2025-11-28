@@ -3,7 +3,7 @@
 
 #include <gdiplus.h>
 #include "resources/ResourceManager.h"
-#include "rendering/graphics/ui/SpriteElement.h"
+#include "rendering/graphics/SpriteElement.h"
 #include <vector>
 #include "graphics/TextRenderer.h"
 #include <memory>

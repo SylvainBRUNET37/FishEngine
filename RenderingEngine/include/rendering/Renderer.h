@@ -8,7 +8,7 @@
 #include "device/RenderContext.h"
 #include "graphics/Material.h"
 #include "graphics/Mesh.h"
-#include "graphics/ui/Sprite2D.h"
+#include "graphics/Sprite2D.h"
 #include "postProcessing/PostProcessSettings.h"
 
 class Renderer

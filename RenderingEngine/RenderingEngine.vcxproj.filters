@@ -144,7 +144,7 @@
     <ClInclude Include="include\rendering\culling\FrustumCuller.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\rendering\graphics\ui\Sprite2D.h">
+    <ClInclude Include="include\rendering\graphics\Sprite2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\rendering\graphics\VertexSprite.h">
@@ -162,7 +162,7 @@
     <ClInclude Include="include\rendering\postProcessing\PostProcessSettings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\rendering\graphics\ui\SpriteElement.h">
+    <ClInclude Include="include\rendering\graphics\SpriteElement.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -212,13 +212,13 @@
     <ClCompile Include="src\rendering\shaders\ShaderReflector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\rendering\graphics\ui\Mesh.cpp">
+    <ClCompile Include="src\rendering\graphics\Mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\rendering\culling\FrustumCuller.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\rendering\graphics\ui\Sprite2D.cpp">
+    <ClCompile Include="src\rendering\graphics\Sprite2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\rendering\device\PostProcess.cpp">

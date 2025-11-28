@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "rendering/graphics/ui/Sprite2D.h"
+#include "rendering/graphics/Sprite2D.h"
 
 using namespace std;
 using namespace DirectX;
