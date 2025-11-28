@@ -12,6 +12,7 @@
 #include "physics/RigidBody.h"
 
 #include "rendering/core/Transform.h"
+#include "rendering/graphics/Billboard.h"
 #include "rendering/graphics/lights/PointLight.h"
 #include "rendering/graphics/Mesh.h"
 
@@ -51,7 +52,8 @@ using Components = std::tuple
 	Camera,
 	PointLight,
 	Eatable,
-	PowerSource
+	PowerSource,
+	Billboard
 >;
 
 #endif

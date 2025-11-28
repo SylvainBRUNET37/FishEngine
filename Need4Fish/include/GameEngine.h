@@ -10,7 +10,7 @@
 class GameEngine
 {
 public:
-	explicit GameEngine(RenderContext* renderContext);
+	explicit GameEngine(RenderContext* renderContext_);
 
 	void Run();
 
@@ -18,6 +18,7 @@ private:
 	static constexpr double TARGET_FPS = 60.0;
 	static constexpr double FRAME_TIME = 1000.0 / TARGET_FPS;
 
+	RenderContext* renderContext; // should not be there idealy, but it helps for testing
 	std::vector<std::unique_ptr<System>> systems;
 
 	Entity mainMenuEntity;

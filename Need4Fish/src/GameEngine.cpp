@@ -14,7 +14,8 @@
 using namespace DirectX;
 
 GameEngine::GameEngine(RenderContext* renderContext)
-	: uiManager(std::make_shared<UIManager>(renderContext->GetDevice()))
+	: renderContext{renderContext},
+	  uiManager{std::make_shared<UIManager>(renderContext->GetDevice())}
 {
 	CameraSystem::SetMouseCursor();
 
@@ -78,7 +79,8 @@ void GameEngine::HandleGameState()
 
 	static bool wasEscapePressed = false;
 	const bool isEscapePressed = GetAsyncKeyState(VK_ESCAPE) & 0x8000;
-	const bool isPausableOrResumable = GameState::currentState == GameState::PLAYING || GameState::currentState == GameState::PAUSED;
+	const bool isPausableOrResumable = GameState::currentState == GameState::PLAYING || GameState::currentState ==
+		GameState::PAUSED;
 
 	// Handle clicks
 	if (GetAsyncKeyState(VK_LBUTTON) & 0x8000 && GameState::currentState != GameState::PLAYING)
@@ -97,8 +99,8 @@ void GameEngine::HandleGameState()
 	wasEscapePressed = isEscapePressed;
 }
 
-void GameEngine::HandleCollions() {
-
+void GameEngine::HandleCollions()
+{
 	while (!GameState::detectedCollisions.empty())
 	{
 		auto& [bodyId1, bodyId2] = GameState::detectedCollisions.front();
@@ -182,7 +184,7 @@ void GameEngine::InitGame()
 	Camera::minDistance = 50.0f;
 	Camera::maxDistance = 170.0f;
 	Camera::zoomSpeed = 1.0f;
-	Camera::firstPersonOffset = { 0.0f,-1.7f,35.0f };
+	Camera::firstPersonOffset = {0.0f, -1.7f, 35.0f};
 
 	const auto cameraEntity = entityManager.CreateEntity();
 	auto& cameraComponent = entityManager.AddComponent<Camera>(cameraEntity, camera);
@@ -199,6 +201,25 @@ void GameEngine::InitGame()
 
 		cameraComponent.targetEntity = entity;
 	}
+
+	// Create a billboard
+	static const auto& shaderBank = Locator::Get<ResourceManager>().GetShaderBank();
+	static Billboard dieBillboard
+	(
+		ShaderProgram
+		{
+			renderContext->GetDevice(), shaderBank.Get<VertexShader>("shaders/BillboardVS.hlsl"),
+			shaderBank.Get<PixelShader>("shaders/BillboardPS.hlsl")
+		},
+		TextureLoader::LoadTextureFromFile("assets/textures/de.png", renderContext->GetDevice()),
+		renderContext->GetDevice(),
+		{0.0f, 700.0f, 0.0f},
+		{50, 50},
+		true
+	);
+
+	const auto dieBillboardEntity = entityManager.CreateEntity();
+	entityManager.AddComponent<Billboard>(dieBillboardEntity, dieBillboard);
 
 	mainMenuEntity = entityManager.CreateEntity();
 }

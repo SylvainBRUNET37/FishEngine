@@ -3,6 +3,7 @@
 #include "GameState.h"
 #include "Locator.h"
 #include "rendering/culling/FrustumCuller.h"
+#include "rendering/texture/TextureLoader.h"
 #include "resources/ResourceManager.h"
 #include "systems/RenderSystem.h"
 
@@ -15,10 +16,9 @@ using namespace std;
 RenderSystem::RenderSystem(RenderContext* renderContext, std::shared_ptr<UIManager> uiManager, std::vector<Material>&& materials)
 	: renderer(renderContext, std::move(materials)),
 	  uiManager(uiManager),
-	  frameBuffer(AddDirectionLightToFrameBuffer()),
+	  frameBuffer(CreateDirectionnalLight()),
 	  renderContext(renderContext)
 {
-
 }
 
 void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
@@ -81,15 +81,17 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 	}
 	auto text = std::format(L"Player mass : {}\nPlayer speed {:.2f}", playerMass, playerSpeed);
 	uiManager->RenderText(text, renderContext->GetContext(), 0.0f, 0.0f, 100.0f, 100.0f);
+	// Render billboards
+	for (const auto& [entity, billboard] : entityManager.View<Billboard>())
+		renderer.Render(billboard, renderContext->GetContext(), currentCamera);
 
 	// Render sprites
 	for (auto& sprite : uiManager->GetSprites())
 		renderer.Render(sprite, renderContext->GetContext());
 
-	const auto& shaderBank = Locator::Get<ResourceManager>().GetShaderBank();
-
 	GameState::postProcessSettings.enableVignette = Camera::mode == Camera::CameraMode::FIRST_PERSON ? 1 : 0;
 
+	const auto& shaderBank = Locator::Get<ResourceManager>().GetShaderBank();
 	renderer.RenderPostProcess
 	(
 		shaderBank.Get<VertexShader>("shaders/PostProcessVS.hlsl").shader,
@@ -100,7 +102,7 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 	Present();
 }
 
-FrameBuffer RenderSystem::AddDirectionLightToFrameBuffer()
+FrameBuffer RenderSystem::CreateDirectionnalLight()
 {
 	return
 	{

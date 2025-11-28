@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "rendering/Renderer.h"
 
+#include "rendering/graphics/camera/BaseCamera.h"
 #include "rendering/texture/TextureLoader.h"
 
 #include <iostream>
@@ -8,13 +9,13 @@
 using namespace DirectX;
 
 Renderer::Renderer(RenderContext* renderContext, std::vector<Material>&& materials)
-	: renderContext{ renderContext },
-	materials{ std::move(materials) },
-	frameConstantBuffer{ renderContext->GetDevice(), frameCbRegisterNumber },
-	objectConstantBuffer{ renderContext->GetDevice(), objectCbRegisterNumber },
-	spriteConstantBuffer{ renderContext->GetDevice(), spriteCbRegisterNumber },
-	postProcessSettingsBuffer{ renderContext->GetDevice(), postProcessCbRegisterNumber },
-	causticTexture{TextureLoader::LoadTextureFromFile("assets/textures/caustics.png", renderContext->GetDevice())}
+	: renderContext{ renderContext }, billboardRenderer{renderContext->GetDevice()},
+	  materials{std::move(materials)},
+	  frameConstantBuffer{renderContext->GetDevice(), frameCbRegisterNumber},
+	  objectConstantBuffer{renderContext->GetDevice(), objectCbRegisterNumber},
+	  spriteConstantBuffer{renderContext->GetDevice(), spriteCbRegisterNumber},
+	  postProcessSettingsBuffer{renderContext->GetDevice(), postProcessCbRegisterNumber},
+	  causticTexture{TextureLoader::LoadTextureFromFile("assets/textures/caustics.png", renderContext->GetDevice())}
 {
 	D3D11_SAMPLER_DESC textureSamplerDesc{};
 	textureSamplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
@@ -75,8 +76,8 @@ void Renderer::Render(Sprite2D& sprite, ID3D11DeviceContext* context)
 {
 	renderContext->EnableAlphaBlending();
 
-	const int screenWidth = GetSystemMetrics(SM_CXSCREEN);
-	const int screenHeight = GetSystemMetrics(SM_CYSCREEN);
+	static const int screenWidth = GetSystemMetrics(SM_CXSCREEN);
+	static const int screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
 	// Orthographic projection to display the sprite in 2D "from the screne"
 	const XMMATRIX matOrtho = XMMatrixOrthographicOffCenterRH
@@ -96,6 +97,11 @@ void Renderer::Render(Sprite2D& sprite, ID3D11DeviceContext* context)
 	Draw(sprite);
 
 	renderContext->DisableAlphaBlending();
+}
+
+void Renderer::Render(Billboard& billboard, ID3D11DeviceContext* context, const BaseCameraData& baseCameraData)
+{
+	billboardRenderer.Render(billboard, context, baseCameraData);
 }
 
 void Renderer::RenderPostProcess(

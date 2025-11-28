@@ -163,6 +163,13 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\rendering\graphics\SpriteElement.h">
+    <ClInclude Include="include\rendering\graphics\Billboard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\rendering\BillboardRenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\rendering\buffers\constantBuffers\BillboardBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -222,6 +229,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\rendering\device\PostProcess.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\rendering\BillboardRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\rendering\graphics\Billboard.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

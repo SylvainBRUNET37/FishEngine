@@ -23,7 +23,7 @@ private:
 
 	void Present() const { renderContext->Present(); }
 
-	static FrameBuffer AddDirectionLightToFrameBuffer();
+	static FrameBuffer CreateDirectionnalLight();
 };
 
 #endif
