@@ -292,7 +292,7 @@ void GameEngine::BuildEndMenu()
 
 	float positionX = 400.0f;
 	float positionY = 400.0f;
-	float positionZ = 0.0f;
+	float positionZ = 1.0f;
 	uiManager->AddSprite({
 		.sprite = uiManager->LoadSprite("assets/ui/testRestart.png", positionX, positionY, positionZ),
 		.onClick = [this] { RestartGame(); }
