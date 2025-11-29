@@ -22,6 +22,7 @@ public:
 	void RenderPostProcess(ID3D11VertexShader* postProcessVertexShader, 
 		                   ID3D11PixelShader* postProcessPixelShader,
 	                       const PostProcessSettings& parameters);
+	void ClearPixelShaderResources();
 	void RenderScene() const;
 
 private:

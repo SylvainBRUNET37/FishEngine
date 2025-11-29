@@ -54,6 +54,7 @@ DXGI_SWAP_CHAIN_DESC DeviceBuilder::CreateSwapChainDesc(const HWND hwnd, const W
 	desc.SampleDesc.Quality = 0;
 	desc.Windowed = windowData.displayMode == DisplayMode::WINDOWED;
 	desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+	desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 
 	return desc;
 }

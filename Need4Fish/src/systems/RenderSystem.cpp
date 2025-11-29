@@ -86,6 +86,8 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 	);
 
 	Present();
+
+	renderer.ClearPixelShaderResources();
 }
 
 FrameBuffer RenderSystem::AddDirectionLightToFrameBuffer()

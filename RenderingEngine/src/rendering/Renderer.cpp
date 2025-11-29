@@ -183,3 +183,8 @@ MaterialBuffer Renderer::BuildConstantMaterialBuffer(const Material& material)
 
 	return params;
 }
+
+void Renderer::ClearPixelShaderResources() {
+	ID3D11ShaderResourceView* null[] = { nullptr, nullptr };
+	renderContext->GetContext()->PSSetShaderResources(0, 2, null);
+}
