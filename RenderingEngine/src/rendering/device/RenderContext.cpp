@@ -12,7 +12,8 @@ RenderContext::RenderContext(const ComPtr<ID3D11Device>& device, const ComPtr<ID
 	renderTarget(device, swapChain),
 	depthBuffer(device, windowData),
 	blendState(device),
-	postProcess(device, windowData.screenWidth, windowData.screenHeight)
+	postProcess(device, windowData.screenWidth, windowData.screenHeight),
+	distortionProcess(device, windowData.screenWidth, windowData.screenHeight)
 {
 	SetRenderTarget();
 	SetupViewPort();

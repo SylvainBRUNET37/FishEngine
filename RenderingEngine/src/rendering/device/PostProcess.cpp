@@ -20,7 +20,8 @@ PostProcess::PostProcess(ID3D11Device* device, const size_t screenWidth, const s
 }
 
 void PostProcess::Draw(ID3D11DeviceContext* context, ID3D11RenderTargetView* backbuffer,
-	ID3D11VertexShader* postProcessVertexShader, ID3D11PixelShader* postProcessPixelShader)
+	ID3D11VertexShader* postProcessVertexShader, ID3D11PixelShader* postProcessPixelShader, 
+    ID3D11ShaderResourceView* distortionSRV)
 {
     // Switch render target to backbuffer
     context->OMSetRenderTargets(1, &backbuffer, nullptr);
@@ -30,7 +31,12 @@ void PostProcess::Draw(ID3D11DeviceContext* context, ID3D11RenderTargetView* bac
     context->PSSetShader(postProcessPixelShader, nullptr, 0);
 
     // Bind scene texture as input
-    context->PSSetShaderResources(0, 1, &sceneShaderResourceView);
+    ID3D11ShaderResourceView* srvs[2] =
+    {
+        sceneShaderResourceView,
+        distortionSRV
+    };
+    context->PSSetShaderResources(0, 2, srvs);
 
     // Render without vertex buffer
     context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);

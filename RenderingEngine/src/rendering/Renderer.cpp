@@ -72,8 +72,8 @@ void Renderer::Render(const Mesh& mesh,
 
 void Renderer::Render(Sprite2D& sprite, ID3D11DeviceContext* context)
 {
-	static const int screenWidth = GetSystemMetrics(SM_CXSCREEN);
-	static const int screenHeight = GetSystemMetrics(SM_CYSCREEN);
+	static const float screenWidth = static_cast<float>(GetSystemMetrics(SM_CXSCREEN));
+	static const float screenHeight = static_cast<float>(GetSystemMetrics(SM_CYSCREEN));
 
 	// Orthographic projection to display the sprite in 2D "from the screne"
 	const XMMATRIX matOrtho = XMMatrixOrthographicOffCenterRH
@@ -110,10 +110,14 @@ void Renderer::RenderPostProcess(
 	postProcessSettingsBuffer.Update(context, parameters);
 	postProcessSettingsBuffer.Bind(context);
 
-	renderContext->GetPostProcess().Draw(context, renderTarget, postProcessVertexShader, postProcessPixelShader);
+	ID3D11ShaderResourceView* distortionSRV =
+		renderContext->GetDistortionProcess().GetShaderResourceView();
+
+	renderContext->GetPostProcess().Draw(
+		context, renderTarget, postProcessVertexShader, postProcessPixelShader, distortionSRV);
 }
 
-void Renderer::RenderScene() const
+void Renderer::UpdateScene() const
 {
 	ID3D11DeviceContext* context = renderContext->GetContext();
 	ID3D11RenderTargetView* renderTarget = renderContext->GetPostProcess().GetRenderTargetView();
@@ -125,6 +129,24 @@ void Renderer::RenderScene() const
 
 	ID3D11RenderTargetView* renderTargetViews[] = { renderTarget };
 	context->OMSetRenderTargets(1, renderTargetViews, depthStencil);
+}
+
+void Renderer::PrepareSceneForDistortion() const
+{
+	ID3D11DeviceContext* context = renderContext->GetContext();
+
+	ID3D11RenderTargetView* distortionRTV =
+		renderContext->GetDistortionProcess().GetRenderTargetView();
+
+	ID3D11DepthStencilView* depthStencil =
+		renderContext->GetDepthStencilView();
+
+	// Set the render target
+	context->OMSetRenderTargets(1, &distortionRTV, depthStencil);
+
+	// Clear RTV
+	constexpr float clearMask[4] = { 0, 0, 0, 0 };
+	context->ClearRenderTargetView(distortionRTV, clearMask);
 }
 
 void Renderer::Draw(const Mesh& mesh) const

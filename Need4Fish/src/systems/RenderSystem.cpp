@@ -25,7 +25,7 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 {
 	const auto currentCamera = entityManager.Get<Camera>(GameState::currentCameraEntity);
 
-	renderer.RenderScene();
+	renderer.UpdateScene();
 
 	// Add point lights to the frame buffer and update their position
 	frameBuffer.pointLightCount = 0;
@@ -60,6 +60,10 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 
 	renderer.UpdateFrameBuffer(frameBuffer);
 
+	// Render billboards
+	for (const auto& [entity, billboard] : entityManager.View<Billboard>())
+		renderer.Render(billboard, renderContext->GetContext(), currentCamera);
+
 	for (const auto& [entity, transform, meshInstance] : entityManager.View<Transform, MeshInstance>())
 	{
 		// Check if the mesh should be rendered or not
@@ -70,13 +74,17 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 		renderer.Render(mesh, renderContext->GetContext(), transform);
 	}
 
-	// Render billboards
-	for (const auto& [entity, billboard] : entityManager.View<Billboard>())
-		renderer.Render(billboard, renderContext->GetContext(), currentCamera);
+	// Apply distortion effect
+	renderer.PrepareSceneForDistortion();
+	for (const auto& [entity, transform, distortionMeshInstance] : entityManager.View<Transform, DistortionMeshInstance>())
+	{
+		// Check if the mesh should be rendered or not
+		auto& mesh = Locator::Get<ResourceManager>().GetMesh(distortionMeshInstance.meshIndex);
+		if (FrustumCuller::IsMeshCulled(mesh, transform, static_cast<BaseCameraData>(currentCamera)))
+			continue;
 
-	// Render sprites
-	for (const auto& [entity, sprite] : entityManager.View<Sprite2D>())
-		renderer.Render(sprite, renderContext->GetContext());
+		renderer.Render(mesh, renderContext->GetContext(), transform);
+	}
 
 	GameState::postProcessSettings.enableVignette = Camera::mode == Camera::CameraMode::FIRST_PERSON ? 1 : 0;
 
@@ -87,6 +95,10 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 		shaderBank.Get<PixelShader>("shaders/PostProcessPS.hlsl").shader,
 		GameState::postProcessSettings
 	);
+
+	// Render sprites
+	for (const auto& [entity, sprite] : entityManager.View<Sprite2D>())
+		renderer.Render(sprite, renderContext->GetContext());
 
 	Present();
 }

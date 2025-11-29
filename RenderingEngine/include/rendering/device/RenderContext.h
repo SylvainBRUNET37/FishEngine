@@ -3,6 +3,7 @@
 
 #include "BlendState.h"
 #include "DepthBuffer.h"
+#include "DistortionProcess.h"
 #include "Rasterizer.h"
 #include "RenderTarget.h"
 #include "rendering/postProcessing/PostProcess.h"
@@ -29,6 +30,11 @@ public:
 	[[nodiscard]] PostProcess& GetPostProcess() noexcept
 	{
 		return postProcess;
+	}
+	
+	[[nodiscard]] DistortionProcess& GetDistortionProcess() noexcept
+	{
+		return distortionProcess;
 	}
 
 	[[nodiscard]] ID3D11DepthStencilView* GetDepthStencilView() const noexcept { return depthBuffer.GetStencilView(); }
@@ -60,6 +66,7 @@ private:
 	DepthBuffer depthBuffer;
 	BlendState blendState;
 	PostProcess postProcess;
+	DistortionProcess distortionProcess;
 
 	void SetRenderTarget() const;
 	void SetupViewPort() const;

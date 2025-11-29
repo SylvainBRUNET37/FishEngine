@@ -38,6 +38,11 @@ struct MeshInstance
 	UINT meshIndex;
 };
 
+struct DistortionMeshInstance
+{
+	UINT meshIndex;
+};
+
 // ===============================================================
 // Add new component types here to register them with the engine
 // ===============================================================
@@ -56,7 +61,8 @@ using Components = std::tuple
 	Eatable,
 	PowerSource,
 	Billboard,
-	Sensor
+	Sensor,
+	DistortionMeshInstance
 >;
 
 #endif
