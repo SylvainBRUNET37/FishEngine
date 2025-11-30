@@ -48,14 +48,17 @@ void GameEngine::Run()
 		const double elapsedTime = isGamePaused ? 0.0 : (frameStartTime - prevTime) / 1000.0;
 
 		if (not isGamePaused) [[likely]]
+		{
 			prevTime = frameStartTime;
+			GameState::playTime += 1.0f / TARGET_FPS;
+		}
 
 		// End the loop if Windows want to terminate the program (+ process messages)
 		shouldContinue = WindowsApplication::ProcessWindowsMessages();
 
 		for (const auto& system : systems)
 			system->Update(elapsedTime, entityManager);
-
+		
 		WaitBeforeNextFrame(frameStartTime);
 	}
 }
@@ -222,6 +225,8 @@ void GameEngine::InitGame()
 	entityManager.AddComponent<Billboard>(dieBillboardEntity, dieBillboard);
 
 	mainMenuEntity = entityManager.CreateEntity();
+
+	GameState::playTime = 0.0f;
 }
 
 void GameEngine::BuildPauseMenu()

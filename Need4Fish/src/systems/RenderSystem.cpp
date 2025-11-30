@@ -79,8 +79,9 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 		playerSpeed = rigiBody.body->GetLinearVelocity().Length();
 		break;
 	}
-	auto text = std::format(L"Player mass : {}\nPlayer speed {:.2f}", playerMass, playerSpeed);
+	auto text = std::format(L"Player mass : {}\nPlayer speed : {:.2f}\nPlaytime : {:.2f}", playerMass, playerSpeed, GameState::playTime);
 	uiManager->RenderText(text, renderContext->GetContext(), 0.0f, 0.0f, 100.0f, 100.0f);
+
 	// Render billboards
 	for (const auto& [entity, billboard] : entityManager.View<Billboard>())
 		renderer.Render(billboard, renderContext->GetContext(), currentCamera);
