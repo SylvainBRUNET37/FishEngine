@@ -2,13 +2,13 @@
 #include "rendering/graphics/Billboard.h"
 
 Billboard::Billboard(const ShaderProgram& shaderProgram_, const Texture& texture_, ID3D11Device* device,
-                     const DirectX::XMFLOAT3 position, const DirectX::XMFLOAT2 scale, bool isCylindric)
+                     const DirectX::XMFLOAT3 position, const DirectX::XMFLOAT2 scale, const Type type)
 	: position{position},
 	  scale{scale},
 	  texture{texture_},
 	  shaderProgram{shaderProgram_},
 	  vertexBuffer{device, ComputeVertices()},
-	  isCylindric{isCylindric}
+	  type{type}
 {
 }
 

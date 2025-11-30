@@ -20,4 +20,19 @@ inline bool operator==(const Entity& e1, const Entity& e2)
 
 static constexpr Entity INVALID_ENTITY = {.index = UINT32_MAX, .generation = UINT32_MAX};
 
+constexpr uint64_t to_uint64(const Entity& entity)
+{
+	return static_cast<uint64_t>(entity.index) << 32 | static_cast<uint64_t>(entity.generation);
+}
+
+constexpr Entity to_entity(const uint64_t value)
+{
+	Entity entity;
+
+	entity.index = static_cast<uint32_t>(value >> 32);
+	entity.generation = static_cast<uint32_t>(value & 0xFFFFFFFFu);
+
+	return entity;
+}
+
 #endif

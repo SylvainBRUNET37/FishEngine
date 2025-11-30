@@ -168,6 +168,8 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\systems\ParticleSystem.cpp" />
+    <ClCompile Include="src\utils\MathsUtils.cpp" />
     <None Include="shaders\PostProcessPS.hlsl">
       <FileType>Document</FileType>
     </None>
@@ -202,10 +204,19 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     <None Include="shaders\BillboardVS.hlsl">
       <FileType>Document</FileType>
     </None>
+    <None Include="shaders\DistPS.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="shaders\DistVS.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="shaders\BubblePS.hlsl" />
     <ClCompile Include="src\components\ComponentFactory.cpp" />
     <ClCompile Include="src\components\gameplay\Eatable.cpp" />
     <ClCompile Include="src\entities\EntityManagerFactory.cpp" />
     <ClCompile Include="src\gameplay\mechanics\Eating.cpp" />
+    <ClCompile Include="src\listeners\ContactListenerImpl.cpp" />
+    <ClCompile Include="src\physicsEngine\SensorFactory.cpp" />
     <ClCompile Include="src\graphics\TextRenderer.cpp" />
     <ClCompile Include="src\physicsEngine\utils\ConversionUtil.cpp" />
     <ClCompile Include="src\physicsEngine\utils\MeshUtil.cpp" />
@@ -228,6 +239,7 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     <ClCompile Include="src\systems\PhysicsSimulationSystem.cpp" />
     <ClCompile Include="src\systems\PowerSystem.cpp" />
     <ClCompile Include="src\systems\RenderSystem.cpp" />
+    <ClCompile Include="src\systems\SensorSystem.cpp" />
     <ClCompile Include="src\UIManager.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -243,10 +255,12 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     <ClInclude Include="external\json_fwd.hpp" />
     <ClInclude Include="include\components\ComponentFactory.h" />
     <ClInclude Include="include\components\gameplay\Eatable.h" />
+    <ClInclude Include="include\components\physics\Sensor.h" />
     <ClInclude Include="include\components\PowerSource.h" />
     <ClInclude Include="include\graphics\TextRenderer.h" />
     <ClInclude Include="include\Locator.h" />
     <ClInclude Include="include\gameplay\mechanics\Eating.h" />
+    <ClInclude Include="include\physicsEngine\SensorFactory.h" />
     <ClInclude Include="include\physicsEngine\utils\ConversionUtil.h" />
     <ClInclude Include="include\CC.h" />
     <ClInclude Include="include\components\camera\Camera.h" />
@@ -276,12 +290,15 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     <ClInclude Include="include\resources\SceneLoader.h" />
     <ClInclude Include="include\resources\SceneResource.h" />
     <ClInclude Include="include\systems\CameraSystem.h" />
+    <ClInclude Include="include\systems\ParticleSystem.h" />
     <ClInclude Include="include\systems\PhysicsSimulationSystem.h" />
     <ClInclude Include="include\systems\PowerSystem.h" />
     <ClInclude Include="include\systems\RenderSystem.h" />
+    <ClInclude Include="include\systems\SensorSystem.h" />
     <ClInclude Include="include\systems\System.h" />
     <ClInclude Include="include\physicsEngine\utils\MeshUtil.h" />
     <ClInclude Include="include\UIManager.h" />
+    <ClInclude Include="include\utils\MathsUtils.h" />
     <ClInclude Include="pch.h" />
     <None Include="shaders\CausticsPS.hlsl">
       <FileType>Document</FileType>

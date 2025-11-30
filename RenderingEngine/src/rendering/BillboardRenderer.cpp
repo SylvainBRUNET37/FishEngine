@@ -17,6 +17,7 @@ void BillboardRenderer::Render(Billboard& billboard, ID3D11DeviceContext* contex
 	XMStoreFloat4x4(&billboardBuffer.matWorld, XMMatrixTranspose(ComputeBillboardWorldMatrix(billboard)));
 	XMStoreFloat4x4(&billboardBuffer.matView, XMMatrixTranspose(baseCameraData.matView));
 	XMStoreFloat4x4(&billboardBuffer.matProj, XMMatrixTranspose(baseCameraData.matProj));
+	XMStoreFloat3(&billboardBuffer.cameraPos, BaseCameraData::position);
 
 	billboard.shaderProgram.Bind(context);
 
@@ -47,7 +48,7 @@ XMMATRIX BillboardRenderer::ComputeBillboardWorldMatrix(const Billboard& billboa
 	XMVECTOR directionToCamera = BaseCameraData::position - billboardPosition;
 
 	// If cylindrical, ignore vertical
-	if (billboard.isCylindric)
+	if (billboard.type == Billboard::Cylindric)
 	{
 		directionToCamera = XMVectorSetY(directionToCamera, 0.0f);
 

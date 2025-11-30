@@ -8,8 +8,14 @@
 
 struct Billboard
 {
+	enum Type
+	{
+		CameraFacing,
+		Cylindric
+	};
+
 	explicit Billboard(const ShaderProgram& shaderProgram_, const Texture& texture_, ID3D11Device* device,
-	                   DirectX::XMFLOAT3 position, DirectX::XMFLOAT2 scale, bool isCylindric = false);
+	                   DirectX::XMFLOAT3 position, DirectX::XMFLOAT2 scale, Type type = CameraFacing);
 
 	DirectX::XMFLOAT3 position;
 	DirectX::XMFLOAT2 scale;
@@ -18,7 +24,7 @@ struct Billboard
 	ShaderProgram shaderProgram;
 	VertexBuffer vertexBuffer;
 
-	bool isCylindric;
+	Type type;
 
 private:
 	static std::vector<VertexSprite> ComputeVertices();

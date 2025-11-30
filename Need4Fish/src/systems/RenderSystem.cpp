@@ -13,9 +13,10 @@
 using namespace DirectX;
 using namespace std;
 
-RenderSystem::RenderSystem(RenderContext* renderContext, std::shared_ptr<UIManager> uiManager, std::vector<Material>&& materials)
-	: renderer(renderContext, std::move(materials)),
-	  uiManager(uiManager),
+RenderSystem::RenderSystem(RenderContext* renderContext, const std::shared_ptr<UIManager>& uiManager,
+                           std::vector<Material>&& materials)
+	: uiManager(uiManager),
+	  renderer(renderContext, std::move(materials)),
 	  frameBuffer(CreateDirectionnalLight()),
 	  renderContext(renderContext)
 {
@@ -25,7 +26,7 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 {
 	const auto currentCamera = entityManager.Get<Camera>(GameState::currentCameraEntity);
 
-	renderer.RenderScene();
+	renderer.UpdateScene();
 
 	// Add point lights to the frame buffer and update their position
 	frameBuffer.pointLightCount = 0;
@@ -70,27 +71,26 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 		renderer.Render(mesh, renderContext->GetContext(), transform);
 	}
 
-	// Text Addition (create sprite)
-	auto watchables = entityManager.View<Controllable, Eatable, RigidBody>();
-	int playerMass;
-	float playerSpeed;
-	for (const auto& [_, __, eatable, rigiBody] : watchables) {
-		playerMass = eatable.mass;
-		playerSpeed = rigiBody.body->GetLinearVelocity().Length();
-		break;
-	}
-	auto text = std::format(L"Player mass : {}\nPlayer speed : {:.2f}\nPlaytime : {:.2f}", playerMass, playerSpeed, GameState::playTime);
-	uiManager->RenderText(text, renderContext->GetContext(), 0.0f, 0.0f, 100.0f, 100.0f);
-
 	// Render billboards
+	renderer.PrepareSceneForBillboard();
 	for (const auto& [entity, billboard] : entityManager.View<Billboard>())
 		renderer.Render(billboard, renderContext->GetContext(), currentCamera);
 
-	// Render sprites
-	for (auto& sprite : uiManager->GetSprites())
-		renderer.Render(sprite, renderContext->GetContext());
+	// Apply distortion effect
+	renderer.PrepareSceneForDistortion();
+	for (const auto& [entity, transform, distortionMeshInstance] : entityManager.View<
+		     Transform, DistortionMeshInstance>())
+	{
+		// Check if the mesh should be rendered or not
+		auto& mesh = Locator::Get<ResourceManager>().GetMesh(distortionMeshInstance.meshIndex);
+		if (FrustumCuller::IsMeshCulled(mesh, transform, static_cast<BaseCameraData>(currentCamera)))
+			continue;
+
+		renderer.Render(mesh, renderContext->GetContext(), transform);
+	}
 
 	GameState::postProcessSettings.enableVignette = Camera::mode == Camera::CameraMode::FIRST_PERSON ? 1 : 0;
+	GameState::postProcessSettings.deltaTime = static_cast<float>(deltaTime);
 
 	const auto& shaderBank = Locator::Get<ResourceManager>().GetShaderBank();
 	renderer.RenderPostProcess
@@ -99,6 +99,24 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 		shaderBank.Get<PixelShader>("shaders/PostProcessPS.hlsl").shader,
 		GameState::postProcessSettings
 	);
+
+	// Text Addition (create sprite)
+	const auto watchables = entityManager.View<Controllable, Eatable, RigidBody>();
+	int playerMass;
+	float playerSpeed;
+	for (const auto& [_, __, eatable, rigiBody] : watchables)
+	{
+		playerMass = eatable.mass;
+		playerSpeed = rigiBody.body->GetLinearVelocity().Length();
+		break;
+	}
+	const auto text = std::format(L"Player mass : {}\nPlayer speed : {:.2f}\nPlaytime : {:.2f}", playerMass,
+		playerSpeed, GameState::playTime);
+	uiManager->RenderText(text, renderContext->GetContext(), 0.0f, 0.0f, 100.0f, 100.0f);
+
+	// Render sprites
+	for (auto& sprite : uiManager->GetSprites())
+		renderer.Render(sprite, renderContext->GetContext());
 
 	Present();
 }

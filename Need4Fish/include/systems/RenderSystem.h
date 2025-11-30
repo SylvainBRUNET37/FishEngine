@@ -10,7 +10,7 @@
 class RenderSystem : public System
 {
 public:
-	explicit RenderSystem(RenderContext* renderContext, std::shared_ptr<UIManager> uiManager, std::vector<Material>&& materials);
+	explicit RenderSystem(RenderContext* renderContext, const std::shared_ptr<UIManager>& uiManager, std::vector<Material>&& materials);
 
 	void Update(double deltaTime, EntityManager& entityManager) override;
 

@@ -88,7 +88,7 @@ SceneResource SceneLoader::LoadScene(const filesystem::path& filePath, const Sha
 	// Process lights
 	ProcessLights(scene, sceneRes);
 
-	nodes = {}; // reset node map
+	nodes.clear(); // reset node map
 
 	return sceneRes;
 }

@@ -1,6 +1,8 @@
 ﻿#include "pch.h"
 #include "systems/PhysicsSimulationSystem.h"
 
+#include <ranges>
+
 #include "PhysicsEngine/JoltSystem.h"
 #include "GameState.h"
 #include "rendering/application/WindowsApplication.h"
@@ -9,6 +11,7 @@
 
 using namespace DirectX;
 using namespace JPH;
+using namespace std;
 
 PhysicsSimulationSystem::PhysicsSimulationSystem()
 {

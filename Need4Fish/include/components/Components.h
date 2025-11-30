@@ -10,6 +10,7 @@
 #include "entities/Entity.h"
 #include "gameplay/Eatable.h"
 #include "physics/RigidBody.h"
+#include "physics/Sensor.h"
 
 #include "rendering/core/Transform.h"
 #include "rendering/graphics/Billboard.h"
@@ -37,6 +38,17 @@ struct MeshInstance
 	UINT meshIndex;
 };
 
+struct DistortionMeshInstance
+{
+	UINT meshIndex;
+};
+
+struct LifeSpan
+{
+	double lifeTime{}; // Store in ms the age of the object
+	double lifeDuration{};
+};
+
 // ===============================================================
 // Add new component types here to register them with the engine
 // ===============================================================
@@ -53,7 +65,10 @@ using Components = std::tuple
 	PointLight,
 	Eatable,
 	PowerSource,
-	Billboard
+	Billboard,
+	Sensor,
+	DistortionMeshInstance,
+	LifeSpan
 >;
 
 #endif

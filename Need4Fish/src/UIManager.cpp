@@ -54,11 +54,11 @@ Sprite2D UIManager::LoadSprite(const std::string& filePath, float positionX, flo
 	for (auto& sprite : sprites)
 		displayedSprites.emplace_back(sprite.UpdateAndGetDisplayedSprite());
 
-	std::sort(displayedSprites.begin(), displayedSprites.end(),
-		[](const Sprite2D& a, const Sprite2D& b)
-		{
-			return a.position.z > b.position.z;
-		});
+	std::ranges::sort(displayedSprites,
+	                  [](const Sprite2D& a, const Sprite2D& b)
+	                  {
+		                  return a.position.z < b.position.z;
+	                  });
 
 	return displayedSprites;
 }

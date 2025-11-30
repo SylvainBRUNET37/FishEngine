@@ -56,8 +56,10 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 		Locator::Set(make_shared<ResourceManager>(renderContext.GetDevice()));
 
 		// Init game engine and run the main loop !
-		unique_ptr<GameEngine> gameEngine = std::make_unique<GameEngine>(&renderContext);
+		auto* gameEngine = new GameEngine{ &renderContext };
 		gameEngine->Run();
+
+		delete gameEngine;
 
 		return EXIT_SUCCESS;
 	}

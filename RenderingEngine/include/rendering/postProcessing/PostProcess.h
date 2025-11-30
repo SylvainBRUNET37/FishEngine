@@ -13,7 +13,8 @@ public:
     void Draw(ID3D11DeviceContext* context,
         ID3D11RenderTargetView* backbuffer,
         ID3D11VertexShader* postProcessVertexShader,
-        ID3D11PixelShader* postProcessPixelShader);
+        ID3D11PixelShader* postProcessPixelShader,
+        ID3D11ShaderResourceView* distortionSRV);
 
     [[nodiscard]] ID3D11RenderTargetView* GetRenderTargetView() const { return sceneRenderTargetView; }
     [[nodiscard]] ID3D11ShaderResourceView* GetShaderResourceView() const { return sceneShaderResourceView; }
@@ -22,6 +23,8 @@ private:
     ComPtr<ID3D11Texture2D> sceneTexture;
     ComPtr<ID3D11RenderTargetView> sceneRenderTargetView;
     ComPtr<ID3D11ShaderResourceView> sceneShaderResourceView;
+    ComPtr<ID3D11SamplerState> postProcessSampler;
+
 };
 
 #endif

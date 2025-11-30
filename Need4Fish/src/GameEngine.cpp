@@ -10,11 +10,14 @@
 #include "rendering/texture/TextureLoader.h"
 #include "gameplay/mechanics/Eating.h"
 #include "systems/PowerSystem.h"
+#include "systems/SensorSystem.h"
+#include "utils/MathsUtils.h"
 
 using namespace DirectX;
 
-GameEngine::GameEngine(RenderContext* renderContext)
-	: renderContext{renderContext},
+GameEngine::GameEngine(RenderContext* renderContext_)
+	: renderContext{renderContext_},
+	  particleSystem{renderContext->GetDevice()},
 	  uiManager{std::make_shared<UIManager>(renderContext->GetDevice())}
 {
 	CameraSystem::SetMouseCursor();
@@ -23,6 +26,7 @@ GameEngine::GameEngine(RenderContext* renderContext)
 
 	// Care about the order of construction, it will be the order of update calls
 	systems.emplace_back(std::make_unique<PhysicsSimulationSystem>());
+	systems.emplace_back(std::make_unique<SensorSystem>());
 	systems.emplace_back(std::make_unique<CameraSystem>());
 	systems.emplace_back(std::make_unique<PowerSystem>());
 	systems.emplace_back(std::make_unique<RenderSystem>(renderContext, uiManager, std::move(sceneResources.materials)));
@@ -53,6 +57,8 @@ void GameEngine::Run()
 
 		// End the loop if Windows want to terminate the program (+ process messages)
 		shouldContinue = WindowsApplication::ProcessWindowsMessages();
+
+		particleSystem.Update(elapsedTime, entityManager);
 
 		for (const auto& system : systems)
 			system->Update(elapsedTime, entityManager);
@@ -173,6 +179,7 @@ void GameEngine::RestartGame()
 void GameEngine::InitGame()
 {
 	entityManager = EntityManagerFactory::Create(Locator::Get<ResourceManager>().GetSceneResource());
+	particleSystem.Reset();
 
 	// TODO: revise this
 	const int screenWidth = GetSystemMetrics(SM_CXSCREEN);
@@ -207,24 +214,16 @@ void GameEngine::InitGame()
 		cameraComponent.targetEntity = entity;
 	}
 
-	// Create a billboard
-	static const auto& shaderBank = Locator::Get<ResourceManager>().GetShaderBank();
-	static Billboard dieBillboard
-	(
-		ShaderProgram
-		{
-			renderContext->GetDevice(), shaderBank.Get<VertexShader>("shaders/BillboardVS.hlsl"),
-			shaderBank.Get<PixelShader>("shaders/BillboardPS.hlsl")
-		},
-		TextureLoader::LoadTextureFromFile("assets/textures/de.png", renderContext->GetDevice()),
-		renderContext->GetDevice(),
-		{0.0f, 700.0f, 0.0f},
-		{50, 50},
-		true
+	// Add particles inside the world (TODO: make it fit the world size)
+	particleSystem.AddParticleZone(entityManager,
+		{ 
+			.centerPosition = {0, 700.0f, 0},
+			.halfExtend = 250.0f,
+			.nbParticle = 80,
+			.particleDurationMin = 3.0f,
+			.particleDurationMax = 15.0f,
+		}
 	);
-
-	const auto dieBillboardEntity = entityManager.CreateEntity();
-	entityManager.AddComponent<Billboard>(dieBillboardEntity, dieBillboard);
 
 	mainMenuEntity = entityManager.CreateEntity();
 
