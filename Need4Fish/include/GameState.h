@@ -26,6 +26,7 @@ struct GameState
     inline static auto currentState = PLAYING;
 
     inline static float playTime = 0.0f;
+    //inline static std::chrono::system_clock::time_point startTime;
 
     inline static bool isGrowing = false;
 };

@@ -35,6 +35,7 @@ void GameEngine::Run()
 	bool shouldContinue = true;
 	DWORD prevTime = GetTickCount();
 
+
 	while (shouldContinue)
 	{
 		// Pause/Unpause the game if ESC is pressed for exemple
@@ -47,11 +48,11 @@ void GameEngine::Run()
 
 		const double elapsedTime = isGamePaused ? 0.0 : (frameStartTime - prevTime) / 1000.0;
 
-		if (not isGamePaused) [[likely]]
-		{
+		/*if (not isGamePaused) [[likely]]
+		{*/
 			prevTime = frameStartTime;
-			GameState::playTime += 1.0f / TARGET_FPS;
-		}
+			GameState::playTime += elapsedTime;
+		//}
 
 		// End the loop if Windows want to terminate the program (+ process messages)
 		shouldContinue = WindowsApplication::ProcessWindowsMessages();
