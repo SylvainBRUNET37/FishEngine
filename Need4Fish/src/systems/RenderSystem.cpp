@@ -87,6 +87,7 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 	}
 
 	GameState::postProcessSettings.enableVignette = Camera::mode == Camera::CameraMode::FIRST_PERSON ? 1 : 0;
+	GameState::postProcessSettings.deltaTime = deltaTime;
 
 	const auto& shaderBank = Locator::Get<ResourceManager>().GetShaderBank();
 	renderer.RenderPostProcess
