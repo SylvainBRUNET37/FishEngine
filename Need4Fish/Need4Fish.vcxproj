@@ -168,6 +168,7 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\systems\ParticleSystem.cpp" />
     <ClCompile Include="src\utils\MathsUtils.cpp" />
     <None Include="shaders\PostProcessPS.hlsl">
       <FileType>Document</FileType>
@@ -287,6 +288,7 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     <ClInclude Include="include\resources\SceneLoader.h" />
     <ClInclude Include="include\resources\SceneResource.h" />
     <ClInclude Include="include\systems\CameraSystem.h" />
+    <ClInclude Include="include\systems\ParticleSystem.h" />
     <ClInclude Include="include\systems\PhysicsSimulationSystem.h" />
     <ClInclude Include="include\systems\PowerSystem.h" />
     <ClInclude Include="include\systems\RenderSystem.h" />

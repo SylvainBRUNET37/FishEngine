@@ -43,6 +43,12 @@ struct DistortionMeshInstance
 	UINT meshIndex;
 };
 
+struct LifeSpan
+{
+	double lifeTime{}; // Store in ms the age of the object
+	double lifeDuration{};
+};
+
 // ===============================================================
 // Add new component types here to register them with the engine
 // ===============================================================
@@ -62,7 +68,8 @@ using Components = std::tuple
 	PowerSource,
 	Billboard,
 	Sensor,
-	DistortionMeshInstance
+	DistortionMeshInstance,
+	LifeSpan
 >;
 
 #endif

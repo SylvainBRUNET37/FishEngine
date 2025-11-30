@@ -17,6 +17,7 @@ using namespace DirectX;
 
 GameEngine::GameEngine(RenderContext* renderContext_)
 	: renderContext{renderContext_},
+	  particleSystem{renderContext->GetDevice()},
 	  uiManager{renderContext->GetDevice()}
 {
 	CameraSystem::SetMouseCursor();
@@ -53,6 +54,8 @@ void GameEngine::Run()
 
 		// End the loop if Windows want to terminate the program (+ process messages)
 		shouldContinue = WindowsApplication::ProcessWindowsMessages();
+
+		particleSystem.Update(elapsedTime, entityManager);
 
 		for (const auto& system : systems)
 			system->Update(elapsedTime, entityManager);
@@ -171,6 +174,7 @@ void GameEngine::EndGame()
 void GameEngine::InitGame()
 {
 	entityManager = EntityManagerFactory::Create(Locator::Get<ResourceManager>().GetSceneResource());
+	particleSystem.Reset();
 
 	// TODO: revise this
 	const int screenWidth = GetSystemMetrics(SM_CXSCREEN);
@@ -204,38 +208,16 @@ void GameEngine::InitGame()
 		cameraComponent.targetEntity = entity;
 	}
 
-	static const auto& shaderBank = Locator::Get<ResourceManager>().GetShaderBank();
-
-	static const ShaderProgram billboardShader{
-		renderContext->GetDevice(),
-		shaderBank.Get<VertexShader>("shaders/BillboardVS.hlsl"),
-		shaderBank.Get<PixelShader>("shaders/BubblePS.hlsl")
-	};
-
-	static const Texture billboardTexture =
-		TextureLoader::LoadTextureFromFile("assets/textures/bble.png",
-		                                   renderContext->GetDevice());
-
-	constexpr int billboardCount = 80;
-	for (int i = 0; i < billboardCount; ++i)
-	{
-		const float scale = MathsUtils::RandomBetween(5.0f, 10.0f);
-		constexpr float halfExtend = 250.0f;
-		const XMFLOAT3 pos = MathsUtils::RandomPosInSquare({0, 700.0f, 0}, halfExtend);
-
-		Billboard billboard
-		{
-			billboardShader,
-			billboardTexture,
-			renderContext->GetDevice(),
-			pos,
-			{scale, scale},
-			Billboard::CameraFacing
-		};
-
-		const auto entity = entityManager.CreateEntity();
-		entityManager.AddComponent<Billboard>(entity, billboard);
-	}
+	// Add particles inside the world (TODO: make it fit the world size)
+	particleSystem.AddParticleZone(entityManager,
+		{ 
+			.centerPosition = {0, 700.0f, 0},
+			.halfExtend = 250.0f,
+			.nbParticle = 80,
+			.particleDurationMin = 3.0f,
+			.particleDurationMax = 15.0f,
+		}
+	);
 
 	mainMenuEntity = entityManager.CreateEntity();
 }
