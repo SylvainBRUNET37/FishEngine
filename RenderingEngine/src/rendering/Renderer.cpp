@@ -150,11 +150,14 @@ void Renderer::PrepareSceneForDistortion() const
 
 	// Disable transparence
 	renderContext->DisableAlphaBlending();
+	renderContext->EnableDefaultDepth();
 }
 
 void Renderer::PrepareSceneForBillboard() const
 {
 	renderContext->EnableAlphaBlending();
+	renderContext->EnableTransparentDepth();
+
 }
 
 void Renderer::Draw(const Mesh& mesh) const

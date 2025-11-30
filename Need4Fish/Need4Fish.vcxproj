@@ -168,6 +168,7 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\utils\MathsUtils.cpp" />
     <None Include="shaders\PostProcessPS.hlsl">
       <FileType>Document</FileType>
     </None>
@@ -208,6 +209,7 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     <None Include="shaders\DistVS.hlsl">
       <FileType>Document</FileType>
     </None>
+    <None Include="shaders\BubblePS.hlsl" />
     <ClCompile Include="src\components\ComponentFactory.cpp" />
     <ClCompile Include="src\components\gameplay\Eatable.cpp" />
     <ClCompile Include="src\entities\EntityManagerFactory.cpp" />
@@ -292,6 +294,7 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     <ClInclude Include="include\systems\System.h" />
     <ClInclude Include="include\physicsEngine\utils\MeshUtil.h" />
     <ClInclude Include="include\UIManager.h" />
+    <ClInclude Include="include\utils\MathsUtils.h" />
     <ClInclude Include="pch.h" />
     <None Include="shaders\CausticsPS.hlsl">
       <FileType>Document</FileType>
