@@ -60,10 +60,6 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 
 	renderer.UpdateFrameBuffer(frameBuffer);
 
-	// Render billboards
-	for (const auto& [entity, billboard] : entityManager.View<Billboard>())
-		renderer.Render(billboard, renderContext->GetContext(), currentCamera);
-
 	for (const auto& [entity, transform, meshInstance] : entityManager.View<Transform, MeshInstance>())
 	{
 		// Check if the mesh should be rendered or not
@@ -73,6 +69,11 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 
 		renderer.Render(mesh, renderContext->GetContext(), transform);
 	}
+
+	// Render billboards
+	renderer.PrepareSceneForBillboard();
+	for (const auto& [entity, billboard] : entityManager.View<Billboard>())
+		renderer.Render(billboard, renderContext->GetContext(), currentCamera);
 
 	// Apply distortion effect
 	renderer.PrepareSceneForDistortion();

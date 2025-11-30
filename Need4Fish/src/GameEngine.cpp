@@ -212,11 +212,11 @@ void GameEngine::InitGame()
 			renderContext->GetDevice(), shaderBank.Get<VertexShader>("shaders/BillboardVS.hlsl"),
 			shaderBank.Get<PixelShader>("shaders/BillboardPS.hlsl")
 		},
-		TextureLoader::LoadTextureFromFile("assets/textures/de.png", renderContext->GetDevice()),
+		TextureLoader::LoadTextureFromFile("assets/textures/bubbles.png", renderContext->GetDevice()),
 		renderContext->GetDevice(),
 		{0.0f, 700.0f, 0.0f},
 		{50, 50},
-		true
+		Billboard::CameraFacing
 	);
 
 	const auto dieBillboardEntity = entityManager.CreateEntity();

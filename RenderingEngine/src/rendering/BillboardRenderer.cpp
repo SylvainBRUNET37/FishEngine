@@ -47,7 +47,7 @@ XMMATRIX BillboardRenderer::ComputeBillboardWorldMatrix(const Billboard& billboa
 	XMVECTOR directionToCamera = BaseCameraData::position - billboardPosition;
 
 	// If cylindrical, ignore vertical
-	if (billboard.isCylindric)
+	if (billboard.type == Billboard::Cylindric)
 	{
 		directionToCamera = XMVectorSetY(directionToCamera, 0.0f);
 

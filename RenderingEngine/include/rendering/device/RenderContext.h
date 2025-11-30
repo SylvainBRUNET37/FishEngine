@@ -3,6 +3,7 @@
 
 #include "BlendState.h"
 #include "DepthBuffer.h"
+#include "DepthState.h"
 #include "DistortionProcess.h"
 #include "Rasterizer.h"
 #include "RenderTarget.h"
@@ -52,6 +53,15 @@ public:
 		context->OMSetBlendState(blendState.GetAlphaBlendDisabled(), nullptr, 0xffffffff);
 	}
 
+	void EnableTransparentDepth() const
+	{
+		context->OMSetDepthStencilState(depthState.GetDepthNoWrite(), 0);
+	}
+
+	void EnableDefaultDepth() const
+	{
+		context->OMSetDepthStencilState(depthState.GetDepthDefault(), 0);
+	}
 
 private:
 	size_t screenWidth;
@@ -67,6 +77,7 @@ private:
 	BlendState blendState;
 	PostProcess postProcess;
 	DistortionProcess distortionProcess;
+	DepthState depthState;
 
 	void SetRenderTarget() const;
 	void SetupViewPort() const;

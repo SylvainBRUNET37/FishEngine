@@ -2,28 +2,31 @@
 #include "rendering/device/RenderContext.h"
 
 RenderContext::RenderContext(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context,
-	const ComPtr<IDXGISwapChain>& swapChain, const WindowData& windowData)
+                             const ComPtr<IDXGISwapChain>& swapChain, const WindowData& windowData)
 	: screenWidth(windowData.screenWidth),
-	screenHeight(windowData.screenHeight),
-	device(device),
-	context(context),
-	swapChain(swapChain),
-	rasterizer(device, context),
-	renderTarget(device, swapChain),
-	depthBuffer(device, windowData),
-	blendState(device),
-	postProcess(device, windowData.screenWidth, windowData.screenHeight),
-	distortionProcess(device, windowData.screenWidth, windowData.screenHeight)
+	  screenHeight(windowData.screenHeight),
+	  device(device),
+	  context(context),
+	  swapChain(swapChain),
+	  rasterizer(device, context),
+	  renderTarget(device, swapChain),
+	  depthBuffer(device, windowData),
+	  blendState(device),
+	  postProcess(device, windowData.screenWidth, windowData.screenHeight),
+	  distortionProcess(device, windowData.screenWidth, windowData.screenHeight),
+	  depthState(device)
 {
 	SetRenderTarget();
 	SetupViewPort();
+
+	EnableDefaultDepth();
 }
 
 void RenderContext::Present() const
 {
 	// The result is an error if the user leave the window
 	[[maybe_unused]]
-	const auto result = swapChain->Present(0, 0);
+		const auto result = swapChain->Present(0, 0);
 }
 
 void RenderContext::SetRenderTarget() const

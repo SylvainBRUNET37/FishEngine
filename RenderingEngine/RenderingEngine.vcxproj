@@ -33,6 +33,7 @@
     <ClInclude Include="include\rendering\culling\FrustumCuller.h" />
     <ClInclude Include="include\rendering\device\BlendState.h" />
     <ClInclude Include="include\rendering\device\DepthBuffer.h" />
+    <ClInclude Include="include\rendering\device\DepthState.h" />
     <ClInclude Include="include\rendering\device\DeviceBuilder.h" />
     <ClInclude Include="include\rendering\device\DistortionProcess.h" />
     <ClInclude Include="include\rendering\graphics\Billboard.h" />
@@ -85,6 +86,7 @@
     <ClCompile Include="src\rendering\culling\FrustumCuller.cpp" />
     <ClCompile Include="src\rendering\device\BlendState.cpp" />
     <ClCompile Include="src\rendering\device\DepthBuffer.cpp" />
+    <ClCompile Include="src\rendering\device\DepthState.cpp" />
     <ClCompile Include="src\rendering\device\DeviceBuilder.cpp" />
     <ClCompile Include="src\rendering\device\DistortionProcess.cpp" />
     <ClCompile Include="src\rendering\device\PostProcess.cpp" />

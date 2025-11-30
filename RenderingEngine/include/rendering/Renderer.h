@@ -30,6 +30,7 @@ public:
 	                       const PostProcessSettings& parameters);
 	void UpdateScene() const;
 	void PrepareSceneForDistortion() const;
+	void PrepareSceneForBillboard() const;
 
 private:
 	static constexpr int frameCbRegisterNumber = 0;

@@ -147,6 +147,14 @@ void Renderer::PrepareSceneForDistortion() const
 	// Clear RTV
 	constexpr float clearMask[4] = { 0, 0, 0, 0 };
 	context->ClearRenderTargetView(distortionRTV, clearMask);
+
+	// Disable transparence
+	renderContext->DisableAlphaBlending();
+}
+
+void Renderer::PrepareSceneForBillboard() const
+{
+	renderContext->EnableAlphaBlending();
 }
 
 void Renderer::Draw(const Mesh& mesh) const

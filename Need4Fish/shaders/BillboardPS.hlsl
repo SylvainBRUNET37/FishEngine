@@ -11,8 +11,5 @@ float4 BillboardPS(VSOutput input) : SV_Target
 {
     float4 finalColor = tex.Sample(samp, input.uv);
 
-    // Discard transparents pixels
-    clip(finalColor.a - 0.01f);
-
     return finalColor;
 }

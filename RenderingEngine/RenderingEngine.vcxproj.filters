@@ -174,6 +174,9 @@
     <ClInclude Include="include\rendering\device\DistortionProcess.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\rendering\device\DepthState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\rendering\device\RenderContext.cpp">
@@ -240,6 +243,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\rendering\device\DistortionProcess.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\rendering\device\DepthState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
