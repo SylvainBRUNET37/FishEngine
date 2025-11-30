@@ -33,8 +33,7 @@ void SensorSystem::Update(double deltaTime, EntityManager& entityManager)
 			//const Vec3 objectForward = bodyInterface.GetRotation(objectId).RotateAxisZ();
 
 			const Vec3 impulse = sensor.direction * sensor.pushStrength;
-
-			bodyInterface.AddLinearVelocity(objectId, impulse);
+			bodyInterface.SetLinearVelocity(objectId, impulse);
 		}
 	}
 }
