@@ -48,11 +48,8 @@ void GameEngine::Run()
 
 		const double elapsedTime = isGamePaused ? 0.0 : (frameStartTime - prevTime) / 1000.0;
 
-		/*if (not isGamePaused) [[likely]]
-		{*/
-			prevTime = frameStartTime;
-			GameState::playTime += elapsedTime;
-		//}
+		prevTime = frameStartTime;
+		GameState::playTime += elapsedTime;
 
 		// End the loop if Windows want to terminate the program (+ process messages)
 		shouldContinue = WindowsApplication::ProcessWindowsMessages();
@@ -87,8 +84,11 @@ void GameEngine::HandleGameState()
 		GameState::PAUSED;
 
 	// Handle clicks
-	if (GetAsyncKeyState(VK_LBUTTON) & 0x8000 && GameState::currentState != GameState::PLAYING)
+	static bool leftButtonPreviouslyDown = false;
+	bool leftButtonDown = (GetAsyncKeyState(VK_LBUTTON) & 0x8000) != 0;
+	if (leftButtonDown && !leftButtonPreviouslyDown && GameState::currentState != GameState::PLAYING)
 		uiManager->HandleClick();
+	leftButtonPreviouslyDown = leftButtonDown;
 
 	// Restart the game if has been was pressed
 	if (GetAsyncKeyState('R') & 0x8000 && GameState::currentState != GameState::PAUSED)
