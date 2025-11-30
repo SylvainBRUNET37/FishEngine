@@ -12,6 +12,14 @@ Sprite2D::Sprite2D(const ShaderProgram& shaderProgram_, const Texture& texture_,
 {
 }
 
+Sprite2D::Sprite2D(const ShaderProgram& shaderProgram_, const Texture& texture_, SpritePosition position_, ID3D11Device* device)
+	: texture{ texture_ },
+	position{ position_ },
+	vertexBuffer{ device, ComputeVertices(position, texture) },
+	shaderProgram{ shaderProgram_ }
+{
+}
+
 std::vector<VertexSprite> Sprite2D::ComputeVertices(const SpritePosition& position, const Texture& texture)
 {
 	return

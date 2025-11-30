@@ -14,7 +14,7 @@
 #include "rendering/core/Transform.h"
 #include "rendering/graphics/Billboard.h"
 #include "rendering/graphics/lights/PointLight.h"
-#include "rendering/graphics/Sprite2D.h"
+#include "rendering/graphics/Mesh.h"
 
 struct Name
 {
@@ -51,7 +51,6 @@ using Components = std::tuple
 	Controllable,
 	Camera,
 	PointLight,
-	Sprite2D,
 	Eatable,
 	PowerSource,
 	Billboard

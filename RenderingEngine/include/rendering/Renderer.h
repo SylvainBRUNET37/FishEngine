@@ -28,7 +28,7 @@ public:
 	void RenderPostProcess(ID3D11VertexShader* postProcessVertexShader, 
 		                   ID3D11PixelShader* postProcessPixelShader,
 	                       const PostProcessSettings& parameters);
-	void RenderScene() const;
+	void RenderScene() const;	
 
 private:
 	static constexpr int frameCbRegisterNumber = 0;

@@ -100,6 +100,7 @@ public:
 	}
 
 	template <typename... QueryComponents>
+		requires AreComponents<QueryComponents...>
 	struct ComponentView
 	{
 		EntityManager* entityManager;
@@ -172,6 +173,7 @@ public:
 	};
 
 	template <typename... QueryComponents>
+		requires AreComponents<QueryComponents...>
 	[[nodiscard]] ComponentView<QueryComponents...> View()
 	{
 		return ComponentView<QueryComponents...>{this};

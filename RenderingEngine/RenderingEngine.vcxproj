@@ -47,6 +47,7 @@
     <ClInclude Include="include\rendering\graphics\lights\DirectionalLight.h" />
     <ClInclude Include="include\rendering\graphics\lights\PointLight.h" />
     <ClInclude Include="include\rendering\graphics\Sprite2D.h" />
+    <ClInclude Include="include\rendering\graphics\SpriteElement.h" />
     <ClInclude Include="include\rendering\graphics\VertexSprite.h" />
     <ClInclude Include="include\rendering\postProcessing\PostProcessSettings.h" />
     <ClInclude Include="include\rendering\Renderer.h" />

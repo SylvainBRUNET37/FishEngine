@@ -4,6 +4,8 @@
 #include "rendering/graphics/camera/BaseCamera.h"
 #include "rendering/texture/TextureLoader.h"
 
+#include <iostream>
+
 using namespace DirectX;
 
 Renderer::Renderer(RenderContext* renderContext, std::vector<Material>&& materials)
@@ -72,14 +74,16 @@ void Renderer::Render(const Mesh& mesh,
 
 void Renderer::Render(Sprite2D& sprite, ID3D11DeviceContext* context)
 {
+	renderContext->EnableAlphaBlending();
+
 	static const int screenWidth = GetSystemMetrics(SM_CXSCREEN);
 	static const int screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
 	// Orthographic projection to display the sprite in 2D "from the screne"
 	const XMMATRIX matOrtho = XMMatrixOrthographicOffCenterRH
 	(
-		0.f, screenWidth,
-		screenHeight, 0.f,
+		0.f, static_cast<float>(screenWidth),
+		static_cast<float>(screenHeight), 0.f,
 		0.f, 1.f
 	);
 
@@ -91,6 +95,8 @@ void Renderer::Render(Sprite2D& sprite, ID3D11DeviceContext* context)
 	context->PSSetShaderResources(0, 1, &sprite.texture.texture);
 
 	Draw(sprite);
+
+	renderContext->DisableAlphaBlending();
 }
 
 void Renderer::Render(Billboard& billboard, ID3D11DeviceContext* context, const BaseCameraData& baseCameraData)
@@ -99,8 +105,8 @@ void Renderer::Render(Billboard& billboard, ID3D11DeviceContext* context, const 
 }
 
 void Renderer::RenderPostProcess(
-	ID3D11VertexShader* postProcessVertexShader, 
-	ID3D11PixelShader* postProcessPixelShader, 
+	ID3D11VertexShader* postProcessVertexShader,
+	ID3D11PixelShader* postProcessPixelShader,
 	const PostProcessSettings& parameters
 )
 {

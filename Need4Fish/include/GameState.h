@@ -14,7 +14,8 @@ struct GameState
 	    PLAYING,
         PAUSED,
         DIED,
-        WON
+        WON,
+        FINISHED
     };
 
     inline static PostProcessSettings postProcessSettings{};
@@ -23,6 +24,9 @@ struct GameState
 
     inline static Entity currentCameraEntity = INVALID_ENTITY;
     inline static auto currentState = PLAYING;
+
+    inline static float playTime = 0.0f;
+    //inline static std::chrono::system_clock::time_point startTime;
 
     inline static bool isGrowing = false;
 };

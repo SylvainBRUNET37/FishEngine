@@ -31,4 +31,7 @@ struct IsOneOf<Type, std::tuple<Types...>> : std::disjunction<std::is_same<Type,
 template <typename Type>
 concept IsComponent = IsOneOf<Type, Components>::value;
 
+template <typename... Types>
+concept AreComponents = (IsComponent<Types> && ...);
+
 #endif

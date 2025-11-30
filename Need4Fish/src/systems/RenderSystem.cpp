@@ -1,21 +1,21 @@
 #include "pch.h"
 
+#include "GameState.h"
+#include "Locator.h"
+#include "rendering/culling/FrustumCuller.h"
+#include "rendering/texture/TextureLoader.h"
+#include "resources/ResourceManager.h"
 #include "systems/RenderSystem.h"
 
 #include <format>
-
-#include "rendering/culling/FrustumCuller.h"
-
-#include "GameState.h"
-#include "Locator.h"
-#include "rendering/texture/TextureLoader.h"
-#include "resources/ResourceManager.h"
+#include <Jolt/Physics/Body/Body.h>
 
 using namespace DirectX;
 using namespace std;
 
-RenderSystem::RenderSystem(RenderContext* renderContext, std::vector<Material>&& materials)
+RenderSystem::RenderSystem(RenderContext* renderContext, std::shared_ptr<UIManager> uiManager, std::vector<Material>&& materials)
 	: renderer(renderContext, std::move(materials)),
+	  uiManager(uiManager),
 	  frameBuffer(CreateDirectionnalLight()),
 	  renderContext(renderContext)
 {
@@ -70,12 +70,24 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 		renderer.Render(mesh, renderContext->GetContext(), transform);
 	}
 
+	// Text Addition (create sprite)
+	auto watchables = entityManager.View<Controllable, Eatable, RigidBody>();
+	int playerMass;
+	float playerSpeed;
+	for (const auto& [_, __, eatable, rigiBody] : watchables) {
+		playerMass = eatable.mass;
+		playerSpeed = rigiBody.body->GetLinearVelocity().Length();
+		break;
+	}
+	auto text = std::format(L"Player mass : {}\nPlayer speed : {:.2f}\nPlaytime : {:.2f}", playerMass, playerSpeed, GameState::playTime);
+	uiManager->RenderText(text, renderContext->GetContext(), 0.0f, 0.0f, 100.0f, 100.0f);
+
 	// Render billboards
 	for (const auto& [entity, billboard] : entityManager.View<Billboard>())
 		renderer.Render(billboard, renderContext->GetContext(), currentCamera);
 
 	// Render sprites
-	for (const auto& [entity, sprite] : entityManager.View<Sprite2D>())
+	for (auto& sprite : uiManager->GetSprites())
 		renderer.Render(sprite, renderContext->GetContext());
 
 	GameState::postProcessSettings.enableVignette = Camera::mode == Camera::CameraMode::FIRST_PERSON ? 1 : 0;

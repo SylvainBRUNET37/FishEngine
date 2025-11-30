@@ -23,7 +23,7 @@ private:
 
 	Entity mainMenuEntity;
 
-	UIManager uiManager;
+	std::shared_ptr<UIManager> uiManager;
 	EntityManager entityManager;
 
 	static void WaitBeforeNextFrame(DWORD frameStartTime);
@@ -35,8 +35,13 @@ private:
 	void ResumeGame();
 	void PauseGame();
 	void EndGame();
+	void RestartGame();
 
 	void InitGame();
+
+	void BuildPauseMenu();
+	void BuildOptionMenu();
+	void BuildEndMenu();
 };
 
 #endif

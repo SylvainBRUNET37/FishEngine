@@ -162,6 +162,7 @@
     <ClInclude Include="include\rendering\postProcessing\PostProcessSettings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\rendering\graphics\SpriteElement.h">
     <ClInclude Include="include\rendering\graphics\Billboard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
