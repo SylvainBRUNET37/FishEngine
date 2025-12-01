@@ -7,12 +7,7 @@
 class EntityManagerFactory
 {
 public:
-	[[nodiscard]] static EntityManager Create()
-	{
-		return EntityManager{};
-	}
-
-	[[nodiscard]] static EntityManager Create(const SceneResource& sceneResource);
+	[[nodiscard]] static std::unique_ptr<EntityManager> Create(const SceneResource& sceneResource);
 };
 
 #endif

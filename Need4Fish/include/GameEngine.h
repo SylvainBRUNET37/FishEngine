@@ -26,7 +26,7 @@ private:
 	Entity mainMenuEntity;
 
 	std::shared_ptr<UIManager> uiManager;
-	EntityManager entityManager;
+	std::unique_ptr< EntityManager> entityManager;
 
 	static void WaitBeforeNextFrame(DWORD frameStartTime);
 

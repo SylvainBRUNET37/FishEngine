@@ -58,10 +58,10 @@ void GameEngine::Run()
 		// End the loop if Windows want to terminate the program (+ process messages)
 		shouldContinue = WindowsApplication::ProcessWindowsMessages();
 
-		particleSystem.Update(elapsedTime, entityManager);
+		particleSystem.Update(elapsedTime, *entityManager);
 
 		for (const auto& system : systems)
-			system->Update(elapsedTime, entityManager);
+			system->Update(elapsedTime, *entityManager);
 		
 		WaitBeforeNextFrame(frameStartTime);
 	}
@@ -79,7 +79,7 @@ void GameEngine::WaitBeforeNextFrame(const DWORD frameStartTime)
 void GameEngine::HandleGameState()
 {
 	if (GameState::isGrowing)
-		Eating::UpdatePlayerScale(entityManager);
+		Eating::UpdatePlayerScale(*entityManager);
 
 	// Check if things get eaten
 	HandleCollions();
@@ -115,7 +115,7 @@ void GameEngine::HandleCollions()
 	{
 		auto& [bodyId1, bodyId2] = GameState::detectedCollisions.front();
 		GameState::detectedCollisions.pop();
-		Eating::Eat(entityManager, bodyId1, bodyId2);
+		Eating::Eat(*entityManager, bodyId1, bodyId2);
 		if (GameState::currentState != GameState::PLAYING) ChangeGameStatus();
 	}
 }
@@ -198,15 +198,15 @@ void GameEngine::InitGame()
 	Camera::firstPersonOffset = { 0.0f,-1.7f,35.0f };
 	Camera::currentDistance = Camera::distance;
 
-	const auto cameraEntity = entityManager.CreateEntity();
-	auto& cameraComponent = entityManager.AddComponent<Camera>(cameraEntity, camera);
+	const auto cameraEntity = entityManager->CreateEntity();
+	auto& cameraComponent = entityManager->AddComponent<Camera>(cameraEntity, camera);
 
 	GameState::currentCameraEntity = cameraEntity;
 	GameState::postProcessSettings = {};
 
 	// Assign the controllable entity to the camera (it's not a pretty way of doing it but it works)
 	unsigned short nbControllable = 0;
-	for (const auto& [entity, controllable] : entityManager.View<Controllable>())
+	for (const auto& [entity, controllable] : entityManager->View<Controllable>())
 	{
 		++nbControllable;
 		vassert(nbControllable == 1, "Currently, it's only possible to have 1 controllable entity.");
@@ -215,7 +215,7 @@ void GameEngine::InitGame()
 	}
 
 	// Add particles inside the world (TODO: make it fit the world size)
-	particleSystem.AddParticleZone(entityManager,
+	particleSystem.AddParticleZone(*entityManager,
 		{ 
 			.centerPosition = {0, 700.0f, 0},
 			.halfExtend = 250.0f,
@@ -226,7 +226,7 @@ void GameEngine::InitGame()
 		}
 	);
 
-	mainMenuEntity = entityManager.CreateEntity();
+	mainMenuEntity = entityManager->CreateEntity();
 
 	GameState::playTime = 0.0f;
 }
