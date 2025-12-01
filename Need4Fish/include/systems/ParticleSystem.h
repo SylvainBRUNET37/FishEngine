@@ -14,6 +14,7 @@ public:
 		float particleDurationMin;
 		float particleDurationMax;
 		float particleSpeed;
+		DirectX::XMFLOAT3 particleDirection; // must be a unit vector
 	};
 
 	explicit ParticleSystem(ID3D11Device* device) : device{device}
@@ -33,6 +34,7 @@ private:
 		float particleDurationMin;
 		float particleDurationMax;
 		float particleSpeed;
+		DirectX::XMFLOAT3 particleDirection; // must be a unit vector
 	};
 
 	std::vector<Zone> particleZones;

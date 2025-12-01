@@ -43,7 +43,7 @@ struct DistortionMeshInstance
 	UINT meshIndex;
 };
 
-struct LifeSpan
+struct Particle
 {
 	double lifeTime{}; // Store in ms the age of the object
 	double lifeDuration{};
@@ -68,7 +68,7 @@ using Components = std::tuple
 	Billboard,
 	Sensor,
 	DistortionMeshInstance,
-	LifeSpan
+	Particle
 >;
 
 #endif

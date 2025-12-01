@@ -7,6 +7,7 @@
 #include "utils/MathsUtils.h"
 
 using namespace std;
+using namespace DirectX;
 
 void ParticleSystem::AddParticleZone(EntityManager& entityManager, const ParticleZoneParams& params)
 {
@@ -26,7 +27,7 @@ void ParticleSystem::AddParticleZone(EntityManager& entityManager, const Particl
 	ranges::for_each(particles, [&](Entity& particle)
 	{
 		particle = entityManager.CreateEntity();
-		entityManager.AddComponent<LifeSpan>(particle, params.particleDurationMax, params.particleDurationMax);
+		entityManager.AddComponent<Particle>(particle, params.particleDurationMax, params.particleDurationMax);
 		entityManager.AddComponent<Billboard>(particle, Billboard
 		                                      {
 			                                      billboardShader,
@@ -38,11 +39,12 @@ void ParticleSystem::AddParticleZone(EntityManager& entityManager, const Particl
 		                                      });
 	});
 
-	particleZones.emplace_back(
+	particleZones.emplace_back
+	(
 		std::move(particles), 
 		params.centerPosition, params.halfExtend, 
 		params.particleDurationMin, params.particleDurationMax,
-		params.particleSpeed
+		params.particleSpeed, params.particleDirection
 	);
 }
 
@@ -52,21 +54,24 @@ void ParticleSystem::Update(const double deltaTime, EntityManager& entityManager
 	{
 		ranges::for_each(zone.particles, [&](const Entity& entity)
 		{
-			TeleportIfAtEndOfLife(entityManager, zone, entity, deltaTime);
+			MoveAndTeleportIfAtEndOfLife(entityManager, zone, entity, deltaTime);
 		});
 	});
 }
 
-void ParticleSystem::TeleportIfAtEndOfLife(
+void ParticleSystem::MoveAndTeleportIfAtEndOfLife(
 	EntityManager& entityManager, const Zone& zone, const Entity& entity, const double deltaTime)
 {
-	auto& lifeSpan = entityManager.Get<LifeSpan>(entity);
+	auto& particle = entityManager.Get<Particle>(entity);
 	auto& billboard = entityManager.Get<Billboard>(entity);
 
-	billboard.position.y += zone.particleSpeed * deltaTime;
+	const XMVECTOR position = XMLoadFloat3(&billboard.position);
+	const XMVECTOR direction = XMLoadFloat3(&zone.particleDirection);
 
-	lifeSpan.lifeTime += deltaTime;
-	if (lifeSpan.lifeTime >= lifeSpan.lifeDuration) [[unlikely]]
+	XMStoreFloat3(&billboard.position, XMVectorAdd(position, direction));
+
+	particle.lifeTime += deltaTime;
+	if (particle.lifeTime >= particle.lifeDuration) [[unlikely]]
 	{
 		static constexpr float scaleMin = 5.0f;
 		static constexpr float scaleMax = 15.0f;
@@ -76,7 +81,7 @@ void ParticleSystem::TeleportIfAtEndOfLife(
 		billboard.position = MathsUtils::RandomPosInSquare(zone.centerPosition, zone.halfExtend);
 		billboard.scale = {scale, scale};
 
-		lifeSpan.lifeDuration = MathsUtils::RandomBetween(zone.particleDurationMin, zone.particleDurationMax);
-		lifeSpan.lifeTime = 0.0f;
+		particle.lifeDuration = MathsUtils::RandomBetween(zone.particleDurationMin, zone.particleDurationMax);
+		particle.lifeTime = 0.0f;
 	}
 }
