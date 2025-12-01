@@ -115,6 +115,7 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 	uiManager->RenderText(text, renderContext->GetContext(), 0.0f, 0.0f, 100.0f, 100.0f);
 
 	// Render sprites
+	renderer.PrepareSceneForSprite();
 	for (auto& sprite : uiManager->GetSprites())
 		renderer.Render(sprite, renderContext->GetContext());
 

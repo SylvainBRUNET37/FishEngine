@@ -11,7 +11,7 @@ using namespace DirectX;
 class FrustumCuller {
 public:
 
-	[[nodiscard]] static bool IsMeshCulled(Mesh& mesh, const Transform& transform, BaseCameraData camera) noexcept;
+	[[nodiscard]] static bool IsMeshCulled(const Mesh& mesh, const Transform& transform, const BaseCameraData& camera) noexcept;
 
 };
 

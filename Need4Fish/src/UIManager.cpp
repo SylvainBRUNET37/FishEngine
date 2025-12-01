@@ -51,6 +51,7 @@ Sprite2D UIManager::LoadSprite(const std::string& filePath, float positionX, flo
 
 [[nodiscard]] std::vector<Sprite2D> UIManager::GetSprites() {
 	std::vector<Sprite2D> displayedSprites{};
+	displayedSprites.reserve(sprites.size());
 	for (auto& sprite : sprites)
 		displayedSprites.emplace_back(sprite.UpdateAndGetDisplayedSprite());
 

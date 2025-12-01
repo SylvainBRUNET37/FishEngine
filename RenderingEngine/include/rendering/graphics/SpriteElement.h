@@ -5,6 +5,9 @@
 #include <optional>
 #include <functional>
 
+#undef min
+#undef max
+
 struct SpriteElement {
 	Sprite2D sprite;
 
@@ -27,7 +30,7 @@ struct SpriteElement {
 		clickSprite = cs;
 	}
 
-	void SetClickFunction(std::function<void()> clickFunction_) {
+	void SetClickFunction(const std::function<void()>& clickFunction_) {
 		onClick = clickFunction_;
 	}
 
@@ -39,9 +42,10 @@ struct SpriteElement {
 		}
 	}
 
-	Sprite2D UpdateAndGetDisplayedSprite() {
-		//remainingDelay -= 1.0f / 60.0f; // ignoble
-		remainingDelay = (remainingDelay >= 1.0f / 60.0f) ? remainingDelay - 1.0f / 60.0f : 0.0f;
+	const Sprite2D& UpdateAndGetDisplayedSprite() {
+		static constexpr float FREQUENCE = 1.0f / 60.0f;
+		remainingDelay = std::max(0.0f, remainingDelay - FREQUENCE);
+
 		if (clickSprite.has_value() && remainingDelay > 0.0f && !isCheckBox)
 		{
 			return clickSprite.value();

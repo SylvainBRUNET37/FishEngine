@@ -72,31 +72,14 @@ void Renderer::Render(const Mesh& mesh,
 	Draw(mesh);
 }
 
-void Renderer::Render(Sprite2D& sprite, ID3D11DeviceContext* context)
+void Renderer::Render(Sprite2D& sprite, ID3D11DeviceContext* context) const
 {
-	renderContext->EnableAlphaBlending();
-
-	static const float screenWidth = static_cast<float>(GetSystemMetrics(SM_CXSCREEN));
-	static const float screenHeight = static_cast<float>(GetSystemMetrics(SM_CYSCREEN));
-
-	// Orthographic projection to display the sprite in 2D "from the screne"
-	const XMMATRIX matOrtho = XMMatrixOrthographicOffCenterRH
-	(
-		0.f, screenWidth,
-		screenHeight, 0.f,
-		0.f, 1.f
-	);
-
 	// Update frame constant buffer
 	sprite.shaderProgram.Bind(context);
-	spriteConstantBuffer.Update(context, {.matProj = XMMatrixTranspose(matOrtho) });
-	spriteConstantBuffer.Bind(context);
 
 	context->PSSetShaderResources(0, 1, &sprite.texture.texture);
 
 	Draw(sprite);
-
-	renderContext->DisableAlphaBlending();
 }
 
 void Renderer::Render(Billboard& billboard, ID3D11DeviceContext* context, const BaseCameraData& baseCameraData)
@@ -128,6 +111,8 @@ void Renderer::UpdateScene() const
 	ID3D11DeviceContext* context = renderContext->GetContext();
 	ID3D11RenderTargetView* renderTarget = renderContext->GetPostProcess().GetRenderTargetView();
 	ID3D11DepthStencilView* depthStencil = renderContext->GetDepthStencilView();
+
+	renderContext->DisableAlphaBlending();
 
 	constexpr float backgroundColor[4] = { 0.0f, 0.2f, 0.4f, 1.0f };
 	context->ClearRenderTargetView(renderTarget, backgroundColor);
@@ -163,6 +148,26 @@ void Renderer::PrepareSceneForBillboard() const
 {
 	renderContext->EnableAlphaBlending();
 	renderContext->EnableTransparentDepth();
+}
+
+void Renderer::PrepareSceneForSprite()
+{
+	ID3D11DeviceContext* context = renderContext->GetContext();
+	static const float screenWidth = static_cast<float>(GetSystemMetrics(SM_CXSCREEN));
+	static const float screenHeight = static_cast<float>(GetSystemMetrics(SM_CYSCREEN));
+
+	// Orthographic projection to display the sprite in 2D "from the screne"
+	static const XMMATRIX matOrtho = XMMatrixOrthographicOffCenterRH
+	(
+		0.f, screenWidth,
+		screenHeight, 0.f,
+		0.f, 1.f
+	);
+
+	renderContext->EnableAlphaBlending();
+
+	spriteConstantBuffer.Update(context, { .matProj = XMMatrixTranspose(matOrtho) });
+	spriteConstantBuffer.Bind(context);
 }
 
 void Renderer::Draw(const Mesh& mesh) const
