@@ -222,6 +222,7 @@ void GameEngine::InitGame()
 			.nbParticle = 80,
 			.particleDurationMin = 3.0f,
 			.particleDurationMax = 15.0f,
+			.particleSpeed = 20.0f
 		}
 	);
 

@@ -13,6 +13,7 @@ public:
 		unsigned int nbParticle;
 		float particleDurationMin;
 		float particleDurationMax;
+		float particleSpeed;
 	};
 
 	explicit ParticleSystem(ID3D11Device* device) : device{device}
@@ -31,6 +32,7 @@ private:
 		float halfExtend;
 		float particleDurationMin;
 		float particleDurationMax;
+		float particleSpeed;
 	};
 
 	std::vector<Zone> particleZones;

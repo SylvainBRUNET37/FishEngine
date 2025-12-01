@@ -39,8 +39,11 @@ void ParticleSystem::AddParticleZone(EntityManager& entityManager, const Particl
 	});
 
 	particleZones.emplace_back(
-		std::move(particles), params.centerPosition, 
-		params.halfExtend, params.particleDurationMin, params.particleDurationMax);
+		std::move(particles), 
+		params.centerPosition, params.halfExtend, 
+		params.particleDurationMin, params.particleDurationMax,
+		params.particleSpeed
+	);
 }
 
 void ParticleSystem::Update(const double deltaTime, EntityManager& entityManager)
@@ -58,14 +61,16 @@ void ParticleSystem::TeleportIfAtEndOfLife(
 	EntityManager& entityManager, const Zone& zone, const Entity& entity, const double deltaTime)
 {
 	auto& lifeSpan = entityManager.Get<LifeSpan>(entity);
+	auto& billboard = entityManager.Get<Billboard>(entity);
+
+	billboard.position.y += zone.particleSpeed * deltaTime;
 
 	lifeSpan.lifeTime += deltaTime;
 	if (lifeSpan.lifeTime >= lifeSpan.lifeDuration) [[unlikely]]
 	{
 		static constexpr float scaleMin = 5.0f;
 		static constexpr float scaleMax = 15.0f;
-
-		auto& billboard = entityManager.Get<Billboard>(entity);
+		
 		const auto scale = MathsUtils::RandomBetween(scaleMin, scaleMax);
 
 		billboard.position = MathsUtils::RandomPosInSquare(zone.centerPosition, zone.halfExtend);
