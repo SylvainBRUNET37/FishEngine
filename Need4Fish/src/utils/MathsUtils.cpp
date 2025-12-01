@@ -14,11 +14,11 @@ float MathsUtils::RandomBetween(const float min, const float max)
 	return dist(rng);
 }
 
-XMFLOAT3 MathsUtils::RandomPosInSquare(XMFLOAT3 squareCenterPosition, const float halfExtend)
+XMFLOAT3 MathsUtils::RandomPosInSquare(XMFLOAT3 squareCenterPosition, const DirectX::XMFLOAT3 halfExtends)
 {
-	squareCenterPosition.x += RandomBetween(-halfExtend, halfExtend);
-	squareCenterPosition.y += RandomBetween(-halfExtend, halfExtend);
-	squareCenterPosition.z += RandomBetween(-halfExtend, halfExtend);
+	squareCenterPosition.x += RandomBetween(-halfExtends.x, halfExtends.x);
+	squareCenterPosition.y += RandomBetween(-halfExtends.y, halfExtends.y);
+	squareCenterPosition.z += RandomBetween(-halfExtends.z, halfExtends.z);
 
 	return squareCenterPosition;
 }

@@ -43,7 +43,7 @@ void ComponentFactory::CreateSensor(const nlohmann::json& componentData, EntityM
 	if (componentData["type"] == "boxSensor")
 		body = SensorFactory::CreateCubeCurrentSensor(transform, entity);
 	else if (componentData["type"] == "cylinderSensor")
-		body = SensorFactory::CreateCubeCurrentSensor(transform, entity);
+		body = SensorFactory::CreateCylinderSensor(transform, entity);
 	
 	vassert(body, "Sensor must have a body type");
 

@@ -9,7 +9,7 @@ public:
 	struct ParticleZoneParams
 	{
 		DirectX::XMFLOAT3 centerPosition;
-		float halfExtend;
+		DirectX::XMFLOAT3 halfExtends;
 		unsigned int nbParticle;
 		float particleDurationMin;
 		float particleDurationMax;
@@ -30,7 +30,7 @@ private:
 	{
 		std::vector<Entity> particles;
 		DirectX::XMFLOAT3 centerPosition;
-		float halfExtend;
+		DirectX::XMFLOAT3 halfExtends;
 		float particleDurationMin;
 		float particleDurationMax;
 		float particleSpeed;
@@ -40,7 +40,7 @@ private:
 	std::vector<Zone> particleZones;
 	ID3D11Device* device;
 
-	static void TeleportIfAtEndOfLife(EntityManager& entityManager, const Zone& zone, const Entity& entity,
+	static void MoveAndTeleportIfAtEndOfLife(EntityManager& entityManager, const Zone& zone, const Entity& entity,
 	                                  double deltaTime);
 };
 

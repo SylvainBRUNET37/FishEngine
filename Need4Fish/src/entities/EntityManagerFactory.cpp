@@ -30,10 +30,8 @@ std::unique_ptr<EntityManager> EntityManagerFactory::Create(const SceneResource&
 
 		if (node.meshIndex != UINT32_MAX)
 		{
-			// Create a distortion mesh if the node is a sensor (not the best way of linking, but it works)
-			if (node.name.find("Sensor") != std::string::npos)
-				entityManager->AddComponent<DistortionMeshInstance>(entity, DistortionMeshInstance{ .meshIndex = node.meshIndex });
-			else
+			// TODO: correct this: do not apply mesh to sensors in Blender
+			if (node.name.find("Sensor") == std::string::npos)
 				entityManager->AddComponent<MeshInstance>(entity, MeshInstance{ .meshIndex = node.meshIndex });
 		}
 

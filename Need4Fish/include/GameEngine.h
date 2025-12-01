@@ -41,6 +41,8 @@ private:
 
 	void InitGame();
 
+	void CreateParticleZones();
+
 	void BuildPauseMenu();
 	void BuildOptionMenu();
 	void BuildEndMenu();

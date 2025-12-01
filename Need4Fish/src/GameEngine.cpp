@@ -3,17 +3,22 @@
 
 #include <tuple>
 #include <algorithm>
+#include <Jolt/Physics/Collision/Shape/CylinderShape.h>
+
+
 #include "GameState.h"
 #include "entities/EntityManagerFactory.h"
 #include "Locator.h"
 #include "rendering/application/WindowsApplication.h"
 #include "rendering/texture/TextureLoader.h"
 #include "gameplay/mechanics/Eating.h"
+#include "physicsEngine/utils/MeshUtil.h"
 #include "systems/PowerSystem.h"
 #include "systems/SensorSystem.h"
 #include "utils/MathsUtils.h"
 
 using namespace DirectX;
+using namespace JPH;
 
 GameEngine::GameEngine(RenderContext* renderContext_)
 	: renderContext{renderContext_},
@@ -214,22 +219,81 @@ void GameEngine::InitGame()
 		cameraComponent.targetEntity = entity;
 	}
 
-	// Add particles inside the world (TODO: make it fit the world size)
-	particleSystem.AddParticleZone(*entityManager,
-		{ 
-			.centerPosition = {0, 700.0f, 0},
-			.halfExtend = 250.0f,
-			.nbParticle = 80,
-			.particleDurationMin = 3.0f,
-			.particleDurationMax = 15.0f,
-			.particleSpeed = 20.0f,
-			.particleDirection = {0, 1, 0}
-		}
-	);
+	CreateParticleZones();
 
 	mainMenuEntity = entityManager->CreateEntity();
 
 	GameState::playTime = 0.0f;
+}
+
+void GameEngine::CreateParticleZones()
+{
+	// Add particles inside the world (TODO: make it fit the world size)
+	particleSystem.AddParticleZone(*entityManager,
+		{
+			.centerPosition = {0, 700.0f, 0},
+			.halfExtends = {250.0f, 250.0f, 250.0f},
+			.nbParticle = 80,
+			.particleDurationMin = 3.0f,
+			.particleDurationMax = 15.0f,
+			.particleSpeed = 3.0f,
+			.particleDirection = {0, 1, 0}
+		}
+	);
+
+	// Add particle zone for geysers and currents
+	// It's not a pretty way of doing it but it works
+	for (const auto& [entity, sensor, transform, name] : entityManager->View<Sensor, Transform, Name>())
+	{
+		auto& bodyInterface = JoltSystem::GetBodyInterface();
+		if (name.name == "CurrentSensor")
+		{
+			const RefConst<Shape> shape = bodyInterface.GetShape(sensor.body->GetID());
+
+			//const auto test = shape->GetInnerRadius();
+			if (shape->GetSubType() == EShapeSubType::Box)
+			{
+				const auto sensorBoxShape = static_cast<const BoxShape*>(shape.GetPtr());
+
+				particleSystem.AddParticleZone(*entityManager,
+					{
+						.centerPosition = transform.position,
+						.halfExtends = MeshUtil::ToDirectX(sensorBoxShape->GetHalfExtent()),
+						.nbParticle = 1000,
+						.particleDurationMin = 0.5f,
+						.particleDurationMax = 2.0f,
+						.particleSpeed = 10.0f,
+						.particleDirection = MeshUtil::ToDirectX(sensor.direction)
+					}
+				);
+			}
+		}
+		else if (name.name == "GeyserSensor")
+		{
+			const RefConst<Shape> shape = bodyInterface.GetShape(sensor.body->GetID());
+
+			//const auto test = shape->GetInnerRadius();
+			if (shape->GetSubType() == EShapeSubType::Cylinder)
+			{
+				const auto sensorCylinderShape = static_cast<const CylinderShape*>(shape.GetPtr());
+
+				const float halfHeight = sensorCylinderShape->GetHalfHeight();
+				const float radius = sensorCylinderShape->GetRadius();
+
+				particleSystem.AddParticleZone(*entityManager,
+					{
+						.centerPosition = transform.position,
+						.halfExtends = {radius, halfHeight, radius},
+						.nbParticle = 1000,
+						.particleDurationMin = 0.5f,
+						.particleDurationMax = 2.0f,
+						.particleSpeed = 10.0f,
+						.particleDirection = MeshUtil::ToDirectX(sensor.direction)
+					}
+				);
+			}
+		}
+	}
 }
 
 void GameEngine::BuildPauseMenu()

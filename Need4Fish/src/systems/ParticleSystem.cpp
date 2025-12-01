@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "systems/ParticleSystem.h"
 
+#include "GameState.h"
 #include "Locator.h"
 #include "rendering/texture/TextureLoader.h"
 #include "resources/ResourceManager.h"
@@ -27,13 +28,15 @@ void ParticleSystem::AddParticleZone(EntityManager& entityManager, const Particl
 	ranges::for_each(particles, [&](Entity& particle)
 	{
 		particle = entityManager.CreateEntity();
-		entityManager.AddComponent<Particle>(particle, params.particleDurationMax, params.particleDurationMax);
+		entityManager.AddComponent<Particle>(particle,
+		                                     MathsUtils::RandomBetween(params.particleDurationMin, params.particleDurationMax),
+		                                     params.particleDurationMax);
 		entityManager.AddComponent<Billboard>(particle, Billboard
 		                                      {
 			                                      billboardShader,
 			                                      billboardTexture,
 			                                      device,
-												  {},
+			                                      {},
 			                                      {0.0f, 0.0f},
 			                                      Billboard::CameraFacing
 		                                      });
@@ -41,8 +44,8 @@ void ParticleSystem::AddParticleZone(EntityManager& entityManager, const Particl
 
 	particleZones.emplace_back
 	(
-		std::move(particles), 
-		params.centerPosition, params.halfExtend, 
+		std::move(particles),
+		params.centerPosition, params.halfExtends,
 		params.particleDurationMin, params.particleDurationMax,
 		params.particleSpeed, params.particleDirection
 	);
@@ -50,13 +53,16 @@ void ParticleSystem::AddParticleZone(EntityManager& entityManager, const Particl
 
 void ParticleSystem::Update(const double deltaTime, EntityManager& entityManager)
 {
-	ranges::for_each(particleZones, [&](const Zone& zone)
+	if (GameState::currentState == GameState::PLAYING)
 	{
-		ranges::for_each(zone.particles, [&](const Entity& entity)
+		ranges::for_each(particleZones, [&](const Zone& zone)
 		{
-			MoveAndTeleportIfAtEndOfLife(entityManager, zone, entity, deltaTime);
+			ranges::for_each(zone.particles, [&](const Entity& entity)
+			{
+				MoveAndTeleportIfAtEndOfLife(entityManager, zone, entity, deltaTime);
+			});
 		});
-	});
+	}
 }
 
 void ParticleSystem::MoveAndTeleportIfAtEndOfLife(
@@ -68,17 +74,17 @@ void ParticleSystem::MoveAndTeleportIfAtEndOfLife(
 	const XMVECTOR position = XMLoadFloat3(&billboard.position);
 	const XMVECTOR direction = XMLoadFloat3(&zone.particleDirection);
 
-	XMStoreFloat3(&billboard.position, XMVectorAdd(position, direction));
+	XMStoreFloat3(&billboard.position, XMVectorAdd(position, direction * zone.particleSpeed));
 
 	particle.lifeTime += deltaTime;
 	if (particle.lifeTime >= particle.lifeDuration) [[unlikely]]
 	{
 		static constexpr float scaleMin = 5.0f;
 		static constexpr float scaleMax = 15.0f;
-		
+
 		const auto scale = MathsUtils::RandomBetween(scaleMin, scaleMax);
 
-		billboard.position = MathsUtils::RandomPosInSquare(zone.centerPosition, zone.halfExtend);
+		billboard.position = MathsUtils::RandomPosInSquare(zone.centerPosition, zone.halfExtends);
 		billboard.scale = {scale, scale};
 
 		particle.lifeDuration = MathsUtils::RandomBetween(zone.particleDurationMin, zone.particleDurationMax);

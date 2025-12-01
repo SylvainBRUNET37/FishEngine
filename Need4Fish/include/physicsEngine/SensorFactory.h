@@ -7,6 +7,7 @@ struct Transform;
 namespace SensorFactory
 {
 	JPH::Body* CreateCubeCurrentSensor(const Transform& transform, const Entity& entity);
+	JPH::Body* CreateCylinderSensor(const Transform& transform, const Entity& entity);
 }
 
 #endif
