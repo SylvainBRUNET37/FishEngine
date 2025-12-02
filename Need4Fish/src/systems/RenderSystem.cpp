@@ -61,11 +61,15 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 
 	renderer.UpdateFrameBuffer(frameBuffer);
 
+	// Prepare culler for meshes and billboards
+	FrustumCuller::Init(static_cast<BaseCameraData>(currentCamera));
+
+	// Render Meshes
 	for (const auto& [entity, transform, meshInstance] : entityManager.View<Transform, MeshInstance>())
 	{
 		// Check if the mesh should be rendered or not
 		auto& mesh = Locator::Get<ResourceManager>().GetMesh(meshInstance.meshIndex);
-		if (FrustumCuller::IsMeshCulled(mesh, transform, static_cast<BaseCameraData>(currentCamera)))
+		if (FrustumCuller::IsMeshCulled(mesh, transform))
 			continue;
 
 		renderer.Render(mesh, renderContext->GetContext(), transform);
@@ -76,7 +80,7 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 	for (const auto& [entity, billboard] : entityManager.View<Billboard>())
 	{
 		const auto worldTransform = billboard.ComputeBillboardWorldMatrix();
-		if (FrustumCuller::IsBillboardCulled(billboard, worldTransform, static_cast<BaseCameraData>(currentCamera)))
+		if (FrustumCuller::IsBillboardCulled(billboard, worldTransform))
 			continue;
 		renderer.Render(billboard, worldTransform, currentCamera);
 	}
@@ -88,7 +92,7 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 	{
 		// Check if the mesh should be rendered or not
 		auto& mesh = Locator::Get<ResourceManager>().GetMesh(distortionMeshInstance.meshIndex);
-		if (FrustumCuller::IsMeshCulled(mesh, transform, static_cast<BaseCameraData>(currentCamera)))
+		if (FrustumCuller::IsMeshCulled(mesh, transform))
 			continue;
 
 		renderer.Render(mesh, renderContext->GetContext(), transform);

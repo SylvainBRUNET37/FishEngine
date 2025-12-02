@@ -12,8 +12,14 @@ using namespace DirectX;
 class FrustumCuller {
 public:
 
- 	[[nodiscard]] static bool IsMeshCulled(const Mesh& mesh, const Transform& transform, const BaseCameraData& camera) noexcept;
-	[[nodiscard]] static bool IsBillboardCulled(const Billboard& billboard, const XMMATRIX& worldMatrix, const BaseCameraData& camera) noexcept;
+	static void Init(const BaseCameraData& camera);
+ 	[[nodiscard]] static bool IsMeshCulled(const Mesh& mesh, const Transform& transform) noexcept;
+	[[nodiscard]] static bool IsBillboardCulled(const Billboard& billboard, const XMMATRIX& worldMatrix) noexcept;
+
+private:
+	static XMMATRIX viewMatrixInvert;
+	static XMMATRIX projectionMatrix;
+	static BoundingFrustum frustum;
 };
 
 #endif
