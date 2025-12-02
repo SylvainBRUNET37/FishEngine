@@ -1,6 +1,8 @@
 #ifndef SPRITE_2D_H
 #define SPRITE_2D_H
 
+#include <memory>
+
 #include "rendering/graphics/VertexSprite.h"
 #include "rendering/buffers/VertexBuffer.h"
 #include "rendering/shaders/ShaderProgram.h"
@@ -15,15 +17,15 @@ struct Sprite2D
         float z;
     };
 
-    explicit Sprite2D(const ShaderProgram& shaderProgram, const Texture& texture, ID3D11Device* device);
+    explicit Sprite2D(const std::shared_ptr<ShaderProgram>& shaderProgram, const Texture& texture, ID3D11Device* device);
 
-    explicit Sprite2D(const ShaderProgram& shaderProgram, const Texture& texture, SpritePosition position, ID3D11Device* device);
+    explicit Sprite2D(const std::shared_ptr<ShaderProgram>& shaderProgram, const Texture& texture, SpritePosition position, ID3D11Device* device);
 
     Texture texture;
     SpritePosition position;
 
     VertexBuffer vertexBuffer;
-    ShaderProgram shaderProgram;
+    std::shared_ptr<ShaderProgram> shaderProgram;
 
     static std::vector<VertexSprite> ComputeVertices(const SpritePosition& position, const Texture& texture);
 };

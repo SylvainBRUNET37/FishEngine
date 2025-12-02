@@ -49,7 +49,7 @@ namespace
 	}
 }
 
-SceneResource SceneLoader::LoadScene(const filesystem::path& filePath, const ShaderBank& shaderBank)
+SceneResource SceneLoader::LoadScene(const filesystem::path& filePath, ShaderBank& shaderBank)
 {
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(
@@ -219,7 +219,7 @@ Material SceneLoader::ProcessMaterial(
 	const filesystem::path& materialPath,
 	const aiScene* scene,
 	const aiMaterial* material,
-	const ShaderBank& shaderBank)
+	ShaderBank& shaderBank)
 {
 	static constexpr int materialCbRegisterNumber = 2;
 
@@ -229,15 +229,13 @@ Material SceneLoader::ProcessMaterial(
 		std::format("Cannot load material '{}', no shaders has been assigned to it in scene meta data", materialName));
 
 	auto& matMetaData = sceneMetaData[materialName];
-
-	const ShaderProgram shaderProgram
+	
+	Material mat
 	{
-		device,
-		shaderBank.Get<VertexShader>(matMetaData["vs"]),
-		shaderBank.Get<PixelShader>(matMetaData["ps"]),
+		device, 
+		shaderBank.GetOrCreateShaderProgram(device, matMetaData["vs"], matMetaData["ps"]), 
+		materialCbRegisterNumber
 	};
-
-	Material mat{device, shaderProgram, materialCbRegisterNumber};
 
 	mat.name = material->GetName().C_Str();
 

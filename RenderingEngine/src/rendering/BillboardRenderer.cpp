@@ -14,7 +14,7 @@ void BillboardRenderer::Render(Billboard& billboard, ID3D11DeviceContext* contex
 {
 	XMStoreFloat4x4(&billboardBuffer.matWorld, XMMatrixTranspose(worldMatrix));
 
-	billboard.shaderProgram.Bind(context);
+	billboard.shaderProgram->Bind(context);
 
 	billboardConstantBuffer.Update(context, billboardBuffer);
 	billboardConstantBuffer.Bind(context);

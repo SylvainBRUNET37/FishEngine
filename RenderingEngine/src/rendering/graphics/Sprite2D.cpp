@@ -4,7 +4,7 @@
 using namespace std;
 using namespace DirectX;
 
-Sprite2D::Sprite2D(const ShaderProgram& shaderProgram_, const Texture& texture_, ID3D11Device* device)
+Sprite2D::Sprite2D(const std::shared_ptr<ShaderProgram>& shaderProgram_, const Texture& texture_, ID3D11Device* device)
 	: texture{texture_},
 	  position{},
 	  vertexBuffer{device, ComputeVertices(position, texture)},
@@ -12,7 +12,7 @@ Sprite2D::Sprite2D(const ShaderProgram& shaderProgram_, const Texture& texture_,
 {
 }
 
-Sprite2D::Sprite2D(const ShaderProgram& shaderProgram_, const Texture& texture_, SpritePosition position_, ID3D11Device* device)
+Sprite2D::Sprite2D(const std::shared_ptr<ShaderProgram>& shaderProgram_, const Texture& texture_, const SpritePosition position_, ID3D11Device* device)
 	: texture{ texture_ },
 	position{ position_ },
 	vertexBuffer{ device, ComputeVertices(position, texture) },

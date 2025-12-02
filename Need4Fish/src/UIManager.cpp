@@ -25,14 +25,12 @@ UIManager::UIManager(ID3D11Device* device) : device{device}
 
 	auto& shaderBank = Locator::Get<ResourceManager>().GetShaderBank();
 
-	const ShaderProgram spriteShaderProgram
-	(
-		device,
-		shaderBank.Get<VertexShader>("shaders/SpriteVS.hlsl"),
-		shaderBank.Get<PixelShader>("shaders/SpritePS.hlsl")
-	);
-
-	textSprite = new Sprite2D(spriteShaderProgram, textTexture, device);
+	textSprite = new Sprite2D
+	{
+		shaderBank.GetOrCreateShaderProgram(device, "shaders/SpriteVS.hlsl", "shaders/SpritePS.hlsl"),
+		textTexture, 
+		device
+	};
 	AddSprite({*textSprite});
 }
 
@@ -49,19 +47,18 @@ Sprite2D UIManager::LoadSprite(const std::string& filePath) const
 	return LoadSprite(filePath, 0.0f, 0.0f, 0.0f);
 }
 
-Sprite2D UIManager::LoadSprite(const std::string& filePath, float positionX, float positionY, float positionZ) const
+Sprite2D UIManager::LoadSprite(const std::string& filePath, const float positionX, const float positionY, const float positionZ) const
 {
 	const auto texture = TextureLoader::LoadTextureFromFile(filePath, device);
 	auto& shaderBank = Locator::Get<ResourceManager>().GetShaderBank();
 
-	const ShaderProgram spriteShaderProgram
-	(
-		device,
-		shaderBank.Get<VertexShader>("shaders/SpriteVS.hlsl"),
-		shaderBank.Get<PixelShader>("shaders/SpritePS.hlsl")
-	);
-
-	return Sprite2D{spriteShaderProgram, texture, {positionX, positionY, positionZ}, device};
+	return Sprite2D
+	{
+		shaderBank.GetOrCreateShaderProgram(device, "shaders/SpriteVS.hlsl", "shaders/SpritePS.hlsl"),
+		texture, 
+		{positionX, positionY, positionZ},
+		device
+	};
 }
 
 [[nodiscard]] std::vector<Sprite2D> UIManager::GetSprites()

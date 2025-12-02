@@ -12,14 +12,14 @@ using namespace DirectX;
 
 void ParticleSystem::AddParticleZone(EntityManager& entityManager, const ParticleZoneParams& params)
 {
-	static const auto& shaderBank = Locator::Get<ResourceManager>().GetShaderBank();
+	static auto& shaderBank = Locator::Get<ResourceManager>().GetShaderBank();
 
-	static const ShaderProgram billboardShader
-	{
+	static const shared_ptr<ShaderProgram> billboardShader = shaderBank.GetOrCreateShaderProgram
+	(
 		device,
-		shaderBank.Get<VertexShader>("shaders/BillboardVS.hlsl"),
-		shaderBank.Get<PixelShader>("shaders/BubblePS.hlsl")
-	};
+		"shaders/BillboardVS.hlsl",
+		"shaders/BubblePS.hlsl"
+	);
 
 	static const Texture billboardTexture = TextureLoader::LoadTextureFromFile("assets/textures/bble.png", device);
 

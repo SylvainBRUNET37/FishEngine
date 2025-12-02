@@ -52,7 +52,7 @@ void Renderer::Render(const Mesh& mesh,
 	const auto cbMaterialParams = BuildConstantMaterialBuffer(material);
 	material.constantBuffer.Update(context, cbMaterialParams);
 	material.constantBuffer.Bind(context);
-	material.shaderProgram.Bind(context);
+	material.shaderProgram->Bind(context);
 
 	// Update object constant buffer
 	const auto cbObjectParams = BuildConstantObjectBuffer(transform);
@@ -75,7 +75,7 @@ void Renderer::Render(const Mesh& mesh,
 void Renderer::Render(Sprite2D& sprite, ID3D11DeviceContext* context) const
 {
 	// Update frame constant buffer
-	sprite.shaderProgram.Bind(context);
+	sprite.shaderProgram->Bind(context);
 
 	context->PSSetShaderResources(0, 1, &sprite.texture.texture);
 

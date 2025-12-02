@@ -7,9 +7,9 @@ using namespace std;
 
 Texture TextureManager::GetOrLoadFromFile(const std::string& filePath, ID3D11Device* device)
 {
-	const auto it = fileTextureCache.find(filePath);
-	if (it != fileTextureCache.end())
-		return it->second;
+	const auto textureIt = fileTextureCache.find(filePath);
+	if (textureIt != fileTextureCache.end())
+		return textureIt->second;
 
 	auto texture = TextureLoader::LoadTextureFromFile(filePath, device);
 	fileTextureCache[filePath] = texture;
@@ -22,9 +22,9 @@ ComPtr<ID3D11ShaderResourceView> TextureManager::GetOrLoadFromMemory(const unsig
 {
 	const size_t hash = HashMemory(data, size);
 
-	const auto it = memeoryTextureCache.find(hash);
-	if (it != memeoryTextureCache.end())
-		return it->second;
+	const auto textureIt = memeoryTextureCache.find(hash);
+	if (textureIt != memeoryTextureCache.end())
+		return textureIt->second;
 
 	auto texture = TextureLoader::LoadTextureFromMemory(data, size, device);
 	memeoryTextureCache[hash] = texture;
@@ -34,7 +34,7 @@ ComPtr<ID3D11ShaderResourceView> TextureManager::GetOrLoadFromMemory(const unsig
 
 size_t TextureManager::HashMemory(const unsigned char* data, const size_t size)
 {
-	constexpr hash<string_view> hasher;
+	constexpr hash<string_view> hasher{};
 
-	return hasher(string_view(reinterpret_cast<const char*>(data), size));
+	return hasher(string_view{ reinterpret_cast<const char*>(data), size });
 }

@@ -16,7 +16,8 @@ void ResourceManager::InitShaderBank()
 	ShaderProgramDesc<VertexShader, PixelShader> shaderDescriptions;
 
 	// Add description of each shader program of the project
-	shaderDescriptions.AddDesc<VertexShader>("shaders/MainVS.hlsl", "MainVS", "vs_5_0")
+	shaderDescriptions
+		.AddDesc<VertexShader>("shaders/MainVS.hlsl", "MainVS", "vs_5_0")
 		.AddDesc<PixelShader>("shaders/PhongCausticsPS.hlsl", "PhongCausticsPS", "ps_5_0")
 		.AddDesc<PixelShader>("shaders/PhongWaterPS.hlsl", "PhongWaterPS", "ps_5_0")
 

@@ -4,8 +4,8 @@
 
 using namespace DirectX;
 
-Billboard::Billboard(const ShaderProgram& shaderProgram_, const Texture& texture_, ID3D11Device* device,
-                     const DirectX::XMFLOAT3 position, const DirectX::XMFLOAT2 scale, const Type type)
+Billboard::Billboard(const std::shared_ptr<ShaderProgram>& shaderProgram_, const Texture& texture_, ID3D11Device* device,
+                     const XMFLOAT3 position, const XMFLOAT2 scale, const Type type)
 	: position{position},
 	  scale{scale},
 	  vertices{ ComputeVertices() },
@@ -37,14 +37,14 @@ std::vector<VertexSprite> Billboard::ComputeVertices()
 	};
 }
 
-XMMATRIX Billboard::ComputeBillboardWorldMatrix()
+XMMATRIX Billboard::ComputeBillboardWorldMatrix() const
 {
 	// Compute the direction from billboard to camera
 	const XMVECTOR billboardPosition = XMLoadFloat3(&position);
 	XMVECTOR directionToCamera = BaseCameraData::position - billboardPosition;
 
 	// If cylindrical, ignore vertical
-	if (type == Billboard::Cylindric)
+	if (type == Cylindric) [[unlikely]]
 	{
 		directionToCamera = XMVectorSetY(directionToCamera, 0.0f);
 
