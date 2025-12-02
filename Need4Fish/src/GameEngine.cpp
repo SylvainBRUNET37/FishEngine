@@ -254,11 +254,17 @@ void GameEngine::CreateParticleZones()
 			{
 				const auto sensorBoxShape = static_cast<const BoxShape*>(shape.GetPtr());
 
+#ifndef NDEBUG
+				static constexpr unsigned int NB_CURRENT_PARTICLES = 75;
+#elif 
+				static constexpr unsigned int NB_CURRENT_PARTICLES = 200;
+#endif
+
 				particleSystem.AddParticleZone(*entityManager,
 					{
 						.centerPosition = transform.position,
 						.halfExtends = MeshUtil::ToDirectX(sensorBoxShape->GetHalfExtent()),
-						.nbParticle = 200,
+						.nbParticle = NB_CURRENT_PARTICLES,
 						.particleDurationMin = 0.5f,
 						.particleDurationMax = 1.0f,
 						.particleSpeed = 10.0f,
@@ -278,11 +284,17 @@ void GameEngine::CreateParticleZones()
 				const float halfHeight = sensorCylinderShape->GetHalfHeight();
 				const float radius = sensorCylinderShape->GetRadius();
 
+#ifndef NDEBUG
+				static constexpr unsigned int NB_GEYSER_PARTICLES = 100;
+#elif 
+				static constexpr unsigned int NB_GEYSER_PARTICLES = 1000;
+#endif
+
 				particleSystem.AddParticleZone(*entityManager,
 					{
 						.centerPosition = transform.position,
 						.halfExtends = {radius, halfHeight, radius},
-						.nbParticle = 1000,
+						.nbParticle = NB_GEYSER_PARTICLES,
 						.particleDurationMin = 0.5f,
 						.particleDurationMax = 1.0f,
 						.particleSpeed = 10.0f,
