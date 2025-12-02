@@ -2,8 +2,6 @@
 #include "UIManager.h"
 #include "Locator.h"
 #include "rendering/texture/TextureLoader.h"
-#include "rendering/utils/Util.h"
-#include <limits>
 #include <Gdiplus.h>
 #include <DirectXMath.h>
 
@@ -17,15 +15,32 @@ UIManager::UIManager(ID3D11Device* device) : device{device}
 
 	// create a GDI+ font for the TextRenderer
 	const FontFamily family(L"Arial", nullptr);
-	textFont = new Gdiplus::Font(&family, 24.0f, Gdiplus::FontStyleRegular, Gdiplus::UnitPixel);
+	textFont = new Font(&family, 24.0f, FontStyleRegular, UnitPixel);
 
 	textRenderer = new TextRenderer(device, 512, 512, textFont);
+
+	textTexture.texture = textRenderer->GetTextureView();
+	textTexture.width = textRenderer->GetTextWidth();
+	textTexture.height = textRenderer->GetTextHeigth();
+
+	auto& shaderBank = Locator::Get<ResourceManager>().GetShaderBank();
+
+	const ShaderProgram spriteShaderProgram
+	(
+		device,
+		shaderBank.Get<VertexShader>("shaders/SpriteVS.hlsl"),
+		shaderBank.Get<PixelShader>("shaders/SpritePS.hlsl")
+	);
+
+	textSprite = new Sprite2D(spriteShaderProgram, textTexture, device);
+	AddSprite({*textSprite});
 }
 
 UIManager::~UIManager()
 {
 	delete textRenderer;
 	delete textFont;
+	delete textSprite;
 	TextRenderer::Close();
 }
 
@@ -46,10 +61,11 @@ Sprite2D UIManager::LoadSprite(const std::string& filePath, float positionX, flo
 		shaderBank.Get<PixelShader>("shaders/SpritePS.hlsl")
 	);
 
-	return Sprite2D{ spriteShaderProgram, texture, { positionX, positionY, positionZ }, device };
+	return Sprite2D{spriteShaderProgram, texture, {positionX, positionY, positionZ}, device};
 }
 
-[[nodiscard]] std::vector<Sprite2D> UIManager::GetSprites() {
+[[nodiscard]] std::vector<Sprite2D> UIManager::GetSprites()
+{
 	std::vector<Sprite2D> displayedSprites{};
 	displayedSprites.reserve(sprites.size());
 	for (auto& sprite : sprites)
@@ -72,11 +88,17 @@ void UIManager::AddSprite(const SpriteElement& sprite)
 void UIManager::Clear()
 {
 	sprites.clear();
+
+	// Readd the text sprite since it has to be on the screen during the entire game
+	AddSprite({*textSprite}); 
 }
 
-void UIManager::HandleClick() {
+void UIManager::HandleClick()
+{
 	float minZ = -FLT_MAX;
-	std::function<void()> toExecute = []{};
+	std::function<void()> toExecute = []
+	{
+	};
 
 	for (auto& sprite : sprites)
 	{
@@ -90,7 +112,8 @@ void UIManager::HandleClick() {
 			sprite.remainingDelay = sprite.clickDelay;
 			minZ = currentZ;
 			toExecute = sprite.onClick;
-			if (sprite.isCheckBox) {
+			if (sprite.isCheckBox)
+			{
 				sprite.InvertBaseAndClickSprites();
 			}
 		}
@@ -98,7 +121,8 @@ void UIManager::HandleClick() {
 	toExecute();
 }
 
-void UIManager::EditSpritePosition(Sprite2D& sprite, float positionX, float positionY, float positionZ)
+void UIManager::EditSpritePosition(Sprite2D& sprite, const float positionX, const float positionY,
+                                   const float positionZ) const
 {
 	sprite.position.x = positionX;
 	sprite.position.y = positionY;
@@ -106,7 +130,7 @@ void UIManager::EditSpritePosition(Sprite2D& sprite, float positionX, float posi
 	sprite.vertexBuffer = VertexBuffer(device, Sprite2D::ComputeVertices(sprite.position, sprite.texture));
 }
 
-static float computeXPosition(Sprite2D& sprite, const std::string alignment)
+static float computeXPosition(const Sprite2D& sprite, const std::string& alignment)
 {
 	const float screenWidth = static_cast<float>(GetSystemMetrics(SM_CXSCREEN));
 	float newX;
@@ -129,7 +153,7 @@ static float computeXPosition(Sprite2D& sprite, const std::string alignment)
 	return newX;
 }
 
-static float computeYPosition(Sprite2D& sprite, const std::string alignment)
+static float computeYPosition(const Sprite2D& sprite, const std::string& alignment)
 {
 	const float screenHeight = static_cast<float>(GetSystemMetrics(SM_CYSCREEN));
 	float newY;
@@ -152,61 +176,48 @@ static float computeYPosition(Sprite2D& sprite, const std::string alignment)
 	return newY;
 }
 
-void UIManager::AlignSpriteX(Sprite2D& sprite, const std::string alignment)
+void UIManager::AlignSpriteX(Sprite2D& sprite, const std::string& alignment)
 {
-	float newX = computeXPosition(sprite, alignment);
+	const float newX = computeXPosition(sprite, alignment);
 	EditSpritePosition(sprite, newX, sprite.position.y, sprite.position.z);
 }
 
-void UIManager::AlignSpriteY(Sprite2D& sprite, const std::string alignment)
+void UIManager::AlignSpriteY(Sprite2D& sprite, const std::string& alignment)
 {
-	float newY = computeYPosition(sprite, alignment);
+	const float newY = computeYPosition(sprite, alignment);
 	EditSpritePosition(sprite, sprite.position.x, newY, sprite.position.z);
 }
 
-void UIManager::AlignSpriteXY(Sprite2D& sprite, const std::string alignmentX, const std::string alignmentY)
+void UIManager::AlignSpriteXY(Sprite2D& sprite, const std::string& alignmentX, const std::string& alignmentY)
 {
-	float newX = computeXPosition(sprite, alignmentX);
-	float newY = computeYPosition(sprite, alignmentY);
+	const float newX = computeXPosition(sprite, alignmentX);
+	const float newY = computeYPosition(sprite, alignmentY);
 	EditSpritePosition(sprite, newX, newY, sprite.position.z);
 }
 
 void UIManager::TranslateSpriteX(Sprite2D& sprite, const float translation)
 {
-	float newX = sprite.position.x + translation;
+	const float newX = sprite.position.x + translation;
 	EditSpritePosition(sprite, newX, sprite.position.y, sprite.position.z);
 }
 
 void UIManager::TranslateSpriteY(Sprite2D& sprite, const float translation)
 {
-	float newY = sprite.position.y + translation;
+	const float newY = sprite.position.y + translation;
 	EditSpritePosition(sprite, sprite.position.x, newY, sprite.position.z);
 }
 
 void UIManager::TranslateSpriteXY(Sprite2D& sprite, const float translationX, const float translationY)
 {
-	float newX = sprite.position.x + translationX;
-	float newY = sprite.position.y + translationY;
+	const float newX = sprite.position.x + translationX;
+	const float newY = sprite.position.y + translationY;
 	EditSpritePosition(sprite, newX, newY, sprite.position.z);
 }
 
-void UIManager::RenderText(const std::wstring& text, ID3D11DeviceContext* context, float x, float y, float width, float height)
+void UIManager::RenderText(const std::wstring& text) const
 {
 	if (!textRenderer) return;
 
 	// Write new text into the GDI+ bitmap and update the GPU texture
 	textRenderer->Ecrire(text);
-
-	const Texture textTexture(textRenderer->GetTextureView(), textRenderer->GetTextWidth(), textRenderer->GetTextHeigth());
-
-	auto& shaderBank = Locator::Get<ResourceManager>().GetShaderBank();
-
-	const ShaderProgram spriteShaderProgram
-	(
-		device,
-		shaderBank.Get<VertexShader>("shaders/SpriteVS.hlsl"),
-		shaderBank.Get<PixelShader>("shaders/SpritePS.hlsl")
-	);
-	const Sprite2D textSprite(spriteShaderProgram, textTexture, device);
-	AddSprite({ textSprite });
 }

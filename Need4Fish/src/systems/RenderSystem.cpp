@@ -100,6 +100,7 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 		GameState::postProcessSettings
 	);
 
+
 	// Text Addition (create sprite)
 	const auto watchables = entityManager.View<Controllable, Eatable, RigidBody>();
 	int playerMass;
@@ -111,8 +112,8 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 		break;
 	}
 	const auto text = std::format(L"Player mass : {}\nPlayer speed : {:.2f}\nPlaytime : {:.2f}", playerMass,
-		playerSpeed, GameState::playTime);
-	uiManager->RenderText(text, renderContext->GetContext(), 0.0f, 0.0f, 100.0f, 100.0f);
+	                              playerSpeed, GameState::playTime);
+	uiManager->RenderText(text);
 
 	// Render sprites
 	renderer.PrepareSceneForSprite();
