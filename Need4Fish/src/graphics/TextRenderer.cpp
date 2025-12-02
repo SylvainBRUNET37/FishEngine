@@ -62,8 +62,8 @@ TextRenderer::TextRenderer(ID3D11Device* pDispositif, int largeur,
 	// Paramètres de l’objet Graphics
 	pCharGraphics->SetCompositingMode(Gdiplus::CompositingModeSourceCopy);
 	pCharGraphics->SetCompositingQuality(Gdiplus::CompositingQualityHighSpeed);
-	pCharGraphics->SetInterpolationMode(Gdiplus::InterpolationModeHighQuality);
-	pCharGraphics->SetPixelOffsetMode(Gdiplus::PixelOffsetModeHighSpeed);
+	pCharGraphics->SetInterpolationMode(Gdiplus::InterpolationModeNearestNeighbor);
+	pCharGraphics->SetPixelOffsetMode(Gdiplus::PixelOffsetModeNone);
 	pCharGraphics->SetSmoothingMode(Gdiplus::SmoothingModeNone);
 	pCharGraphics->SetPageUnit(Gdiplus::UnitPixel);
 	Gdiplus::TextRenderingHint hint = Gdiplus::TextRenderingHintAntiAlias;

@@ -17,7 +17,7 @@ UIManager::UIManager(ID3D11Device* device) : device{device}
 	const FontFamily family(L"Arial", nullptr);
 	textFont = new Font(&family, 24.0f, FontStyleRegular, UnitPixel);
 
-	textRenderer = new TextRenderer(device, 512, 512, textFont);
+	textRenderer = new TextRenderer(device, 300, 100, textFont);
 
 	textTexture.texture = textRenderer->GetTextureView();
 	textTexture.width = textRenderer->GetTextWidth();
