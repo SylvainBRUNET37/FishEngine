@@ -10,8 +10,9 @@ struct Sensor
 {
 	enum Type : std::uint8_t
 	{
-		Pusher = 0, // push (geyser, current)
-		Seaweed = 1 // slow
+		Pusher = 0, // geyser, current
+		Slow = 1,
+		Bounce = 2,
 	};
 
 	JPH::Vec3 direction{}; // the push direction

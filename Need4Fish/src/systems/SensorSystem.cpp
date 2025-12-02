@@ -40,8 +40,10 @@ void SensorSystem::Update(const double deltaTime, EntityManager& entityManager)
 		// Apply the effect which corresond to the sensor type
 		if (sensor.type == Sensor::Pusher)
 			ApplyPusherEffect(deltaTime, sensor, objectId);
-		else if (sensor.type == Sensor::Seaweed)
-			ApplySeaweedEffect(deltaTime, sensor, objectId);
+		else if (sensor.type == Sensor::Slow)
+			ApplySlowEffect(deltaTime, objectId);
+		else if (sensor.type == Sensor::Bounce)
+			ApplyBounceEffect(deltaTime, sensor, objectId);
 	}
 }
 
@@ -57,7 +59,17 @@ void SensorSystem::ApplyPusherEffect(const double deltaTime, const Sensor& senso
 	}
 }
 
-void SensorSystem::ApplySeaweedEffect(const double deltaTime, const Sensor& sensor, const BodyID objectId)
+void SensorSystem::ApplyBounceEffect(const double deltaTime, const Sensor& sensor, const BodyID objectId)
+{
+	static auto& bodyInterface = JoltSystem::GetBodyInterface();
+
+	const Vec3 objectForward = bodyInterface.GetRotation(objectId).RotateAxisZ();
+
+	const Vec3 impulse = -objectForward * sensor.pushStrength * WORLD_SIZE_FACTOR * static_cast<float>(deltaTime);
+	bodyInterface.AddForce(objectId, impulse);
+}
+
+void SensorSystem::ApplySlowEffect(const double deltaTime, const BodyID objectId)
 {
 	static constexpr float HALF_PLAYER_SPEED = 100.0f;
 	static auto& bodyInterface = JoltSystem::GetBodyInterface();

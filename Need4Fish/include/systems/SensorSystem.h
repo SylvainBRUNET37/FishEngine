@@ -19,7 +19,8 @@ private:
 	void Update(double deltaTime, EntityManager& entityManager) override;
 
 	static void ApplyPusherEffect(double deltaTime, const Sensor& sensor, JPH::BodyID objectId);
-	static void ApplySeaweedEffect(double deltaTime, const Sensor& sensor, JPH::BodyID objectId);
+	static void ApplySlowEffect(double deltaTime, JPH::BodyID objectId);
+	static void ApplyBounceEffect(double deltaTime, const Sensor& sensor, JPH::BodyID objectId);
 };
 
 #endif
