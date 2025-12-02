@@ -22,13 +22,70 @@ RenderSystem::RenderSystem(RenderContext* renderContext, const std::shared_ptr<U
 {
 }
 
-void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
+void RenderSystem::RenderPostProcesses(const double deltaTime)
 {
-	const auto currentCamera = entityManager.Get<Camera>(GameState::currentCameraEntity);
+	GameState::postProcessSettings.enableVignette = Camera::mode == Camera::CameraMode::FIRST_PERSON ? 1 : 0;
+	GameState::postProcessSettings.deltaTime = static_cast<float>(deltaTime);
 
-	renderer.UpdateScene();
+	static const auto& shaderBank = Locator::Get<ResourceManager>().GetShaderBank();
+	static const auto vertexShader = shaderBank.Get<VertexShader>("shaders/PostProcessVS.hlsl").shader;
+	static const auto pixelShader = shaderBank.Get<PixelShader>("shaders/PostProcessPS.hlsl").shader;
+	
+	renderer.RenderPostProcess
+	(
+		vertexShader,
+		pixelShader,
+		GameState::postProcessSettings
+	);
+}
 
-	// Add point lights to the frame buffer and update their position
+void RenderSystem::ComputeDistortionZones(EntityManager& entityManager)
+{
+	// Apply distortion effect
+	renderer.PrepareSceneForDistortion();
+	for (const auto& [entity, transform, distortionMeshInstance] : entityManager.View<
+		     Transform, DistortionMeshInstance>())
+	{
+		// Check if the mesh should be rendered or not
+		auto& mesh = Locator::Get<ResourceManager>().GetMesh(distortionMeshInstance.meshIndex);
+		if (FrustumCuller::IsMeshCulled(mesh, transform))
+			continue;
+
+		renderer.Render(mesh, renderContext->GetContext(), transform);
+	}
+}
+
+void RenderSystem::RenderBillboards(EntityManager& entityManager, const Camera& currentCamera)
+{
+	// Render billboards
+	renderer.PrepareSceneForBillboard();
+	for (const auto& [entity, billboard] : entityManager.View<Billboard>())
+	{
+		const auto worldTransform = billboard.ComputeBillboardWorldMatrix();
+		/* Culling has a higher cost than drawing a billboard, so it's disabled
+		if (FrustumCuller::IsBillboardCulled(billboard, worldTransform))
+			continue;
+		*/
+		renderer.Render(billboard, worldTransform, currentCamera);
+	}
+}
+
+void RenderSystem::RenderMeshes(EntityManager& entityManager)
+{
+	// Render Meshes
+	for (const auto& [entity, transform, meshInstance] : entityManager.View<Transform, MeshInstance>())
+	{
+		// Check if the mesh should be rendered or not
+		auto& mesh = Locator::Get<ResourceManager>().GetMesh(meshInstance.meshIndex);
+		if (FrustumCuller::IsMeshCulled(mesh, transform))
+			continue;
+
+		renderer.Render(mesh, renderContext->GetContext(), transform);
+	}
+}
+
+void RenderSystem::UpdatePointLights(EntityManager& entityManager)
+{
 	frameBuffer.pointLightCount = 0;
 	for (const auto& [entity, pointLight, transform] : entityManager.View<PointLight, Transform>())
 	{
@@ -50,66 +107,46 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 
 		frameBuffer.pointLights[frameBuffer.pointLightCount++] = pointLight;
 	}
+}
+
+void RenderSystem::UpdateFrameBuffer(const double deltaTime, EntityManager& entityManager, const Camera& currentCamera)
+{
+	// Add point lights to the frame buffer and update their position
+	UpdatePointLights(entityManager);
 
 	// Update frame buffer
 	XMStoreFloat4x4(&frameBuffer.matViewProj, XMMatrixTranspose(currentCamera.matView * currentCamera.matProj));
-	XMStoreFloat4(&frameBuffer.vCamera, currentCamera.position);
+	XMStoreFloat4(&frameBuffer.vCamera, Camera::position);
 
 	static float elapsedTime = 0;
 	elapsedTime += static_cast<float>(deltaTime);
 	frameBuffer.elapsedTime = elapsedTime;
 
 	renderer.UpdateFrameBuffer(frameBuffer);
+}
 
-	// Prepare culler for meshes and billboards
-	FrustumCuller::Init(static_cast<BaseCameraData>(currentCamera));
+void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
+{
+	const auto currentCamera = entityManager.Get<Camera>(GameState::currentCameraEntity);
+	FrustumCuller::Init(static_cast<BaseCameraData>(currentCamera));// Prepare the frustum culler
 
-	// Render Meshes
-	for (const auto& [entity, transform, meshInstance] : entityManager.View<Transform, MeshInstance>())
-	{
-		// Check if the mesh should be rendered or not
-		auto& mesh = Locator::Get<ResourceManager>().GetMesh(meshInstance.meshIndex);
-		if (FrustumCuller::IsMeshCulled(mesh, transform))
-			continue;
+	renderer.UpdateScene();
 
-		renderer.Render(mesh, renderContext->GetContext(), transform);
-	}
+	UpdateFrameBuffer(deltaTime, entityManager, currentCamera);
 
-	// Render billboards
-	renderer.PrepareSceneForBillboard();
-	for (const auto& [entity, billboard] : entityManager.View<Billboard>())
-	{
-		const auto worldTransform = billboard.ComputeBillboardWorldMatrix();
-		if (FrustumCuller::IsBillboardCulled(billboard, worldTransform))
-			continue;
-		renderer.Render(billboard, worldTransform, currentCamera);
-	}
+	RenderMeshes(entityManager);
+	RenderBillboards(entityManager, currentCamera);
 
-	// Apply distortion effect
-	renderer.PrepareSceneForDistortion();
-	for (const auto& [entity, transform, distortionMeshInstance] : entityManager.View<
-		     Transform, DistortionMeshInstance>())
-	{
-		// Check if the mesh should be rendered or not
-		auto& mesh = Locator::Get<ResourceManager>().GetMesh(distortionMeshInstance.meshIndex);
-		if (FrustumCuller::IsMeshCulled(mesh, transform))
-			continue;
+	ComputeDistortionZones(entityManager);
+	RenderPostProcesses(deltaTime);
 
-		renderer.Render(mesh, renderContext->GetContext(), transform);
-	}
+	RenderUI(entityManager);
 
-	GameState::postProcessSettings.enableVignette = Camera::mode == Camera::CameraMode::FIRST_PERSON ? 1 : 0;
-	GameState::postProcessSettings.deltaTime = static_cast<float>(deltaTime);
+	Present();
+}
 
-	const auto& shaderBank = Locator::Get<ResourceManager>().GetShaderBank();
-	renderer.RenderPostProcess
-	(
-		shaderBank.Get<VertexShader>("shaders/PostProcessVS.hlsl").shader,
-		shaderBank.Get<PixelShader>("shaders/PostProcessPS.hlsl").shader,
-		GameState::postProcessSettings
-	);
-
-
+void RenderSystem::RenderUI(EntityManager& entityManager)
+{
 	// Text Addition (create sprite)
 	const auto watchables = entityManager.View<Controllable, Eatable, RigidBody>();
 	int playerMass;
@@ -121,15 +158,13 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 		break;
 	}
 	const auto text = std::format(L"Player mass : {}\nPlayer speed : {:.2f}\nPlaytime : {:.2f}", playerMass,
-	                              playerSpeed, GameState::playTime);
+		playerSpeed, GameState::playTime);
 	uiManager->RenderText(text);
 
 	// Render sprites
 	renderer.PrepareSceneForSprite();
 	for (auto& sprite : uiManager->GetSprites())
 		renderer.Render(sprite, renderContext->GetContext());
-
-	Present();
 }
 
 FrameBuffer RenderSystem::CreateDirectionnalLight()

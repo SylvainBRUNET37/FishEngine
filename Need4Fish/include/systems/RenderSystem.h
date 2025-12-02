@@ -15,11 +15,18 @@ public:
 	void Update(double deltaTime, EntityManager& entityManager) override;
 
 private:
-
 	std::shared_ptr<UIManager> uiManager;
 	Renderer renderer;
 	FrameBuffer frameBuffer;
 	RenderContext* renderContext;
+
+	void RenderUI(EntityManager& entityManager);
+	void RenderPostProcesses(double deltaTime);
+	void ComputeDistortionZones(EntityManager& entityManager);
+	void RenderBillboards(EntityManager& entityManager, const Camera& currentCamera);
+	void RenderMeshes(EntityManager& entityManager);
+	void UpdatePointLights(EntityManager& entityManager);
+	void UpdateFrameBuffer(double deltaTime, EntityManager& entityManager, const Camera& currentCamera);
 
 	void Present() const { renderContext->Present(); }
 

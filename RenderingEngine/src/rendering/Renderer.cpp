@@ -140,15 +140,15 @@ void Renderer::PrepareSceneForDistortion() const
 	constexpr float clearMask[4] = { 0, 0, 0, 0 };
 	context->ClearRenderTargetView(distortionRTV, clearMask);
 
-	// Disable transparence
+	// Disable transparence and active depth buffer writing
 	renderContext->DisableAlphaBlending();
 	renderContext->EnableDefaultDepth();
 }
 
 void Renderer::PrepareSceneForBillboard() const
 {
-	renderContext->EnableAlphaBlending();
-	renderContext->EnableTransparentDepth();
+	renderContext->EnableAlphaBlending(); // add a better look but have a performance cost
+	renderContext->EnableTransparentDepth(); // avoid artifacts by disbaling depth buffer writing
 }
 
 void Renderer::PrepareSceneForSprite()

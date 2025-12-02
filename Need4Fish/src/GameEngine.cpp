@@ -256,7 +256,7 @@ void GameEngine::CreateParticleZones()
 
 #ifndef NDEBUG
 				static constexpr unsigned int NB_CURRENT_PARTICLES = 75;
-#elif 
+#else 
 				static constexpr unsigned int NB_CURRENT_PARTICLES = 200;
 #endif
 
@@ -286,7 +286,7 @@ void GameEngine::CreateParticleZones()
 
 #ifndef NDEBUG
 				static constexpr unsigned int NB_GEYSER_PARTICLES = 100;
-#elif 
+#else 
 				static constexpr unsigned int NB_GEYSER_PARTICLES = 1000;
 #endif
 
