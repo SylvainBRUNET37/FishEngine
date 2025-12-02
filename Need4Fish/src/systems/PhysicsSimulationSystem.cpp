@@ -111,11 +111,8 @@ void PhysicsSimulationSystem::UpdateControllables(EntityManager& entityManager)
 			inputRoll = -0.1f;
 		}
 
-		auto theoreticalSpeed = currentSpeed + newSpeed;
-		if ((theoreticalSpeed).Length() > controllable.maxSpeed)
-			newSpeed = theoreticalSpeed.Normalized() * controllable.maxSpeed - currentSpeed;
-
-		if (speedChanged)
+		const auto theoreticalSpeed = currentSpeed + newSpeed;
+		if (speedChanged && (theoreticalSpeed).Length() < controllable.maxSpeed)
 			JoltSystem::GetBodyInterface().SetLinearVelocity(rigidBody.body->GetID(), currentSpeed + newSpeed);
 	}
 }
