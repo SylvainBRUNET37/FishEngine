@@ -84,7 +84,8 @@ void Renderer::Render(Sprite2D& sprite, ID3D11DeviceContext* context) const
 
 void Renderer::Render(Billboard& billboard, ID3D11DeviceContext* context, const BaseCameraData& baseCameraData)
 {
-	billboardRenderer.Render(billboard, context, baseCameraData);
+	billboardRenderer.UpdateCameraData(baseCameraData, context, billboard.texture.texture);
+	billboardRenderer.Render(billboard, context);
 }
 
 void Renderer::RenderPostProcess(

@@ -10,14 +10,9 @@ BillboardRenderer::BillboardRenderer(ID3D11Device* device)
 {
 }
 
-void BillboardRenderer::Render(Billboard& billboard, ID3D11DeviceContext* context, const BaseCameraData& baseCameraData)
+void BillboardRenderer::Render(Billboard& billboard, ID3D11DeviceContext* context)
 {
-	BillboardBuffer billboardBuffer{};
-
 	XMStoreFloat4x4(&billboardBuffer.matWorld, XMMatrixTranspose(ComputeBillboardWorldMatrix(billboard)));
-	XMStoreFloat4x4(&billboardBuffer.matView, XMMatrixTranspose(baseCameraData.matView));
-	XMStoreFloat4x4(&billboardBuffer.matProj, XMMatrixTranspose(baseCameraData.matProj));
-	XMStoreFloat3(&billboardBuffer.cameraPos, BaseCameraData::position);
 
 	billboard.shaderProgram.Bind(context);
 
@@ -27,6 +22,13 @@ void BillboardRenderer::Render(Billboard& billboard, ID3D11DeviceContext* contex
 	context->PSSetShaderResources(0, 1, &billboard.texture.texture);
 
 	Draw(billboard, context);
+}
+
+void BillboardRenderer::UpdateCameraData(const BaseCameraData& baseCameraData, ID3D11DeviceContext* context, ID3D11ShaderResourceView* billboardSRV)
+{
+	XMStoreFloat4x4(&billboardBuffer.matView, XMMatrixTranspose(baseCameraData.matView));
+	XMStoreFloat4x4(&billboardBuffer.matProj, XMMatrixTranspose(baseCameraData.matProj));
+	XMStoreFloat3(&billboardBuffer.cameraPos, BaseCameraData::position);
 }
 
 void BillboardRenderer::Draw(const Billboard& billboard, ID3D11DeviceContext* context)
