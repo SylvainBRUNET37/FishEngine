@@ -28,12 +28,15 @@ void SensorSystem::Update(double deltaTime, EntityManager& entityManager)
 		const auto sensorEntity = to_entity(bodyInterface.GetUserData(sensorId));
 		const auto& sensor = entityManager.Get<Sensor>(sensorEntity);
 
-		if (bodyInterface.GetMotionType(objectId) == EMotionType::Dynamic)
+		static constexpr float SPEED_LIMIT = 400.0f;
+		const bool shouldApplyForce = bodyInterface.GetMotionType(objectId) == EMotionType::Dynamic &&
+			bodyInterface.GetLinearVelocity(objectId).Length() < SPEED_LIMIT;
+		if (shouldApplyForce)
 		{
-			//const Vec3 objectForward = bodyInterface.GetRotation(objectId).RotateAxisZ();
-
+			static constexpr float WORLD_SIZE_FACTOR = 30000000;
 			const Vec3 impulse = sensor.direction * sensor.pushStrength;
-			bodyInterface.SetLinearVelocity(objectId, impulse);
+			
+			bodyInterface.AddForce(objectId, impulse * WORLD_SIZE_FACTOR);
 		}
 	}
 }

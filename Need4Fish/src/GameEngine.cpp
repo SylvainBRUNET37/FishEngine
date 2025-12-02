@@ -233,7 +233,7 @@ void GameEngine::CreateParticleZones()
 		{
 			.centerPosition = {0, 700.0f, 0},
 			.halfExtends = {250.0f, 250.0f, 250.0f},
-			.nbParticle = 80,
+			.nbParticle = 1,
 			.particleDurationMin = 3.0f,
 			.particleDurationMax = 15.0f,
 			.particleSpeed = 3.0f,
@@ -250,7 +250,6 @@ void GameEngine::CreateParticleZones()
 		{
 			const RefConst<Shape> shape = bodyInterface.GetShape(sensor.body->GetID());
 
-			//const auto test = shape->GetInnerRadius();
 			if (shape->GetSubType() == EShapeSubType::Box)
 			{
 				const auto sensorBoxShape = static_cast<const BoxShape*>(shape.GetPtr());
@@ -259,9 +258,9 @@ void GameEngine::CreateParticleZones()
 					{
 						.centerPosition = transform.position,
 						.halfExtends = MeshUtil::ToDirectX(sensorBoxShape->GetHalfExtent()),
-						.nbParticle = 1000,
+						.nbParticle = 200,
 						.particleDurationMin = 0.5f,
-						.particleDurationMax = 2.0f,
+						.particleDurationMax = 1.0f,
 						.particleSpeed = 10.0f,
 						.particleDirection = MeshUtil::ToDirectX(sensor.direction)
 					}
@@ -272,7 +271,6 @@ void GameEngine::CreateParticleZones()
 		{
 			const RefConst<Shape> shape = bodyInterface.GetShape(sensor.body->GetID());
 
-			//const auto test = shape->GetInnerRadius();
 			if (shape->GetSubType() == EShapeSubType::Cylinder)
 			{
 				const auto sensorCylinderShape = static_cast<const CylinderShape*>(shape.GetPtr());
@@ -286,7 +284,7 @@ void GameEngine::CreateParticleZones()
 						.halfExtends = {radius, halfHeight, radius},
 						.nbParticle = 1000,
 						.particleDurationMin = 0.5f,
-						.particleDurationMax = 2.0f,
+						.particleDurationMax = 1.0f,
 						.particleSpeed = 10.0f,
 						.particleDirection = MeshUtil::ToDirectX(sensor.direction)
 					}
