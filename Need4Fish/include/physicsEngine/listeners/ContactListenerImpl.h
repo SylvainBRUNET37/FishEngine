@@ -15,8 +15,6 @@ public:
 		JPH::RVec3Arg inBaseOffset,
 		const JPH::CollideShapeResult& inCollisionResult) override
 	{
-		std::cout << "Contact validate callback between body1 in layer " << GetObjectLayerName(inBody1.GetObjectLayer()) << " and body2 in layer " << GetObjectLayerName(inBody2.GetObjectLayer()) << std::endl;
-		std::cout << "Body1 has ID=" << inBody1.GetID().GetIndexAndSequenceNumber() << " and Body2 has ID=" << inBody2.GetID().GetIndexAndSequenceNumber() << std::endl;
 		return JPH::ValidateResult::AcceptAllContactsForThisBodyPair;
 	}
 

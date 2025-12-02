@@ -31,6 +31,7 @@ void ComponentFactory::CreateSensor(const nlohmann::json& componentData, EntityM
 {
 	const auto& transform = entityManager.Get<Transform>(entity);
 
+	const auto type = static_cast<Sensor::Type>(componentData["type"].get<int>());
 	const auto pushStrength = componentData["pushStrength"].get<float>();
 	const Vec3 direction =
 	{
@@ -40,9 +41,9 @@ void ComponentFactory::CreateSensor(const nlohmann::json& componentData, EntityM
 	};
 
 	Body* body = nullptr;
-	if (componentData["type"] == "boxSensor")
+	if (componentData["bodyType"] == "boxSensor")
 		body = SensorFactory::CreateCubeCurrentSensor(transform, entity);
-	else if (componentData["type"] == "cylinderSensor")
+	else if (componentData["bodyType"] == "cylinderSensor")
 		body = SensorFactory::CreateCylinderSensor(transform, entity);
 	
 	vassert(body, "Sensor must have a body type");
@@ -51,7 +52,8 @@ void ComponentFactory::CreateSensor(const nlohmann::json& componentData, EntityM
 	{
 		.direction = direction,
 		.body = body,
-		.pushStrength = pushStrength
+		.pushStrength = pushStrength,
+		.type = type
 	};
 
 	entityManager.AddComponent<Sensor>(entity, std::move(sensor));

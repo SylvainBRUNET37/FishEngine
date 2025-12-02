@@ -10,6 +10,7 @@
     "WaterMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongWaterPS.hlsl" },
     "PufferFishMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongWaterPS.hlsl" },
     "AnglerFishMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongWaterPS.hlsl" },
-    "DistortionMat": { "vs": "shaders/DistVS.hlsl", "ps": "shaders/DistPS.hlsl" }
+    "DistortionMat": { "vs": "shaders/DistVS.hlsl", "ps": "shaders/DistPS.hlsl" },
+    "SeaweedMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongWaterPS.hlsl" }
   }
 }
