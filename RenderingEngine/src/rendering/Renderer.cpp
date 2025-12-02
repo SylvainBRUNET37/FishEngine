@@ -82,10 +82,10 @@ void Renderer::Render(Sprite2D& sprite, ID3D11DeviceContext* context) const
 	Draw(sprite);
 }
 
-void Renderer::Render(Billboard& billboard, ID3D11DeviceContext* context, const BaseCameraData& baseCameraData)
+void Renderer::Render(Billboard& billboard, const XMMATRIX& worldMatrix, const BaseCameraData& baseCameraData)
 {
-	billboardRenderer.UpdateCameraData(baseCameraData, context, billboard.texture.texture);
-	billboardRenderer.Render(billboard, context);
+	billboardRenderer.UpdateCameraData(baseCameraData, renderContext->GetContext(), billboard.texture.texture);
+	billboardRenderer.Render(billboard, renderContext->GetContext(), worldMatrix);
 }
 
 void Renderer::RenderPostProcess(

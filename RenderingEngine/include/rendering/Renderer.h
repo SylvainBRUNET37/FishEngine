@@ -24,7 +24,7 @@ public:
 	void UpdateFrameBuffer(const FrameBuffer& frameBuffer_) { frameBuffer = frameBuffer_; };
 	void Render(const Mesh& mesh, ID3D11DeviceContext* context, const Transform& transform);
 	void Render(Sprite2D& sprite, ID3D11DeviceContext* context) const;
-	void Render(Billboard& billboard, ID3D11DeviceContext* context, const BaseCameraData& baseCameraData);
+	void Render(Billboard& billboard, const DirectX::XMMATRIX& worldMatrix, const BaseCameraData& baseCameraData);
 	void RenderPostProcess(ID3D11VertexShader* postProcessVertexShader, 
 		                   ID3D11PixelShader* postProcessPixelShader,
 	                       const PostProcessSettings& parameters);

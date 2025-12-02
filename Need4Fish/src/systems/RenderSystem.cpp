@@ -74,7 +74,12 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 	// Render billboards
 	renderer.PrepareSceneForBillboard();
 	for (const auto& [entity, billboard] : entityManager.View<Billboard>())
-		renderer.Render(billboard, renderContext->GetContext(), currentCamera);
+	{
+		const auto worldTransform = billboard.ComputeBillboardWorldMatrix();
+		if (FrustumCuller::IsBillboardCulled(billboard, worldTransform, static_cast<BaseCameraData>(currentCamera)))
+			continue;
+		renderer.Render(billboard, worldTransform, currentCamera);
+	}
 
 	// Apply distortion effect
 	renderer.PrepareSceneForDistortion();

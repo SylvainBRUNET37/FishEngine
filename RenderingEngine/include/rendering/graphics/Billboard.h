@@ -5,6 +5,7 @@
 #include "rendering/buffers/VertexBuffer.h"
 #include "rendering/shaders/ShaderProgram.h"
 #include "rendering/texture/Texture.h"
+#include <DirectXCollision.h>
 
 struct Billboard
 {
@@ -20,14 +21,20 @@ struct Billboard
 	DirectX::XMFLOAT3 position;
 	DirectX::XMFLOAT2 scale;
 
+	std::vector<VertexSprite> vertices;
 	Texture texture;
 	ShaderProgram shaderProgram;
 	VertexBuffer vertexBuffer;
 
 	Type type;
 
+	DirectX::BoundingBox boundingBox;
+
+	DirectX::XMMATRIX ComputeBillboardWorldMatrix();
+
 private:
 	static std::vector<VertexSprite> ComputeVertices();
+
 };
 
 #endif
