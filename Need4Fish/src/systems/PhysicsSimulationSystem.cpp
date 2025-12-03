@@ -16,10 +16,10 @@ using namespace std;
 PhysicsSimulationSystem::PhysicsSimulationSystem()
 {
 	// Water init
-	surfacePoint = RVec3(0, 2620.f, 0);
+	surfacePoint = RVec3(0, 1226.f, 0);
 	waterBox = AABox(
-		Vec3(-3500.0f, -100.0f, -3500),
-		Vec3(3500.0f, 2620.f, 3500.0f)
+		Vec3(-6000.0f, -250.0f, -6000),
+		Vec3(6000.0f, 1226.f, 6000.0f)
 	);
 	// End Water init
 
