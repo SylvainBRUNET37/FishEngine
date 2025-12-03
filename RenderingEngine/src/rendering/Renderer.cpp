@@ -4,6 +4,8 @@
 #include "rendering/graphics/camera/BaseCamera.h"
 #include "rendering/texture/TextureLoader.h"
 
+#include <iostream>
+
 using namespace DirectX;
 
 Renderer::Renderer(RenderContext* renderContext, std::vector<Material>&& materials)
@@ -27,6 +29,8 @@ Renderer::Renderer(RenderContext* renderContext, std::vector<Material>&& materia
 
 	DXEssayer(renderContext->GetDevice()->CreateSamplerState(&textureSamplerDesc, &textureSampler));
 
+	SetDebugName(textureSampler, "textureSampler-in-Renderer");
+
 	D3D11_SAMPLER_DESC causticSamplerDesc{};
 	causticSamplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 	causticSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -38,6 +42,8 @@ Renderer::Renderer(RenderContext* renderContext, std::vector<Material>&& materia
 	causticSamplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
 
 	DXEssayer(renderContext->GetDevice()->CreateSamplerState(&causticSamplerDesc, &causticSampler));
+
+	SetDebugName(causticSampler, "causticSampler-in-Renderer");
 }
 
 void Renderer::Render(const Mesh& mesh,
@@ -50,7 +56,7 @@ void Renderer::Render(const Mesh& mesh,
 	const auto cbMaterialParams = BuildConstantMaterialBuffer(material);
 	material.constantBuffer.Update(context, cbMaterialParams);
 	material.constantBuffer.Bind(context);
-	material.shaderProgram.Bind(context);
+	material.shaderProgram->Bind(context);
 
 	// Update object constant buffer
 	const auto cbObjectParams = BuildConstantObjectBuffer(transform);
@@ -67,40 +73,33 @@ void Renderer::Render(const Mesh& mesh,
 	context->PSSetSamplers(0, 1, &textureSampler);
 	context->PSSetSamplers(1, 1, &causticSampler);
 
-	Draw(mesh);
+	if (material.name != "WaterMat") {
+		Draw(mesh);
+	}
+	else {
+		DoubleSidedDraw(mesh);
+	}
 }
 
-void Renderer::Render(Sprite2D& sprite, ID3D11DeviceContext* context)
+void Renderer::Render(Sprite2D& sprite, ID3D11DeviceContext* context) const
 {
-	static const int screenWidth = GetSystemMetrics(SM_CXSCREEN);
-	static const int screenHeight = GetSystemMetrics(SM_CYSCREEN);
-
-	// Orthographic projection to display the sprite in 2D "from the screne"
-	const XMMATRIX matOrtho = XMMatrixOrthographicOffCenterRH
-	(
-		0.f, screenWidth,
-		screenHeight, 0.f,
-		0.f, 1.f
-	);
-
 	// Update frame constant buffer
-	sprite.shaderProgram.Bind(context);
-	spriteConstantBuffer.Update(context, {.matProj = XMMatrixTranspose(matOrtho) });
-	spriteConstantBuffer.Bind(context);
+	sprite.shaderProgram->Bind(context);
 
 	context->PSSetShaderResources(0, 1, &sprite.texture.texture);
 
 	Draw(sprite);
 }
 
-void Renderer::Render(Billboard& billboard, ID3D11DeviceContext* context, const BaseCameraData& baseCameraData)
+void Renderer::Render(Billboard& billboard, const XMMATRIX& worldMatrix, const BaseCameraData& baseCameraData)
 {
-	billboardRenderer.Render(billboard, context, baseCameraData);
+	billboardRenderer.UpdateCameraData(baseCameraData, renderContext->GetContext(), billboard.texture.texture);
+	billboardRenderer.Render(billboard, renderContext->GetContext(), worldMatrix);
 }
 
 void Renderer::RenderPostProcess(
-	ID3D11VertexShader* postProcessVertexShader, 
-	ID3D11PixelShader* postProcessPixelShader, 
+	ID3D11VertexShader* postProcessVertexShader,
+	ID3D11PixelShader* postProcessPixelShader,
 	const PostProcessSettings& parameters
 )
 {
@@ -110,14 +109,20 @@ void Renderer::RenderPostProcess(
 	postProcessSettingsBuffer.Update(context, parameters);
 	postProcessSettingsBuffer.Bind(context);
 
-	renderContext->GetPostProcess().Draw(context, renderTarget, postProcessVertexShader, postProcessPixelShader);
+	ID3D11ShaderResourceView* distortionSRV =
+		renderContext->GetDistortionProcess().GetShaderResourceView();
+
+	renderContext->GetPostProcess().Draw(
+		context, renderTarget, postProcessVertexShader, postProcessPixelShader, distortionSRV);
 }
 
-void Renderer::RenderScene() const
+void Renderer::UpdateScene() const
 {
 	ID3D11DeviceContext* context = renderContext->GetContext();
 	ID3D11RenderTargetView* renderTarget = renderContext->GetPostProcess().GetRenderTargetView();
 	ID3D11DepthStencilView* depthStencil = renderContext->GetDepthStencilView();
+
+	renderContext->DisableAlphaBlending();
 
 	constexpr float backgroundColor[4] = { 0.0f, 0.2f, 0.4f, 1.0f };
 	context->ClearRenderTargetView(renderTarget, backgroundColor);
@@ -125,6 +130,54 @@ void Renderer::RenderScene() const
 
 	ID3D11RenderTargetView* renderTargetViews[] = { renderTarget };
 	context->OMSetRenderTargets(1, renderTargetViews, depthStencil);
+}
+
+void Renderer::PrepareSceneForDistortion() const
+{
+	ID3D11DeviceContext* context = renderContext->GetContext();
+
+	ID3D11RenderTargetView* distortionRTV =
+		renderContext->GetDistortionProcess().GetRenderTargetView();
+
+	ID3D11DepthStencilView* depthStencil =
+		renderContext->GetDepthStencilView();
+
+	// Set the render target
+	context->OMSetRenderTargets(1, &distortionRTV, depthStencil);
+
+	// Clear RTV
+	constexpr float clearMask[4] = { 0, 0, 0, 0 };
+	context->ClearRenderTargetView(distortionRTV, clearMask);
+
+	// Disable transparence and active depth buffer writing
+	renderContext->DisableAlphaBlending();
+	renderContext->EnableDefaultDepth();
+}
+
+void Renderer::PrepareSceneForBillboard() const
+{
+	renderContext->EnableAlphaBlending(); // add a better look but have a performance cost
+	renderContext->EnableTransparentDepth(); // avoid artifacts by disbaling depth buffer writing
+}
+
+void Renderer::PrepareSceneForSprite()
+{
+	ID3D11DeviceContext* context = renderContext->GetContext();
+	static const float screenWidth = static_cast<float>(GetSystemMetrics(SM_CXSCREEN));
+	static const float screenHeight = static_cast<float>(GetSystemMetrics(SM_CYSCREEN));
+
+	// Orthographic projection to display the sprite in 2D "from the screne"
+	static const XMMATRIX matOrtho = XMMatrixOrthographicOffCenterRH
+	(
+		0.f, screenWidth,
+		screenHeight, 0.f,
+		0.f, 1.f
+	);
+
+	renderContext->EnableAlphaBlending();
+
+	spriteConstantBuffer.Update(context, { .matProj = XMMatrixTranspose(matOrtho) });
+	spriteConstantBuffer.Bind(context);
 }
 
 void Renderer::Draw(const Mesh& mesh) const
@@ -139,6 +192,14 @@ void Renderer::Draw(const Mesh& mesh) const
 	renderContext->GetContext()->IASetIndexBuffer(mesh.indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 	renderContext->GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	renderContext->GetContext()->DrawIndexed(static_cast<UINT>(mesh.indices.size()), 0, 0);
+}
+
+void Renderer::DoubleSidedDraw(const Mesh& mesh) const
+{
+	renderContext->SetCullModeCullNone();
+	Draw(mesh);
+	renderContext->SetCullModeCullBack();
+
 }
 
 void Renderer::Draw(const Sprite2D& sprite) const
@@ -178,4 +239,9 @@ MaterialBuffer Renderer::BuildConstantMaterialBuffer(const Material& material)
 	params.padding = XMFLOAT2(0, 0);
 
 	return params;
+}
+
+void Renderer::ClearPixelShaderResources() {
+	ID3D11ShaderResourceView* null[] = { nullptr, nullptr };
+	renderContext->GetContext()->PSSetShaderResources(0, 2, null);
 }

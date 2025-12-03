@@ -3,6 +3,7 @@
 
 #include "UIManager.h"
 #include "entities/EntityManager.h"
+#include "systems/ParticleSystem.h"
 #include "systems/PhysicsSimulationSystem.h"
 #include "systems/RenderSystem.h"
 #include "systems/System.h"
@@ -19,12 +20,13 @@ private:
 	static constexpr double FRAME_TIME = 1000.0 / TARGET_FPS;
 
 	RenderContext* renderContext; // should not be there idealy, but it helps for testing
+	ParticleSystem particleSystem;
 	std::vector<std::unique_ptr<System>> systems;
 
 	Entity mainMenuEntity;
 
-	UIManager uiManager;
-	EntityManager entityManager;
+	std::shared_ptr<UIManager> uiManager;
+	std::unique_ptr< EntityManager> entityManager;
 
 	static void WaitBeforeNextFrame(DWORD frameStartTime);
 
@@ -35,8 +37,15 @@ private:
 	void ResumeGame();
 	void PauseGame();
 	void EndGame();
+	void RestartGame();
 
 	void InitGame();
+
+	void CreateParticleZones();
+
+	void BuildPauseMenu();
+	void BuildOptionMenu();
+	void BuildEndMenu();
 };
 
 #endif

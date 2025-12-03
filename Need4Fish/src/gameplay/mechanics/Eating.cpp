@@ -5,6 +5,7 @@
 #include "DirectXMath.h"
 #include "components/PowerSource.h"
 #include "systems/PowerSystem.h"
+#include <cmath>
 
 using namespace DirectX;
 
@@ -75,6 +76,7 @@ static void AcuallyEat(
 )
 {
 	float scaleFactor = CalculateGrowthFactor(predatorEatable.mass, preyEatable.mass);
+	std::cout << "growth factor : " << scaleFactor << std::endl;
 
 	// Apply power effect of the killed entity
 	if (entityManager.HasComponent<PowerSource>(preyEntity))
@@ -102,9 +104,10 @@ static void AcuallyEat(
 
 	// Scale mesh
 	auto& trans = entityManager.Get<Transform>(predatorEntity);
-	trans.deltaScale.x = scaleFactor;
-	trans.deltaScale.y = scaleFactor;
-	trans.deltaScale.z = scaleFactor;
+	// We should be able to assume scaleFactor - scale > 0, but better safe than sorry
+	trans.deltaScale.x = std::abs(scaleFactor - trans.scale.x);
+	trans.deltaScale.y = std::abs(scaleFactor - trans.scale.y);
+	trans.deltaScale.z = std::abs(scaleFactor - trans.scale.z);
 
 	const float F_GROWTH_STEPS = 60.0f;
 
@@ -176,6 +179,9 @@ void Eating::UpdatePlayerScale(EntityManager& entityManager)
 				else {
 					delta[i] -= transform.scaleStep;
 					scale[i] += transform.scaleStep;
+				}
+				if (i == 0) {
+					std::cout << scale[i] << std::endl;
 				}
 			}
 

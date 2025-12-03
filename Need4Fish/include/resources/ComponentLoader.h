@@ -56,6 +56,13 @@ private:
 					ComponentFactory::CreatePowerSource(componentData, entityManager, entity);
 				}
 			},
+			{
+				"sensor",
+				[](const nlohmann::json& componentData, EntityManager& entityManager, const Entity& entity)
+				{
+					ComponentFactory::CreateSensor(componentData, entityManager, entity);
+				}
+			},
 		}
 	};
 };

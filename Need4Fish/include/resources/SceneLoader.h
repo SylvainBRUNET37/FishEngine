@@ -21,7 +21,7 @@ public:
 	{
 	}
 
-	[[nodiscard]] SceneResource LoadScene(const std::filesystem::path& filePath, const ShaderBank& shaderBank);
+	[[nodiscard]] SceneResource LoadScene(const std::filesystem::path& filePath, ShaderBank& shaderBank);
 
 	[[nodiscard]] Texture GetTexture(const std::string& filePath);
 
@@ -46,7 +46,7 @@ private:
 	Mesh ProcessMesh(const aiMesh* mesh, const DirectX::XMMATRIX& transform) const;
 
 	Material ProcessMaterial(const std::filesystem::path& materialPath, const aiScene* scene,
-	                         const aiMaterial* material, const ShaderBank& shaderBank);
+	                         const aiMaterial* material, ShaderBank& shaderBank);
 	ComPtr<ID3D11ShaderResourceView> ProcessEmbededTexture(const aiTexture* embeddedTex);
 
 	void ProcessLights(const aiScene* scene, SceneResource& sceneRes);

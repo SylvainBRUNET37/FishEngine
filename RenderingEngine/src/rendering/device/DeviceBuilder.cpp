@@ -18,8 +18,8 @@ RenderContext DeviceBuilder::CreateRenderContext(const HWND hwnd, const WindowDa
 		D3D_FEATURE_LEVEL_10_0
 	};
 
-	constexpr size_t width = 1920; // TODO: find these values
-	constexpr size_t height = 1080;
+	const size_t width = GetSystemMetrics(SM_CXSCREEN);
+	const size_t height = GetSystemMetrics(SM_CYSCREEN);
 
 	const auto swapChainDesc = CreateSwapChainDesc(hwnd, windowData);
 
@@ -54,6 +54,7 @@ DXGI_SWAP_CHAIN_DESC DeviceBuilder::CreateSwapChainDesc(const HWND hwnd, const W
 	desc.SampleDesc.Quality = 0;
 	desc.Windowed = windowData.displayMode == DisplayMode::WINDOWED;
 	desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+	desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 
 	return desc;
 }

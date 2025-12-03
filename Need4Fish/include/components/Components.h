@@ -10,11 +10,12 @@
 #include "entities/Entity.h"
 #include "gameplay/Eatable.h"
 #include "physics/RigidBody.h"
+#include "physics/Sensor.h"
 
 #include "rendering/core/Transform.h"
 #include "rendering/graphics/Billboard.h"
 #include "rendering/graphics/lights/PointLight.h"
-#include "rendering/graphics/Sprite2D.h"
+#include "rendering/graphics/Mesh.h"
 
 struct Name
 {
@@ -37,6 +38,17 @@ struct MeshInstance
 	UINT meshIndex;
 };
 
+struct DistortionMeshInstance
+{
+	UINT meshIndex;
+};
+
+struct Particle
+{
+	double lifeTime{}; // Store in ms the age of the object
+	double lifeDuration{};
+};
+
 // ===============================================================
 // Add new component types here to register them with the engine
 // ===============================================================
@@ -51,10 +63,12 @@ using Components = std::tuple
 	Controllable,
 	Camera,
 	PointLight,
-	Sprite2D,
 	Eatable,
 	PowerSource,
-	Billboard
+	Billboard,
+	Sensor,
+	DistortionMeshInstance,
+	Particle
 >;
 
 #endif

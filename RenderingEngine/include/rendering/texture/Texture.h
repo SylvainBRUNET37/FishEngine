@@ -1,7 +1,6 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
-#include "rendering/shaders/Shader.h"
 #include "rendering/utils/ComPtr.h"
 
 struct Texture

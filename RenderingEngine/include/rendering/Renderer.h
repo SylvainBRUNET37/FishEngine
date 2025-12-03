@@ -23,12 +23,16 @@ public:
 
 	void UpdateFrameBuffer(const FrameBuffer& frameBuffer_) { frameBuffer = frameBuffer_; };
 	void Render(const Mesh& mesh, ID3D11DeviceContext* context, const Transform& transform);
-	void Render(Sprite2D& sprite, ID3D11DeviceContext* context);
-	void Render(Billboard& billboard, ID3D11DeviceContext* context, const BaseCameraData& baseCameraData);
+	void Render(Sprite2D& sprite, ID3D11DeviceContext* context) const;
+	void Render(Billboard& billboard, const DirectX::XMMATRIX& worldMatrix, const BaseCameraData& baseCameraData);
 	void RenderPostProcess(ID3D11VertexShader* postProcessVertexShader, 
 		                   ID3D11PixelShader* postProcessPixelShader,
 	                       const PostProcessSettings& parameters);
-	void RenderScene() const;
+	void UpdateScene() const;
+	void PrepareSceneForDistortion() const;
+	void PrepareSceneForBillboard() const;
+	void PrepareSceneForSprite();
+	void ClearPixelShaderResources();
 
 private:
 	static constexpr int frameCbRegisterNumber = 0;
@@ -37,8 +41,8 @@ private:
 	static constexpr int postProcessCbRegisterNumber = 0;
 
 	RenderContext* renderContext;
-	ID3D11SamplerState* textureSampler;
-	ID3D11SamplerState* causticSampler;
+	ComPtr<ID3D11SamplerState> textureSampler;
+	ComPtr<ID3D11SamplerState> causticSampler;
 
 	BillboardRenderer billboardRenderer;
 
@@ -53,6 +57,7 @@ private:
 	Texture causticTexture;
 
 	void Draw(const Mesh& mesh) const;
+	void DoubleSidedDraw(const Mesh& mesh) const;
 	void Draw(const Sprite2D& sprite) const;
 
 	static ObjectBuffer BuildConstantObjectBuffer(const Transform& transform);

@@ -37,7 +37,7 @@ struct Camera : public BaseCameraData
 	inline static float zoomSpeed;
 
 	// Inversion des contrôles/caméra
-	bool invertCamRotation = false;
+	inline static bool invertCamRotation = false;
 
 	// Mode de caméra actuel
 	inline static CameraMode mode = CameraMode::THIRD_PERSON;
@@ -52,6 +52,13 @@ struct Camera : public BaseCameraData
 	inline static float deltaMaxDistance;
 	inline static float deltaZoomSpeed;
 	inline static float cameraScaleStep;
+
+	// Pour le SpringArm
+	inline static float currentDistance;  // Distance actuelle < distance si collision
+	inline static float springArmSpeed = 50.0f;
+	inline static bool enableSpringArm = true;
+	inline static float cameraRadius = 2.0f;
+	inline static float collisionOffset = 1.0f;
 };
 #endif
 

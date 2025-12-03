@@ -6,6 +6,7 @@
 #include "buffers/constantBuffers/BillboardBuffer.h"
 #include "buffers/constantBuffers/ConstantBuffer.h"
 #include "graphics/Billboard.h"
+#include <DirectXMath.h>
 
 struct BaseCameraData;
 
@@ -14,16 +15,16 @@ class BillboardRenderer
 public:
 	explicit BillboardRenderer(ID3D11Device* device);
 
-	void Render(Billboard& billboard, ID3D11DeviceContext* context, const BaseCameraData& baseCameraData);
+	void Render(Billboard& billboard, ID3D11DeviceContext* context, const DirectX::XMMATRIX& worldMatrix);
+	void UpdateCameraData(const BaseCameraData& baseCameraData, ID3D11DeviceContext* context, ID3D11ShaderResourceView* billboardSRV);
 
 private:
 	static constexpr int billboardCbRegisterNumber = 0;
 
+	BillboardBuffer billboardBuffer{};
 	ConstantBuffer<BillboardBuffer> billboardConstantBuffer;
 
 	static void Draw(const Billboard& billboard, ID3D11DeviceContext* context);
-
-	[[nodiscard]] static DirectX::XMMATRIX ComputeBillboardWorldMatrix(const Billboard& billboard);
 };
 
 #endif

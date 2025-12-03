@@ -2,6 +2,7 @@
 #define MATERIAL_H
 
 #include <DirectXMath.h>
+#include <memory>
 #include <string>
 
 #include "rendering/buffers/constantBuffers/ConstantBuffer.h"
@@ -11,7 +12,7 @@
 
 struct Material
 {
-	explicit Material(ID3D11Device* device, const ShaderProgram& shaderProgram, const int materialCbRegisterNumber)
+	explicit Material(ID3D11Device* device, const std::shared_ptr<ShaderProgram>& shaderProgram, const int materialCbRegisterNumber)
 		: constantBuffer{device, materialCbRegisterNumber}, shaderProgram{shaderProgram}
 	{
 	}
@@ -28,7 +29,7 @@ struct Material
 	bool transparent = false;
 
 	ConstantBuffer<MaterialBuffer> constantBuffer; // b2 in the shader program
-	ShaderProgram shaderProgram;
+	std::shared_ptr<ShaderProgram> shaderProgram;
 };
 
 #endif

@@ -17,10 +17,19 @@ PostProcess::PostProcess(ID3D11Device* device, const size_t screenWidth, const s
     DXEssayer(device->CreateTexture2D(&desc, nullptr, &sceneTexture));
     DXEssayer(device->CreateRenderTargetView(sceneTexture, nullptr, &sceneRenderTargetView));
     DXEssayer(device->CreateShaderResourceView(sceneTexture, nullptr, &sceneShaderResourceView));
+
+    D3D11_SAMPLER_DESC sampDesc{};
+    sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+    sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+    sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+    sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+
+    DXEssayer(device->CreateSamplerState(&sampDesc, &postProcessSampler));
 }
 
 void PostProcess::Draw(ID3D11DeviceContext* context, ID3D11RenderTargetView* backbuffer,
-	ID3D11VertexShader* postProcessVertexShader, ID3D11PixelShader* postProcessPixelShader)
+	ID3D11VertexShader* postProcessVertexShader, ID3D11PixelShader* postProcessPixelShader, 
+    ID3D11ShaderResourceView* distortionSRV)
 {
     // Switch render target to backbuffer
     context->OMSetRenderTargets(1, &backbuffer, nullptr);
@@ -30,7 +39,15 @@ void PostProcess::Draw(ID3D11DeviceContext* context, ID3D11RenderTargetView* bac
     context->PSSetShader(postProcessPixelShader, nullptr, 0);
 
     // Bind scene texture as input
-    context->PSSetShaderResources(0, 1, &sceneShaderResourceView);
+    ID3D11ShaderResourceView* srvs[2] =
+    {
+        sceneShaderResourceView,
+        distortionSRV
+    };
+    context->PSSetShaderResources(0, 2, srvs);
+
+    // Set post process sampler
+    context->PSSetSamplers(0, 1, &postProcessSampler);
 
     // Render without vertex buffer
     context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);

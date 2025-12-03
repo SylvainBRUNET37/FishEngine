@@ -1,6 +1,8 @@
 #ifndef UTIL_H
 #define UTIL_H
 
+#include <string>
+
 template <class Type>
 void DXEssayer(const Type& Resultat)
 {
@@ -35,6 +37,19 @@ void DXRelacher(Type& UnPointeur)
 	{
 		UnPointeur->Release();
 		UnPointeur = nullptr;
+	}
+}
+
+//référence: https://seanmiddleditch.github.io/direct3d-11-debug-api-tricks/
+inline void SetDebugName(ID3D11DeviceChild* child, const std::string& name) {
+	if (child != nullptr /*&& name != null*/) {
+		child->SetPrivateData(WKPDID_D3DDebugObjectName, name.size(), name.c_str());
+	}
+}
+
+inline void SetDebugName(ID3D11Device* device, const std::string& name) {
+	if (device != nullptr /*&& name != null*/) {
+		device->SetPrivateData(WKPDID_D3DDebugObjectName, name.size(), name.c_str());
 	}
 }
 

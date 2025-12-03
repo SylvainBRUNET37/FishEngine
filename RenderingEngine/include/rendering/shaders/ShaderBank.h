@@ -6,7 +6,6 @@
 
 #include "Shader.h"
 
-// TODO: Avoid copies ? Shaders contains ComPtr so idk
 class ShaderBank
 {
 public:
@@ -17,14 +16,37 @@ public:
 	}
 
 	template <typename Shader>
-	void Set(const std::string& path, Shader&& shader) // NOLINT(cppcoreguidelines-missing-std-forward)
+	void Set(const std::string& path, Shader&& shader)
 	{
 		ShaderBankAccessor<Shader>::Set(*this, path, std::forward<Shader>(shader));
+	}
+
+	// Assume user use only vertex and pixel shader
+	[[nodiscard]] std::shared_ptr<ShaderProgram> GetOrCreateShaderProgram(
+		ID3D11Device* device,
+		const std::string& vsPath,
+		const std::string& psPath)
+	{
+		const ShaderProgramKey key{ vsPath, psPath };
+
+		// Return cached ShaderProgram if already stored
+		if (const auto shaderProgramIt = shaderPrograms.find(key); shaderProgramIt != shaderPrograms.end())
+			return shaderProgramIt->second;
+
+		const auto& vs = Get<VertexShader>(vsPath);
+		const auto& ps = Get<PixelShader>(psPath);
+
+		auto shaderProgram = std::make_shared<ShaderProgram>(device, vs, ps);
+
+		shaderPrograms.emplace(key, shaderProgram);
+		return shaderProgram;
 	}
 
 private:
 	std::unordered_map<std::string, VertexShader> vertexShaders;
 	std::unordered_map<std::string, PixelShader> pixelShaders;
+
+	std::unordered_map<ShaderProgramKey, std::shared_ptr<ShaderProgram>> shaderPrograms;
 
 	template <typename>
 	friend struct ShaderBankAccessor;

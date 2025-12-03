@@ -3,6 +3,8 @@
 
 #include "BlendState.h"
 #include "DepthBuffer.h"
+#include "DepthState.h"
+#include "DistortionProcess.h"
 #include "Rasterizer.h"
 #include "RenderTarget.h"
 #include "rendering/postProcessing/PostProcess.h"
@@ -30,6 +32,11 @@ public:
 	{
 		return postProcess;
 	}
+	
+	[[nodiscard]] DistortionProcess& GetDistortionProcess() noexcept
+	{
+		return distortionProcess;
+	}
 
 	[[nodiscard]] ID3D11DepthStencilView* GetDepthStencilView() const noexcept { return depthBuffer.GetStencilView(); }
 
@@ -46,6 +53,23 @@ public:
 		context->OMSetBlendState(blendState.GetAlphaBlendDisabled(), nullptr, 0xffffffff);
 	}
 
+	void SetCullModeCullNone() {
+		rasterizer.SetCullingToNone(device, context);
+	}
+
+	void SetCullModeCullBack() {
+		rasterizer.SetCullingToBack(device, context);
+	}
+
+	void EnableTransparentDepth() const
+	{
+		context->OMSetDepthStencilState(depthState.GetDepthNoWrite(), 0);
+	}
+
+	void EnableDefaultDepth() const
+	{
+		context->OMSetDepthStencilState(depthState.GetDepthDefault(), 0);
+	}
 
 private:
 	size_t screenWidth;
@@ -60,6 +84,8 @@ private:
 	DepthBuffer depthBuffer;
 	BlendState blendState;
 	PostProcess postProcess;
+	DistortionProcess distortionProcess;
+	DepthState depthState;
 
 	void SetRenderTarget() const;
 	void SetupViewPort() const;

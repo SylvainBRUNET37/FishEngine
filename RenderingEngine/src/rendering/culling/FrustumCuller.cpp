@@ -3,32 +3,39 @@
 
 #include <DirectXCollision.h>
 
-bool FrustumCuller::IsMeshCulled(Mesh& mesh, const Transform& transform, BaseCameraData camera) noexcept {
 
-	// Local Mesh bounding box
-	DirectX::BoundingBox localBox;
-	DirectX::BoundingBox::CreateFromPoints(
-		localBox,
-		static_cast<UINT>(mesh.vertices.size()),
-		&mesh.vertices[0].position,
-		sizeof(Vertex)
-	);
+// Static variables definitions
+DirectX::XMMATRIX FrustumCuller::viewMatrixInvert = DirectX::XMMatrixIdentity();
+DirectX::XMMATRIX FrustumCuller::projectionMatrix = DirectX::XMMatrixIdentity();
+DirectX::BoundingFrustum FrustumCuller::frustum;
 
-	// Transform into the world space
-	DirectX::BoundingBox worldBox;
-	localBox.Transform(worldBox, transform.world);
-
+void FrustumCuller::Init(const BaseCameraData& camera)
+{
 	// Get the matrices based on the camera data
-	auto viewMatrix = XMMatrixLookAtLH(camera.position, camera.focus, camera.up);
-	auto projectionMatrix = XMMatrixPerspectiveFovLH(camera.fov, camera.aspectRatio, camera.nearPlane, camera.farPlane);
-
+	auto viewMatrix = XMMatrixLookAtLH(BaseCameraData::position, camera.focus, camera.up);
+	viewMatrixInvert = XMMatrixInverse(nullptr, viewMatrix);
+	projectionMatrix = XMMatrixPerspectiveFovLH(camera.fov, camera.aspectRatio, camera.nearPlane, camera.farPlane);
+	
 	// Local furstum bounding box
-	DirectX::BoundingFrustum frustum;
-	DirectX::BoundingFrustum::CreateFromMatrix(frustum, projectionMatrix);
-
+	frustum = BoundingFrustum(projectionMatrix);
 	// Transform into the world space
-	DirectX::BoundingFrustum worldFrustum = frustum;
-	worldFrustum.Transform(worldFrustum, XMMatrixInverse(nullptr, viewMatrix));
+	frustum.Transform(frustum, viewMatrixInvert);
+}
 
-	return !worldFrustum.Intersects(worldBox);
+bool FrustumCuller::IsMeshCulled(const Mesh& mesh, const Transform& transform) noexcept
+{
+	// Transform into the world space
+	BoundingBox worldBox;
+	mesh.boundingBox.Transform(worldBox, transform.world);
+
+	return !frustum.Intersects(worldBox);
+}
+
+bool FrustumCuller::IsBillboardCulled(const Billboard& billboard, const XMMATRIX& worldMatrix) noexcept
+{
+	// Transform into the world space
+	BoundingBox worldBox;
+	billboard.boundingBox.Transform(worldBox, worldMatrix);
+
+	return !frustum.Intersects(worldBox);
 }
