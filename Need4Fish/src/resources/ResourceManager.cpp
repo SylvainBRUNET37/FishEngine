@@ -46,7 +46,7 @@ void ResourceManager::InitShaderBank()
 
 SceneResource& ResourceManager::LoadScene()
 {
-	const std::filesystem::path filePath = "assets\\test_current.glb";
+	const std::filesystem::path filePath = "assets\\MainScene_Volet2.glb";
 	sceneResource = sceneLoader.LoadScene(filePath, shaderBank);
 
 	return sceneResource;
