@@ -8,7 +8,12 @@
 
 ResourceManager::ResourceManager(ID3D11Device* device) : device{device}, sceneLoader{device}
 {
+#ifdef _DEBUG
+	device->QueryInterface(IID_PPV_ARGS(&debug));
+#endif
 	InitShaderBank();
+	SetDebugName(device, "Device-in-ResourceManager");
+	
 }
 
 void ResourceManager::InitShaderBank()
@@ -36,4 +41,10 @@ SceneResource& ResourceManager::LoadScene()
 	sceneResource = sceneLoader.LoadScene(filePath, shaderBank);
 
 	return sceneResource;
+}
+
+void ResourceManager::ReportLiveDeviceObjects() {
+	if (debug) {
+		debug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
+	}
 }

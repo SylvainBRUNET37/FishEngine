@@ -26,6 +26,8 @@ Renderer::Renderer(RenderContext* renderContext, std::vector<Material>&& materia
 
 	DXEssayer(renderContext->GetDevice()->CreateSamplerState(&textureSamplerDesc, &textureSampler));
 
+	SetDebugName(textureSampler, "textureSampler-in-Renderer");
+
 	D3D11_SAMPLER_DESC causticSamplerDesc{};
 	causticSamplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 	causticSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -37,6 +39,8 @@ Renderer::Renderer(RenderContext* renderContext, std::vector<Material>&& materia
 	causticSamplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
 
 	DXEssayer(renderContext->GetDevice()->CreateSamplerState(&causticSamplerDesc, &causticSampler));
+
+	SetDebugName(causticSampler, "causticSampler-in-Renderer");
 }
 
 void Renderer::Render(const Mesh& mesh,

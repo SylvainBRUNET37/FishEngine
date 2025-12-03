@@ -59,6 +59,7 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 		GameEngine gameEngine{ &renderContext };
 		gameEngine.Run();
 
+		Locator::Get<ResourceManager>().ReportLiveDeviceObjects();
 		return EXIT_SUCCESS;
 	}
 	catch (const std::exception& ex)

@@ -32,8 +32,8 @@ private:
 	static constexpr int postProcessCbRegisterNumber = 0;
 
 	RenderContext* renderContext;
-	ID3D11SamplerState* textureSampler;
-	ID3D11SamplerState* causticSampler;
+	ComPtr<ID3D11SamplerState> textureSampler;
+	ComPtr<ID3D11SamplerState> causticSampler;
 
 	std::vector<Material> materials;
 	FrameBuffer frameBuffer{};

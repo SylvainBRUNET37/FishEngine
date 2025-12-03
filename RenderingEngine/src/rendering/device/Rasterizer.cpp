@@ -21,12 +21,15 @@ Rasterizer::Rasterizer(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11De
 
 	DXEssayer(device->CreateRasterizerState(&resterizeDesc, &rasterizerState), "Error while creating resterize state");
 	context->RSSetState(rasterizerState);
+	SetDebugName(rasterizerState, "rasterizerState-in-Rasterizer" + counter);
+	counter++;
 }
 
 void Rasterizer::SetCullingToNone(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) {
 	D3D11_RASTERIZER_DESC desc;
 	rasterizerState->GetDesc(&desc);
 	desc.CullMode = D3D11_CULL_NONE;
+	rasterizerState->Release();
 	DXEssayer(device->CreateRasterizerState(&desc, &rasterizerState), "Error while creating resterize state");
 	context->RSSetState(rasterizerState);
 }
@@ -35,6 +38,7 @@ void Rasterizer::SetCullingToBack(const ComPtr<ID3D11Device>& device, const ComP
 	D3D11_RASTERIZER_DESC desc;
 	rasterizerState->GetDesc(&desc);
 	desc.CullMode = D3D11_CULL_BACK;
+	rasterizerState->Release();
 	DXEssayer(device->CreateRasterizerState(&desc, &rasterizerState), "Error while creating resterize state");
 	context->RSSetState(rasterizerState);
 }
