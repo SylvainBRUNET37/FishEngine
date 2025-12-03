@@ -143,6 +143,8 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 	RenderUI(entityManager);
 
 	Present();
+
+	renderer.ClearPixelShaderResources();
 }
 
 void RenderSystem::RenderUI(EntityManager& entityManager)

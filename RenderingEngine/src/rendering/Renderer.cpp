@@ -29,6 +29,8 @@ Renderer::Renderer(RenderContext* renderContext, std::vector<Material>&& materia
 
 	DXEssayer(renderContext->GetDevice()->CreateSamplerState(&textureSamplerDesc, &textureSampler));
 
+	SetDebugName(textureSampler, "textureSampler-in-Renderer");
+
 	D3D11_SAMPLER_DESC causticSamplerDesc{};
 	causticSamplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 	causticSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -40,6 +42,8 @@ Renderer::Renderer(RenderContext* renderContext, std::vector<Material>&& materia
 	causticSamplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
 
 	DXEssayer(renderContext->GetDevice()->CreateSamplerState(&causticSamplerDesc, &causticSampler));
+
+	SetDebugName(causticSampler, "causticSampler-in-Renderer");
 }
 
 void Renderer::Render(const Mesh& mesh,
@@ -69,7 +73,12 @@ void Renderer::Render(const Mesh& mesh,
 	context->PSSetSamplers(0, 1, &textureSampler);
 	context->PSSetSamplers(1, 1, &causticSampler);
 
-	Draw(mesh);
+	if (material.name != "WaterMat") {
+		Draw(mesh);
+	}
+	else {
+		DoubleSidedDraw(mesh);
+	}
 }
 
 void Renderer::Render(Sprite2D& sprite, ID3D11DeviceContext* context) const
@@ -185,6 +194,14 @@ void Renderer::Draw(const Mesh& mesh) const
 	renderContext->GetContext()->DrawIndexed(static_cast<UINT>(mesh.indices.size()), 0, 0);
 }
 
+void Renderer::DoubleSidedDraw(const Mesh& mesh) const
+{
+	renderContext->SetCullModeCullNone();
+	Draw(mesh);
+	renderContext->SetCullModeCullBack();
+
+}
+
 void Renderer::Draw(const Sprite2D& sprite) const
 {
 	// There is 2 triangle in a sprite, so 6 vertices
@@ -222,4 +239,9 @@ MaterialBuffer Renderer::BuildConstantMaterialBuffer(const Material& material)
 	params.padding = XMFLOAT2(0, 0);
 
 	return params;
+}
+
+void Renderer::ClearPixelShaderResources() {
+	ID3D11ShaderResourceView* null[] = { nullptr, nullptr };
+	renderContext->GetContext()->PSSetShaderResources(0, 2, null);
 }

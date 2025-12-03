@@ -61,6 +61,7 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 
 		delete gameEngine;
 
+		Locator::Get<ResourceManager>().ReportLiveDeviceObjects();
 		return EXIT_SUCCESS;
 	}
 	catch (const std::exception& ex)

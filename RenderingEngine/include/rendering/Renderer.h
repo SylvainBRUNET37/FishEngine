@@ -32,6 +32,7 @@ public:
 	void PrepareSceneForDistortion() const;
 	void PrepareSceneForBillboard() const;
 	void PrepareSceneForSprite();
+	void ClearPixelShaderResources();
 
 private:
 	static constexpr int frameCbRegisterNumber = 0;
@@ -40,8 +41,8 @@ private:
 	static constexpr int postProcessCbRegisterNumber = 0;
 
 	RenderContext* renderContext;
-	ID3D11SamplerState* textureSampler;
-	ID3D11SamplerState* causticSampler;
+	ComPtr<ID3D11SamplerState> textureSampler;
+	ComPtr<ID3D11SamplerState> causticSampler;
 
 	BillboardRenderer billboardRenderer;
 
@@ -56,6 +57,7 @@ private:
 	Texture causticTexture;
 
 	void Draw(const Mesh& mesh) const;
+	void DoubleSidedDraw(const Mesh& mesh) const;
 	void Draw(const Sprite2D& sprite) const;
 
 	static ObjectBuffer BuildConstantObjectBuffer(const Transform& transform);

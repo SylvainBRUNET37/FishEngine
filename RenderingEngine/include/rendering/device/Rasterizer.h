@@ -9,6 +9,8 @@ class Rasterizer
 {
 public:
 	Rasterizer(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
+	void SetCullingToNone(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
+	void SetCullingToBack(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
 
 private:
 	ComPtr<ID3D11RasterizerState> rasterizerState;
