@@ -74,7 +74,7 @@
     <ClInclude Include="include\rendering\utils\VerboseAssertion.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="resources\resource.h" />
-    <ClInclude Include="ShadowMap.h" />
+    <ClInclude Include="include\rendering\graphics\ShadowMap.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -83,7 +83,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="ShadowMap.cpp" />
+    <ClCompile Include="src\rendering\graphics\ShadowMap.cpp" />
     <ClCompile Include="src\rendering\application\WindowsApplication.cpp" />
     <ClCompile Include="src\rendering\BillboardRenderer.cpp" />
     <ClCompile Include="src\rendering\culling\FrustumCuller.cpp" />

@@ -18,6 +18,22 @@ D3D11_RASTERIZER_DESC Rasterizer::CreateRasterizeDesc()
 	return desc;
 }
 
+D3D11_RASTERIZER_DESC Rasterizer::CreateShadowMapRasterizeDesc()
+{
+
+	D3D11_RASTERIZER_DESC desc{};
+
+	desc.FillMode = D3D11_FILL_SOLID;
+	desc.CullMode = D3D11_CULL_BACK;
+	desc.FrontCounterClockwise = TRUE;
+	desc.DepthClipEnable = TRUE;
+	desc.DepthBias = 100000;
+	desc.DepthBiasClamp = 0.0f;
+	desc.SlopeScaledDepthBias = 1.0f;
+
+	return desc;
+}
+
 Rasterizer::Rasterizer(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 {
 	const auto resterizeDesc = CreateRasterizeDesc();

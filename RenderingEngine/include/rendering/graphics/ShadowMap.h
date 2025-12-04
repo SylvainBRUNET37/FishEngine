@@ -2,6 +2,7 @@
 #define SHADOW_MAP_H
 
 #include <d3d11.h>
+#include "rendering/utils/ComPtr.h"
 
 //Move this to the appropriate folder later
 
@@ -23,8 +24,8 @@ private:
 	UINT width;
 	UINT height;
 
-	ID3D11ShaderResourceView* depthMapSRV;
-	ID3D11DepthStencilView* depthMapDSV;
+	ComPtr<ID3D11ShaderResourceView> depthMapSRV;
+	ComPtr<ID3D11DepthStencilView> depthMapDSV;
 
 	D3D11_VIEWPORT viewport;
 };

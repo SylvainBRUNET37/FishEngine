@@ -5,7 +5,9 @@
 #include "rendering/Renderer.h"
 #include "rendering/device/RenderContext.h"
 #include "rendering/graphics/Material.h"
+#include "rendering/graphics/ShadowMap.h" //Move this?
 #include "UIManager.h"
+#include <memory>
 
 class RenderSystem : public System
 {
@@ -27,10 +29,25 @@ private:
 	void RenderMeshes(EntityManager& entityManager);
 	void UpdatePointLights(EntityManager& entityManager);
 	void UpdateFrameBuffer(double deltaTime, EntityManager& entityManager, const Camera& currentCamera);
+	void BuildShadowTransform();
 
 	void Present() const { renderContext->Present(); }
 
-	static FrameBuffer CreateDirectionnalLight();
+	static FrameBuffer CreateDirectionalLight();
+
+	static const int SHADOW_MAP_SIZE = 512;
+	std::unique_ptr<ShadowMap> shadowMap; //mSmap
+	DirectX::XMFLOAT4X4 lightView; //mLightView
+	DirectX::XMFLOAT4X4 lightProj; //mLightProj
+	DirectX::XMFLOAT4X4 shadowTransform; //mShadowTransform
+
+	struct BoundingSphere {
+		BoundingSphere() : Center(0.0f, 0.0f, 0.0f), Radius(0.0f) {}
+		DirectX::XMFLOAT3 Center;
+		float Radius;
+	};
+
+	BoundingSphere sceneBoundaries;
 };
 
 #endif

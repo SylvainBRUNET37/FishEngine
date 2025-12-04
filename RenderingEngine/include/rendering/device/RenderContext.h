@@ -71,6 +71,10 @@ public:
 		context->OMSetDepthStencilState(depthState.GetDepthDefault(), 0);
 	}
 
+	//Must be public for shadow map reasons...
+	void SetRenderTarget() const;
+	void SetupViewPort() const;
+
 private:
 	size_t screenWidth;
 	size_t screenHeight;
@@ -78,6 +82,7 @@ private:
 	ComPtr<ID3D11Device> device;
 	ComPtr<ID3D11DeviceContext> context;
 	ComPtr<IDXGISwapChain> swapChain;
+	D3D11_VIEWPORT viewPort;
 
 	Rasterizer rasterizer;
 	RenderTarget renderTarget;
@@ -86,9 +91,6 @@ private:
 	PostProcess postProcess;
 	DistortionProcess distortionProcess;
 	DepthState depthState;
-
-	void SetRenderTarget() const;
-	void SetupViewPort() const;
 };
 
 #endif

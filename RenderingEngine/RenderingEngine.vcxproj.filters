@@ -1,264 +1,90 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="src\rendering\graphics\ShadowMap.cpp" />
+    <ClCompile Include="src\rendering\application\WindowsApplication.cpp" />
+    <ClCompile Include="src\rendering\BillboardRenderer.cpp" />
+    <ClCompile Include="src\rendering\culling\FrustumCuller.cpp" />
+    <ClCompile Include="src\rendering\device\BlendState.cpp" />
+    <ClCompile Include="src\rendering\device\DepthBuffer.cpp" />
+    <ClCompile Include="src\rendering\device\DepthState.cpp" />
+    <ClCompile Include="src\rendering\device\DeviceBuilder.cpp" />
+    <ClCompile Include="src\rendering\device\DistortionProcess.cpp" />
+    <ClCompile Include="src\rendering\device\PostProcess.cpp" />
+    <ClCompile Include="src\rendering\device\RenderContext.cpp" />
+    <ClCompile Include="src\rendering\device\RenderTarget.cpp" />
+    <ClCompile Include="src\rendering\device\Rasterizer.cpp" />
+    <ClCompile Include="src\rendering\graphics\Billboard.cpp" />
+    <ClCompile Include="src\rendering\graphics\Mesh.cpp" />
+    <ClCompile Include="src\rendering\graphics\Sprite2D.cpp" />
+    <ClCompile Include="src\rendering\Renderer.cpp" />
+    <ClCompile Include="src\rendering\shaders\ShaderProgram.cpp" />
+    <ClCompile Include="src\rendering\shaders\ShaderReflector.cpp" />
+    <ClCompile Include="src\rendering\shaders\ShaderUtils.cpp" />
+    <ClCompile Include="src\rendering\texture\TextureLoader.cpp" />
+    <ClCompile Include="src\rendering\texture\TextureManager.cpp" />
+    <ClCompile Include="src\rendering\utils\Clock.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\rendering\application\WindowsApplication.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\device\RenderContext.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\utils\ComPtr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\utils\Clock.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\utils\Util.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="pch.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="resources\resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\graphics\Mesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\graphics\Vertex.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\utils\VerboseAssertion.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\graphics\Material.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\texture\TextureManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\utils\DDSTextureLoader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\shaders\ShaderProgram.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\buffers\VertexBuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\buffers\Buffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\buffers\IndexBuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\buffers\constantBuffers\ConstantBuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\core\Transform.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\core\SceneData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\shaders\ShaderDesc.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\shaders\ShaderProgramDesc.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\shaders\ShaderUtils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\shaders\Shader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\shaders\ShaderBank.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\shaders\ShaderFactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="external\stb_image.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\texture\TextureLoader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\device\RenderTarget.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\device\DepthBuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\device\BlendState.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\device\Rasterizer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\device\DeviceBuilder.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\core\WindowData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\Renderer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\shaders\ShaderReflector.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\buffers\constantBuffers\FrameBuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\graphics\lights\DirectionalLight.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\graphics\lights\PointLight.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\buffers\constantBuffers\ObjectBuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\buffers\constantBuffers\MaterialBuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\graphics\camera\BaseCamera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\culling\FrustumCuller.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\graphics\Sprite2D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\graphics\VertexSprite.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\texture\Texture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\buffers\constantBuffers\SpriteBuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\postProcessing\PostProcess.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\postProcessing\PostProcessSettings.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\graphics\SpriteElement.h">
-    <ClInclude Include="include\rendering\graphics\Billboard.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\BillboardRenderer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\buffers\constantBuffers\BillboardBuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\device\DistortionProcess.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rendering\device\DepthState.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ShadowMap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+    <ClInclude Include="external\stb_image.h" />
+    <ClInclude Include="include\rendering\application\WindowsApplication.h" />
+    <ClInclude Include="include\rendering\BillboardRenderer.h" />
+    <ClInclude Include="include\rendering\buffers\constantBuffers\BillboardBuffer.h" />
+    <ClInclude Include="include\rendering\buffers\constantBuffers\FrameBuffer.h" />
+    <ClInclude Include="include\rendering\buffers\constantBuffers\MaterialBuffer.h" />
+    <ClInclude Include="include\rendering\buffers\constantBuffers\ObjectBuffer.h" />
+    <ClInclude Include="include\rendering\buffers\constantBuffers\SpriteBuffer.h" />
+    <ClInclude Include="include\rendering\core\SceneData.h" />
+    <ClInclude Include="include\rendering\core\Transform.h" />
+    <ClInclude Include="include\rendering\core\WindowData.h" />
+    <ClInclude Include="include\rendering\culling\FrustumCuller.h" />
+    <ClInclude Include="include\rendering\device\BlendState.h" />
+    <ClInclude Include="include\rendering\device\DepthBuffer.h" />
+    <ClInclude Include="include\rendering\device\DepthState.h" />
+    <ClInclude Include="include\rendering\device\DeviceBuilder.h" />
+    <ClInclude Include="include\rendering\device\DistortionProcess.h" />
+    <ClInclude Include="include\rendering\graphics\Billboard.h" />
+    <ClInclude Include="include\rendering\postProcessing\PostProcess.h" />
+    <ClInclude Include="include\rendering\device\RenderContext.h" />
+    <ClInclude Include="include\rendering\buffers\Buffer.h" />
+    <ClInclude Include="include\rendering\buffers\constantBuffers\ConstantBuffer.h" />
+    <ClInclude Include="include\rendering\buffers\IndexBuffer.h" />
+    <ClInclude Include="include\rendering\buffers\VertexBuffer.h" />
+    <ClInclude Include="include\rendering\device\Rasterizer.h" />
+    <ClInclude Include="include\rendering\device\RenderTarget.h" />
+    <ClInclude Include="include\rendering\graphics\camera\BaseCamera.h" />
+    <ClInclude Include="include\rendering\graphics\lights\DirectionalLight.h" />
+    <ClInclude Include="include\rendering\graphics\lights\PointLight.h" />
+    <ClInclude Include="include\rendering\graphics\Sprite2D.h" />
+    <ClInclude Include="include\rendering\graphics\SpriteElement.h" />
+    <ClInclude Include="include\rendering\graphics\VertexSprite.h" />
+    <ClInclude Include="include\rendering\postProcessing\PostProcessSettings.h" />
+    <ClInclude Include="include\rendering\Renderer.h" />
+    <ClInclude Include="include\rendering\shaders\Shader.h" />
+    <ClInclude Include="include\rendering\shaders\ShaderBank.h" />
+    <ClInclude Include="include\rendering\shaders\ShaderDesc.h" />
+    <ClInclude Include="include\rendering\shaders\ShaderFactory.h" />
+    <ClInclude Include="include\rendering\shaders\ShaderProgram.h" />
+    <ClInclude Include="include\rendering\shaders\ShaderProgramDesc.h" />
+    <ClInclude Include="include\rendering\shaders\ShaderReflector.h" />
+    <ClInclude Include="include\rendering\shaders\ShaderUtils.h" />
+    <ClInclude Include="include\rendering\graphics\Material.h" />
+    <ClInclude Include="include\rendering\graphics\Mesh.h" />
+    <ClInclude Include="include\rendering\graphics\Vertex.h" />
+    <ClInclude Include="include\rendering\texture\Texture.h" />
+    <ClInclude Include="include\rendering\texture\TextureLoader.h" />
+    <ClInclude Include="include\rendering\texture\TextureManager.h" />
+    <ClInclude Include="include\rendering\utils\ComPtr.h" />
+    <ClInclude Include="include\rendering\utils\Clock.h" />
+    <ClInclude Include="include\rendering\utils\DDSTextureLoader.h" />
+    <ClInclude Include="include\rendering\utils\Util.h" />
+    <ClInclude Include="include\rendering\utils\VerboseAssertion.h" />
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="resources\resource.h" />
+    <ClInclude Include="include\rendering\graphics\ShadowMap.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\rendering\device\RenderContext.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="pch.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\rendering\utils\Clock.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\rendering\application\WindowsApplication.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\rendering\texture\TextureManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\rendering\shaders\ShaderUtils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\rendering\shaders\ShaderProgram.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\rendering\texture\TextureLoader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\rendering\device\RenderTarget.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\rendering\device\DepthBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\rendering\device\Rasterizer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\rendering\device\BlendState.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\rendering\device\DeviceBuilder.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\rendering\Renderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\rendering\shaders\ShaderReflector.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\rendering\graphics\Mesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\rendering\culling\FrustumCuller.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\rendering\graphics\Sprite2D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\rendering\device\PostProcess.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\rendering\BillboardRenderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\rendering\graphics\Billboard.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\rendering\device\DistortionProcess.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\rendering\device\DepthState.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ShadowMap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="resources\Resource.rc">
-      <Filter>Resource Files</Filter>
-    </ResourceCompile>
+    <ResourceCompile Include="resources\Resource.rc" />
   </ItemGroup>
 </Project>

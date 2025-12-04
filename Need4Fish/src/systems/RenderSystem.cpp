@@ -17,9 +17,14 @@ RenderSystem::RenderSystem(RenderContext* renderContext, const std::shared_ptr<U
                            std::vector<Material>&& materials)
 	: uiManager(uiManager),
 	  renderer(renderContext, std::move(materials)),
-	  frameBuffer(CreateDirectionnalLight()),
+	  frameBuffer(CreateDirectionalLight()),
 	  renderContext(renderContext)
 {
+	shadowMap = std::make_unique<ShadowMap>(renderContext->GetDevice(), SHADOW_MAP_SIZE, SHADOW_MAP_SIZE);
+
+	//GOOD code would determine these dynamically...
+	sceneBoundaries.Center = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	sceneBoundaries.Radius = 3536.0f;
 }
 
 void RenderSystem::RenderPostProcesses(const double deltaTime)
@@ -134,6 +139,19 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 
 	UpdateFrameBuffer(deltaTime, entityManager, currentCamera);
 
+	BuildShadowTransform();
+	
+
+	//Below is equivalent to draw scene, so...
+	//shadowMap->BindDsvAndSetNullRenderTarget(renderContext->GetContext());
+	//drawSceneToShadowMap...
+	//renderContext->GetContext()->RSSetState(0);
+	
+	//Restore back and depth buffer to OM stage (what's that? THe output-merger stage?)
+	//How do I even mimic that?
+	//renderContext->SetRenderTarget();
+	//renderContext->SetupViewPort();
+	
 	RenderMeshes(entityManager);
 	RenderBillboards(entityManager, currentCamera);
 
@@ -169,7 +187,7 @@ void RenderSystem::RenderUI(EntityManager& entityManager)
 		renderer.Render(sprite, renderContext->GetContext());
 }
 
-FrameBuffer RenderSystem::CreateDirectionnalLight()
+FrameBuffer RenderSystem::CreateDirectionalLight()
 {
 	return
 	{
@@ -183,4 +201,43 @@ FrameBuffer RenderSystem::CreateDirectionnalLight()
 			.pad = 0.0f
 		},
 	};
+}
+
+void RenderSystem::BuildShadowTransform() {
+	//Commençons par seulement la lumière directionnelle principale...
+	XMVECTOR lightDirection = XMLoadFloat3(&frameBuffer.dirLight.direction);
+	//uh, directional lights have no position
+	XMVECTOR targetPosition = XMLoadFloat3(&sceneBoundaries.Center);
+	XMVECTOR lightPosition = targetPosition - sceneBoundaries.Radius * lightDirection; //Can I fake it like this?
+	XMVECTOR upVector = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f); //Let's assume this is true because I can't find the code to confirm...
+
+	//XMMatrixLookAtLH = Build a Left Handed View Matrix from point of view (parameter 1) to target location (parameter 2)
+	XMMATRIX LightViewMatrix = XMMatrixLookAtLH(lightPosition, targetPosition, upVector);
+
+	//transform bounding sphere to light space
+	XMFLOAT3 sphereCenterLightSpace;
+	XMStoreFloat3(&sphereCenterLightSpace, XMVector3TransformCoord(targetPosition, LightViewMatrix));
+
+	//Orthographic frustrum in light space encloses scene...
+	float left = sphereCenterLightSpace.x - sceneBoundaries.Radius;
+	float bottom = sphereCenterLightSpace.y - sceneBoundaries.Radius;
+	float nnear = sphereCenterLightSpace.z - sceneBoundaries.Radius; //near is a reserved word, it seems
+	float right = sphereCenterLightSpace.x + sceneBoundaries.Radius;
+	float top = sphereCenterLightSpace.y + sceneBoundaries.Radius;
+	float ffar = sphereCenterLightSpace.z + sceneBoundaries.Radius; //far is a reserved word, it seems
+	XMMATRIX LightProjectionMatrix = XMMatrixOrthographicOffCenterLH(left, right, bottom, top, nnear, ffar);
+
+	//Transform NDC space [-1, +1]^2 to texture space [0,1]^2
+	XMMATRIX T(
+		0.5f,  0.0f, 0.0f, 0.0f,
+		0.0f, -0.5f, 0.0f, 0.0f,
+		0.0f,  0.0f, 1.0f, 0.0f,
+		0.5f,  0.5f, 0.0f, 1.0f
+	);
+
+	XMMATRIX ShadowTransform = LightViewMatrix * LightProjectionMatrix * T;
+
+	XMStoreFloat4x4(&lightView, LightViewMatrix);
+	XMStoreFloat4x4(&lightProj, LightProjectionMatrix);
+	XMStoreFloat4x4(&shadowTransform, ShadowTransform);
 }

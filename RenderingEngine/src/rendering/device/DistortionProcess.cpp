@@ -16,6 +16,7 @@ DistortionProcess::DistortionProcess(ID3D11Device* device, const size_t screenWi
 	texDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
 
 	DXEssayer(device->CreateTexture2D(&texDesc, nullptr, &texture));
+	SetDebugName(texture, "texture-in-DistortionProcess");
 	DXEssayer(device->CreateRenderTargetView(texture, nullptr, &renderTargetView));
 	DXEssayer(device->CreateShaderResourceView(texture, nullptr, &shaderResourceView));
 }

@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "ShadowMap.h"
+#include "include/rendering/graphics/ShadowMap.h"
 #include "include/rendering/utils/Util.h"
 
 class ShadowMapTexture2DCreationError {};
@@ -43,6 +43,7 @@ ShadowMap::ShadowMap(ID3D11Device* device, UINT width, UINT height)
 	dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 	dsvDesc.Texture2D.MipSlice = 0;
 	DXEssayer(device->CreateDepthStencilView(depthMap, &dsvDesc, &depthMapDSV), DepthStencilViewCreationError{});
+	SetDebugName(depthMapDSV, "depthMapDSV-in-ShadowMap");
 
 	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
 	srvDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
@@ -50,6 +51,7 @@ ShadowMap::ShadowMap(ID3D11Device* device, UINT width, UINT height)
 	srvDesc.Texture2D.MipLevels = texDesc.MipLevels;
 	srvDesc.Texture2D.MostDetailedMip = 0;
 	DXEssayer(device->CreateShaderResourceView(depthMap, &srvDesc, &depthMapSRV), ShaderResourceViewCreationError{});
+	SetDebugName(depthMapSRV, "depthMapSRV-in-ShadowMap");
 
 	// View saves a reference to the texture so we can release our reference
 	DXRelacher(depthMap);
@@ -70,6 +72,8 @@ void ShadowMap::BindDsvAndSetNullRenderTarget(ID3D11DeviceContext* dc)
 	// Setting a null render target will disable color writes
 	ID3D11RenderTargetView* renderTargets[1] = { 0 };
 	dc->OMSetRenderTargets(1, renderTargets, depthMapDSV);
+	//is below equivalent?
+	//dc->OMSetRenderTargets(1, 0, depthMapDSV);
 
 	dc->ClearDepthStencilView(depthMapDSV, D3D11_CLEAR_DEPTH, 1.0f, 0);
 }

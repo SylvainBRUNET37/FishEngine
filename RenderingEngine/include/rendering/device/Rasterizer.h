@@ -16,6 +16,8 @@ private:
 	ComPtr<ID3D11RasterizerState> rasterizerState;
 
 	static D3D11_RASTERIZER_DESC CreateRasterizeDesc();
+
+	static D3D11_RASTERIZER_DESC CreateShadowMapRasterizeDesc();
 };
 
 #endif
