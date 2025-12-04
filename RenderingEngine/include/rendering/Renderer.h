@@ -30,7 +30,7 @@ public:
 	                       const PostProcessSettings& parameters);
 	void UpdateScene() const;
 	void PrepareSceneForDistortion() const;
-	void PrepareSceneForBillboard() const;
+	void PrepareSceneForBillboard();
 	void PrepareSceneForSprite();
 	void ClearPixelShaderResources();
 

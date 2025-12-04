@@ -154,8 +154,11 @@ void Renderer::PrepareSceneForDistortion() const
 	renderContext->EnableDefaultDepth();
 }
 
-void Renderer::PrepareSceneForBillboard() const
+void Renderer::PrepareSceneForBillboard()
 {
+	// Use a basic sampler instead of a good one
+	renderContext->GetContext()->PSSetSamplers(0, 1, &causticSampler);
+
 	renderContext->EnableAlphaBlending(); // add a better look but have a performance cost
 	renderContext->EnableTransparentDepth(); // avoid artifacts by disbaling depth buffer writing
 }
