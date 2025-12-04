@@ -31,6 +31,7 @@ void PhysicsSimulationSystem::Update(double, EntityManager& entityManager)
 	if (GameState::currentState == GameState::PLAYING)
 	{
 		UpdateControllables(entityManager);
+		UpdateNPCs(entityManager);
 		UpdatePhysics();
 		UpdateTransforms(entityManager);
 	}
@@ -38,7 +39,7 @@ void PhysicsSimulationSystem::Update(double, EntityManager& entityManager)
 
 void PhysicsSimulationSystem::UpdateControllables(EntityManager& entityManager)
 {
-	//R�cup�rer la cam�ra pour le targetYaw
+	// Get camera for the targetYaw
 	Camera* activeCamera = nullptr;
 	for (const auto& [entity, camera] : entityManager.View<Camera>())
 	{
@@ -46,6 +47,7 @@ void PhysicsSimulationSystem::UpdateControllables(EntityManager& entityManager)
 		break;
 	}
 
+	// Update the player
 	for (const auto& [entity, rigidBody, controllable] : entityManager.View<RigidBody, Controllable>())
 	{
 		const auto& transform = rigidBody.body->GetWorldTransform();
@@ -258,6 +260,37 @@ void PhysicsSimulationSystem::UpdateTransforms(EntityManager& entityManager)
 
 		transform.world = S * R * T;
 		transform.world *= parentTransform.world;
+	}
+}
+
+void PhysicsSimulationSystem::UpdateNPCs(EntityManager& entityManager)
+{
+	auto computeNewSpeed = [](Body* body, AIController aiController) {
+		const auto& transform = body->GetWorldTransform();
+		Vec3 forward = transform.GetColumn3(2).Normalized();
+
+		// TODO: have a proper AI / Calculation for the newSpeed
+		Vec3 currentSpeed = JoltSystem::GetBodyInterface().GetLinearVelocity(body->GetID());
+
+		auto newSpeed = forward.Normalized() * aiController.acceleration;
+		newSpeed -= currentSpeed;
+		newSpeed /= 2.0f;
+		// END TODO
+
+		return newSpeed;
+		};
+
+	// Update the NPC
+	for (const auto& [entity, rigidBody, aiController] : entityManager.View<RigidBody, AIController>())
+	{
+		Vec3 newSpeed = computeNewSpeed(rigidBody.body, aiController);
+
+		Vec3 currentSpeed = JoltSystem::GetBodyInterface().GetLinearVelocity(rigidBody.body->GetID());
+		const auto theoreticalSpeed = currentSpeed + newSpeed;
+
+		// Allow fishes to be influenced by currents
+		if (theoreticalSpeed.Length() < aiController.maxSpeed)
+			JoltSystem::GetBodyInterface().SetLinearVelocity(rigidBody.body->GetID(), currentSpeed + newSpeed);
 	}
 }
 

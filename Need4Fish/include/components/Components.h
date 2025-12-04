@@ -33,6 +33,12 @@ struct Controllable
 	float maxSpeed;
 };
 
+struct AIController
+{
+	float maxSpeed = 50.0f; // TODO: tmp
+	float acceleration = 10.0f;
+};
+
 struct MeshInstance
 {
 	UINT meshIndex;
@@ -68,7 +74,8 @@ using Components = std::tuple
 	Billboard,
 	Sensor,
 	DistortionMeshInstance,
-	Particle
+	Particle,
+	AIController
 >;
 
 #endif

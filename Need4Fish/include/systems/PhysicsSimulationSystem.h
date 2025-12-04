@@ -24,6 +24,7 @@ private:
 
 	static void UpdateControllables(EntityManager& entityManager);
 	static void UpdateTransforms(EntityManager& entityManager);
+	static void UpdateNPCs(EntityManager& entityManager);
 	
 	void UpdatePhysics();
 
