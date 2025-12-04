@@ -84,32 +84,157 @@ void CameraSystem::ComputeCameraPosition(Camera& camera, const Transform& transf
 
 			if (Camera::currentDistance <= 0.0f)
 				Camera::currentDistance = desiredDistance;
-			float actualDistance = PerformSpringArmRaycast(camera.focus, idealCameraPos, desiredDistance);
 
-			// Interpolation progressive vers la nouvelle distance
+			XMVECTOR adjustedPos = PerformSpringArm3D(camera.focus, idealCameraPos, desiredDistance);
+
+			// Vers la nouvelle distance
 			const float t = std::clamp(camera.springArmSpeed * dt, 0.0f, 1.0f);
-			Camera::currentDistance = Lerp(Camera::currentDistance, actualDistance, t);
+			camera.position = XMVectorLerp(camera.position, adjustedPos, t);
 
-			// Recalculer la position avec la distance ajustée
-			XMVECTOR dir = XMVectorSubtract(idealCameraPos, camera.focus);
-			const float dirLen = XMVectorGetX(XMVector3Length(dir));
-			if (dirLen > 0.0001f)
-			{
-				dir = XMVector3Normalize(dir);
-				XMVECTOR newPos = XMVectorAdd(camera.focus, XMVectorScale(dir, Camera::currentDistance));
-				camera.position = XMVectorSetW(newPos, 1.0f);
-			}
-			else
-			{
-				// fallback si dir très petit
-				camera.position = idealCameraPos;
-			}
+			Camera::currentDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(camera.position, camera.focus)));
 		}
 		else
 		{
 			camera.position = idealCameraPos;
 		}
 	}
+}
+
+XMVECTOR CameraSystem::PerformSpringArm3D(const XMVECTOR& focus, const XMVECTOR& idealPos, float maxDistance)
+{
+	auto& physicSystem = JoltSystem::GetPhysicSystem();
+
+	JPH::RVec3 focusPos(XMVectorGetX(focus), XMVectorGetY(focus), XMVectorGetZ(focus));
+	JPH::RVec3 idealCamPos(XMVectorGetX(idealPos), XMVectorGetY(idealPos), XMVectorGetZ(idealPos));
+
+	JPH::Vec3 direction = (idealCamPos - focusPos).Normalized();
+	const float totalDistance = (idealCamPos - focusPos).Length();
+
+	if (totalDistance < 0.001f)
+		return idealPos;
+
+	// Créer une sphère de collision pour la caméra
+	JPH::RefConst<JPH::SphereShape> sphere = new JPH::SphereShape(Camera::cameraRadius);
+
+	// Sphère cast
+	JPH::RShapeCast shapeCast = JPH::RShapeCast::sFromWorldTransform(
+		sphere,
+		JPH::Vec3::sReplicate(1.0f),
+		JPH::RMat44::sTranslation(focusPos),
+		direction * totalDistance
+	);
+
+	// Collision la plus proche
+	class ClosestHitCollector : public JPH::CastShapeCollector
+	{
+	public:
+		virtual void AddHit(const JPH::ShapeCastResult& inResult) override
+		{
+			if (inResult.mFraction < mHit.mFraction)
+			{
+				mHit = inResult;
+			}
+		}
+		JPH::ShapeCastResult mHit;
+	};
+
+	ClosestHitCollector collector;
+	collector.mHit.mFraction = 1.0f;
+
+	// Collide sur NON_MOVING seulement
+	class NonMovingOnlyBroadPhaseFilter : public JPH::BroadPhaseLayerFilter
+	{
+	public:
+		virtual bool ShouldCollide(JPH::BroadPhaseLayer inLayer) const override
+		{
+			return inLayer == BroadPhaseLayers::NON_MOVING;
+		}
+	};
+
+	class NonMovingOnlyObjectFilter : public JPH::ObjectLayerFilter
+	{
+	public:
+		virtual bool ShouldCollide(JPH::ObjectLayer inLayer) const override
+		{
+			return inLayer == Layers::NON_MOVING;
+		}
+	};
+
+	class AllBodyFilter : public JPH::BodyFilter
+	{
+	public:
+		virtual bool ShouldCollide([[maybe_unused]] const JPH::BodyID& inBodyID) const override
+		{
+			return true;
+		}
+	};
+
+	class NoShapeFilter : public JPH::ShapeFilter
+	{
+	public:
+		virtual bool ShouldCollide([[maybe_unused]] const JPH::Shape* inShape2, [[maybe_unused]] const JPH::SubShapeID& inSubShapeIDOfShape2) const override
+		{
+			return true;
+		}
+	};
+
+	NonMovingOnlyBroadPhaseFilter broadPhaseFilter;
+	NonMovingOnlyObjectFilter objectLayerFilter;
+	AllBodyFilter bodyFilter;
+	NoShapeFilter shapeFilter;
+
+	JPH::ShapeCastSettings settings;
+	settings.mUseShrunkenShapeAndConvexRadius = true;
+	settings.mReturnDeepestPoint = false;
+
+	// Effectuer le cast
+	physicSystem.GetNarrowPhaseQuery().CastShape(
+		shapeCast,
+		settings,
+		JPH::RVec3::sZero(),
+		collector,
+		broadPhaseFilter,
+		objectLayerFilter,
+		bodyFilter,
+		shapeFilter
+	);
+
+	// Si collision détectée
+	if (collector.mHit.mFraction < 1.0f)
+	{
+		// Position de collision
+		JPH::RVec3 hitPos = focusPos + direction * (collector.mHit.mFraction * totalDistance);
+
+		// Normale de contact
+		JPH::Vec3 contactNormal = -collector.mHit.mPenetrationAxis.Normalized();
+
+		// Reculer la caméra le long de la normale
+		const float safetyOffset = Camera::cameraRadius + Camera::collisionOffset;
+		JPH::RVec3 safePos = hitPos + JPH::RVec3(contactNormal) * safetyOffset;
+
+		// Ne pas dépasser la distance max
+		JPH::Vec3 toSafePos = (safePos - focusPos);
+		float safePosDistance = toSafePos.Length();
+
+		if (safePosDistance > maxDistance)
+		{
+			toSafePos = toSafePos.Normalized() * maxDistance;
+			safePos = focusPos + toSafePos;
+		}
+
+		// Distance minimale
+		const float minSafeDistance = Camera::cameraRadius * 2.0f;
+		if (safePosDistance < minSafeDistance)
+		{
+			toSafePos = toSafePos.Normalized() * minSafeDistance;
+			safePos = focusPos + toSafePos;
+		}
+
+		return XMVectorSet(safePos.GetX(), safePos.GetY(), safePos.GetZ(), 1.0f);
+	}
+
+	// Pas de collision
+	return idealPos;
 }
 
 void CameraSystem::ComputeCameraOrientation(Camera& camera)
