@@ -143,14 +143,14 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 	
 
 	//Below is equivalent to draw scene, so...
-	//shadowMap->BindDsvAndSetNullRenderTarget(renderContext->GetContext());
+	shadowMap->BindDsvAndSetNullRenderTarget(renderContext->GetContext());
 	//drawSceneToShadowMap...
 	//renderContext->GetContext()->RSSetState(0);
 	
-	//Restore back and depth buffer to OM stage (what's that? THe output-merger stage?)
+	//Restore back and depth buffer to OM stage (what's that? The output-merger stage?)
 	//How do I even mimic that?
-	//renderContext->SetRenderTarget();
-	//renderContext->SetupViewPort();
+	renderer.UpdateScene();
+	renderContext->SetupViewPort();
 	
 	RenderMeshes(entityManager);
 	RenderBillboards(entityManager, currentCamera);

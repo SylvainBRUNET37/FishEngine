@@ -27,7 +27,7 @@ RenderContext::RenderContext(const ComPtr<ID3D11Device>& device, const ComPtr<ID
 
 	EnableDefaultDepth();
 
-	viewPort.Width = 1;
+	//viewPort.Width = 1;
 }
 
 void RenderContext::Present() const

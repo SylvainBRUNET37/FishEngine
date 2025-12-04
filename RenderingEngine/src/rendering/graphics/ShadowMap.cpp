@@ -35,6 +35,7 @@ ShadowMap::ShadowMap(ID3D11Device* device, UINT width, UINT height)
 
 	ID3D11Texture2D* depthMap = 0; //Not nullpointer?
 	DXEssayer(device->CreateTexture2D(&texDesc, 0, &depthMap), ShadowMapTexture2DCreationError{});
+	SetDebugName(depthMap, "depthMap-in-ShadowMap");
 
 	//Depth stencil view creation
 	D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc;

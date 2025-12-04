@@ -107,6 +107,7 @@ ComPtr<ID3D11ShaderResourceView> TextureLoader::CreateTextureView(ID3D11Device* 
 		device->CreateShaderResourceView(texture, &srvDesc, &textureView), 
 		"Failed to create texture view"
 	);
+	SetDebugName(textureView, "textureView-in-TextureLoader");
 
 	return textureView;
 }

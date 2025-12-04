@@ -15,8 +15,11 @@ PostProcess::PostProcess(ID3D11Device* device, const size_t screenWidth, const s
     desc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
 
     DXEssayer(device->CreateTexture2D(&desc, nullptr, &sceneTexture));
+    SetDebugName(sceneTexture, "sceneTexture-in-PostProcess");
     DXEssayer(device->CreateRenderTargetView(sceneTexture, nullptr, &sceneRenderTargetView));
+    SetDebugName(sceneRenderTargetView, "sceneRenderTargetView-in-PostProcess");
     DXEssayer(device->CreateShaderResourceView(sceneTexture, nullptr, &sceneShaderResourceView));
+    SetDebugName(sceneShaderResourceView, "sceneShaderResourceView-in-PostProcess");
 
     D3D11_SAMPLER_DESC sampDesc{};
     sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;

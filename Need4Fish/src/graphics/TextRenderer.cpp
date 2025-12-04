@@ -117,4 +117,5 @@ TextRenderer::TextRenderer(ID3D11Device* pDispositif, int largeur,
 	DXEssayer(pDispositif->CreateShaderResourceView(pTexture,
 		&srvDesc, &pTextureView));
 	pCharBitmap->UnlockBits(&bmData);
+	SetDebugName(pTextureView, "pTextureView-in-TextRenderer");
 }
