@@ -32,6 +32,9 @@ void ResourceManager::InitShaderBank()
 		.AddDesc<VertexShader>("shaders/PostProcessVS.hlsl", "PostProcessVS", "vs_5_0")
 		.AddDesc<PixelShader>("shaders/PostProcessPS.hlsl", "PostProcessPS", "ps_5_0")
 
+		.AddDesc<VertexShader>("shaders/SkyboxVertexShader.hlsl", "main", "vs_5_0")
+		.AddDesc<PixelShader>("shaders/SuperBasicPixelShader.hlsl", "main", "ps_5_0")
+		
 		.AddDesc<VertexShader>("shaders/BillboardVS.hlsl", "BillboardVS", "vs_5_0")
 		.AddDesc<PixelShader>("shaders/BillboardPS.hlsl", "BillboardPS", "ps_5_0")
 

@@ -23,6 +23,13 @@ void CameraSystem::Update(double dt, EntityManager& entityManager)
 			HandleRotation(camera);
 			UpdateCameraMatrices(camera, entityManager, static_cast<float>(dt));
 		}
+		//Terrible hack to synch skybox position to camera position
+		for (const auto& [entity, transform, name] : entityManager.View<Transform, Name>())
+		{
+			if (name.name == "Skybox") {
+				XMStoreFloat3(&transform.position, Camera::position);
+			}
+		}
 	}
 }
 
