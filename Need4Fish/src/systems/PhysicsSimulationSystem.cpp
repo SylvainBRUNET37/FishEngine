@@ -194,21 +194,32 @@ void PhysicsSimulationSystem::RotateTowardsCameraDirection(
 	Quat pitchQuat = Quat::sRotation(right, currentPitch);
 
 	// Rotation combinée yaw + pitch
-	Quat finalRotation = (pitchQuat * yawQuat).Normalized();
+	Quat targetRotation = (pitchQuat * yawQuat).Normalized();
 
 	// Appliquer le roll ensuite (souris + A et D)
-	Vec3 forwardAxis = finalRotation * Vec3::sAxisZ();
+	Vec3 forwardAxis = targetRotation * Vec3::sAxisZ();
 	Quat rollQuat = Quat::sRotation(forwardAxis, GetTargetRoll(yawDiff, inputRoll));
 
-	finalRotation = (rollQuat * finalRotation).Normalized();
+	targetRotation = (rollQuat * targetRotation).Normalized();
+	const Quat currentRotation = rigidBody.body->GetRotation();
 
-	JoltSystem::GetBodyInterface().SetRotation(
-		rigidBody.body->GetID(),
-		finalRotation,
-		EActivation::Activate
-	);
+	// Différence entre la rotation actuel et la roation vers laquel on veut aller
+	const Quat delta = (targetRotation * currentRotation.Conjugated()).Normalized();
+
+	// Converti en axe & angle
+	Vec3 axis;
+	float angle;
+	delta.GetAxisAngle(axis, angle);
+
+	// Vérifie l'angle pour éviter les problemes
+	if (angle > 0.0001f)
+	{
+		constexpr float ROTATION_SPEED = 80.0f;
+		const Vec3 angularVelocity = axis * angle * ROTATION_SPEED;
+
+		rigidBody.body->SetAngularVelocity(angularVelocity);
+	}
 }
-
 
 void PhysicsSimulationSystem::UpdateTransforms(EntityManager& entityManager)
 {

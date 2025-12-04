@@ -13,7 +13,7 @@ struct BaseCameraData
 	DirectX::XMMATRIX matProj{};
 
 	float nearPlane = 0.05f;
-	float farPlane = 10000.0f;
+	float farPlane = 15000.0f;
 	float fov = DirectX::XM_PI / 3.0f;
 
 	float aspectRatio = static_cast<float>(GetSystemMetrics(SM_CXSCREEN)) / static_cast<float>(GetSystemMetrics(SM_CYSCREEN));
