@@ -71,13 +71,13 @@ void ParticleSystem::MoveAndTeleportIfAtEndOfLife(
 	auto& particle = entityManager.Get<Particle>(entity);
 	auto& billboard = entityManager.Get<Billboard>(entity);
 
-	const XMVECTOR position = XMLoadFloat3(&billboard.position);
-	const XMVECTOR direction = XMLoadFloat3(&zone.particleDirection);
-
-	XMStoreFloat3(&billboard.position, XMVectorAdd(position, direction * zone.particleSpeed));
-
 	particle.lifeTime += deltaTime;
-	if (particle.lifeTime >= particle.lifeDuration) [[unlikely]]
+
+	const bool shouldBeTeleported = 
+		not MathsUtils::IsInsideAABB(billboard.position, zone.centerPosition, zone.halfExtends) || 
+		particle.lifeTime >= particle.lifeDuration;
+
+	if (shouldBeTeleported) [[unlikely]] // Teleport the particle
 	{
 		static constexpr float scaleMin = 5.0f;
 		static constexpr float scaleMax = 15.0f;
@@ -85,9 +85,16 @@ void ParticleSystem::MoveAndTeleportIfAtEndOfLife(
 		const auto scale = MathsUtils::RandomBetween(scaleMin, scaleMax);
 
 		billboard.position = MathsUtils::RandomPosInSquare(zone.centerPosition, zone.halfExtends);
-		billboard.scale = {scale, scale};
+		billboard.scale = { scale, scale };
 
 		particle.lifeDuration = MathsUtils::RandomBetween(zone.particleDurationMin, zone.particleDurationMax);
 		particle.lifeTime = 0.0f;
+	}
+	else // Update particle position
+	{
+		const XMVECTOR position = XMLoadFloat3(&billboard.position);
+		const XMVECTOR direction = XMLoadFloat3(&zone.particleDirection);
+
+		XMStoreFloat3(&billboard.position, XMVectorAdd(position, direction * zone.particleSpeed));
 	}
 }

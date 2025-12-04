@@ -12,6 +12,7 @@
     "AnglerFishMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongWaterPS.hlsl" },
     "DistortionMat": { "vs": "shaders/DistVS.hlsl", "ps": "shaders/DistPS.hlsl" },
     "SeaweedMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongWaterPS.hlsl" },
-    "SkyboxMat": { "vs": "shaders/SkyboxVertexShader.hlsl", "ps": "shaders/SuperBasicPixelShader.hlsl" }
+    "SkyboxMat": { "vs": "shaders/SkyboxVertexShader.hlsl", "ps": "shaders/SuperBasicPixelShader.hlsl" },
+    "LavaMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/LavaPS.hlsl" }
   }
 }

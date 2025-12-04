@@ -21,8 +21,7 @@ SamplerState causticSamp : register(s1);
 
 float4 PhongCausticsPS(VSOutput input) : SV_Target
 {
-	float3 finalColor = ApplyBlingPhong(input);
-
+    float3 finalColor = ApplyBlingPhong(input);
     // Apply underwater effects if the camera is in the water
 	if (vCamera.y < WATER_HEIGHT)
 	{
@@ -30,6 +29,8 @@ float4 PhongCausticsPS(VSOutput input) : SV_Target
 		finalColor = ApplyUnderwaterAttenuation(finalColor, input.worldPosition, vCamera.xyz);
 		finalColor = ApplyUnderwaterFog(finalColor, input.worldPosition, vCamera.xyz);
 	}
+
+    //finalColor = ;
 
 	return float4(finalColor, 1.0f);
 }
