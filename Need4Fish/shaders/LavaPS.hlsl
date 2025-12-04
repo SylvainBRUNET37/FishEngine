@@ -1,5 +1,3 @@
-// https://thebookofshaders.com/
-// https://thebookofshaders.com/13
 #include "MainBuffers.hlsl"
 
 Texture2D sceneTex : register(t0);
@@ -9,47 +7,16 @@ SamplerState samp : register(s0);
 // Includes
 // =====================================
 
-#include "BlingPhongBasePS.hlsl"
 #include "UnderwaterAttenuationPS.hlsl"
 #include "UnderwaterFogPS.hlsl"
+#include "Noise.hlsl"
 
 // =====================================
 // Algorithm
 // =====================================
 
-// Random float between 0 and 1
-float Random(float2 uv)
-{
-	return frac(sin(dot(uv, float2(12.9898, 78.233))) * 43758.5453123);
-}
-
-// https://gamedev.stackexchange.com/questions/198247/creating-large-perlin-noise-spaces-on-gpu
-float Noise(float2 p)
-{
-	float2 i = floor(p);
-	float2 f = frac(p);
-
-	float a = Random(i);
-	float b = Random(i + float2(1.0, 0.0));
-	float c = Random(i + float2(0.0, 1.0));
-	float d = Random(i + float2(1.0, 1.0));
-
-	float2 u = f * f * (3.0 - 2.0 * f);
-
-	return lerp(lerp(a, b, u.x), lerp(c, d, u.x), u.y);
-}
-
-float2 LavaDistortion(float2 uv)
-{
-	float noiseX = Noise(uv);
-	float noiseY = Noise(uv);
-	
-	static const float STRENGTH = 0.1;
-	return uv + float2(noiseX, noiseY) * STRENGTH;
-}
-
-// Paint the color of the pixel depending on the noise value
-float3 LavaColor(float noiseValue)
+// Paint the pixel with a color which depend on the noise value
+float3 ApplyLavaColor(float noiseValue)
 {
     // Lava colors
 	static const float3 COLOR_BLACK = float3(0.0, 0.0, 0.0);
@@ -78,23 +45,13 @@ float3 LavaColor(float noiseValue)
 	return lerp(COLOR_YELLOW, COLOR_WHITE, (noiseValue - YELLOW_STOP) / GRADIANT_SEGMENT_WIDTH);
 }
 
-static const float3 NOISE_FREQUENCE = float3(3.0, 6.0, 9.0);
-static const float3 NOISE_SPEED = float3(0.5, -1.0, 1.5);
-static const float3 NOISE_AMPLITUDE = float3(0.45, 0.30, 0.15);
-
 float4 LavaPS(VSOutput input) : SV_Target
 {
-    // Distord UV
-	float2 distordedUV = LavaDistortion(input.textCoord * 2.0);
-
-    // Add noise with 3 octaves
-	float noiseValue =
-	    Noise(distordedUV * NOISE_FREQUENCE.x + elapsedTime * NOISE_SPEED.x) * NOISE_AMPLITUDE.x +
-	    Noise(distordedUV * NOISE_FREQUENCE.y + elapsedTime * NOISE_SPEED.y) * NOISE_AMPLITUDE.y +
-	    Noise(distordedUV * NOISE_FREQUENCE.z + elapsedTime * NOISE_SPEED.z) * NOISE_AMPLITUDE.z;
+    // Get a noise value
+	float noiseValue = CreateNoise(input.textCoord, elapsedTime);
 
     // Convert the noise to a color
-	float3 finalColor = LavaColor(noiseValue);
+	float3 finalColor = ApplyLavaColor(noiseValue);
 
     // Add a glossy affect
 	static const float GLOSSY_POWER = 2.5;
@@ -109,6 +66,3 @@ float4 LavaPS(VSOutput input) : SV_Target
 
 	return float4(finalColor, 1.0);
 }
-
-
-
