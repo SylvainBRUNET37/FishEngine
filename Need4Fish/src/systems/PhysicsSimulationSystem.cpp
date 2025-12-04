@@ -16,10 +16,10 @@ using namespace std;
 PhysicsSimulationSystem::PhysicsSimulationSystem()
 {
 	// Water init
-	surfacePoint = RVec3(0, 1226.f, 0);
+	surfacePoint = RVec3(0, WATER_LEVEL_Y, 0);
 	waterBox = AABox(
 		Vec3(-6000.0f, -250.0f, -6000),
-		Vec3(6000.0f, 1226.f, 6000.0f)
+		Vec3(6000.0f, WATER_LEVEL_Y, 6000.0f)
 	);
 	// End Water init
 
@@ -111,7 +111,7 @@ void PhysicsSimulationSystem::UpdateControllables(EntityManager& entityManager)
 			inputRoll = -0.1f;
 		}
 
-		if (JoltSystem::GetBodyInterface().GetPosition(rigidBody.body->GetID()).GetY() > 1226.0f && newSpeed.GetY() > 0.0f)
+		if (JoltSystem::GetBodyInterface().GetPosition(rigidBody.body->GetID()).GetY() > WATER_LEVEL_Y && newSpeed.GetY() > 0.0f)
 			newSpeed.SetY(0.0f);
 
 		const auto theoreticalSpeed = currentSpeed + newSpeed;

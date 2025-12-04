@@ -12,6 +12,7 @@ public:
 private:
 	static constexpr double TARGET_UPDATES_PER_SECOND = 60.0;
 	static constexpr double PHYSICS_UPDATE_RATE = 1.0 / TARGET_UPDATES_PER_SECOND;
+	static constexpr float WATER_LEVEL_Y = 2225.59f;
 
 	WaterCollector waterCollector;
 

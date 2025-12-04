@@ -2,7 +2,7 @@
 // Datas
 // =====================================
 
-static const float WATER_HEIGHT = 1226.0f; // TODO: do not hardcode if possible
+static const float WATER_HEIGHT = 2225.59f; // TODO: do not hardcode if possible
 
 struct VSOutput
 {
