@@ -2,6 +2,8 @@
 #include "systems/PhysicsSimulationSystem.h"
 
 #include <ranges>
+#include <random>
+#include <numbers> 
 
 #include "PhysicsEngine/JoltSystem.h"
 #include "GameState.h"
@@ -203,6 +205,7 @@ void PhysicsSimulationSystem::RotateTowardsCameraDirection(
 	Quat rollQuat = Quat::sRotation(forwardAxis, GetTargetRoll(yawDiff, inputRoll));
 
 	targetRotation = (rollQuat * targetRotation).Normalized();
+
 	const Quat currentRotation = rigidBody.body->GetRotation();
 
 	// Différence entre la rotation actuel et la roation vers laquel on veut aller
@@ -265,25 +268,59 @@ void PhysicsSimulationSystem::UpdateTransforms(EntityManager& entityManager)
 
 void PhysicsSimulationSystem::UpdateNPCs(EntityManager& entityManager)
 {
-	auto computeNewSpeed = [](Body* body, AIController aiController) {
+	auto computeNewSpeed = [&](Body* body, AIController aiController, string name) {
 		const auto& transform = body->GetWorldTransform();
+		Vec3 right = transform.GetColumn3(0).Normalized();
+		Vec3 up = transform.GetColumn3(1).Normalized();
 		Vec3 forward = transform.GetColumn3(2).Normalized();
 
-		// TODO: have a proper AI / Calculation for the newSpeed
-		Vec3 currentSpeed = JoltSystem::GetBodyInterface().GetLinearVelocity(body->GetID());
+		Vec3 newSpeed{ 0.0f, 0.0f, 0.0f };
+		Vec3 playerPosition{ 0.0f, 0.0f, 0.0f };
 
-		auto newSpeed = forward.Normalized() * aiController.acceleration;
-		newSpeed -= currentSpeed;
-		newSpeed /= 2.0f;
-		// END TODO
+		for (const auto& [entity, rigidBody, controllable] : entityManager.View<RigidBody, Controllable>())
+		{
+			playerPosition = rigidBody.body->GetPosition();
+		}
+
+		// Panic mode
+		if (auto diff = body->GetPosition() - playerPosition; diff.Length() < aiController.safeDistance)
+		{
+			// Take a random direction opposite to the player
+			newSpeed = newSpeed.Normalized();
+			static std::mt19937 rng(std::random_device{}());
+			static std::uniform_real_distribution<float> dist(0.0f, std::numbers::pi_v<float>);
+		
+			// Base direction (away from player)
+			JPH::Vec3 newDir = (-diff).Normalized();
+
+			// Random direction
+			JPH::Quat qPitch = JPH::Quat::sRotation(right, dist(rng));
+			JPH::Quat qYaw = JPH::Quat::sRotation(up, dist(rng));
+			const JPH::Quat q = (qYaw * qPitch).Normalized();
+			newDir = (q * newDir).Normalized();
+
+			// Ensure it's still opposite the player
+			if (newDir.Dot(diff.Normalized()) < 0.f)
+				newDir = -newDir;
+
+			newSpeed = newDir * (aiController.acceleration * 0.5f);
+
+			// TODO : rotate the fishes properly
+
+		}
+		// Standard roaming behavior
+		else
+		{
+			// TODO : Roaming behavior
+		}
 
 		return newSpeed;
 		};
 
 	// Update the NPC
-	for (const auto& [entity, rigidBody, aiController] : entityManager.View<RigidBody, AIController>())
+	for (const auto& [entity, rigidBody, aiController, name] : entityManager.View<RigidBody, AIController, Name>())
 	{
-		Vec3 newSpeed = computeNewSpeed(rigidBody.body, aiController);
+		Vec3 newSpeed = computeNewSpeed(rigidBody.body, aiController, name.name);
 
 		Vec3 currentSpeed = JoltSystem::GetBodyInterface().GetLinearVelocity(rigidBody.body->GetID());
 		const auto theoreticalSpeed = currentSpeed + newSpeed;

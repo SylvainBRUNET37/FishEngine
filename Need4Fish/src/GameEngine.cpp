@@ -219,6 +219,13 @@ void GameEngine::InitGame()
 		cameraComponent.targetEntity = entity;
 	}
 
+	for (const auto& [entity, name, _] : entityManager->View<Name, Eatable>())
+	{
+		//std::cout << name.name << std::endl;
+		if (name.name != "Mosasaure")
+			entityManager->AddComponent<AIController>(entity, 100.0f, 10.0f);
+	}
+
 	CreateParticleZones();
 
 	mainMenuEntity = entityManager->CreateEntity();
