@@ -46,8 +46,9 @@ void CameraSystem::ComputeCameraPosition(Camera& camera, const Transform& transf
 
 	XMVECTOR baseFocus = XMVectorAdd(targetPos, XMVectorSet(0, camera.heightOffset, 0, 0));
 
-	const float fpEntryFactor = 0.5f;
-	const float fpExitFactor = 0.9f;
+	// Facteurs pour passage 1ère personne
+	const float fpEntryFactor = 0.8f;  // déclenchement plus rapide
+	const float fpExitFactor = 0.7f;
 
 	const float horizontalDist = camera.distance * cosf(camera.pitchAngle);
 	const float verticalDist = camera.distance * sinf(camera.pitchAngle);
@@ -68,7 +69,7 @@ void CameraSystem::ComputeCameraPosition(Camera& camera, const Transform& transf
 
 	// Timer temporaire 1ère personne
 	static float tempFPTime = 0.0f;
-	const float tempFPMinTime = 0.5f;
+	const float tempFPMinTime = 2.f; // réduit pour passage plus rapide
 
 	bool forceFirstPerson = (achievedDistance < camera.distance * fpEntryFactor);
 
@@ -184,7 +185,7 @@ XMVECTOR CameraSystem::PerformSpringArm3D(const XMVECTOR& focus, const XMVECTOR&
 		if (std::abs(normal.GetY()) > 0.3f)
 		{
 			JPH::RVec3 verticalUp(0, 1, 0);
-			float verticalOffset = safetyOffset * 12.0f * (1.0f - collector.mHit.mFraction);
+			float verticalOffset = safetyOffset * 20.0f * (1.0f - collector.mHit.mFraction);
 			if (normal.GetY() < 0.0f) safePos -= verticalUp * verticalOffset; // plafond
 			else safePos += verticalUp * verticalOffset; // sol
 		}
