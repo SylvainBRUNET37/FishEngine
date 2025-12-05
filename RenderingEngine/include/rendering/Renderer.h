@@ -25,7 +25,7 @@ public:
 
 	void UpdateFrameBuffer(const FrameBuffer& frameBuffer_) { frameBuffer = frameBuffer_; };
 	void Render(const Mesh& mesh, ID3D11DeviceContext* context, const Transform& transform);
-	void RenderToShadowMap(const Mesh& mesh, ID3D11DeviceContext* context, const Transform& transform, DirectX::XMMATRIX lightViewProj, ShaderBank& shaderBank);
+	void RenderToShadowMap(const Mesh& mesh, ID3D11DeviceContext* context, const Transform& transform, DirectX::XMMATRIX lightView, DirectX::XMMATRIX lightProjection, ShaderBank& shaderBank);
 	void Render(Sprite2D& sprite, ID3D11DeviceContext* context) const;
 	void Render(Billboard& billboard, const DirectX::XMMATRIX& worldMatrix, const BaseCameraData& baseCameraData);
 	void RenderPostProcess(ID3D11VertexShader* postProcessVertexShader, 
@@ -68,7 +68,7 @@ private:
 
 	static ObjectBuffer BuildConstantObjectBuffer(const Transform& transform);
 	static MaterialBuffer BuildConstantMaterialBuffer(const Material& material);
-	static ShadowMapLightWVPBuffer BuildConstantShadowMapLightWVPBuffer(const DirectX::XMMATRIX);
+	static ShadowMapLightWVPBuffer BuildConstantShadowMapLightWVPBuffer(const Transform& transformForWorldMatrix, const DirectX::XMMATRIX lightViewMatrix, const DirectX::XMMATRIX lightProjectionMatrix);
 };
 
 #endif

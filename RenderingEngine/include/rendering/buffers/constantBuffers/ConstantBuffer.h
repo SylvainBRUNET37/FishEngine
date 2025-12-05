@@ -3,6 +3,7 @@
 
 #include "rendering/buffers/Buffer.h"
 #include "rendering/utils/Util.h"
+#include "string"
 
 template <typename Params>
 class ConstantBuffer : public Buffer
@@ -16,8 +17,10 @@ public:
 		constantBufferDesc.ByteWidth = static_cast<UINT>(sizeof(Params));
 		constantBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 		constantBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-
+		std::string debugName = "buffer-in-ConstantBuffer";
+		debugName.append(typeid(Params).name());
 		DXEssayer(device->CreateBuffer(&constantBufferDesc, nullptr, &buffer));
+		SetDebugName(buffer, debugName);
 	}
 
 	void Update(ID3D11DeviceContext* context, const Params& params)

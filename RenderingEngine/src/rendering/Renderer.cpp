@@ -84,7 +84,7 @@ void Renderer::Render(const Mesh& mesh,
 	}
 }
 
-void Renderer::RenderToShadowMap(const Mesh& mesh, ID3D11DeviceContext* context, const Transform& transform, XMMATRIX lightViewProj, ShaderBank& shaderBank)
+void Renderer::RenderToShadowMap(const Mesh& mesh, ID3D11DeviceContext* context, const Transform& transform, DirectX::XMMATRIX lightView, DirectX::XMMATRIX lightProjection, ShaderBank& shaderBank)
 {
 	auto& material = materials[mesh.materialIndex];
 
@@ -93,7 +93,7 @@ void Renderer::RenderToShadowMap(const Mesh& mesh, ID3D11DeviceContext* context,
 	}
 
 	//// Update material constant buffer
-	const auto cbSMParams = BuildConstantShadowMapLightWVPBuffer(lightViewProj);
+	const auto cbSMParams = BuildConstantShadowMapLightWVPBuffer(transform, lightView, lightProjection);
 	shadowMapLightWVPBuffer.Update(context, cbSMParams);
 	shadowMapLightWVPBuffer.Bind(context);
 
@@ -287,11 +287,13 @@ MaterialBuffer Renderer::BuildConstantMaterialBuffer(const Material& material)
 	return params;
 }
 
-ShadowMapLightWVPBuffer Renderer::BuildConstantShadowMapLightWVPBuffer(const XMMATRIX matrix)
+ShadowMapLightWVPBuffer Renderer::BuildConstantShadowMapLightWVPBuffer(const Transform& transformForWorldMatrix, const DirectX::XMMATRIX lightViewMatrix, const DirectX::XMMATRIX lightProjectionMatrix)
 {
 	ShadowMapLightWVPBuffer param;
 
-	param.lightWVP = matrix;
+	XMMATRIX temp = transformForWorldMatrix.world * lightViewMatrix * lightProjectionMatrix;
+
+	param.lightWVP = XMMatrixTranspose(temp);
 
 	return param;
 }
