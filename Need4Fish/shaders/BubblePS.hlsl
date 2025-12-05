@@ -1,5 +1,6 @@
 #include "UnderwaterFogPS.hlsl"
 #include "UnderwaterAttenuationPS.hlsl"
+#include "Constants.hlsl"
 
 cbuffer BillboardBuffer : register(b0)
 {
@@ -24,8 +25,11 @@ float4 BubblePS(VSOutput input) : SV_Target
 	float4 finalColor = tex.Sample(samp, input.uv);
 
     // Apply fog & attenuation
-	finalColor.rgb = ApplyUnderwaterAttenuation(finalColor, input.pos, cameraPos);
-	finalColor.rgb = ApplyUnderwaterFog(finalColor, input.pos, cameraPos);
+	if (cameraPos.y < WATER_HEIGHT)
+	{
+		finalColor.rgb = ApplyUnderwaterAttenuation(finalColor, input.pos, cameraPos, WATER_HEIGHT);
+		finalColor.rgb = ApplyUnderwaterFog(finalColor, input.pos, cameraPos, WATER_HEIGHT);
+	}
 
 	return finalColor;
 }

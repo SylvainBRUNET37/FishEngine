@@ -280,7 +280,7 @@ void GameEngine::CreateParticleZones()
 				);
 			}
 		}
-		else if (name.name == "GeyserSensor")
+		else if (name.name == "GeyserSensor" || name.name == "VolcanoSensor")
 		{
 			const RefConst<Shape> shape = bodyInterface.GetShape(sensor.body->GetID());
 
@@ -294,7 +294,7 @@ void GameEngine::CreateParticleZones()
 #ifndef NDEBUG
 				static constexpr unsigned int NB_GEYSER_PARTICLES = 100;
 #else 
-				static constexpr unsigned int NB_GEYSER_PARTICLES = 1000;
+				static constexpr unsigned int NB_GEYSER_PARTICLES = 5000;
 #endif
 
 				particleSystem.AddParticleZone(*entityManager,

@@ -5,8 +5,9 @@
 static const float VTXSIZE = 0.15f;
 static const float WAVESIZE = 0.8f;
 static const float FACTOR = 0.5f;
-static const float SPEED = 2.0f;
+static const float SPEED = 1.7f;
 static const int OCTAVES = 4;
+static const float UV_SCALE = 0.005;
 
 static const float AIR_INDICE_OF_REFRACTION = 1.0f;
 static const float WATER_INDICE_OF_REFRACTION = 1.3f;
@@ -66,7 +67,8 @@ float3 GetWaveNormal(float2 worldPosXZ, float elapsedTime)
 float ApplyCaustics(
 	float3 worldPos, 
 	float3 dirLightDirection, 
-	float elapsedTime
+	float elapsedTime, 
+	float waterHeight
 )
 {
 	// Horizontal positon of the ocean
@@ -91,15 +93,14 @@ float ApplyCaustics(
 
     // Add intensity to the caustic effect
 	// The higher the sharpness is, the lower the caustic will be bright
-	// TODO: Sharpness could depend on the depth of the object relative to the water height
-    static const float SHARPNESS = 8.0;
-	float intensity = pow(alignment, SHARPNESS);
+    static const float BASE_SHARPNESS = 0.008;
+    const float pixelDepth = max(0.0f, waterHeight + 10 - worldPos.y);
+    float intensity = pow(alignment, pixelDepth * BASE_SHARPNESS);
 
 	// Project the refracted ray onto the scene geometry
-	// It doesn't really work but it looks good
+	// It's not physically realistic but it looks good
     float3 projection = worldPos + refracted * worldPos.y;
 
-	const float UV_SCALE = 0.005;
 	float causticTexture = causticTex.Sample(causticSamp, projection.xz * UV_SCALE).r;
 
 	return intensity * causticTexture;

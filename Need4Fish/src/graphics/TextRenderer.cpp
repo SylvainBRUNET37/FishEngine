@@ -69,6 +69,11 @@ TextRenderer::TextRenderer(ID3D11Device* pDispositif, int largeur,
 	Gdiplus::TextRenderingHint hint = Gdiplus::TextRenderingHintAntiAlias;
 	//TextRenderingHintSystemDefault;
 	pCharGraphics->SetTextRenderingHint(hint);
+
+	pCharGraphics->SetTextContrast(0);
+	pCharGraphics->SetRenderingOrigin(0, 0);
+
+
 	// Un brosse noire pour le remplissage
 	// Notez que la brosse aurait pu être passée
 	// en paramètre pour plus de flexibilité

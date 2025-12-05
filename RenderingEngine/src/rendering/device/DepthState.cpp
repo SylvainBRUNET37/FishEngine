@@ -9,7 +9,7 @@ DepthState::DepthState(ID3D11Device* device)
     D3D11_DEPTH_STENCIL_DESC desc{};
     desc.DepthEnable = TRUE;
     desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
-    desc.DepthFunc = D3D11_COMPARISON_LESS;
+    desc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
     desc.StencilEnable = FALSE;
 
     DXEssayer(device->CreateDepthStencilState(&desc, &depthNoWrite));

@@ -168,6 +168,14 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="shaders\LavaPS.hlsl" />
+    <None Include="shaders\WaterPS.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="shaders\Noise.hlsl" />
+    <None Include="shaders\Constants.hlsl">
+      <FileType>Document</FileType>
+    </None>
     <ClCompile Include="src\systems\ParticleSystem.cpp" />
     <ClCompile Include="src\utils\MathsUtils.cpp" />
     <None Include="shaders\PostProcessPS.hlsl">

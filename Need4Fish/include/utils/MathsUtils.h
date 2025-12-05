@@ -5,8 +5,12 @@
 
 namespace MathsUtils
 {
-	float RandomBetween(float min, float max);
-	DirectX::XMFLOAT3 RandomPosInSquare(DirectX::XMFLOAT3 squareCenterPosition, DirectX::XMFLOAT3 halfExtends);
+	[[nodiscard]] float RandomBetween(float min, float max);
+    [[nodiscard]] DirectX::XMFLOAT3 RandomPosInSquare(DirectX::XMFLOAT3 squareCenterPosition, const DirectX::XMFLOAT3& halfExtends);
+    [[nodiscard]] bool IsInsideAABB(
+        const DirectX::XMFLOAT3& point,
+        const DirectX::XMFLOAT3& center,
+        const DirectX::XMFLOAT3& halfExtends);
 }
 
 #endif

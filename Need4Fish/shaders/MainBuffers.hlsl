@@ -2,7 +2,7 @@
 // Datas
 // =====================================
 
-static const float WATER_HEIGHT = 2225.59f; // TODO: do not hardcode if possible
+#include "Constants.hlsl"
 
 struct VSOutput
 {
