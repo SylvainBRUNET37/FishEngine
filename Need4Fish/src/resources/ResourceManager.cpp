@@ -40,7 +40,8 @@ void ResourceManager::InitShaderBank()
 
 		.AddDesc<PixelShader>("shaders/BubblePS.hlsl", "BubblePS", "ps_5_0")
 		
-		.AddDesc<VertexShader>("shaders/ShadowMapVS.hlsl", "main", "vs_5_0");
+		.AddDesc<VertexShader>("shaders/ShadowMapVS.hlsl", "main", "vs_5_0")
+		.AddDesc<PixelShader>("shaders/ShadowMapPS.hlsl", "main", "ps_5_0");
 
 	ShaderFactory<VertexShader, PixelShader> shaderFactory;
 	shaderBank = shaderFactory.CreateShaderBank(shaderDescriptions, device);

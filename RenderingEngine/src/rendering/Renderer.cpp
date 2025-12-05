@@ -88,7 +88,7 @@ void Renderer::RenderToShadowMap(const Mesh& mesh, ID3D11DeviceContext* context,
 {
 	auto& material = materials[mesh.materialIndex];
 
-	if (material.name == "WaterMat") {
+	if (material.name == "WaterMat" || material.name == "DistortionMat") {
 		return;
 	}
 
@@ -102,10 +102,11 @@ void Renderer::RenderToShadowMap(const Mesh& mesh, ID3D11DeviceContext* context,
 		renderContext->GetDevice(),
 		"shaders/ShadowMapVS.hlsl",
 		//nullptr
-		"shaders/PhongWaterPS.hlsl"
+		"shaders/ShadowMapPS.hlsl"
 	);
-
-	context->VSGetShaderResources(0, 1, &material.texture);
+	shadowMapShader->Bind(context);
+	context->VSSetShaderResources(0, 1, &material.texture);
+	context->PSSetShaderResources(0, 1, &material.texture);
 
 	//DrawToShadowMap(mesh);
 	Draw(mesh);
@@ -226,16 +227,17 @@ void Renderer::Draw(const Mesh& mesh) const
 
 void Renderer::DrawToShadowMap(const Mesh& mesh) const
 {
-	//constexpr UINT stride = sizeof(Vertex);
-	//constexpr UINT offset = 0;
+	renderContext->SetCullModeShadowMap();
+	constexpr UINT stride = sizeof(Vertex);
+	constexpr UINT offset = 0;
 
-	//const auto rawVertexBuffer = mesh.vertexBuffer.Get();
+	const auto rawVertexBuffer = mesh.vertexBuffer.Get();
 
-	//// Bind vertex buffer
-	//renderContext->GetContext()->IASetVertexBuffers(0, 1, &rawVertexBuffer, &stride, &offset);
-	//renderContext->GetContext()->IASetIndexBuffer(mesh.indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-	//renderContext->GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	//renderContext->GetContext()->DrawIndexed(static_cast<UINT>(mesh.indices.size()), 0, 0);
+	// Bind vertex buffer
+	renderContext->GetContext()->IASetVertexBuffers(0, 1, &rawVertexBuffer, &stride, &offset);
+	renderContext->GetContext()->IASetIndexBuffer(mesh.indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+	renderContext->GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	renderContext->GetContext()->DrawIndexed(static_cast<UINT>(mesh.indices.size()), 0, 0);
 }
 
 void Renderer::DoubleSidedDraw(const Mesh& mesh) const

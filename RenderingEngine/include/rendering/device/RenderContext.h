@@ -60,6 +60,10 @@ public:
 	void SetCullModeCullBack() {
 		rasterizer.SetCullingToBack(device, context);
 	}
+	
+	void SetCullModeShadowMap() {
+		rasterizer.PrepareRasterizerStateForShadowMap(device, context);
+	}
 
 	void EnableTransparentDepth() const
 	{

@@ -28,15 +28,8 @@ struct VertexOut
     float3 Profondeur : TEXCOORD1;
 };
 
-VertexOut main(VertexIn vIn)
+void main(VertexOut pin)
 {
-    VertexOut vOut;
-        
-    vOut.PosH = mul(float4(vIn.PosL, 1.0f), gLightWVP); //reference uses gWorldViewProj here despite not having it? //Atelier says to use WVP of light also...
-    //reference material uses gTexTransform despite not having it...
-    //vOut.Tex = mul(float4(vIn.Tex, 0.0f, 1.0f), gTexTransform).xy;
-    vOut.Profondeur.x = vOut.PosH.z / vOut.PosH.w;
-    vOut.Tex = vIn.Tex;
-    
-    return vOut;
+    float4 diffuse = gDiffuseMap.Sample(samLinear, pin.Tex);
+    clip(diffuse.a - 0.15f);
 }

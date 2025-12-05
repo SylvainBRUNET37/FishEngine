@@ -91,10 +91,12 @@ void RenderSystem::RenderMeshes(EntityManager& entityManager)
 
 void RenderSystem::RenderMeshesToShadowMap(EntityManager& entityManager)
 {
+	renderContext->SetCullModeShadowMap();
 	// Render Meshes
 	for (const auto& [entity, transform, meshInstance] : entityManager.View<Transform, MeshInstance>())
 	{
 		// Check if the mesh should be rendered or not
+		// TODO: Probably wrong view point for culling...
 		auto& mesh = Locator::Get<ResourceManager>().GetMesh(meshInstance.meshIndex);
 		if (FrustumCuller::IsMeshCulled(mesh, transform))
 			continue;
@@ -160,8 +162,10 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 	
 	//Below is equivalent to draw scene, so...
 	shadowMap->BindDsvAndSetNullRenderTarget(renderContext->GetContext());
-	/*DrawSceneToShadowMap(entityManager);
-	renderContext->GetContext()->RSSetState(0);*/
+	DrawSceneToShadowMap(entityManager);
+	//renderContext->GetContext()->RSSetState(0);
+	renderContext->SetCullModeCullBack();
+
 	
 	//Restore back and depth buffer to OM stage (what's that? The output-merger stage?)
 	//How do I even mimic that?
