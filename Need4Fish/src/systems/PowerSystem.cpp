@@ -46,3 +46,11 @@ void PowerSystem::DisablePower(const Power power)
 		break;
 	}
 }
+
+void PowerSystem::ResetPowers()
+{
+	for (const auto& powerSource : activeGlobalPowers) 
+		DisablePower(powerSource.power);
+
+	activeGlobalPowers.clear();
+}
