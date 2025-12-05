@@ -1,4 +1,4 @@
-#include "pch.h"
+Ôªø#include "pch.h"
 #include "systems/CameraSystem.h"
 #include "GameState.h"
 #include <physicsEngine/JoltSystem.h>
@@ -38,78 +38,174 @@ void CameraSystem::ComputeCameraPosition(Camera& camera, const Transform& transf
 	const XMVECTOR targetPos = XMLoadFloat3(&transform.position);
 	const XMVECTOR targetRotQuat = XMLoadFloat4(&transform.rotation);
 	const XMMATRIX targetRotMat = XMMatrixRotationQuaternion(targetRotQuat);
-
-	// Yaw actuel
 	const XMVECTOR forward = targetRotMat.r[2];
 	const float targetYaw = atan2f(XMVectorGetX(forward), XMVectorGetZ(forward));
-
-	// Yaw et pitch visÈs
 	const float totalYaw = targetYaw + camera.yawOffset;
-	camera.targetYaw = totalYaw; // Pour la physique	
+	camera.targetYaw = totalYaw;
 	camera.targetPitch = camera.pitchAngle;
 
-	if (camera.mode == Camera::CameraMode::FIRST_PERSON)
+	XMVECTOR baseFocus = XMVectorAdd(targetPos, XMVectorSet(0, camera.heightOffset, 0, 0));
+
+	// Facteurs pour passage 1√®re personne
+	const float fpEntryFactor = 0.75f; // Plus grand -> entr√©e plus rapide
+	const float fpExitFactor = 1.1f; // Plus grand -> sortie plus difficile.
+
+	const float horizontalDist = camera.distance * cosf(camera.pitchAngle);
+	const float verticalDist = camera.distance * sinf(camera.pitchAngle);
+
+	// Position id√©ale de la cam√©ra
+	XMVECTOR idealCameraPos = XMVectorSet(
+		XMVectorGetX(baseFocus) - horizontalDist * sinf(totalYaw),
+		XMVectorGetY(baseFocus) + verticalDist + camera.heightOffset,
+		XMVectorGetZ(baseFocus) - horizontalDist * cosf(totalYaw),
+		1.0f
+	);
+
+	// Application du spring arm
+	XMVECTOR adjustedPos = idealCameraPos;
+	if (camera.enableSpringArm)
+		adjustedPos = PerformSpringArm3D(baseFocus, idealCameraPos, camera.distance);
+
+	float achievedDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(adjustedPos, baseFocus)));
+
+	// Gestion temporaire du passage en premi√®re personne
+	static float tempFPTime = 0.0f;
+	const float tempFPMinTime = 2.f;
+	bool forceFirstPerson = (achievedDistance < camera.distance * fpEntryFactor);
+
+	if (!Camera::isTemporaryFirstPerson && forceFirstPerson)
 	{
-		// Position ‡ l'intÈrieur/devant le mosasaure
+		Camera::isTemporaryFirstPerson = true;
+		Camera::distanceBeforeTemporaryFP = camera.distance;
+		tempFPTime = 0.0f;
+	}
+
+	if (Camera::isTemporaryFirstPerson)
+	{
+		tempFPTime += dt;
+
 		XMVECTOR fpOffset = XMLoadFloat3(&camera.firstPersonOffset);
 		XMVECTOR s = XMLoadFloat3(&transform.scale);
 		fpOffset = XMVectorMultiply(fpOffset, s);
-		
-		// Position selon la rotation avec l'offset
-		const XMVECTOR rotatedOffset = XMVector3Transform(fpOffset, targetRotMat);
+		XMVECTOR rotatedOffset = XMVector3Transform(fpOffset, targetRotMat);
+
 		camera.position = XMVectorAdd(targetPos, rotatedOffset);
+		camera.focus = XMVectorAdd(camera.position, XMVectorScale(forward, 100.0f));
 
-		// On utilise directement le forward vector du mosasaure
-		const XMVECTOR lookDirection = XMVector3Normalize(forward);
-		camera.focus = XMVectorAdd(camera.position, XMVectorScale(lookDirection, 100.0f));
+		if (achievedDistance > camera.distance * fpExitFactor && tempFPTime > tempFPMinTime)
+			Camera::isTemporaryFirstPerson = false;
+
+		return;
 	}
-	else // THIRD_PERSON
+
+	// Cam√©ra 3√®me personne
+	float lerpSpeed = camera.springArmSpeed;
+	if (achievedDistance < camera.distance * 0.5f)
+		lerpSpeed *= 3.0f;
+
+	camera.position = XMVectorLerp(camera.position, adjustedPos, std::clamp(lerpSpeed * dt, 0.0f, 1.0f));
+
+	// Gestion du focus lat√©ral
+	XMVECTOR idealToActual = XMVectorSubtract(camera.position, idealCameraPos);
+	float lateralDisplacement = XMVectorGetX(XMVector3Length(idealToActual));
+	if (lateralDisplacement > camera.distance * 0.005f)
 	{
-		camera.focus = XMVectorAdd(targetPos, XMVectorSet(0, camera.heightOffset, 0, 0));
+		XMVECTOR lateralDirection = XMVector3Normalize(idealToActual);
+		camera.focus = XMVectorAdd(baseFocus, XMVectorScale(lateralDirection, lateralDisplacement * 0.95f));
+	}
+	else
+		camera.focus = baseFocus;
 
-		const float horizontalDist = camera.distance * cosf(camera.pitchAngle);
-		const float verticalDist = camera.distance * sinf(camera.pitchAngle);
+	Camera::currentDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(camera.position, camera.focus)));
+}
 
-		const XMVECTOR idealCameraPos = XMVectorSet(
-			XMVectorGetX(camera.focus) - horizontalDist * sinf(totalYaw),
-			XMVectorGetY(camera.focus) + verticalDist + camera.heightOffset,
-			XMVectorGetZ(camera.focus) - horizontalDist * cosf(totalYaw),
-			1.0f
-		);
+XMVECTOR CameraSystem::PerformSpringArm3D(const XMVECTOR& focus, const XMVECTOR& idealPos, float maxDistance)
+{
+	auto& physicSystem = JoltSystem::GetPhysicSystem();
+	JPH::RVec3 focusPos(XMVectorGetX(focus), XMVectorGetY(focus), XMVectorGetZ(focus));
+	JPH::RVec3 idealCamPos(XMVectorGetX(idealPos), XMVectorGetY(idealPos), XMVectorGetZ(idealPos));
 
-		// DÈtection de collision pour le Springarm
-		if (camera.enableSpringArm)
+	JPH::Vec3 direction = (idealCamPos - focusPos).Normalized();
+	const float totalDistance = (idealCamPos - focusPos).Length();
+	if (totalDistance < 0.001f) return idealPos;
+
+	JPH::RefConst<JPH::SphereShape> sphere = new JPH::SphereShape(Camera::cameraRadius);
+	JPH::RShapeCast shapeCast = JPH::RShapeCast::sFromWorldTransform(
+		sphere, JPH::Vec3::sReplicate(1.0f), JPH::RMat44::sTranslation(focusPos), direction * totalDistance);
+
+	class ClosestHitCollector : public JPH::CastShapeCollector
+	{
+	public:
+		void AddHit(const JPH::ShapeCastResult& inResult) override
 		{
-			const float desiredDistance = camera.distance;
+			if (inResult.mFraction < mHit.mFraction)
+				mHit = inResult;
+		}
+		JPH::ShapeCastResult mHit;
+	};
 
-			if (Camera::currentDistance <= 0.0f)
-				Camera::currentDistance = desiredDistance;
-			float actualDistance = PerformSpringArmRaycast(camera.focus, idealCameraPos, desiredDistance);
+	ClosestHitCollector collector;
+	collector.mHit.mFraction = 1.0f;
 
-			// Interpolation progressive vers la nouvelle distance
-			const float t = std::clamp(camera.springArmSpeed * dt, 0.0f, 1.0f);
-			Camera::currentDistance = Lerp(Camera::currentDistance, actualDistance, t);
+	// Filtres de collision
+	class NonMovingOnlyBroadPhaseFilter : public JPH::BroadPhaseLayerFilter { bool ShouldCollide(JPH::BroadPhaseLayer inLayer) const override { return inLayer == BroadPhaseLayers::NON_MOVING; } };
+	class NonMovingOnlyObjectFilter : public JPH::ObjectLayerFilter { bool ShouldCollide(JPH::ObjectLayer inLayer) const override { return inLayer == Layers::NON_MOVING; } };
+	class AllBodyFilter : public JPH::BodyFilter { bool ShouldCollide(const JPH::BodyID&) const override { return true; } };
+	class NoShapeFilter : public JPH::ShapeFilter { bool ShouldCollide(const JPH::Shape*, const JPH::SubShapeID&) const override { return true; } };
 
-			// Recalculer la position avec la distance ajustÈe
-			XMVECTOR dir = XMVectorSubtract(idealCameraPos, camera.focus);
-			const float dirLen = XMVectorGetX(XMVector3Length(dir));
-			if (dirLen > 0.0001f)
-			{
-				dir = XMVector3Normalize(dir);
-				XMVECTOR newPos = XMVectorAdd(camera.focus, XMVectorScale(dir, Camera::currentDistance));
-				camera.position = XMVectorSetW(newPos, 1.0f);
-			}
-			else
-			{
-				// fallback si dir trËs petit
-				camera.position = idealCameraPos;
-			}
+	NonMovingOnlyBroadPhaseFilter broadPhaseFilter;
+	NonMovingOnlyObjectFilter objectLayerFilter;
+	AllBodyFilter bodyFilter;
+	NoShapeFilter shapeFilter;
+
+	JPH::ShapeCastSettings settings;
+	settings.mUseShrunkenShapeAndConvexRadius = true;
+
+	// Ex√©cution du cast
+	physicSystem.GetNarrowPhaseQuery().CastShape(
+		shapeCast,
+		settings,
+		JPH::RVec3::sZero(),
+		collector,
+		broadPhaseFilter,
+		objectLayerFilter,
+		bodyFilter,
+		shapeFilter
+	);
+
+	if (collector.mHit.mFraction < 1.0f)
+	{
+		const float hitDistance = collector.mHit.mFraction * totalDistance;
+		const float safetyOffset = Camera::cameraRadius + Camera::collisionOffset;
+		float safePosDistance = std::clamp(hitDistance - safetyOffset, Camera::cameraRadius * 2.0f, maxDistance);
+		JPH::RVec3 safePos = focusPos + direction * safePosDistance;
+
+		JPH::Vec3 normal = -collector.mHit.mPenetrationAxis.Normalized();
+
+		// Gestion verticale stricte
+		if (std::abs(normal.GetY()) > 0.3f)
+		{
+			JPH::RVec3 verticalUp(0, 1, 0);
+			float verticalOffset = safetyOffset * 20.0f * (1.0f - collector.mHit.mFraction);
+			if (normal.GetY() < 0.0f) safePos -= verticalUp * verticalOffset;
+			else safePos += verticalUp * verticalOffset;
 		}
 		else
 		{
-			camera.position = idealCameraPos;
+			// Gestion lat√©rale stricte
+			float dot = direction.Dot(normal);
+			if (std::abs(dot) < 0.7f)
+			{
+				JPH::Vec3 lateral = normal - direction * dot;
+				if (lateral.Length() > 0.001f) lateral = lateral.Normalized();
+				safePos += JPH::RVec3(lateral) * safetyOffset * 8.0f * (1.0f - collector.mHit.mFraction);
+			}
 		}
+
+		return XMVectorSet(safePos.GetX(), safePos.GetY(), safePos.GetZ(), 1.0f);
 	}
+
+	return idealPos;
 }
 
 void CameraSystem::ComputeCameraOrientation(Camera& camera)
@@ -141,12 +237,12 @@ void CameraSystem::HandleRotation(Camera& cameraData)
 	const auto deltaX = static_cast<float>(currentCursorCoordinates.x - cameraData.cursorCoordinates.x);
 	const auto deltaY = static_cast<float>(currentCursorCoordinates.y - cameraData.cursorCoordinates.y);
 
-	static constexpr float deadzone = 2.0f; // Pixels de tolÈrance
+	static constexpr float deadzone = 2.0f;
 
-	// Appliquer la rotation seulement si le mouvement dÈpasse la deadzone
+	// Appliquer la rotation seulement si le mouvement d√©passe la deadzone
 	if (std::abs(deltaX) > deadzone || std::abs(deltaY) > deadzone)
 	{
-		// SensibilitÈ ajustÈe selon le mode
+		// Sensibilit√© ajust√©e selon le mode
 		float yawSensitivity, pitchSensitivity;
 		if (cameraData.mode == Camera::CameraMode::FIRST_PERSON)
 		{
@@ -159,7 +255,7 @@ void CameraSystem::HandleRotation(Camera& cameraData)
 			pitchSensitivity = 0.002f;
 		}
 
-		// Inversion si true
+		// Inversion
 		const float yawMultiplier = cameraData.invertCamRotation ? -1.0f : 1.0f;
 		const float pitchMultiplier = cameraData.invertCamRotation ? 1.0f : -1.0f;
 
@@ -169,32 +265,24 @@ void CameraSystem::HandleRotation(Camera& cameraData)
 	}
 	else
 	{
-		// Ramener progressivement vers zÈro quand pas de mouvement
+		// Ramener progressivement vers z√©ro
 		if (std::abs(cameraData.yawOffset) > 0.001f)
 		{
 			float returnSpeed;
 			if (cameraData.mode == Camera::CameraMode::FIRST_PERSON)
-			{
 				returnSpeed = 0.005f;
-			}
 			else
-			{
 				returnSpeed = 0.02f;
-			}
 
 			const float returnStep = std::copysign(returnSpeed, -cameraData.yawOffset);
 			cameraData.yawOffset += returnStep;
 
-			// Snap ‡ zÈro si trËs proche
 			if (std::abs(cameraData.yawOffset) < returnSpeed)
-			{
 				cameraData.yawOffset = 0.0f;
-			}
 		}
-		
 	}
 
-	// Recentrer seulement si la souris s'Èloigne suffisament du centre
+	// Recentrement du curseur si n√©cessaire
 	static constexpr float recenterThreshold = 100.0f;
 	const float distanceFromCenter = sqrtf(
 		powf(currentCursorCoordinates.x - cameraData.screenCenter.x, 2.0f) +
@@ -207,15 +295,13 @@ void CameraSystem::HandleRotation(Camera& cameraData)
 		cameraData.cursorCoordinates = cameraData.screenCenter;
 	}
 	else
-	{
 		cameraData.cursorCoordinates = currentCursorCoordinates;
-	}
 }
 
 void CameraSystem::Rotate(Camera& cameraData, const float yawDelta, const float pitchDelta)
 {
-	// Limiter la camÈra
-	constexpr float maxOffset = XM_PIDIV4; // ±45 degrÈs dans toutes les directions
+	// Limiter la cam√©ra
+	constexpr float maxOffset = XM_PIDIV4; // ¬±45 degr√©s dans toutes les directions
 
 	cameraData.yawOffset = std::clamp(
 		cameraData.yawOffset + yawDelta,
@@ -245,19 +331,19 @@ void CameraSystem::SetMouseCursor()
 	Camera::screenCenter.x = (rect.right - rect.left) / 2;
 	Camera::screenCenter.y = (rect.bottom - rect.top) / 2;
 
-	// Convertir en repËre Ècran
+	// Convertir en rep√®re √©cran
 	ClientToScreen(hwnd, &Camera::screenCenter);
 
 	// Centrer le curseur
 	SetCursorPos(Camera::screenCenter.x, Camera::screenCenter.y);
 
-	// Initialiser les coordonnÈes de la camÈra
+	// Initialiser les coordonn√©es de la cam√©ra
 	Camera::cursorCoordinates = Camera::screenCenter;
 }
 
 void CameraSystem::ScaleCamera(float scaleFactor)
 {
-	// Calculer les valeurs ‡ atteindre
+	// Calculer les valeurs √† atteindre
 	const float targetDistance = Camera::distance * scaleFactor;
 	const float targetHeightOffset = Camera::heightOffset * scaleFactor;
 	const float targetMinDistance = Camera::minDistance * scaleFactor;
@@ -290,13 +376,13 @@ float CameraSystem::PerformSpringArmRaycast(const XMVECTOR& start, const XMVECTO
 	if (rayLength < 0.001f)
 		return maxDistance;
 
-	// CrÈer un cast "Èpais" pour ne pas voir les "intÈrieurs" de cÙtÈ
+	// Cr√©er un cast "√©pais" pour ne pas voir les "int√©rieurs" de c√¥t√©
 	JPH::RefConst<JPH::SphereShape> sphere = new JPH::SphereShape(Camera::cameraRadius);
 
 	JPH::RShapeCast shapeCast = JPH::RShapeCast::sFromWorldTransform(
 		sphere,
 		JPH::Vec3::sReplicate(1.0f),  // Scale
-		JPH::RMat44::sTranslation(rayStart),  // Position de dÈpart
+		JPH::RMat44::sTranslation(rayStart),  // Position de d√©part
 		rayDirection * rayLength  // Direction et longueur
 	);
 
@@ -380,7 +466,7 @@ float CameraSystem::PerformSpringArmRaycast(const XMVECTOR& start, const XMVECTO
 	{
 		const float hitDistance = collector.mHit.mFraction * rayLength;
 
-		// Offset pour tenir compte de la sphËre
+		// Offset pour tenir compte de la sph√®re
 		const float COLLISION_OFFSET = Camera::cameraRadius + Camera::collisionOffset;
 		return max(hitDistance - COLLISION_OFFSET, 0.1f);
 	}

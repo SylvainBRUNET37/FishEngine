@@ -59,6 +59,10 @@ struct Camera : public BaseCameraData
 	inline static bool enableSpringArm = true;
 	inline static float cameraRadius = 2.0f;
 	inline static float collisionOffset = 1.0f;
+
+	// SpringArm 1st person temporaire
+	inline static bool isTemporaryFirstPerson = false;
+	inline static float distanceBeforeTemporaryFP = 0.0f;
 };
 #endif
 
