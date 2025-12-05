@@ -1,7 +1,12 @@
-float3 ApplyUnderwaterFog(float3 color, float3 worldPos, float3 cameraPos)
+float3 ApplyUnderwaterFog(float3 color, float3 worldPos, float3 cameraPos, float waterHeight)
 {
 	const float3 fogColor = float3(0.0f, 0.2f, 0.4f);
-	const float fogDensity = 0.0006f;
+
+    float depth = max(0.0f, (waterHeight - cameraPos.y));
+    float baseDensity = 0.00030f;
+    float depthDensity = depth * 0.00000030f;
+
+    float fogDensity = baseDensity + depthDensity;
 
 	float distanceFromCamera = length(cameraPos - worldPos);
 

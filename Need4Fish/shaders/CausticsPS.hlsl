@@ -66,7 +66,8 @@ float3 GetWaveNormal(float2 worldPosXZ, float elapsedTime)
 float ApplyCaustics(
 	float3 worldPos, 
 	float3 dirLightDirection, 
-	float elapsedTime
+	float elapsedTime, 
+	float waterHeight
 )
 {
 	// Horizontal positon of the ocean

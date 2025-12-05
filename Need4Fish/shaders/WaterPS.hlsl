@@ -55,9 +55,9 @@ float4 WaterPS(VSOutput input) : SV_Target
     // Apply underwater effects if under water
 	if (vCamera.y < WATER_HEIGHT)
 	{
-		finalColor = ApplyUnderwaterAttenuation(finalColor, input.worldPosition, vCamera.xyz);
-		finalColor = ApplyUnderwaterFog(finalColor, input.worldPosition, vCamera.xyz);
-	}
+        finalColor = ApplyUnderwaterAttenuation(finalColor, input.worldPosition, vCamera.xyz, WATER_HEIGHT);
+        finalColor = ApplyUnderwaterFog(finalColor, input.worldPosition, vCamera.xyz, WATER_HEIGHT);
+    }
 
 	return float4(finalColor, 1.0);
 }

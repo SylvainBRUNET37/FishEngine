@@ -1,4 +1,5 @@
 #include "UnderwaterFogPS.hlsl"
+#include "Constants.hlsl"
 
 cbuffer BillboardBuffer : register(b0)
 {
@@ -22,7 +23,7 @@ float4 BillboardPS(VSOutput input) : SV_Target
 {
     float4 finalColor = tex.Sample(samp, input.uv);
 
-    ApplyUnderwaterFog(finalColor, input.pos, cameraPos);
+    ApplyUnderwaterFog(finalColor, input.pos, cameraPos, WATER_HEIGHT);
 
     return finalColor;
 }
