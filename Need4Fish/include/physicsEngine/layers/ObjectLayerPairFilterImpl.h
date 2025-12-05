@@ -12,6 +12,8 @@ public:
 		{
 		case Layers::MOVING:
 			return true;	//Collide with everything
+		case Layers::MOVING_DECOR:
+			return true;	//Collide with everything
 		case Layers::NON_MOVING:
 			return !(inLayer2 == Layers::NON_MOVING || inLayer2 == Layers::SENSOR);	//Collide with all except non-moving and sensor
 		case Layers::SENSOR:
