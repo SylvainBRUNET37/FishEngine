@@ -178,8 +178,8 @@ void CameraSystem::HandleRotation(Camera& cameraData)
 		float yawSensitivity, pitchSensitivity;
 		if (cameraData.mode == Camera::CameraMode::FIRST_PERSON)
 		{
-			yawSensitivity = 0.00005f;
-			pitchSensitivity = 0.0002f;
+			yawSensitivity = 0.00002f;
+			pitchSensitivity = 0.0004f;
 		}
 		else
 		{
