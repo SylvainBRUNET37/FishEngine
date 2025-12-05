@@ -27,9 +27,11 @@ private:
 	void ComputeDistortionZones(EntityManager& entityManager);
 	void RenderBillboards(EntityManager& entityManager, const Camera& currentCamera);
 	void RenderMeshes(EntityManager& entityManager);
+	void RenderMeshesToShadowMap(EntityManager& entityManager);
 	void UpdatePointLights(EntityManager& entityManager);
 	void UpdateFrameBuffer(double deltaTime, EntityManager& entityManager, const Camera& currentCamera);
 	void BuildShadowTransform();
+	void DrawSceneToShadowMap(EntityManager& entityManager);
 
 	void Present() const { renderContext->Present(); }
 

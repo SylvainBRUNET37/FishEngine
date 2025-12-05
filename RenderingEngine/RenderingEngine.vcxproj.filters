@@ -83,6 +83,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="resources\resource.h" />
     <ClInclude Include="include\rendering\graphics\ShadowMap.h" />
+    <ClInclude Include="include\rendering\buffers\constantBuffers\ShadowMapLightWVPBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

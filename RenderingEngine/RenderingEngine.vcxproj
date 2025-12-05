@@ -26,6 +26,7 @@
     <ClInclude Include="include\rendering\buffers\constantBuffers\FrameBuffer.h" />
     <ClInclude Include="include\rendering\buffers\constantBuffers\MaterialBuffer.h" />
     <ClInclude Include="include\rendering\buffers\constantBuffers\ObjectBuffer.h" />
+    <ClInclude Include="include\rendering\buffers\constantBuffers\ShadowMapLightWVPBuffer.h" />
     <ClInclude Include="include\rendering\buffers\constantBuffers\SpriteBuffer.h" />
     <ClInclude Include="include\rendering\core\SceneData.h" />
     <ClInclude Include="include\rendering\core\Transform.h" />

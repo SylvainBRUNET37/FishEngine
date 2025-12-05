@@ -4,6 +4,8 @@
 #include "rendering/graphics/camera/BaseCamera.h"
 #include "rendering/texture/TextureLoader.h"
 
+#include <memory>
+
 #include <iostream>
 
 using namespace DirectX;
@@ -14,6 +16,7 @@ Renderer::Renderer(RenderContext* renderContext, std::vector<Material>&& materia
 	  frameConstantBuffer{renderContext->GetDevice(), frameCbRegisterNumber},
 	  objectConstantBuffer{renderContext->GetDevice(), objectCbRegisterNumber},
 	  spriteConstantBuffer{renderContext->GetDevice(), spriteCbRegisterNumber},
+	  shadowMapLightWVPBuffer{ renderContext->GetDevice(), shadowMapLightWVPCbRegisterNumber },
 	  postProcessSettingsBuffer{renderContext->GetDevice(), postProcessCbRegisterNumber},
 	  causticTexture{TextureLoader::LoadTextureFromFile("assets/textures/caustics.png", renderContext->GetDevice())}
 {
@@ -79,6 +82,33 @@ void Renderer::Render(const Mesh& mesh,
 	else {
 		DoubleSidedDraw(mesh);
 	}
+}
+
+void Renderer::RenderToShadowMap(const Mesh& mesh, ID3D11DeviceContext* context, const Transform& transform, XMMATRIX lightViewProj, ShaderBank& shaderBank)
+{
+	auto& material = materials[mesh.materialIndex];
+
+	if (material.name == "WaterMat") {
+		return;
+	}
+
+	//// Update material constant buffer
+	const auto cbSMParams = BuildConstantShadowMapLightWVPBuffer(lightViewProj);
+	shadowMapLightWVPBuffer.Update(context, cbSMParams);
+	shadowMapLightWVPBuffer.Bind(context);
+
+	static const std::shared_ptr<ShaderProgram> shadowMapShader = shaderBank.GetOrCreateShaderProgram
+	(
+		renderContext->GetDevice(),
+		"shaders/ShadowMapVS.hlsl",
+		//nullptr
+		"shaders/PhongWaterPS.hlsl"
+	);
+
+	context->VSGetShaderResources(0, 1, &material.texture);
+
+	//DrawToShadowMap(mesh);
+	Draw(mesh);
 }
 
 void Renderer::Render(Sprite2D& sprite, ID3D11DeviceContext* context) const
@@ -194,6 +224,20 @@ void Renderer::Draw(const Mesh& mesh) const
 	renderContext->GetContext()->DrawIndexed(static_cast<UINT>(mesh.indices.size()), 0, 0);
 }
 
+void Renderer::DrawToShadowMap(const Mesh& mesh) const
+{
+	//constexpr UINT stride = sizeof(Vertex);
+	//constexpr UINT offset = 0;
+
+	//const auto rawVertexBuffer = mesh.vertexBuffer.Get();
+
+	//// Bind vertex buffer
+	//renderContext->GetContext()->IASetVertexBuffers(0, 1, &rawVertexBuffer, &stride, &offset);
+	//renderContext->GetContext()->IASetIndexBuffer(mesh.indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+	//renderContext->GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	//renderContext->GetContext()->DrawIndexed(static_cast<UINT>(mesh.indices.size()), 0, 0);
+}
+
 void Renderer::DoubleSidedDraw(const Mesh& mesh) const
 {
 	renderContext->SetCullModeCullNone();
@@ -239,6 +283,15 @@ MaterialBuffer Renderer::BuildConstantMaterialBuffer(const Material& material)
 	params.padding = XMFLOAT2(0, 0);
 
 	return params;
+}
+
+ShadowMapLightWVPBuffer Renderer::BuildConstantShadowMapLightWVPBuffer(const XMMATRIX matrix)
+{
+	ShadowMapLightWVPBuffer param;
+
+	param.lightWVP = matrix;
+
+	return param;
 }
 
 void Renderer::ClearPixelShaderResources() {

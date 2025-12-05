@@ -89,6 +89,23 @@ void RenderSystem::RenderMeshes(EntityManager& entityManager)
 	}
 }
 
+void RenderSystem::RenderMeshesToShadowMap(EntityManager& entityManager)
+{
+	// Render Meshes
+	for (const auto& [entity, transform, meshInstance] : entityManager.View<Transform, MeshInstance>())
+	{
+		// Check if the mesh should be rendered or not
+		auto& mesh = Locator::Get<ResourceManager>().GetMesh(meshInstance.meshIndex);
+		if (FrustumCuller::IsMeshCulled(mesh, transform))
+			continue;
+
+		static auto& shaderBank = Locator::Get<ResourceManager>().GetShaderBank();
+		XMMATRIX view = XMLoadFloat4x4(&lightView);
+		XMMATRIX proj = XMLoadFloat4x4(&lightProj);
+		renderer.RenderToShadowMap(mesh, renderContext->GetContext(), transform, XMMatrixMultiply(view, proj), shaderBank);
+	}
+}
+
 void RenderSystem::UpdatePointLights(EntityManager& entityManager)
 {
 	frameBuffer.pointLightCount = 0;
@@ -141,11 +158,10 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 
 	BuildShadowTransform();
 	
-
 	//Below is equivalent to draw scene, so...
 	shadowMap->BindDsvAndSetNullRenderTarget(renderContext->GetContext());
-	//drawSceneToShadowMap...
-	//renderContext->GetContext()->RSSetState(0);
+	/*DrawSceneToShadowMap(entityManager);
+	renderContext->GetContext()->RSSetState(0);*/
 	
 	//Restore back and depth buffer to OM stage (what's that? The output-merger stage?)
 	//How do I even mimic that?
@@ -240,4 +256,9 @@ void RenderSystem::BuildShadowTransform() {
 	XMStoreFloat4x4(&lightView, LightViewMatrix);
 	XMStoreFloat4x4(&lightProj, LightProjectionMatrix);
 	XMStoreFloat4x4(&shadowTransform, ShadowTransform);
+}
+
+void RenderSystem::DrawSceneToShadowMap(EntityManager& entityManager)
+{
+	RenderMeshesToShadowMap(entityManager);
 }
