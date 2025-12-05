@@ -127,6 +127,8 @@ void GameEngine::HandleCollions()
 
 void GameEngine::ChangeGameStatus()
 {
+	WindowsApplication::mouseWheelDelta = 0;
+
 	switch (GameState::currentState)
 	{
 	case GameState::PAUSED:
@@ -157,7 +159,7 @@ void GameEngine::PauseGame()
 	ClipCursor(nullptr);
 	ReleaseCapture();
 
-	GameState::currentState = GameState::PAUSED;
+	GameState::currentState = GameState::PAUSED;	
 
 	BuildPauseMenu();
 }
