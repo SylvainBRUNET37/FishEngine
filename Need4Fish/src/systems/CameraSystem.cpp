@@ -12,6 +12,9 @@
 #include <Jolt/Physics/Collision/Shape/SphereShape.h>
 #include <Jolt/Physics/Collision/ShapeCast.h>
 
+#undef min
+#undef max
+
 using namespace DirectX;
 
 void CameraSystem::Update(double dt, EntityManager& entityManager)
@@ -64,10 +67,11 @@ void CameraSystem::ComputeCameraPosition(Camera& camera, const Transform& transf
 		camera.focus = XMVectorAdd(camera.position, XMVectorScale(fpForward, 100.0f));
 		camera.up = XMVectorSet(0, 1, 0, 0); // Up fixe
 
-		return;
+		if (camera.mode == Camera::CameraMode::FIRST_PERSON && !camera.isTemporaryFirstPerson)
+			return;
 	}
 
-	// THIRD PERSON SpringArm ---
+	// --- THIRD PERSON SpringArm ---
 	const float horizontalDist = camera.distance * cosf(camera.pitchAngle);
 	const float verticalDist = camera.distance * sinf(camera.pitchAngle);
 
@@ -83,32 +87,42 @@ void CameraSystem::ComputeCameraPosition(Camera& camera, const Transform& transf
 	{
 		XMVECTOR dir = XMVectorSubtract(idealCameraPos, baseFocus);
 		float targetDist = XMVectorGetX(XMVector3Length(dir));
-		dir = XMVector3Normalize(dir);
-
-		float safeDist = PerformSpringArmRaycast(baseFocus, idealCameraPos, targetDist);
-		adjustedPos = XMVectorAdd(baseFocus, XMVectorScale(dir, safeDist));
+		if (targetDist > 0.0001f)
+		{
+			dir = XMVector3Normalize(dir);
+			float safeDist = PerformSpringArmRaycast(baseFocus, idealCameraPos, targetDist);
+			adjustedPos = XMVectorAdd(baseFocus, XMVectorScale(dir, safeDist));
+		}
 	}
 
 	float achievedDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(adjustedPos, baseFocus)));
 
 	// --- Temporary 1st Person ---
-	static float tempFPTime = 0.0f;
-	const float tempFPMinTime = 2.0f;
-	const float fpEntryFactor = 0.75f;
-	const float fpExitFactor = 1.1f;
+	constexpr float tempFPMinTime = 2.0f;
+	constexpr float fpEntryFactor = 0.75f;
+	constexpr float fpExitFactor = 1.05f;
+	constexpr float exitDistanceTolerance = 0.9f;
+	constexpr float reentryCooldown = 0.75f;
 
-	bool forceTempFP = (achievedDistance < camera.distance * fpEntryFactor);
+	// Met a jour le cooldown
+	if (camera.tempFPExitCooldown > 0.0f)
+		camera.tempFPExitCooldown = std::max(0.0f, camera.tempFPExitCooldown - dt);
+
+	// Détecte l'entrée forcée en temporary 1st person
+	bool forceTempFP = camera.tempFPExitCooldown <= 0.0f &&
+		achievedDistance < camera.distance * fpEntryFactor;
 
 	if (!camera.isTemporaryFirstPerson && forceTempFP)
 	{
 		camera.isTemporaryFirstPerson = true;
 		camera.distanceBeforeTemporaryFP = camera.distance;
-		tempFPTime = 0.0f;
+		camera.tempFPTime = 0.0f;
+		camera.justEnteredTemporaryFP = true;
 	}
 
 	if (camera.isTemporaryFirstPerson)
 	{
-		tempFPTime += dt;
+		camera.tempFPTime += dt;
 
 		// Position FP
 		XMVECTOR fpOffset = XMLoadFloat3(&camera.firstPersonOffset);
@@ -117,20 +131,41 @@ void CameraSystem::ComputeCameraPosition(Camera& camera, const Transform& transf
 		XMVECTOR rotatedOffset = XMVector3Transform(fpOffset, targetRotMat);
 		camera.position = XMVectorAdd(targetPos, rotatedOffset);
 
-		// Direction FP basée sur yaw/pitch
 		const float baseYaw = atan2f(XMVectorGetX(forward), XMVectorGetZ(forward));
 		const XMMATRIX yawPitchMat = XMMatrixRotationRollPitchYaw(camera.pitchAngle, camera.yawOffset + baseYaw, 0.0f);
 		XMVECTOR fpForward = XMVector3TransformNormal(XMVectorSet(0, 0, 1, 0), yawPitchMat);
 
 		camera.focus = XMVectorAdd(camera.position, XMVectorScale(fpForward, 100.0f));
 
-		if (achievedDistance > camera.distance * fpExitFactor && tempFPTime > tempFPMinTime)
-			camera.isTemporaryFirstPerson = false;
+		// Condition de sortie de 1rst person temporaire
+		bool hasStayedMinTime = camera.tempFPTime >= tempFPMinTime;
+		bool distanceRecovered = achievedDistance >= camera.distanceBeforeTemporaryFP * exitDistanceTolerance ||
+			achievedDistance >= camera.distance * fpExitFactor;
 
-		return;
+		if (hasStayedMinTime && distanceRecovered)
+		{
+			// Reset les valeurs temporaires
+			camera.isTemporaryFirstPerson = false;
+			camera.tempFPExitCooldown = reentryCooldown;
+			camera.tempFPTime = 0.0f;
+			camera.justEnteredTemporaryFP = false;
+
+			// Restaurer la distance stockée
+			camera.distance = camera.distanceBeforeTemporaryFP;
+
+			// Placer la caméra progressivement sur adjustedPos
+			camera.position = XMVectorLerp(camera.position, adjustedPos, 0.6f);
+		}
+		else
+		{
+			if (camera.justEnteredTemporaryFP)
+				camera.justEnteredTemporaryFP = false;
+
+			return;
+		}
 	}
 
-	// --- 3rd Person interpolation ---
+	// --- 3rd Person interpolation (après gestion temporaryFP) ---
 	float lerpSpeed = camera.springArmSpeed;
 	if (achievedDistance < camera.distance * 0.5f)
 		lerpSpeed *= 3.0f;
@@ -150,6 +185,7 @@ void CameraSystem::ComputeCameraPosition(Camera& camera, const Transform& transf
 
 	Camera::currentDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(camera.position, camera.focus)));
 }
+
 
 void CameraSystem::ComputeCameraOrientation(Camera& camera)
 {
@@ -420,7 +456,7 @@ float CameraSystem::PerformSpringArmRaycast(const XMVECTOR& start, const XMVECTO
 
 		// Offset pour tenir compte de la sphère
 		const float COLLISION_OFFSET = Camera::cameraRadius + Camera::collisionOffset;
-		return max(hitDistance - COLLISION_OFFSET, 0.1f);
+		return std::max(hitDistance - COLLISION_OFFSET, 0.1f);
 	}
 
 	return maxDistance;

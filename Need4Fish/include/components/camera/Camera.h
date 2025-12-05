@@ -63,6 +63,9 @@ struct Camera : public BaseCameraData
 	// SpringArm 1st person temporaire
 	inline static bool isTemporaryFirstPerson = false;
 	inline static float distanceBeforeTemporaryFP = 0.0f;
+	float tempFPTime = 0.0f;
+	float tempFPExitCooldown = 0.0f;
+	bool justEnteredTemporaryFP = false;
 };
 #endif
 
