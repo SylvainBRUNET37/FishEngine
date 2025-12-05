@@ -47,12 +47,13 @@ void CameraSystem::ComputeCameraPosition(Camera& camera, const Transform& transf
 	XMVECTOR baseFocus = XMVectorAdd(targetPos, XMVectorSet(0, camera.heightOffset, 0, 0));
 
 	// Facteurs pour passage 1ère personne
-	const float fpEntryFactor = 0.8f;  // déclenchement plus rapide
-	const float fpExitFactor = 0.7f;
+	const float fpEntryFactor = 0.75f; // Plus grand -> entrée plus rapide
+	const float fpExitFactor = 1.1f; // Plus grand -> sortie plus difficile.
 
 	const float horizontalDist = camera.distance * cosf(camera.pitchAngle);
 	const float verticalDist = camera.distance * sinf(camera.pitchAngle);
 
+	// Position idéale de la caméra
 	XMVECTOR idealCameraPos = XMVectorSet(
 		XMVectorGetX(baseFocus) - horizontalDist * sinf(totalYaw),
 		XMVectorGetY(baseFocus) + verticalDist + camera.heightOffset,
@@ -60,17 +61,16 @@ void CameraSystem::ComputeCameraPosition(Camera& camera, const Transform& transf
 		1.0f
 	);
 
-	// SPRING ARM strict
+	// Application du spring arm
 	XMVECTOR adjustedPos = idealCameraPos;
 	if (camera.enableSpringArm)
 		adjustedPos = PerformSpringArm3D(baseFocus, idealCameraPos, camera.distance);
 
 	float achievedDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(adjustedPos, baseFocus)));
 
-	// Timer temporaire 1ère personne
+	// Gestion temporaire du passage en première personne
 	static float tempFPTime = 0.0f;
-	const float tempFPMinTime = 2.f; // réduit pour passage plus rapide
-
+	const float tempFPMinTime = 2.f;
 	bool forceFirstPerson = (achievedDistance < camera.distance * fpEntryFactor);
 
 	if (!Camera::isTemporaryFirstPerson && forceFirstPerson)
@@ -98,14 +98,14 @@ void CameraSystem::ComputeCameraPosition(Camera& camera, const Transform& transf
 		return;
 	}
 
-	// --- 3rd PERSON ---
+	// Caméra 3ème personne
 	float lerpSpeed = camera.springArmSpeed;
 	if (achievedDistance < camera.distance * 0.5f)
 		lerpSpeed *= 3.0f;
 
 	camera.position = XMVectorLerp(camera.position, adjustedPos, std::clamp(lerpSpeed * dt, 0.0f, 1.0f));
 
-	// Gestion focus latéral pour éviter de voir l'extérieur
+	// Gestion du focus latéral
 	XMVECTOR idealToActual = XMVectorSubtract(camera.position, idealCameraPos);
 	float lateralDisplacement = XMVectorGetX(XMVector3Length(idealToActual));
 	if (lateralDisplacement > camera.distance * 0.005f)
@@ -147,7 +147,7 @@ XMVECTOR CameraSystem::PerformSpringArm3D(const XMVECTOR& focus, const XMVECTOR&
 	ClosestHitCollector collector;
 	collector.mHit.mFraction = 1.0f;
 
-	// filtres collision
+	// Filtres de collision
 	class NonMovingOnlyBroadPhaseFilter : public JPH::BroadPhaseLayerFilter { bool ShouldCollide(JPH::BroadPhaseLayer inLayer) const override { return inLayer == BroadPhaseLayers::NON_MOVING; } };
 	class NonMovingOnlyObjectFilter : public JPH::ObjectLayerFilter { bool ShouldCollide(JPH::ObjectLayer inLayer) const override { return inLayer == Layers::NON_MOVING; } };
 	class AllBodyFilter : public JPH::BodyFilter { bool ShouldCollide(const JPH::BodyID&) const override { return true; } };
@@ -161,6 +161,7 @@ XMVECTOR CameraSystem::PerformSpringArm3D(const XMVECTOR& focus, const XMVECTOR&
 	JPH::ShapeCastSettings settings;
 	settings.mUseShrunkenShapeAndConvexRadius = true;
 
+	// Exécution du cast
 	physicSystem.GetNarrowPhaseQuery().CastShape(
 		shapeCast,
 		settings,
@@ -181,17 +182,17 @@ XMVECTOR CameraSystem::PerformSpringArm3D(const XMVECTOR& focus, const XMVECTOR&
 
 		JPH::Vec3 normal = -collector.mHit.mPenetrationAxis.Normalized();
 
-		// --- Gestion verticale stricte ---
+		// Gestion verticale stricte
 		if (std::abs(normal.GetY()) > 0.3f)
 		{
 			JPH::RVec3 verticalUp(0, 1, 0);
 			float verticalOffset = safetyOffset * 20.0f * (1.0f - collector.mHit.mFraction);
-			if (normal.GetY() < 0.0f) safePos -= verticalUp * verticalOffset; // plafond
-			else safePos += verticalUp * verticalOffset; // sol
+			if (normal.GetY() < 0.0f) safePos -= verticalUp * verticalOffset;
+			else safePos += verticalUp * verticalOffset;
 		}
 		else
 		{
-			// --- Gestion latérale stricte ---
+			// Gestion latérale stricte
 			float dot = direction.Dot(normal);
 			if (std::abs(dot) < 0.7f)
 			{
@@ -236,7 +237,7 @@ void CameraSystem::HandleRotation(Camera& cameraData)
 	const auto deltaX = static_cast<float>(currentCursorCoordinates.x - cameraData.cursorCoordinates.x);
 	const auto deltaY = static_cast<float>(currentCursorCoordinates.y - cameraData.cursorCoordinates.y);
 
-	static constexpr float deadzone = 2.0f; // Pixels de tolérance
+	static constexpr float deadzone = 2.0f;
 
 	// Appliquer la rotation seulement si le mouvement dépasse la deadzone
 	if (std::abs(deltaX) > deadzone || std::abs(deltaY) > deadzone)
@@ -254,7 +255,7 @@ void CameraSystem::HandleRotation(Camera& cameraData)
 			pitchSensitivity = 0.002f;
 		}
 
-		// Inversion si true
+		// Inversion
 		const float yawMultiplier = cameraData.invertCamRotation ? -1.0f : 1.0f;
 		const float pitchMultiplier = cameraData.invertCamRotation ? 1.0f : -1.0f;
 
@@ -264,32 +265,24 @@ void CameraSystem::HandleRotation(Camera& cameraData)
 	}
 	else
 	{
-		// Ramener progressivement vers zéro quand pas de mouvement
+		// Ramener progressivement vers zéro
 		if (std::abs(cameraData.yawOffset) > 0.001f)
 		{
 			float returnSpeed;
 			if (cameraData.mode == Camera::CameraMode::FIRST_PERSON)
-			{
 				returnSpeed = 0.005f;
-			}
 			else
-			{
 				returnSpeed = 0.02f;
-			}
 
 			const float returnStep = std::copysign(returnSpeed, -cameraData.yawOffset);
 			cameraData.yawOffset += returnStep;
 
-			// Snap à zéro si très proche
 			if (std::abs(cameraData.yawOffset) < returnSpeed)
-			{
 				cameraData.yawOffset = 0.0f;
-			}
 		}
-		
 	}
 
-	// Recentrer seulement si la souris s'éloigne suffisament du centre
+	// Recentrement du curseur si nécessaire
 	static constexpr float recenterThreshold = 100.0f;
 	const float distanceFromCenter = sqrtf(
 		powf(currentCursorCoordinates.x - cameraData.screenCenter.x, 2.0f) +
@@ -302,9 +295,7 @@ void CameraSystem::HandleRotation(Camera& cameraData)
 		cameraData.cursorCoordinates = cameraData.screenCenter;
 	}
 	else
-	{
 		cameraData.cursorCoordinates = currentCursorCoordinates;
-	}
 }
 
 void CameraSystem::Rotate(Camera& cameraData, const float yawDelta, const float pitchDelta)
