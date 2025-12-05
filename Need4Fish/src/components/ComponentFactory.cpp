@@ -24,6 +24,8 @@ void ComponentFactory::CreateRigidBody(const nlohmann::json& componentData, Enti
 		entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCube(transform, mesh));
 	else if (componentData["type"] == "meshShape")
 		entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateMeshShape(transform, mesh));
+	else if (componentData["type"] == "hullShape")
+		entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateConvexHullShape(transform, mesh));
 }
 
 void ComponentFactory::CreateSensor(const nlohmann::json& componentData, EntityManager& entityManager,

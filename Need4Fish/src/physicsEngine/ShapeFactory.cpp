@@ -9,6 +9,7 @@
 #include <Jolt/Physics/Collision/Shape/SphereShape.h>
 #include <Jolt/Physics/Collision/Shape/MeshShape.h>
 #include <Jolt/Physics/Collision/Shape/ScaledShape.h>
+#include <Jolt/Physics/Collision/Shape/ConvexHullShape.h>
 
 #include "PhysicsEngine/layers/Layers.h"
 #include "PhysicsEngine/JoltSystem.h"
@@ -320,6 +321,39 @@ JPH::Body* ShapeFactory::CreateMeshShape(const Transform& transform, const Mesh&
 
     BodyInterface& bodyInterface = JoltSystem::GetBodyInterface();
     Body* body = bodyInterface.CreateBody(meshBodySettings);
+    bodyInterface.AddBody(body->GetID(), EActivation::Activate);
+
+    return body;
+}
+
+Body* ShapeFactory::CreateConvexHullShape(const Transform& transform, const Mesh& mesh)
+{
+    Array<Vec3> points;
+    points.reserve(mesh.vertices.size());
+
+    const Vec3 scale = ConversionUtil::XMFloat3ToVec3Arg(transform.scale);
+    for (const auto& v : mesh.vertices)
+        points.push_back(Vec3(v.position.x, v.position.y, v.position.z) * scale);
+
+    // Create hull shape
+    const auto* hullSettings = new ConvexHullShapeSettings{ points };
+    const ShapeRefC hullShape = hullSettings->Create().Get();
+
+    // Body transform
+    const RVec3 position(transform.position.x, transform.position.y, transform.position.z);
+    const Quat rotation(transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w);
+
+    const BodyCreationSettings settings
+	{
+        hullShape, 
+		position, 
+		rotation, 
+		EMotionType::Dynamic, 
+		Layers::MOVING
+	};
+
+    BodyInterface& bodyInterface = JoltSystem::GetBodyInterface();
+    Body* body = bodyInterface.CreateBody(settings);
     bodyInterface.AddBody(body->GetID(), EActivation::Activate);
 
     return body;
