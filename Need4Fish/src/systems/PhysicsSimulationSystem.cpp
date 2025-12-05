@@ -129,6 +129,13 @@ void PhysicsSimulationSystem::UpdatePhysics()
 		SpecifiedObjectLayerFilter(Layers::MOVING)
 	);
 
+	JoltSystem::GetPhysicSystem().GetBroadPhaseQuery().CollideAABox(
+		waterBox,
+		waterCollector,
+		SpecifiedBroadPhaseLayerFilter(BroadPhaseLayers::MOVING),
+		SpecifiedObjectLayerFilter(Layers::MOVING_DECOR)
+	);
+	
 	// Update physics
 	constexpr int collisionSteps = 2;
 	JoltSystem::GetPhysicSystem().Update(PHYSICS_UPDATE_RATE, collisionSteps,

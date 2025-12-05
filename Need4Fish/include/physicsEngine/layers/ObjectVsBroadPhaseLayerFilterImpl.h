@@ -19,6 +19,8 @@ public:
 			return broadPhaseLayer == BroadPhaseLayers::MOVING;
 		case Layers::MOVING:
 			return true;
+		case Layers::MOVING_DECOR:
+			return true;
 		case Layers::SENSOR:
 			return broadPhaseLayer == BroadPhaseLayers::MOVING;
 		case Layers::VEHICLE:

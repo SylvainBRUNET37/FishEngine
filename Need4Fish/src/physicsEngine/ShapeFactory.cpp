@@ -349,7 +349,7 @@ Body* ShapeFactory::CreateConvexHullShape(const Transform& transform, const Mesh
 		position, 
 		rotation, 
 		EMotionType::Dynamic, 
-		Layers::MOVING
+		Layers::MOVING_DECOR
 	};
 
     BodyInterface& bodyInterface = JoltSystem::GetBodyInterface();
