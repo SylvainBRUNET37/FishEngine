@@ -24,7 +24,9 @@ RenderSystem::RenderSystem(RenderContext* renderContext, const std::shared_ptr<U
 
 void RenderSystem::RenderPostProcesses(const double deltaTime)
 {
-	GameState::postProcessSettings.enableVignette = Camera::mode == Camera::CameraMode::FIRST_PERSON ? 1 : 0;
+	GameState::postProcessSettings.enableVignette = 
+		(Camera::mode == Camera::CameraMode::FIRST_PERSON || Camera::isTemporaryFirstPerson) ? 1 : 0;
+
 	GameState::postProcessSettings.deltaTime = static_cast<float>(deltaTime);
 
 	static const auto& shaderBank = Locator::Get<ResourceManager>().GetShaderBank();

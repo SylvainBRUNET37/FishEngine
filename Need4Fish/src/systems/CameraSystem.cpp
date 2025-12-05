@@ -49,20 +49,25 @@ void CameraSystem::ComputeCameraPosition(Camera& camera, const Transform& transf
 	// Base focus
 	XMVECTOR baseFocus = XMVectorAdd(targetPos, XMVectorSet(0, camera.heightOffset, 0, 0));
 
-	// --- 1st Person ---
-	if (camera.mode == Camera::CameraMode::FIRST_PERSON)
+	// FIRST PERSON
+	if (camera.mode == Camera::CameraMode::FIRST_PERSON || camera.isTemporaryFirstPerson)
 	{
 		XMVECTOR fpOffset = XMLoadFloat3(&camera.firstPersonOffset);
 		XMVECTOR s = XMLoadFloat3(&transform.scale);
 		fpOffset = XMVectorMultiply(fpOffset, s);
-		XMVECTOR rotatedOffset = XMVector3Transform(fpOffset, targetRotMat);
+		camera.position = XMVectorAdd(targetPos, XMVector3Transform(fpOffset, targetRotMat));
 
-		camera.position = XMVectorAdd(targetPos, rotatedOffset);
-		camera.focus = XMVectorAdd(camera.position, XMVectorScale(forward, 100.0f));
+		// Forward basé sur yaw/pitch
+		const XMMATRIX yawPitchMat = XMMatrixRotationRollPitchYaw(camera.pitchAngle, camera.yawOffset + targetYaw, 0.0f);
+		XMVECTOR fpForward = XMVector3TransformNormal(XMVectorSet(0, 0, 1, 0), yawPitchMat);
+
+		camera.focus = XMVectorAdd(camera.position, XMVectorScale(fpForward, 100.0f));
+		camera.up = XMVectorSet(0, 1, 0, 0); // Up fixe
+
 		return;
 	}
 
-	// --- 3rd Person SpringArm ---
+	// THIRD PERSON SpringArm ---
 	const float horizontalDist = camera.distance * cosf(camera.pitchAngle);
 	const float verticalDist = camera.distance * sinf(camera.pitchAngle);
 
@@ -105,13 +110,19 @@ void CameraSystem::ComputeCameraPosition(Camera& camera, const Transform& transf
 	{
 		tempFPTime += dt;
 
+		// Position FP
 		XMVECTOR fpOffset = XMLoadFloat3(&camera.firstPersonOffset);
 		XMVECTOR s = XMLoadFloat3(&transform.scale);
 		fpOffset = XMVectorMultiply(fpOffset, s);
 		XMVECTOR rotatedOffset = XMVector3Transform(fpOffset, targetRotMat);
-
 		camera.position = XMVectorAdd(targetPos, rotatedOffset);
-		camera.focus = XMVectorAdd(camera.position, XMVectorScale(forward, 100.0f));
+
+		// Direction FP basée sur yaw/pitch
+		const float baseYaw = atan2f(XMVectorGetX(forward), XMVectorGetZ(forward));
+		const XMMATRIX yawPitchMat = XMMatrixRotationRollPitchYaw(camera.pitchAngle, camera.yawOffset + baseYaw, 0.0f);
+		XMVECTOR fpForward = XMVector3TransformNormal(XMVectorSet(0, 0, 1, 0), yawPitchMat);
+
+		camera.focus = XMVectorAdd(camera.position, XMVectorScale(fpForward, 100.0f));
 
 		if (achievedDistance > camera.distance * fpExitFactor && tempFPTime > tempFPMinTime)
 			camera.isTemporaryFirstPerson = false;
@@ -176,8 +187,7 @@ void CameraSystem::HandleRotation(Camera& cameraData)
 	{
 		// Sensibilité ajustée selon le mode
 		float yawSensitivity, pitchSensitivity;
-		if (cameraData.mode == Camera::CameraMode::FIRST_PERSON)
-		{
+		if (cameraData.mode == Camera::CameraMode::FIRST_PERSON || cameraData.isTemporaryFirstPerson) {
 			yawSensitivity = 0.00002f;
 			pitchSensitivity = 0.0004f;
 		}
