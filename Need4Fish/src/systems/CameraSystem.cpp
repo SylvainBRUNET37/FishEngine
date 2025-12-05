@@ -38,177 +38,107 @@ void CameraSystem::ComputeCameraPosition(Camera& camera, const Transform& transf
 	const XMVECTOR targetPos = XMLoadFloat3(&transform.position);
 	const XMVECTOR targetRotQuat = XMLoadFloat4(&transform.rotation);
 	const XMMATRIX targetRotMat = XMMatrixRotationQuaternion(targetRotQuat);
-
 	const XMVECTOR forward = targetRotMat.r[2];
 	const float targetYaw = atan2f(XMVectorGetX(forward), XMVectorGetZ(forward));
-
 	const float totalYaw = targetYaw + camera.yawOffset;
 	camera.targetYaw = totalYaw;
 	camera.targetPitch = camera.pitchAngle;
 
-	// NOUVEAU: Vérifier si on doit être en mode temporaire première personne
-	bool wasTemporaryFP = Camera::isTemporaryFirstPerson;
+	XMVECTOR baseFocus = XMVectorAdd(targetPos, XMVectorSet(0, camera.heightOffset, 0, 0));
 
-	if (camera.mode == Camera::CameraMode::FIRST_PERSON || Camera::isTemporaryFirstPerson)
+	const float fpEntryFactor = 0.5f;
+	const float fpExitFactor = 0.9f;
+
+	const float horizontalDist = camera.distance * cosf(camera.pitchAngle);
+	const float verticalDist = camera.distance * sinf(camera.pitchAngle);
+
+	XMVECTOR idealCameraPos = XMVectorSet(
+		XMVectorGetX(baseFocus) - horizontalDist * sinf(totalYaw),
+		XMVectorGetY(baseFocus) + verticalDist + camera.heightOffset,
+		XMVectorGetZ(baseFocus) - horizontalDist * cosf(totalYaw),
+		1.0f
+	);
+
+	// SPRING ARM strict
+	XMVECTOR adjustedPos = idealCameraPos;
+	if (camera.enableSpringArm)
+		adjustedPos = PerformSpringArm3D(baseFocus, idealCameraPos, camera.distance);
+
+	float achievedDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(adjustedPos, baseFocus)));
+
+	// Timer temporaire 1ère personne
+	static float tempFPTime = 0.0f;
+	const float tempFPMinTime = 0.5f;
+
+	bool forceFirstPerson = (achievedDistance < camera.distance * fpEntryFactor);
+
+	if (!Camera::isTemporaryFirstPerson && forceFirstPerson)
 	{
+		Camera::isTemporaryFirstPerson = true;
+		Camera::distanceBeforeTemporaryFP = camera.distance;
+		tempFPTime = 0.0f;
+	}
+
+	if (Camera::isTemporaryFirstPerson)
+	{
+		tempFPTime += dt;
+
 		XMVECTOR fpOffset = XMLoadFloat3(&camera.firstPersonOffset);
 		XMVECTOR s = XMLoadFloat3(&transform.scale);
 		fpOffset = XMVectorMultiply(fpOffset, s);
+		XMVECTOR rotatedOffset = XMVector3Transform(fpOffset, targetRotMat);
 
-		const XMVECTOR rotatedOffset = XMVector3Transform(fpOffset, targetRotMat);
 		camera.position = XMVectorAdd(targetPos, rotatedOffset);
+		camera.focus = XMVectorAdd(camera.position, XMVectorScale(forward, 100.0f));
 
-		const XMVECTOR lookDirection = XMVector3Normalize(forward);
-		camera.focus = XMVectorAdd(camera.position, XMVectorScale(lookDirection, 100.0f));
+		if (achievedDistance > camera.distance * fpExitFactor && tempFPTime > tempFPMinTime)
+			Camera::isTemporaryFirstPerson = false;
 
-		// NOUVEAU: Si on était en mode temporaire, vérifier si on peut revenir en 3e personne
-		if (Camera::isTemporaryFirstPerson && camera.mode == Camera::CameraMode::THIRD_PERSON)
-		{
-			// Essayer de revenir à la distance d'avant
-			const float testDistance = Camera::distanceBeforeTemporaryFP;
-			const float horizontalDist = testDistance * cosf(camera.pitchAngle);
-			const float verticalDist = testDistance * sinf(camera.pitchAngle);
-
-			XMVECTOR baseFocus = XMVectorAdd(targetPos, XMVectorSet(0, camera.heightOffset, 0, 0));
-			const XMVECTOR testCameraPos = XMVectorSet(
-				XMVectorGetX(baseFocus) - horizontalDist * sinf(totalYaw),
-				XMVectorGetY(baseFocus) + verticalDist + camera.heightOffset,
-				XMVectorGetZ(baseFocus) - horizontalDist * cosf(totalYaw),
-				1.0f
-			);
-
-			// Vérifier s'il y a encore une collision à cette distance
-			XMVECTOR adjustedTestPos = PerformSpringArm3D(baseFocus, testCameraPos, testDistance);
-			float achievedDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(adjustedTestPos, baseFocus)));
-
-			// Si on peut atteindre au moins 80% de la distance d'origine, revenir en 3e personne
-			if (achievedDistance >= testDistance * 0.8f)
-			{
-				Camera::isTemporaryFirstPerson = false;
-				// Continuer le traitement en 3e personne ci-dessous
-			}
-			else
-			{
-				// Rester en première personne temporaire
-				return;
-			}
-		}
-		else
-		{
-			return;
-		}
+		return;
 	}
 
-	// THIRD_PERSON (ou sortie du mode temporaire)
-	if (camera.mode == Camera::CameraMode::THIRD_PERSON)
+	// --- 3rd PERSON ---
+	float lerpSpeed = camera.springArmSpeed;
+	if (achievedDistance < camera.distance * 0.5f)
+		lerpSpeed *= 3.0f;
+
+	camera.position = XMVectorLerp(camera.position, adjustedPos, std::clamp(lerpSpeed * dt, 0.0f, 1.0f));
+
+	// Gestion focus latéral pour éviter de voir l'extérieur
+	XMVECTOR idealToActual = XMVectorSubtract(camera.position, idealCameraPos);
+	float lateralDisplacement = XMVectorGetX(XMVector3Length(idealToActual));
+	if (lateralDisplacement > camera.distance * 0.005f)
 	{
-		XMVECTOR baseFocus = XMVectorAdd(targetPos, XMVectorSet(0, camera.heightOffset, 0, 0));
-
-		const float horizontalDist = camera.distance * cosf(camera.pitchAngle);
-		const float verticalDist = camera.distance * sinf(camera.pitchAngle);
-
-		const XMVECTOR idealCameraPos = XMVectorSet(
-			XMVectorGetX(baseFocus) - horizontalDist * sinf(totalYaw),
-			XMVectorGetY(baseFocus) + verticalDist + camera.heightOffset,
-			XMVectorGetZ(baseFocus) - horizontalDist * cosf(totalYaw),
-			1.0f
-		);
-
-		if (camera.enableSpringArm)
-		{
-			const float desiredDistance = camera.distance;
-
-			if (Camera::currentDistance <= 0.0f)
-				Camera::currentDistance = desiredDistance;
-
-			XMVECTOR adjustedPos = PerformSpringArm3D(baseFocus, idealCameraPos, desiredDistance);
-
-			const float t = std::clamp(camera.springArmSpeed * dt, 0.0f, 1.0f);
-			camera.position = XMVectorLerp(camera.position, adjustedPos, t);
-
-			// NOUVEAU: Calculer la distance réelle atteinte
-			float achievedDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(camera.position, baseFocus)));
-
-			// NOUVEAU: Si la caméra est trop proche (moins de 15% de la distance désirée),
-			// passer temporairement en première personne
-			const float fpThreshold = desiredDistance * 0.15f; // 15% de la distance
-
-			if (achievedDistance < fpThreshold && !Camera::isTemporaryFirstPerson)
-			{
-				Camera::isTemporaryFirstPerson = true;
-				Camera::distanceBeforeTemporaryFP = desiredDistance;
-
-				// Recalculer immédiatement en première personne
-				XMVECTOR fpOffset = XMLoadFloat3(&camera.firstPersonOffset);
-				XMVECTOR s = XMLoadFloat3(&transform.scale);
-				fpOffset = XMVectorMultiply(fpOffset, s);
-
-				const XMVECTOR rotatedOffset = XMVector3Transform(fpOffset, targetRotMat);
-				camera.position = XMVectorAdd(targetPos, rotatedOffset);
-
-				const XMVECTOR lookDirection = XMVector3Normalize(forward);
-				camera.focus = XMVectorAdd(camera.position, XMVectorScale(lookDirection, 100.0f));
-
-				return;
-			}
-
-			XMVECTOR idealToActual = XMVectorSubtract(camera.position, idealCameraPos);
-			float lateralDisplacement = XMVectorGetX(XMVector3Length(idealToActual));
-
-			float distanceThreshold = desiredDistance * 0.005f;
-
-			if (lateralDisplacement > distanceThreshold)
-			{
-				XMVECTOR lateralDirection = XMVector3Normalize(idealToActual);
-				float focusDisplacement = lateralDisplacement * 0.95f;
-				camera.focus = XMVectorAdd(baseFocus, XMVectorScale(lateralDirection, focusDisplacement));
-			}
-			else
-			{
-				camera.focus = baseFocus;
-			}
-
-			Camera::currentDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(camera.position, camera.focus)));
-		}
-		else
-		{
-			camera.position = idealCameraPos;
-			camera.focus = baseFocus;
-		}
+		XMVECTOR lateralDirection = XMVector3Normalize(idealToActual);
+		camera.focus = XMVectorAdd(baseFocus, XMVectorScale(lateralDirection, lateralDisplacement * 0.95f));
 	}
+	else
+		camera.focus = baseFocus;
+
+	Camera::currentDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(camera.position, camera.focus)));
 }
 
 XMVECTOR CameraSystem::PerformSpringArm3D(const XMVECTOR& focus, const XMVECTOR& idealPos, float maxDistance)
 {
 	auto& physicSystem = JoltSystem::GetPhysicSystem();
-
 	JPH::RVec3 focusPos(XMVectorGetX(focus), XMVectorGetY(focus), XMVectorGetZ(focus));
 	JPH::RVec3 idealCamPos(XMVectorGetX(idealPos), XMVectorGetY(idealPos), XMVectorGetZ(idealPos));
 
 	JPH::Vec3 direction = (idealCamPos - focusPos).Normalized();
 	const float totalDistance = (idealCamPos - focusPos).Length();
-
-	if (totalDistance < 0.001f)
-		return idealPos;
+	if (totalDistance < 0.001f) return idealPos;
 
 	JPH::RefConst<JPH::SphereShape> sphere = new JPH::SphereShape(Camera::cameraRadius);
-
 	JPH::RShapeCast shapeCast = JPH::RShapeCast::sFromWorldTransform(
-		sphere,
-		JPH::Vec3::sReplicate(1.0f),
-		JPH::RMat44::sTranslation(focusPos),
-		direction * totalDistance
-	);
+		sphere, JPH::Vec3::sReplicate(1.0f), JPH::RMat44::sTranslation(focusPos), direction * totalDistance);
 
 	class ClosestHitCollector : public JPH::CastShapeCollector
 	{
 	public:
-		virtual void AddHit(const JPH::ShapeCastResult& inResult) override
+		void AddHit(const JPH::ShapeCastResult& inResult) override
 		{
 			if (inResult.mFraction < mHit.mFraction)
-			{
 				mHit = inResult;
-			}
 		}
 		JPH::ShapeCastResult mHit;
 	};
@@ -216,41 +146,11 @@ XMVECTOR CameraSystem::PerformSpringArm3D(const XMVECTOR& focus, const XMVECTOR&
 	ClosestHitCollector collector;
 	collector.mHit.mFraction = 1.0f;
 
-	class NonMovingOnlyBroadPhaseFilter : public JPH::BroadPhaseLayerFilter
-	{
-	public:
-		virtual bool ShouldCollide(JPH::BroadPhaseLayer inLayer) const override
-		{
-			return inLayer == BroadPhaseLayers::NON_MOVING;
-		}
-	};
-
-	class NonMovingOnlyObjectFilter : public JPH::ObjectLayerFilter
-	{
-	public:
-		virtual bool ShouldCollide(JPH::ObjectLayer inLayer) const override
-		{
-			return inLayer == Layers::NON_MOVING;
-		}
-	};
-
-	class AllBodyFilter : public JPH::BodyFilter
-	{
-	public:
-		virtual bool ShouldCollide([[maybe_unused]] const JPH::BodyID& inBodyID) const override
-		{
-			return true;
-		}
-	};
-
-	class NoShapeFilter : public JPH::ShapeFilter
-	{
-	public:
-		virtual bool ShouldCollide([[maybe_unused]] const JPH::Shape* inShape2, [[maybe_unused]] const JPH::SubShapeID& inSubShapeIDOfShape2) const override
-		{
-			return true;
-		}
-	};
+	// filtres collision
+	class NonMovingOnlyBroadPhaseFilter : public JPH::BroadPhaseLayerFilter { bool ShouldCollide(JPH::BroadPhaseLayer inLayer) const override { return inLayer == BroadPhaseLayers::NON_MOVING; } };
+	class NonMovingOnlyObjectFilter : public JPH::ObjectLayerFilter { bool ShouldCollide(JPH::ObjectLayer inLayer) const override { return inLayer == Layers::NON_MOVING; } };
+	class AllBodyFilter : public JPH::BodyFilter { bool ShouldCollide(const JPH::BodyID&) const override { return true; } };
+	class NoShapeFilter : public JPH::ShapeFilter { bool ShouldCollide(const JPH::Shape*, const JPH::SubShapeID&) const override { return true; } };
 
 	NonMovingOnlyBroadPhaseFilter broadPhaseFilter;
 	NonMovingOnlyObjectFilter objectLayerFilter;
@@ -259,7 +159,6 @@ XMVECTOR CameraSystem::PerformSpringArm3D(const XMVECTOR& focus, const XMVECTOR&
 
 	JPH::ShapeCastSettings settings;
 	settings.mUseShrunkenShapeAndConvexRadius = true;
-	settings.mReturnDeepestPoint = false;
 
 	physicSystem.GetNarrowPhaseQuery().CastShape(
 		shapeCast,
@@ -276,257 +175,28 @@ XMVECTOR CameraSystem::PerformSpringArm3D(const XMVECTOR& focus, const XMVECTOR&
 	{
 		const float hitDistance = collector.mHit.mFraction * totalDistance;
 		const float safetyOffset = Camera::cameraRadius + Camera::collisionOffset;
-
-		float safePosDistance = max(hitDistance - safetyOffset, Camera::cameraRadius * 2.0f);
-		safePosDistance = min(safePosDistance, maxDistance);
-
+		float safePosDistance = std::clamp(hitDistance - safetyOffset, Camera::cameraRadius * 2.0f, maxDistance);
 		JPH::RVec3 safePos = focusPos + direction * safePosDistance;
 
-		JPH::Vec3 contactNormal = -collector.mHit.mPenetrationAxis.Normalized();
-		float dotProduct = direction.Dot(contactNormal);
+		JPH::Vec3 normal = -collector.mHit.mPenetrationAxis.Normalized();
 
-		const float normalY = contactNormal.GetY();
-		const float verticalThreshold = 0.6f;
-
-		const bool isVerticalCollision = std::abs(normalY) > verticalThreshold;
-		bool verticalAdjustmentApplied = false; // NOUVEAU: Flag pour éviter la validation finale
-
-		if (isVerticalCollision)
+		// --- Gestion verticale stricte ---
+		if (std::abs(normal.GetY()) > 0.3f)
 		{
-			// === GESTION DES COLLISIONS VERTICALES ===
-
-			JPH::Vec3 verticalUp = JPH::Vec3(0.0f, 1.0f, 0.0f);
-
-			float collisionSeverity = 1.0f - collector.mHit.mFraction;
-
-			// CHANGEMENT: Offset beaucoup plus agressif pour les plafonds
-			float maxVerticalOffset = safetyOffset * 10.0f; // Augmenté de 6.0f à 10.0f
-			float verticalOffset = maxVerticalOffset * collisionSeverity;
-
-			// CHANGEMENT: Pas de limite maximale pour le déplacement vertical
-			// On veut pouvoir descendre autant que nécessaire
-
-			if (normalY < 0.0f) // Plafond (normale vers le bas)
-			{
-				// DESCENDRE DE MANIÈRE TRÈS AGRESSIVE
-
-				// Essayer de descendre beaucoup plus bas
-				JPH::RVec3 verticalPosDown = safePos - JPH::RVec3(verticalUp) * verticalOffset;
-
-				// Validation
-				JPH::RShapeCast verticalValidationCastDown = JPH::RShapeCast::sFromWorldTransform(
-					sphere,
-					JPH::Vec3::sReplicate(1.0f),
-					JPH::RMat44::sTranslation(focusPos),
-					(verticalPosDown - focusPos)
-				);
-
-				ClosestHitCollector verticalCollectorDown;
-				verticalCollectorDown.mHit.mFraction = 1.0f;
-
-				physicSystem.GetNarrowPhaseQuery().CastShape(
-					verticalValidationCastDown,
-					settings,
-					JPH::RVec3::sZero(),
-					verticalCollectorDown,
-					broadPhaseFilter,
-					objectLayerFilter,
-					bodyFilter,
-					shapeFilter
-				);
-
-				// CHANGEMENT: Validation beaucoup plus permissive (0.3f au lieu de 0.5f)
-				if (verticalCollectorDown.mHit.mFraction >= 0.3f)
-				{
-					if (verticalCollectorDown.mHit.mFraction < 1.0f)
-					{
-						float adjustedOffset = verticalOffset * verticalCollectorDown.mHit.mFraction * 0.95f;
-						safePos = safePos - JPH::RVec3(verticalUp) * adjustedOffset;
-					}
-					else
-					{
-						safePos = verticalPosDown;
-					}
-					verticalAdjustmentApplied = true; // On a réussi à descendre
-				}
-				else
-				{
-					// Si on ne peut pas descendre autant, descendre au maximum possible
-					// CHANGEMENT: Descendre quand même un peu, même avec collision
-					float adjustedOffset = verticalOffset * verticalCollectorDown.mHit.mFraction * 0.95f;
-					if (adjustedOffset > safetyOffset) // Au moins descendre d'un peu
-					{
-						safePos = safePos - JPH::RVec3(verticalUp) * adjustedOffset;
-						verticalAdjustmentApplied = true;
-					}
-				}
-			}
-			else // Sol (normale vers le haut)
-			{
-				// Essayer de monter
-				JPH::RVec3 verticalPosUp = safePos + JPH::RVec3(verticalUp) * verticalOffset;
-
-				JPH::RShapeCast verticalValidationCastUp = JPH::RShapeCast::sFromWorldTransform(
-					sphere,
-					JPH::Vec3::sReplicate(1.0f),
-					JPH::RMat44::sTranslation(focusPos),
-					(verticalPosUp - focusPos)
-				);
-
-				ClosestHitCollector verticalCollectorUp;
-				verticalCollectorUp.mHit.mFraction = 1.0f;
-
-				physicSystem.GetNarrowPhaseQuery().CastShape(
-					verticalValidationCastUp,
-					settings,
-					JPH::RVec3::sZero(),
-					verticalCollectorUp,
-					broadPhaseFilter,
-					objectLayerFilter,
-					bodyFilter,
-					shapeFilter
-				);
-
-				if (verticalCollectorUp.mHit.mFraction >= 0.3f)
-				{
-					if (verticalCollectorUp.mHit.mFraction < 1.0f)
-					{
-						float adjustedOffset = verticalOffset * verticalCollectorUp.mHit.mFraction * 0.95f;
-						safePos = safePos + JPH::RVec3(verticalUp) * adjustedOffset;
-					}
-					else
-					{
-						safePos = verticalPosUp;
-					}
-					verticalAdjustmentApplied = true;
-				}
-			}
+			JPH::RVec3 verticalUp(0, 1, 0);
+			float verticalOffset = safetyOffset * 12.0f * (1.0f - collector.mHit.mFraction);
+			if (normal.GetY() < 0.0f) safePos -= verticalUp * verticalOffset; // plafond
+			else safePos += verticalUp * verticalOffset; // sol
 		}
 		else
 		{
-			// === GESTION DES COLLISIONS LATÉRALES ===
-
-			const float perpendicularThreshold = 0.6f;
-
-			if (std::abs(dotProduct) < perpendicularThreshold)
+			// --- Gestion latérale stricte ---
+			float dot = direction.Dot(normal);
+			if (std::abs(dot) < 0.7f)
 			{
-				JPH::Vec3 lateralComponent = contactNormal - direction * dotProduct;
-
-				if (lateralComponent.Length() > 0.001f)
-				{
-					lateralComponent = lateralComponent.Normalized();
-
-					float collisionSeverity = 1.0f - collector.mHit.mFraction;
-					float maxLateralOffset = safetyOffset * 6.0f;
-					float lateralOffset = maxLateralOffset * collisionSeverity;
-
-					JPH::RVec3 lateralPos1 = safePos + JPH::RVec3(lateralComponent) * lateralOffset;
-					JPH::RVec3 lateralPos2 = safePos - JPH::RVec3(lateralComponent) * lateralOffset;
-
-					JPH::RShapeCast lateralValidationCast1 = JPH::RShapeCast::sFromWorldTransform(
-						sphere,
-						JPH::Vec3::sReplicate(1.0f),
-						JPH::RMat44::sTranslation(focusPos),
-						(lateralPos1 - focusPos)
-					);
-
-					ClosestHitCollector lateralCollector1;
-					lateralCollector1.mHit.mFraction = 1.0f;
-
-					physicSystem.GetNarrowPhaseQuery().CastShape(
-						lateralValidationCast1,
-						settings,
-						JPH::RVec3::sZero(),
-						lateralCollector1,
-						broadPhaseFilter,
-						objectLayerFilter,
-						bodyFilter,
-						shapeFilter
-					);
-
-					JPH::RShapeCast lateralValidationCast2 = JPH::RShapeCast::sFromWorldTransform(
-						sphere,
-						JPH::Vec3::sReplicate(1.0f),
-						JPH::RMat44::sTranslation(focusPos),
-						(lateralPos2 - focusPos)
-					);
-
-					ClosestHitCollector lateralCollector2;
-					lateralCollector2.mHit.mFraction = 1.0f;
-
-					physicSystem.GetNarrowPhaseQuery().CastShape(
-						lateralValidationCast2,
-						settings,
-						JPH::RVec3::sZero(),
-						lateralCollector2,
-						broadPhaseFilter,
-						objectLayerFilter,
-						bodyFilter,
-						shapeFilter
-					);
-
-					if (lateralCollector1.mHit.mFraction >= 0.5f || lateralCollector2.mHit.mFraction >= 0.5f)
-					{
-						if (lateralCollector1.mHit.mFraction > lateralCollector2.mHit.mFraction)
-						{
-							if (lateralCollector1.mHit.mFraction < 1.0f)
-							{
-								float adjustedOffset = lateralOffset * lateralCollector1.mHit.mFraction * 0.9f;
-								safePos = safePos + JPH::RVec3(lateralComponent) * adjustedOffset;
-							}
-							else
-							{
-								safePos = lateralPos1;
-							}
-						}
-						else
-						{
-							if (lateralCollector2.mHit.mFraction < 1.0f)
-							{
-								float adjustedOffset = lateralOffset * lateralCollector2.mHit.mFraction * 0.9f;
-								safePos = safePos - JPH::RVec3(lateralComponent) * adjustedOffset;
-							}
-							else
-							{
-								safePos = lateralPos2;
-							}
-						}
-					}
-				}
-			}
-		}
-
-		// CHANGEMENT CRITIQUE: Validation finale SEULEMENT si on n'a PAS fait d'ajustement vertical
-		// Si on a descendu pour un plafond, on NE VÉRIFIE PAS à nouveau (sinon ça annule la descente)
-		if (!verticalAdjustmentApplied)
-		{
-			JPH::RShapeCast validationCast = JPH::RShapeCast::sFromWorldTransform(
-				sphere,
-				JPH::Vec3::sReplicate(1.0f),
-				JPH::RMat44::sTranslation(focusPos),
-				(safePos - focusPos)
-			);
-
-			ClosestHitCollector validationCollector;
-			validationCollector.mHit.mFraction = 1.0f;
-
-			physicSystem.GetNarrowPhaseQuery().CastShape(
-				validationCast,
-				settings,
-				JPH::RVec3::sZero(),
-				validationCollector,
-				broadPhaseFilter,
-				objectLayerFilter,
-				bodyFilter,
-				shapeFilter
-			);
-
-			if (validationCollector.mHit.mFraction < 0.5f)
-			{
-				const float validatedDistance = validationCollector.mHit.mFraction *
-					(safePos - focusPos).Length();
-				safePosDistance = max(validatedDistance * 0.9f - safetyOffset, Camera::cameraRadius * 2.0f);
-				safePos = focusPos + direction * safePosDistance;
+				JPH::Vec3 lateral = normal - direction * dot;
+				if (lateral.Length() > 0.001f) lateral = lateral.Normalized();
+				safePos += JPH::RVec3(lateral) * safetyOffset * 8.0f * (1.0f - collector.mHit.mFraction);
 			}
 		}
 
