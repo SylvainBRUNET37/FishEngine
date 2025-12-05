@@ -269,6 +269,9 @@ void PhysicsSimulationSystem::UpdateTransforms(EntityManager& entityManager)
 void PhysicsSimulationSystem::UpdateNPCs(EntityManager& entityManager)
 {
 	auto computeNewSpeed = [&](Body* body, AIController aiController, string name) {
+		// Random device
+		static std::mt19937 rng(std::random_device{}());
+		
 		const auto& transform = body->GetWorldTransform();
 		Vec3 right = transform.GetColumn3(0).Normalized();
 		Vec3 up = transform.GetColumn3(1).Normalized();
@@ -283,36 +286,66 @@ void PhysicsSimulationSystem::UpdateNPCs(EntityManager& entityManager)
 		}
 
 		// Panic mode
-		if (auto diff = body->GetPosition() - playerPosition; diff.Length() < aiController.safeDistance)
-		{
-			// Take a random direction opposite to the player
-			newSpeed = newSpeed.Normalized();
-			static std::mt19937 rng(std::random_device{}());
-			static std::uniform_real_distribution<float> dist(0.0f, std::numbers::pi_v<float>);
-		
-			// Base direction (away from player)
-			JPH::Vec3 newDir = (-diff).Normalized();
+		auto diff = body->GetPosition() - playerPosition;
+		const bool isPanicking = diff.Length() < aiController.safeDistance;
 
-			// Random direction
-			JPH::Quat qPitch = JPH::Quat::sRotation(right, dist(rng));
-			JPH::Quat qYaw = JPH::Quat::sRotation(up, dist(rng));
-			const JPH::Quat q = (qYaw * qPitch).Normalized();
+		if (!isPanicking && aiController.remainingDelay > 0)
+		{
+			aiController.remainingDelay -= 1.0f / 60.0f;
+			return newSpeed;
+		}
+		else if (aiController.remainingDelay < 0)
+		{
+			aiController.remainingDelay = aiController.updateDelay;
+		}
+
+
+		// Take a random direction opposite to the player
+		static std::uniform_real_distribution<float> dist(-std::numbers::pi_v<float>, std::numbers::pi_v<float>);
+		float divider = isPanicking ? 3.0f : 1.0f;
+
+
+		//// Base direction (away from player)
+		JPH::Vec3 newDir = (isPanicking ? diff : forward).Normalized();
+
+		//// Random direction
+		auto yaw = dist(rng) / divider;
+		JPH::Quat q = JPH::Quat::sRotation(up, yaw); // q is qYaw
+		cout << "Random yaw : " << yaw << std::endl;
+		if (isPanicking)
+		{
+			JPH::Quat qPitch = JPH::Quat::sRotation((q * right).Normalized(), dist(rng));
+			q = (qPitch * q).Normalized();
 			newDir = (q * newDir).Normalized();
-
-			// Ensure it's still opposite the player
-			if (newDir.Dot(diff.Normalized()) < 0.f)
-				newDir = -newDir;
-
-			newSpeed = newDir * (aiController.acceleration * 0.5f);
-
-			// TODO : rotate the fishes properly
-
 		}
-		// Standard roaming behavior
-		else
+
+		//// Ensure it's still opposite the player
+		//if (newDir.Dot(diff.Normalized()) < 0.f)
+		//{
+		//	newDir = -newDir;
+		//	// TODO change angle
+		//	q = JPH::Quat::sRotation(q * up, std::numbers::pi_v<float>) * q;
+		//}
+
+		newSpeed = newDir * (aiController.acceleration * 0.5f);
+
+		//// FISH ROTATION
+		const Quat currentRotation = body->GetRotation();
+		// Différence entre la rotation actuel et la roation vers laquel on veut aller
+		const Quat delta = (q * currentRotation.Conjugated()).Normalized();
+		// Converti en axe & angle
+		Vec3 axis;
+		float angle;
+		delta.GetAxisAngle(axis, angle);
+		// Vérifie l'angle pour éviter les problemes
+		if (angle > 0.0001f)
 		{
-			// TODO : Roaming behavior
+			constexpr float ROTATION_SPEED = .5f;
+			const Vec3 angularVelocity = axis * angle * ROTATION_SPEED;
+
+			body->SetAngularVelocity(angularVelocity);
 		}
+		//// END FISH ROTATION
 
 		return newSpeed;
 		};

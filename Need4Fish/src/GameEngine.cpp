@@ -219,9 +219,13 @@ void GameEngine::InitGame()
 		cameraComponent.targetEntity = entity;
 	}
 
-	for (const auto& [entity, name, _] : entityManager->View<Name, Eatable>())
+	for (const auto& [entity, name, _, rigidBody] : entityManager->View<Name, Eatable, RigidBody>())
 	{
-		//std::cout << name.name << std::endl;
+		const auto& transform = rigidBody.body->GetWorldTransform();
+		JPH::Vec3 forward = transform.GetAxisZ();
+
+		std::cout << name.name << " forward : " << forward.GetX() << ", " << forward.GetY() << ", " << forward.GetZ() << ", " << std::endl;
+
 		if (name.name != "Mosasaure")
 			entityManager->AddComponent<AIController>(entity, 100.0f, 10.0f);
 	}
