@@ -33,7 +33,7 @@ Vec3 MeshUtil::getApproximateSize(const Mesh& mesh)
 	return Vec3(maxX - minX, maxY - minY, maxZ - minZ);
 }
 
-TriangleList MeshUtil::generateMeshTriangleList(const Mesh mesh)
+TriangleList MeshUtil::generateMeshTriangleList(const Mesh& mesh)
 {
 	const auto nIndices = mesh.indices.size();
 	assert(nIndices % 3 == 0); //If it doesn't, we won't be able to make triangles... TODO: Do this more elegantly?

@@ -18,6 +18,7 @@ public:
 		mObjectToBroadPhase[Layers::VEHICLE] = BroadPhaseLayers::MOVING;
 		mObjectToBroadPhase[Layers::FOOD_CHAIN] = BroadPhaseLayers::MOVING;
 		mObjectToBroadPhase[Layers::GOAL] = BroadPhaseLayers::MOVING;
+		mObjectToBroadPhase[Layers::MOVING_DECOR] = BroadPhaseLayers::MOVING;
 	}
 
 	[[nodiscard]] JPH::uint GetNumBroadPhaseLayers() const override
