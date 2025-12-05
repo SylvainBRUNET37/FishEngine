@@ -129,11 +129,12 @@ static void LoseOrEat(
 	{
 		GameState::currentState = GameState::DIED;
 	}
-	else
+	else if (IsEntityAPlayer(entityManager, predatorEntity))
 	{
-		if (IsEntityAPlayer(entityManager, predatorEntity)) GameState::isGrowing = true; // TODO (maybe) also grow fishes ?
+		GameState::isGrowing = true; // TODO (maybe) also grow fishes ?
 		AcuallyEat(entityManager, predatorEntity, predatorEatable, predatorBody, preyEntity, preyEatable);
 	}
+	// Else : nothing (fishes do not eat each other)
 }
 
 
