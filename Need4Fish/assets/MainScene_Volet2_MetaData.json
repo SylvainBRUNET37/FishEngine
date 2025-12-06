@@ -27,6 +27,13 @@
 	"CheeseMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
 	"TortleMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongWaterPS.hlsl" },
 	
+	"BarkMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongWaterPS.hlsl" },
+	"BushMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongWaterPS.hlsl" },
+	"CoconutMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongWaterPS.hlsl" },
+	"LeafMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongWaterPS.hlsl" },
+	"BeachSmallStoneMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongWaterPS.hlsl" },
+	"BeachBigStoneMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongWaterPS.hlsl" },
+	
 	"ArchMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
 	"CrocoMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
 	
