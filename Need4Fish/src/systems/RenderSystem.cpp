@@ -95,12 +95,12 @@ void RenderSystem::RenderMeshesToShadowMap(EntityManager& entityManager)
 	// Render Meshes
 	for (const auto& [entity, transform, meshInstance] : entityManager.View<Transform, MeshInstance>())
 	{
-		// Check if the mesh should be rendered or not
-		// TODO: Probably wrong view point for culling...
+		// There's not point in checking if the mesh should be rendered or not with frustrum culling
+		// because the bounding box for a directional light would be the whole scene
 		auto& mesh = Locator::Get<ResourceManager>().GetMesh(meshInstance.meshIndex);
-		if (FrustumCuller::IsMeshCulled(mesh, transform))
+		/*if (FrustumCuller::IsMeshCulled(mesh, transform))
 			continue;
-
+		*/
 		static auto& shaderBank = Locator::Get<ResourceManager>().GetShaderBank();
 		XMMATRIX view = XMLoadFloat4x4(&lightView);
 		XMMATRIX proj = XMLoadFloat4x4(&lightProj);

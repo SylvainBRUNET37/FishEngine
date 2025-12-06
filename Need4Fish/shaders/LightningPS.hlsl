@@ -1,4 +1,4 @@
-static const float SHADOW_MAP_SIZE = 1024.0f; //Shadow map size must also be defined in RenderSystem
+static const float SHADOW_MAP_SIZE = 4096.0f; //Shadow map size must also be defined in RenderSystem
 static const float SHADOW_MAP_DX = 1.0f / SHADOW_MAP_SIZE;
 float CalcShadowFactor(SamplerComparisonState samShadow, Texture2D shadowMap, float4 shadowPosH)
 {

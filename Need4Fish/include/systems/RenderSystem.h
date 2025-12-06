@@ -37,7 +37,8 @@ private:
 
 	static FrameBuffer CreateDirectionalLight();
 
-	static const int SHADOW_MAP_SIZE = 1024; //shadow map size must also be defined in LightningPS.hlsl
+	static const int SHADOW_MAP_SIZE = 4096; //shadow map size must also be defined in LightningPS.hlsl
+	//4096 seems to be the maximum before a performance hit
 	std::unique_ptr<ShadowMap> shadowMap; //mSmap
 	DirectX::XMFLOAT4X4 lightView; //mLightView
 	DirectX::XMFLOAT4X4 lightProj; //mLightProj

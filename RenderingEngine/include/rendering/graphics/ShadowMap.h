@@ -6,9 +6,9 @@
 
 //Move this to the appropriate folder later
 
-//Reference: Frank D. Luna
+//Beaucoup du code pour les shadow maps ont pour référence la code de Frank D. Luna à l'adresse https://www.d3dcoder.net/d3d11.htm
 
-//Note: La taille de la shadow map doit être définie dans RenderSystem.h mais aussi dans 
+//Note: La taille de la shadow map doit être définie dans RenderSystem.h mais aussi dans LightningPS.hlsl
 class ShadowMap
 {
 public:
