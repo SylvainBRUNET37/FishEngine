@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "rendering/device/RenderContext.h"
 
+#include "rendering/utils/Util.h"
+
 RenderContext::RenderContext(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context,
                              const ComPtr<IDXGISwapChain>& swapChain, const WindowData& windowData)
 	: screenWidth(windowData.screenWidth),
@@ -49,4 +51,42 @@ void RenderContext::SetupViewPort() const
 	viewPort.TopLeftY = 0;
 
 	context->RSSetViewports(1, &viewPort);
+}
+
+void RenderContext::Resize(const UINT width, const UINT height)
+{
+	screenWidth = width;
+	screenHeight = height;
+
+	// Unbind previous render target and clear state
+	context->OMSetRenderTargets(0, nullptr, nullptr);
+	context->ClearState();
+	context->Flush();
+
+	renderTarget = RenderTarget{};
+
+	// Resize swap chain buffers
+	DXEssayer(swapChain->ResizeBuffers
+		(
+			0,
+			width,
+			height,
+			DXGI_FORMAT_R8G8B8A8_UNORM,
+			DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH
+		));
+
+	// Recreate member objets to take the new size in count
+	renderTarget = RenderTarget{device, swapChain};
+	postProcess = PostProcess{device, width, height};
+	distortionProcess = DistortionProcess{device, width, height};
+
+	// Recreate the depth buffer
+	WindowData windowData{};
+	windowData.screenWidth = width;
+	windowData.screenHeight = height;
+	depthBuffer = DepthBuffer{device, windowData};
+
+	// Update viewport and set new render target
+	SetRenderTarget();
+	SetupViewPort();
 }

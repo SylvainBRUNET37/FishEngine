@@ -18,6 +18,7 @@ public:
 	                       const ComPtr<IDXGISwapChain>& swapChain, const WindowData& windowData);
 
 	void Present() const;
+	void Resize(UINT width, UINT height);
 
 	[[nodiscard]] ID3D11Device* GetDevice() const noexcept { return device; }
 	[[nodiscard]] ID3D11DeviceContext* GetContext() const noexcept { return context; }

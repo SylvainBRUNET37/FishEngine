@@ -50,7 +50,8 @@ void GameEngine::Run()
 		// Pause/Unpause the game if ESC is pressed for exemple
 		HandleGameState();
 
-		if (GameState::currentState == GameState::FINISHED) return;
+		if (GameState::currentState == GameState::FINISHED) 
+			return;
 
 		const DWORD frameStartTime = GetTickCount();
 		const auto isGamePaused = GameState::currentState != GameState::PLAYING;

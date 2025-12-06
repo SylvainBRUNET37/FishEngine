@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "rendering/application/WindowsApplication.h"
 
+#include "rendering/utils/VerboseAssertion.h"
+
 bool WindowsApplication::Init()
 {
 	if (!RegisterWindowClass())
@@ -67,7 +69,7 @@ ATOM WindowsApplication::RegisterWindowClass() const
 	return RegisterClassExW(&wcex);
 }
 
-LRESULT WindowsApplication::ProcessWindowMessage(const HWND hWnd, const UINT msg, const WPARAM wp, const LPARAM lp)
+LRESULT WindowsApplication::ProcessWindowMessage(const HWND hWnd, const UINT msg, const WPARAM wp, const LPARAM lp) const
 {
 	static constexpr LRESULT MESSAGE_HANDLED = 0;
 
@@ -89,6 +91,19 @@ LRESULT WindowsApplication::ProcessWindowMessage(const HWND hWnd, const UINT msg
 		mouseWheelDelta += delta;              
 		return MESSAGE_HANDLED;
 	}
+	case WM_SIZE:
+	{
+		if (renderContext)
+		{
+			const UINT width = LOWORD(lp);
+			const UINT height = HIWORD(lp);
+
+			if (width > 0 && height > 0)
+				renderContext->Resize(width, height);
+		}
+	}
+	break;
+
 	default:
 		return DefWindowProcW(hWnd, msg, wp, lp);
 	}
@@ -99,16 +114,24 @@ LRESULT WindowsApplication::ProcessWindowMessage(const HWND hWnd, const UINT msg
 LRESULT WindowsApplication::HandleWindowsMessage(const HWND hWnd, const UINT message, const WPARAM wParam,
                                                  const LPARAM lParam)
 {
+	WindowsApplication* app = nullptr;
+
 	if (message == WM_NCCREATE)
 	{
 		const auto cs = reinterpret_cast<CREATESTRUCTW*>(lParam);
+		app = static_cast<WindowsApplication*>(cs->lpCreateParams);
+
 		SetWindowLongPtrW(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(cs->lpCreateParams));
+
+		app->mainWindow = hWnd;
 
 		return DefWindowProcW(hWnd, message, wParam, lParam);
 	}
+		
+	app = reinterpret_cast<WindowsApplication*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 
-	if (const auto self = reinterpret_cast<WindowsApplication*>(GetWindowLongPtrW(hWnd, GWLP_USERDATA)))
-		return ProcessWindowMessage(hWnd, message, wParam, lParam);
+	if (app)
+		return app->ProcessWindowMessage(hWnd, message, wParam, lParam);
 
 	return DefWindowProcW(hWnd, message, wParam, lParam);
 }

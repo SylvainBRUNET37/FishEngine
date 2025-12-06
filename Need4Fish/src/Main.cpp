@@ -49,6 +49,9 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 		auto renderContext = 
 			DeviceBuilder::CreateRenderContext(application.GetMainWindow(), application.GetWindowData());
 
+		// Link the render context to the application (used for resizing)
+		application.SetRenderContext(&renderContext);
+
 		// Init physics
 		JoltSystem joltSystem;
 
