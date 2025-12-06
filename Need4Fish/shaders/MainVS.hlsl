@@ -10,6 +10,7 @@ cbuffer FrameBuffer : register(b0)
 cbuffer ObjectBuffer : register(b1)
 {
     float4x4 matWorld;
+    float4x4 gShadowTransform;
 };
 
 // =====================================
@@ -29,6 +30,7 @@ struct VSOutput
     float3 normal : TEXCOORD0;
     float3 worldPosition : TEXCOORD1;
     float2 uv : TEXCOORD2;
+    float4 ShadowPosH : TEXCOORD4;
 };
 
 // =====================================
@@ -48,6 +50,8 @@ VSOutput MainVS(VSInput input)
     output.normal = normalize(normalWorld);
 
     output.uv = input.UV;
+    
+    output.ShadowPosH = mul(float4(input.POS, 1.0f), gShadowTransform);
 
     return output;
 }

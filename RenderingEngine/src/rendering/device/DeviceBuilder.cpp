@@ -31,6 +31,7 @@ RenderContext DeviceBuilder::CreateRenderContext(const HWND hwnd, const WindowDa
 			D3D11_SDK_VERSION, &swapChainDesc, &swapChain, &device, nullptr, &context),
 		DXE_ERREURCREATIONDEVICE
 	);
+	SetDebugName(swapChain, "swapChainDesc-in-DeviceBuilder");
 
 	return RenderContext{device, context, swapChain, windowData};
 }

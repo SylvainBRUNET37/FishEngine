@@ -4,6 +4,8 @@
 #include "rendering/graphics/camera/BaseCamera.h"
 #include "rendering/texture/TextureLoader.h"
 
+#include <memory>
+
 #include <iostream>
 
 using namespace DirectX;
@@ -14,6 +16,7 @@ Renderer::Renderer(RenderContext* renderContext, std::vector<Material>&& materia
 	  frameConstantBuffer{renderContext->GetDevice(), frameCbRegisterNumber},
 	  objectConstantBuffer{renderContext->GetDevice(), objectCbRegisterNumber},
 	  spriteConstantBuffer{renderContext->GetDevice(), spriteCbRegisterNumber},
+	  shadowMapLightWVPBuffer{ renderContext->GetDevice(), shadowMapLightWVPCbRegisterNumber },
 	  postProcessSettingsBuffer{renderContext->GetDevice(), postProcessCbRegisterNumber},
 	  causticTexture{TextureLoader::LoadTextureFromFile("assets/textures/caustics.png", renderContext->GetDevice())}
 {
@@ -44,11 +47,26 @@ Renderer::Renderer(RenderContext* renderContext, std::vector<Material>&& materia
 	DXEssayer(renderContext->GetDevice()->CreateSamplerState(&causticSamplerDesc, &causticSampler));
 
 	SetDebugName(causticSampler, "causticSampler-in-Renderer");
+
+	D3D11_SAMPLER_DESC shadowMapSamplerComparisonStateDesc{};
+	shadowMapSamplerComparisonStateDesc.ComparisonFunc = D3D11_COMPARISON_LESS;
+	shadowMapSamplerComparisonStateDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
+	shadowMapSamplerComparisonStateDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
+	shadowMapSamplerComparisonStateDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
+	shadowMapSamplerComparisonStateDesc.BorderColor[0] = 0.0f;
+	shadowMapSamplerComparisonStateDesc.BorderColor[1] = 0.0f;
+	shadowMapSamplerComparisonStateDesc.BorderColor[2] = 0.0f;
+	shadowMapSamplerComparisonStateDesc.BorderColor[3] = 0.0f;
+	shadowMapSamplerComparisonStateDesc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
+
+	DXEssayer(renderContext->GetDevice()->CreateSamplerState(&shadowMapSamplerComparisonStateDesc, &shadowMapSamplerComparisonState));
+
+	SetDebugName(shadowMapSamplerComparisonState, "shadowMapSamplerComparisonState-in-Renderer");
 }
 
 void Renderer::Render(const Mesh& mesh,
-                      ID3D11DeviceContext* context,
-                      const Transform& transform)
+	ID3D11DeviceContext* context,
+	const Transform& transform)
 {
 	auto& material = materials[mesh.materialIndex];
 
@@ -79,6 +97,73 @@ void Renderer::Render(const Mesh& mesh,
 	else {
 		DoubleSidedDraw(mesh);
 	}
+}
+
+void Renderer::RenderWithShadowMap(const Mesh& mesh,
+                      ID3D11DeviceContext* context,
+                      const Transform& transform,
+					  const XMMATRIX shadowTransform,
+					  ID3D11ShaderResourceView* depthMapSRV)
+{
+	auto& material = materials[mesh.materialIndex];
+
+	// Update material constant buffer
+	const auto cbMaterialParams = BuildConstantMaterialBuffer(material);
+	material.constantBuffer.Update(context, cbMaterialParams);
+	material.constantBuffer.Bind(context);
+	material.shaderProgram->Bind(context);
+
+	// Update object constant buffer
+	const auto cbObjectParams = BuildConstantObjectBuffer(transform, shadowTransform);
+	objectConstantBuffer.Update(context, cbObjectParams);
+	objectConstantBuffer.Bind(context);
+
+	// Update frame constant buffer
+	frameConstantBuffer.Update(context, frameBuffer);
+	frameConstantBuffer.Bind(context);
+
+	// Bind textures and samplers
+	context->PSSetShaderResources(0, 1, &material.texture);
+	context->PSSetShaderResources(1, 1, &causticTexture.texture);
+	context->PSSetShaderResources(2, 1, &depthMapSRV);
+	context->PSSetSamplers(0, 1, &textureSampler);
+	context->PSSetSamplers(1, 1, &causticSampler);
+	context->PSSetSamplers(2, 1, &shadowMapSamplerComparisonState);
+
+	if (material.name != "WaterMat") {
+		Draw(mesh);
+	}
+	else {
+		DoubleSidedDraw(mesh);
+	}
+}
+
+void Renderer::RenderToShadowMap(const Mesh& mesh, ID3D11DeviceContext* context, const Transform& transform, DirectX::XMMATRIX lightView, DirectX::XMMATRIX lightProjection, ShaderBank& shaderBank)
+{
+	auto& material = materials[mesh.materialIndex];
+
+	if (material.name == "WaterMat" || material.name == "DistortionMat") {
+		return;
+	}
+
+	//// Update material constant buffer
+	const auto cbSMParams = BuildConstantShadowMapLightWVPBuffer(transform, lightView, lightProjection);
+	shadowMapLightWVPBuffer.Update(context, cbSMParams);
+	shadowMapLightWVPBuffer.Bind(context);
+
+	static const std::shared_ptr<ShaderProgram> shadowMapShader = shaderBank.GetOrCreateShaderProgram
+	(
+		renderContext->GetDevice(),
+		"shaders/ShadowMapVS.hlsl",
+		//nullptr
+		"shaders/ShadowMapPS.hlsl"
+	);
+	shadowMapShader->Bind(context);
+	context->VSSetShaderResources(0, 1, &material.texture);
+	context->PSSetShaderResources(0, 1, &material.texture);
+
+	//DrawToShadowMap(mesh);
+	Draw(mesh);
 }
 
 void Renderer::Render(Sprite2D& sprite, ID3D11DeviceContext* context) const
@@ -197,6 +282,21 @@ void Renderer::Draw(const Mesh& mesh) const
 	renderContext->GetContext()->DrawIndexed(static_cast<UINT>(mesh.indices.size()), 0, 0);
 }
 
+void Renderer::DrawToShadowMap(const Mesh& mesh) const
+{
+	renderContext->SetCullModeShadowMap();
+	constexpr UINT stride = sizeof(Vertex);
+	constexpr UINT offset = 0;
+
+	const auto rawVertexBuffer = mesh.vertexBuffer.Get();
+
+	// Bind vertex buffer
+	renderContext->GetContext()->IASetVertexBuffers(0, 1, &rawVertexBuffer, &stride, &offset);
+	renderContext->GetContext()->IASetIndexBuffer(mesh.indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+	renderContext->GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	renderContext->GetContext()->DrawIndexed(static_cast<UINT>(mesh.indices.size()), 0, 0);
+}
+
 void Renderer::DoubleSidedDraw(const Mesh& mesh) const
 {
 	renderContext->SetCullModeCullNone();
@@ -230,6 +330,16 @@ ObjectBuffer Renderer::BuildConstantObjectBuffer(const Transform& transform)
 	return params;
 }
 
+ObjectBuffer Renderer::BuildConstantObjectBuffer(const Transform& transform, const XMMATRIX shadowTransform)
+{
+	ObjectBuffer params;
+
+	params.matWorld = XMMatrixTranspose(transform.world);
+	params.shadowTransform = XMMatrixTranspose(transform.world * shadowTransform);
+
+	return params;
+}
+
 MaterialBuffer Renderer::BuildConstantMaterialBuffer(const Material& material)
 {
 	MaterialBuffer params;
@@ -242,6 +352,17 @@ MaterialBuffer Renderer::BuildConstantMaterialBuffer(const Material& material)
 	params.padding = XMFLOAT2(0, 0);
 
 	return params;
+}
+
+ShadowMapLightWVPBuffer Renderer::BuildConstantShadowMapLightWVPBuffer(const Transform& transformForWorldMatrix, const DirectX::XMMATRIX lightViewMatrix, const DirectX::XMMATRIX lightProjectionMatrix)
+{
+	ShadowMapLightWVPBuffer param;
+
+	XMMATRIX temp = transformForWorldMatrix.world * lightViewMatrix * lightProjectionMatrix;
+
+	param.lightWVP = XMMatrixTranspose(temp);
+
+	return param;
 }
 
 void Renderer::ClearPixelShaderResources() {

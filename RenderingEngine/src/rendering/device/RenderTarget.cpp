@@ -10,6 +10,7 @@ RenderTarget::RenderTarget(const ComPtr<ID3D11Device>& device, const ComPtr<IDXG
 
 	DXEssayer(swapChain->GetBuffer(0, IID_PPV_ARGS(&backBuffer)), DXE_ERREUROBTENTIONBUFFER);
 	DXEssayer(device->CreateRenderTargetView(backBuffer, nullptr, &renderTargetView), DXE_ERREURCREATIONRENDERTARGET);
+	SetDebugName(renderTargetView, "renderTargetView-in-RenderTarget");
 }
 
 void RenderTarget::Init(const ComPtr<ID3D11Device>& device, const ComPtr<IDXGISwapChain>& swapChain)

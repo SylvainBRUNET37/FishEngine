@@ -19,9 +19,17 @@ RenderContext::RenderContext(const ComPtr<ID3D11Device>& device, const ComPtr<ID
 	  depthState(device)
 {
 	SetRenderTarget();
+	viewPort.Width = static_cast<FLOAT>(screenWidth);
+	viewPort.Height = static_cast<FLOAT>(screenHeight);
+	viewPort.MinDepth = 0.0f;
+	viewPort.MaxDepth = 1.0f;
+	viewPort.TopLeftX = 0;
+	viewPort.TopLeftY = 0;
 	SetupViewPort();
 
 	EnableDefaultDepth();
+
+	//viewPort.Width = 1;
 }
 
 void RenderContext::Present() const
@@ -41,14 +49,15 @@ void RenderContext::SetRenderTarget() const
 
 void RenderContext::SetupViewPort() const
 {
-	D3D11_VIEWPORT viewPort{};
+	//D3D11_VIEWPORT viewPort{};
+	//Compiler complains of Expression Must Be a Modifiable Lvalue if viewPort is local...
 
-	viewPort.Width = static_cast<FLOAT>(screenWidth);
+	/*viewPort.Width = static_cast<FLOAT>(screenWidth);
 	viewPort.Height = static_cast<FLOAT>(screenHeight);
 	viewPort.MinDepth = 0.0f;
 	viewPort.MaxDepth = 1.0f;
 	viewPort.TopLeftX = 0;
-	viewPort.TopLeftY = 0;
+	viewPort.TopLeftY = 0;*/
 
 	context->RSSetViewports(1, &viewPort);
 }
