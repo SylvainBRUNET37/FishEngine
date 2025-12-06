@@ -22,6 +22,8 @@
     "LavaMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/LavaPS.hlsl" },
     "SmallRockMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
     "MidRockMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
-    "BigRockMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" }
+    "BigRockMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
+	
+	"CheeseMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" }
   }
 }
