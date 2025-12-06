@@ -8,7 +8,7 @@
 #include "Entity.h"
 
 // TODO: not the best way of doing it, using a sparse set would be better
-inline static constexpr size_t MAX_ENTITIES = 32768;
+inline static constexpr size_t MAX_ENTITIES = 65536;
 
 // A container for the given component
 template <typename Component>

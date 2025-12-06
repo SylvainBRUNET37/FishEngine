@@ -245,16 +245,15 @@ void GameEngine::CreateParticleZones()
 
 	particleSystem.AddParticleZone(*entityManager,
 	                               {
-		                               .centerPosition = {0, 700.0f, 0},
-		                               .halfExtends = {250.0f, 250.0f, 250.0f},
-		                               .nbParticle = 18'000,
+		                               .centerPosition = {0, 1300.0f, 0},
+		                               .halfExtends = {7000.0f,900.0f, 7000.0f},
+		                               .nbParticle = 30'000,
 		                               .particleDurationMin = 3.0f,
 		                               .particleDurationMax = 15.0f,
 		                               .particleSpeed = 3.0f,
 		                               .particleDirection = {0, 1, 0},
 		                               .billboardTexture = bubbleTexture,
 		                               .billboardShader = bubbleShader
-
 	                               }
 	);
 	// Add particles inside the world (TODO: make it fit the world size)
@@ -275,7 +274,7 @@ void GameEngine::CreateParticleZones()
 #ifndef NDEBUG
 				static constexpr unsigned int NB_CURRENT_PARTICLES = 75;
 #else
-				static constexpr unsigned int NB_CURRENT_PARTICLES = 200;
+				static constexpr unsigned int NB_CURRENT_PARTICLES = 1000;
 #endif
 
 				particleSystem.AddParticleZone(*entityManager,
@@ -307,7 +306,7 @@ void GameEngine::CreateParticleZones()
 #ifndef NDEBUG
 				static constexpr unsigned int NB_GEYSER_PARTICLES = 100;
 #else
-				static constexpr unsigned int NB_GEYSER_PARTICLES = 5000;
+				static constexpr unsigned int NB_GEYSER_PARTICLES = 2500;
 #endif
 
 				particleSystem.AddParticleZone(*entityManager,
