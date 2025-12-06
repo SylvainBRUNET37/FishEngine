@@ -18,8 +18,10 @@ RenderSystem::RenderSystem(RenderContext* renderContext, const std::shared_ptr<U
 	: uiManager(uiManager),
 	  renderer(renderContext, std::move(materials)),
 	  frameBuffer(CreateDirectionnalLight()),
-	  renderContext(renderContext)
+	  renderContext(renderContext),
+particleWorldMatrices(BillboardRenderer::MAX_BILLBOARDS)
 {
+
 }
 
 void RenderSystem::RenderPostProcesses(const double deltaTime)
@@ -77,20 +79,15 @@ void RenderSystem::RenderParticles(EntityManager& entityManager, const Camera& c
 {
 	renderer.PrepareSceneForBillboard();
 
-	static constexpr size_t NB_PARTICLE_MAX = 276;
-	vector<XMMATRIX> particleWorldMatrices;
-	particleWorldMatrices.reserve(NB_PARTICLE_MAX);
-
 	Billboard* billboard{};
 	size_t i = 0;
 	for (const auto& [entity, particle] : entityManager.View<Particle>())
 	{
 		if (i == 0) [[unlikely]] // store the billboard object only once
-		{
 			billboard = &particle.billboard;
-			++i;
-		}
-		particleWorldMatrices.emplace_back(particle.billboard.ComputeBillboardWorldMatrix());
+
+		particleWorldMatrices[i] = particle.billboard.ComputeBillboardWorldMatrix();
+		++i;
 	}
 
 	vassert(billboard, "There should be particles in the world since RenderParticles is called");

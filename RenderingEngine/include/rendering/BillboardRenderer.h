@@ -13,6 +13,8 @@ struct BaseCameraData;
 class BillboardRenderer
 {
 public:
+	static constexpr size_t MAX_BILLBOARDS = 30'000;
+
 	explicit BillboardRenderer(ID3D11Device* device);
 
 	void Render(Billboard& billboard, ID3D11DeviceContext* context, const DirectX::XMMATRIX& worldMatrix);
@@ -30,9 +32,9 @@ private:
 	ConstantBuffer<BillboardBuffer> billboardConstantBuffer;
 
 	// For instancing
-	static constexpr size_t MAX_BILLBOARDS = 276;
 	ComPtr<ID3D11Buffer> billboardWorldBuffer;
 	ComPtr<ID3D11ShaderResourceView> billboardWorldSRV;
+	std::vector<BillboardBuffer> instancingBuffers;
 
 	static void Draw(const Billboard& billboard, ID3D11DeviceContext* context);
 };

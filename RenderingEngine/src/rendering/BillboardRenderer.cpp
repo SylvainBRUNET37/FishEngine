@@ -8,7 +8,8 @@ using namespace std;
 
 BillboardRenderer::BillboardRenderer(ID3D11Device* device)
 	: billboardCameraConstantBuffer{device, billboardCameraCbRegisterNumber},
-	  billboardConstantBuffer{device, billboardCbRegisterNumber}
+	  billboardConstantBuffer{device, billboardCbRegisterNumber},
+	instancingBuffers(MAX_BILLBOARDS)
 {
 	D3D11_BUFFER_DESC desc{};
 	desc.Usage = D3D11_USAGE_DEFAULT;
@@ -49,12 +50,10 @@ void BillboardRenderer::Render(Billboard& billboard, ID3D11DeviceContext* contex
 void BillboardRenderer::RenderWithInstancing(Billboard& billboard, ID3D11DeviceContext* context,
 	const vector<XMMATRIX>& worldMatrices)
 {
-	vector<BillboardBuffer> buffers(MAX_BILLBOARDS);
-
 	for (size_t i = 0; i < worldMatrices.size(); i++)
-		XMStoreFloat4x4(&buffers[i].matWorld, XMMatrixTranspose(worldMatrices[i]));
+		XMStoreFloat4x4(&instancingBuffers[i].matWorld, XMMatrixTranspose(worldMatrices[i]));
 
-	context->UpdateSubresource(billboardWorldBuffer, 0, nullptr, buffers.data(), 0, 0);
+	context->UpdateSubresource(billboardWorldBuffer, 0, nullptr, instancingBuffers.data(), 0, 0);
 	billboard.shaderProgram->Bind(context);
 
 	billboardCameraConstantBuffer.Update(context, billboardCameraBuffer);

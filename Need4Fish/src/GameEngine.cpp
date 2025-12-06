@@ -247,7 +247,7 @@ void GameEngine::CreateParticleZones()
 	                               {
 		                               .centerPosition = {0, 700.0f, 0},
 		                               .halfExtends = {250.0f, 250.0f, 250.0f},
-		                               .nbParticle = 1,
+		                               .nbParticle = 18'000,
 		                               .particleDurationMin = 3.0f,
 		                               .particleDurationMax = 15.0f,
 		                               .particleSpeed = 3.0f,

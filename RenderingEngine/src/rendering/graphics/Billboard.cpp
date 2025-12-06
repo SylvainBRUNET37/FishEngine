@@ -69,15 +69,15 @@ XMMATRIX Billboard::ComputeBillboardWorldMatrix() const
 	};
 
 	// Build billboard world matrix (S * R * T)
-	const XMMATRIX billboardMatWorld =
-		XMMatrixScaling(scale.x, scale.y, 1.0f) *
-		billboardRotation *
+	return 
+	{
+		XMMatrixScaling(scale.x, scale.y, 1.0f)*
+		billboardRotation*
 		XMMatrixTranslation
 		(
 			position.x,
 			position.y,
 			position.z
-		);
-
-	return billboardMatWorld;
+		)
+	};
 }

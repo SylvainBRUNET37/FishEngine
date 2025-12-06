@@ -1,6 +1,8 @@
 #ifndef RENDER_SYSTEM_H
 #define RENDER_SYSTEM_H
 
+#include <vector>
+
 #include "System.h"
 #include "rendering/Renderer.h"
 #include "rendering/device/RenderContext.h"
@@ -19,6 +21,8 @@ private:
 	Renderer renderer;
 	FrameBuffer frameBuffer;
 	RenderContext* renderContext;
+
+	std::vector<DirectX::XMMATRIX> particleWorldMatrices;
 
 	void RenderUI(EntityManager& entityManager);
 	void RenderPostProcesses(double deltaTime);
