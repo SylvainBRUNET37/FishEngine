@@ -99,7 +99,7 @@ void CameraSystem::ComputeCameraPosition(Camera& camera, const Transform& transf
 
 	// --- Temporary 1st Person ---
 	constexpr float tempFPMinTime = 2.0f;
-	constexpr float fpEntryFactor = 0.75f;
+	constexpr float fpEntryFactor = 0.1f;
 	constexpr float fpExitFactor = 1.05f;
 	constexpr float exitDistanceTolerance = 0.9f;
 	constexpr float reentryCooldown = 0.75f;
