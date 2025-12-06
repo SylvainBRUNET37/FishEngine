@@ -6,6 +6,7 @@
 #include "components/PowerSource.h"
 #include "systems/PowerSystem.h"
 #include <cmath>
+#include "entities/EntityManager.h"
 
 using namespace DirectX;
 

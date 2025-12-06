@@ -8,19 +8,19 @@
 class ConversionUtil
 {
 public:
-	static inline JPH::Float3 XMFloat3ToFloat3(DirectX::XMFLOAT3 f) {
+	static JPH::Float3 XMFloat3ToFloat3(DirectX::XMFLOAT3 f) {
 		return JPH::Float3(f.x, f.y, f.z);
 	}
 
-	static inline DirectX::XMFLOAT3 Float3ToXMFloat3(JPH::Float3 f) {
+	static DirectX::XMFLOAT3 Float3ToXMFloat3(JPH::Float3 f) {
 		return DirectX::XMFLOAT3(f.x, f.y, f.z);
 	}
 
-	static inline JPH::Vec3Arg XMFloat3ToVec3Arg(DirectX::XMFLOAT3 f) {
+	static JPH::Vec3Arg XMFloat3ToVec3Arg(DirectX::XMFLOAT3 f) {
 		return JPH::Vec3Arg(f.x, f.y, f.z);
 	}
 
-	static inline DirectX::XMFLOAT3 Vec3ArgToXMFloat3(JPH::Vec3Arg f) {
+	static DirectX::XMFLOAT3 Vec3ArgToXMFloat3(JPH::Vec3Arg f) {
 		return DirectX::XMFLOAT3(f.GetX(), f.GetY(), f.GetZ());
 	}
 };

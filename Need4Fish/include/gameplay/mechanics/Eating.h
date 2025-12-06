@@ -1,6 +1,10 @@
-#pragma once
-#include "pch.h"
-#include "entities/EntityManagerFactory.h"
+#ifndef EATING_H
+#define EATING_H
+
+#include <Jolt/Jolt.h>
+#include <Jolt/Physics/Body/Body.h>
+
+class EntityManager;
 
 namespace Eating
 {
@@ -8,3 +12,5 @@ namespace Eating
 
 	void UpdatePlayerScale(EntityManager& entityManager);
 }
+
+#endif

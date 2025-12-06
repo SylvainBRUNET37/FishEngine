@@ -1,7 +1,6 @@
 #ifndef WATER_COLLECTOR_H
 #define WATER_COLLECTOR_H
 
-#include "pch.h"
 #include <Jolt/Physics/PhysicsSystem.h>
 #include <Jolt/Physics/Collision/BroadPhase/BroadPhaseQuery.h>
 
