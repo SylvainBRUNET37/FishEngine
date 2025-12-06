@@ -1,7 +1,11 @@
 #include "pch.h"
 #include "utils/MathsUtils.h"
 
+#include <numbers>
 #include <random>
+#include <Jolt/Physics/EActivation.h>
+
+#include "physicsEngine/JoltSystem.h"
 
 using namespace std;
 using namespace DirectX;
@@ -33,4 +37,24 @@ bool MathsUtils::IsInsideAABB(const XMFLOAT3& point, const XMFLOAT3& center,
 		point.y <= center.y + halfExtends.y &&
 		point.z >= center.z - halfExtends.z &&
 		point.z <= center.z + halfExtends.z;
+}
+
+void MathsUtils::TurnFishAround(EntityManager& entityManager, const Entity& entity)
+{
+	auto& bodyInterface = JoltSystem::GetBodyInterface();
+	const auto& rigidBody = entityManager.Get<RigidBody>(entity);
+	const JPH::Vec3 axis = rigidBody.body->GetWorldTransform().GetColumn3(1).Normalized(); // up
+
+	static constexpr float angle = std::numbers::pi_v<float>;
+
+	// Vérifie l'angle pour éviter les problemes
+	if (angle > 0.0001f)
+	{
+		bodyInterface.SetPositionAndRotation(
+			rigidBody.body->GetID(),
+			rigidBody.body->GetPosition(),
+			(JPH::Quat::sRotation(axis, angle) * rigidBody.body->GetRotation()).Normalized(),
+			JPH::EActivation::Activate
+		);
+	}
 }

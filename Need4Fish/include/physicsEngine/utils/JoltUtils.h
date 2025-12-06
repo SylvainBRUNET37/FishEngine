@@ -6,14 +6,9 @@
 #include <cstdarg>
 #include <format>
 #include <iostream>
-#include "entities/Entity.h"
-#include "entities/EntityManager.h"
 
 namespace JoltUtils
 {
-
-	void TurnFishAround(EntityManager& entityManager, const Entity& entity);
-
 	static void TraceImpl(const char* inFMT, ...)
 	{
 		va_list args;
@@ -34,7 +29,7 @@ namespace JoltUtils
 
 		assert(false && "Jolt Assertion Failed. See error output for more information.");
 		return false;
-	};
+	}
 
 #endif
 }

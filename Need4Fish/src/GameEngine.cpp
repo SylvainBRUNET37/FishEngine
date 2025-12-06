@@ -17,7 +17,6 @@
 #include "systems/SensorSystem.h"
 #include "utils/MathsUtils.h"
 #include "utils/EntityManagerUtils.h"
-#include "physicsEngine/utils/JoltUtils.h"
 
 using namespace DirectX;
 using namespace JPH;
@@ -145,9 +144,9 @@ void GameEngine::HandleCollions()
 		{
 			// Rotate da fishes around
 			if (isAiFish(*entityManager, entity1))
-				JoltUtils::TurnFishAround(*entityManager, entity1);
+				MathsUtils::TurnFishAround(*entityManager, entity1);
 			if (isAiFish(*entityManager, entity2))
-				JoltUtils::TurnFishAround(*entityManager, entity2);
+				MathsUtils::TurnFishAround(*entityManager, entity2);
 		}
 
 		if (GameState::currentState != GameState::PLAYING) ChangeGameStatus();

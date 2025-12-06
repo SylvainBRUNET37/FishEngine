@@ -176,7 +176,6 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     <None Include="shaders\Constants.hlsl">
       <FileType>Document</FileType>
     </None>
-    <ClCompile Include="include\physicsEngine\utils\JoltUtils.cpp" />
     <None Include="shaders\BubbleInstancingPS.hlsl">
       <FileType>Document</FileType>
     </None>

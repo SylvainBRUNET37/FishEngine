@@ -3,6 +3,9 @@
 
 #include <DirectXMath.h>
 
+class EntityManager;
+struct Entity;
+
 namespace MathsUtils
 {
 	[[nodiscard]] float RandomBetween(float min, float max);
@@ -11,6 +14,8 @@ namespace MathsUtils
         const DirectX::XMFLOAT3& point,
         const DirectX::XMFLOAT3& center,
         const DirectX::XMFLOAT3& halfExtends);
+
+    void TurnFishAround(EntityManager& entityManager, const Entity& entity);
 }
 
 #endif
