@@ -8,15 +8,14 @@ using namespace std;
 
 BillboardRenderer::BillboardRenderer(ID3D11Device* device)
 	: billboardCameraConstantBuffer{device, billboardCameraCbRegisterNumber},
-	  billboardConstantBuffer{device, billboardCbRegisterNumber},
-	instancingBuffers(MAX_BILLBOARDS)
+	  billboardConstantBuffer{device, billboardCbRegisterNumber}
 {
 	D3D11_BUFFER_DESC desc{};
 	desc.Usage = D3D11_USAGE_DEFAULT;
-	desc.ByteWidth = sizeof(BillboardBuffer) * MAX_BILLBOARDS;
+	desc.ByteWidth = sizeof(BillboardData) * MAX_BILLBOARDS;
 	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 	desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
-	desc.StructureByteStride = sizeof(BillboardBuffer);
+	desc.StructureByteStride = sizeof(BillboardData);
 
 	DXEssayer(device->CreateBuffer(&desc, nullptr, &billboardWorldBuffer));
 
@@ -48,21 +47,19 @@ void BillboardRenderer::Render(Billboard& billboard, ID3D11DeviceContext* contex
 }
 
 void BillboardRenderer::RenderWithInstancing(Billboard& billboard, ID3D11DeviceContext* context,
-	const vector<XMMATRIX>& worldMatrices)
+	const vector<BillboardData>& worldMatrices)
 {
-	for (size_t i = 0; i < worldMatrices.size(); i++)
-		XMStoreFloat4x4(&instancingBuffers[i].matWorld, XMMatrixTranspose(worldMatrices[i]));
-
-	context->UpdateSubresource(billboardWorldBuffer, 0, nullptr, instancingBuffers.data(), 0, 0);
+	context->UpdateSubresource(billboardWorldBuffer, 0, nullptr, worldMatrices.data(), 0, 0);
 	billboard.shaderProgram->Bind(context);
 
 	billboardCameraConstantBuffer.Update(context, billboardCameraBuffer);
 	billboardCameraConstantBuffer.Bind(context);
 
+	// Bind the vertex buffer
 	constexpr UINT stride = sizeof(VertexSprite);
 	constexpr UINT offset = 0;
-	ID3D11Buffer* vb = billboard.vertexBuffer.Get();
-	context->IASetVertexBuffers(0, 1, &vb, &stride, &offset);
+	ID3D11Buffer* billboardVB = billboard.vertexBuffer.Get();
+	context->IASetVertexBuffers(0, 1, &billboardVB, &stride, &offset);
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// Bind SRV of the structured buffer

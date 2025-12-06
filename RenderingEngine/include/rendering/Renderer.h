@@ -25,7 +25,7 @@ public:
 	void Render(const Mesh& mesh, ID3D11DeviceContext* context, const Transform& transform);
 	void Render(Sprite2D& sprite, ID3D11DeviceContext* context) const;
 	void Render(Billboard& billboard, const DirectX::XMMATRIX& worldMatrix, const BaseCameraData& baseCameraData);
-	void RenderWithInstancing(Billboard& billboard, const std::vector<DirectX::XMMATRIX>& worldMatrices, const BaseCameraData& baseCameraData);
+	void RenderWithInstancing(Billboard& billboard, const std::vector<BillboardData>& worldMatrices, const BaseCameraData& baseCameraData);
 	void RenderPostProcess(ID3D11VertexShader* postProcessVertexShader, 
 		                   ID3D11PixelShader* postProcessPixelShader,
 	                       const PostProcessSettings& parameters);

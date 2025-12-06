@@ -6,7 +6,13 @@ cbuffer BillboardCameraBuffer : register(b0)
 	float pad;
 };
 
-StructuredBuffer<float4x4> BillboardWorlds : register(t1);
+struct BillboardData
+{
+    float3 position;
+    float scale;
+};
+
+StructuredBuffer<BillboardData> BillboardWorlds : register(t1);
 
 struct VSInput
 {
@@ -26,14 +32,36 @@ VSOutput BubbleInstancingVS(VSInput input)
 {
 	VSOutput output;
 
-	float4x4 matWorld = BillboardWorlds[input.instanceID];
+	// Get billboard data
+    BillboardData data = BillboardWorlds[input.instanceID];
+    float3 billboardPos = data.position.xyz;
+    float2 billboardScale = data.scale.xx;
 
-	float4 worldPos = mul(float4(input.pos, 1.0f), matWorld);
-	float4 viewPos = mul(worldPos, matView);
-	output.pos = mul(viewPos, matProj);
+	// Compute orientation vectprs
+    float3 forward = normalize(cameraPos - billboardPos);
+    float3 worldUp = float3(0, 1, 0);
+    float3 right = normalize(cross(worldUp, forward));
+    float3 up = cross(forward, right);
 
-	output.uv = input.uv;
-	output.worldPos = worldPos.xyz;
+	// Scale
+    float3 local = float3
+	(
+		input.pos.x * billboardScale.x,
+		input.pos.y * billboardScale.y,
+		0.0f
+	);
+
+	// Position
+    float3 worldPos = billboardPos +
+                      right * local.x +
+                      up * local.y;
+
+	// Apply view & proj
+    float4 viewPos = mul(float4(worldPos, 1.0f), matView);
+    output.pos = mul(viewPos, matProj);
+
+    output.uv = input.uv;
+    output.worldPos = worldPos;
 
 	return output;
 }

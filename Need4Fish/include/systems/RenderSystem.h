@@ -22,7 +22,7 @@ private:
 	FrameBuffer frameBuffer;
 	RenderContext* renderContext;
 
-	std::vector<DirectX::XMMATRIX> particleWorldMatrices;
+	std::vector<BillboardData> particleData;
 
 	void RenderUI(EntityManager& entityManager);
 	void RenderPostProcesses(double deltaTime);

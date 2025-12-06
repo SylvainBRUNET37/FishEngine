@@ -18,7 +18,7 @@ public:
 	explicit BillboardRenderer(ID3D11Device* device);
 
 	void Render(Billboard& billboard, ID3D11DeviceContext* context, const DirectX::XMMATRIX& worldMatrix);
-	void RenderWithInstancing(Billboard& billboard, ID3D11DeviceContext* context, const std::vector<DirectX::XMMATRIX>& worldMatrices);
+	void RenderWithInstancing(Billboard& billboard, ID3D11DeviceContext* context, const std::vector<BillboardData>& worldMatrices);
 	void UpdateCameraData(const BaseCameraData& baseCameraData, ID3D11DeviceContext* context, ID3D11ShaderResourceView* billboardSRV);
 
 private:
@@ -34,7 +34,6 @@ private:
 	// For instancing
 	ComPtr<ID3D11Buffer> billboardWorldBuffer;
 	ComPtr<ID3D11ShaderResourceView> billboardWorldSRV;
-	std::vector<BillboardBuffer> instancingBuffers;
 
 	static void Draw(const Billboard& billboard, ID3D11DeviceContext* context);
 };

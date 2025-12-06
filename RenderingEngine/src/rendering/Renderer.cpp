@@ -97,7 +97,7 @@ void Renderer::Render(Billboard& billboard, const XMMATRIX& worldMatrix, const B
 	billboardRenderer.Render(billboard, renderContext->GetContext(), worldMatrix);
 }
 
-void Renderer::RenderWithInstancing(Billboard& billboard, const std::vector<XMMATRIX>& worldMatrices,
+void Renderer::RenderWithInstancing(Billboard& billboard, const std::vector<BillboardData>& worldMatrices,
 	const BaseCameraData& baseCameraData)
 {
 	billboardRenderer.UpdateCameraData(baseCameraData, renderContext->GetContext(), billboard.texture.texture);

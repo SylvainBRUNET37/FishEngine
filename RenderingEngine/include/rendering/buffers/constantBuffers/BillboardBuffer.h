@@ -15,4 +15,10 @@ struct alignas(16) BillboardBuffer
 	DirectX::XMFLOAT4X4 matWorld;
 };
 
+struct alignas(16) BillboardData
+{
+	DirectX::XMFLOAT3 pos;
+	float scale;
+};
+
 #endif
