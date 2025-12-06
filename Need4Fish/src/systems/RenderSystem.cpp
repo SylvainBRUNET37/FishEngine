@@ -24,7 +24,7 @@ RenderSystem::RenderSystem(RenderContext* renderContext, const std::shared_ptr<U
 
 	//GOOD code would determine these dynamically...
 	sceneBoundaries.Center = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	sceneBoundaries.Radius = sqrtf(5000.0f*5000.0f + 5000.0f*5000.0f);
+	sceneBoundaries.Radius = sqrtf(7000.0f*7000.0f + 7010.5f*7010.5f);
 }
 
 void RenderSystem::RenderPostProcesses(const double deltaTime)

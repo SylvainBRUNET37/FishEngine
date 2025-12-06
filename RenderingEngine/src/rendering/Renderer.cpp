@@ -142,7 +142,7 @@ void Renderer::RenderToShadowMap(const Mesh& mesh, ID3D11DeviceContext* context,
 {
 	auto& material = materials[mesh.materialIndex];
 
-	if (material.name == "WaterMat" || material.name == "DistortionMat") {
+	if (material.name == "WaterMat" || material.name == "DistortionMat" || material.name == "SkyboxMat") {
 		return;
 	}
 
