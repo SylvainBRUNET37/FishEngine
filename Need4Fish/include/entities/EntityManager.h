@@ -21,7 +21,7 @@ public:
 
 	void Kill(const Entity entity)
 	{
-		if (not IsAlive(entity))
+		if (not IsAlive(entity)) [[unlikely]]
 			return;
 
 		// Erase the entity from every component pool
@@ -46,7 +46,7 @@ public:
 		requires IsComponent<Component>
 	Component& AddComponent(const Entity entity, ComponentArgs&&... args)
 	{
-		if (not IsAlive(entity))
+		if (not IsAlive(entity)) [[unlikely]]
 			throw std::runtime_error("Invalid entity");
 
 		auto& componentPool = std::get<ComponentPool<Component>>(componentPools);
@@ -58,7 +58,7 @@ public:
 		requires IsComponent<Component>
 	[[nodiscard]] bool HasComponent(const Entity entity) const noexcept
 	{
-		if (not IsAlive(entity))
+		if (not IsAlive(entity)) [[unlikely]]
 			return false;
 
 		const auto& componentPool = std::get<ComponentPool<Component>>(componentPools);
@@ -69,7 +69,7 @@ public:
 		requires IsComponent<Component>
 	void RemoveComponent(const Entity entity)
 	{
-		if (not IsAlive(entity))
+		if (not IsAlive(entity)) [[unlikely]]
 			return;
 
 		auto& componentPool = std::get<ComponentPool<Component>>(componentPools);
@@ -81,7 +81,7 @@ public:
 		requires IsComponent<Component>
 	[[nodiscard]] Component& Get(const Entity entity)
 	{
-		if (not IsAlive(entity) || not HasComponent<Component>(entity))
+		if (not IsAlive(entity) || not HasComponent<Component>(entity)) [[unlikely]]
 			throw std::runtime_error("Invalid entity");
 
 		auto& componentPool = std::get<ComponentPool<Component>>(componentPools);
@@ -92,7 +92,7 @@ public:
 		requires IsComponent<Component>
 	[[nodiscard]] const Component& Get(const Entity entity) const
 	{
-		if (not IsAlive(entity))
+		if (not IsAlive(entity)) [[unlikely]]
 			throw std::runtime_error("Invalid entity");
 
 		const auto& componentPool = std::get<ComponentPool<Component>>(componentPools);

@@ -19,14 +19,13 @@ RenderSystem::RenderSystem(RenderContext* renderContext, const std::shared_ptr<U
 	  renderer(renderContext, std::move(materials)),
 	  frameBuffer(CreateDirectionnalLight()),
 	  renderContext(renderContext),
-particleWorldMatrices(BillboardRenderer::MAX_BILLBOARDS)
+	  particleWorldMatrices(BillboardRenderer::MAX_BILLBOARDS)
 {
-
 }
 
 void RenderSystem::RenderPostProcesses(const double deltaTime)
 {
-	GameState::postProcessSettings.enableVignette = 
+	GameState::postProcessSettings.enableVignette =
 		(Camera::mode == Camera::CameraMode::FIRST_PERSON || Camera::isTemporaryFirstPerson) ? 1 : 0;
 
 	GameState::postProcessSettings.deltaTime = static_cast<float>(deltaTime);
@@ -34,7 +33,7 @@ void RenderSystem::RenderPostProcesses(const double deltaTime)
 	static const auto& shaderBank = Locator::Get<ResourceManager>().GetShaderBank();
 	static const auto vertexShader = shaderBank.Get<VertexShader>("shaders/PostProcessVS.hlsl").shader;
 	static const auto pixelShader = shaderBank.Get<PixelShader>("shaders/PostProcessPS.hlsl").shader;
-	
+
 	renderer.RenderPostProcess
 	(
 		vertexShader,
@@ -65,7 +64,10 @@ void RenderSystem::RenderBillboards(EntityManager& entityManager, const Camera& 
 	renderer.PrepareSceneForBillboard();
 	for (const auto& [entity, billboard] : entityManager.View<Billboard>())
 	{
-		const auto worldTransform = billboard.ComputeBillboardWorldMatrix();
+		const auto worldTransform =
+			billboard.type == Billboard::Type::CameraFacing
+				? billboard.ComputeCameraFacingBillboardWorldMatrix()
+				: billboard.ComputeCylindricBillboardWorldMatrix();
 		/* Culling has a higher cost than drawing a billboard, so it's disabled
 		if (FrustumCuller::IsBillboardCulled(billboard, worldTransform))
 			continue;
@@ -86,7 +88,7 @@ void RenderSystem::RenderParticles(EntityManager& entityManager, const Camera& c
 		if (i == 0) [[unlikely]] // store the billboard object only once
 			billboard = &particle.billboard;
 
-		particleWorldMatrices[i] = particle.billboard.ComputeBillboardWorldMatrix();
+		particleWorldMatrices[i] = particle.billboard.ComputeCameraFacingBillboardWorldMatrix();
 		++i;
 	}
 
@@ -186,7 +188,7 @@ void RenderSystem::RenderUI(EntityManager& entityManager)
 		break;
 	}
 	const auto text = std::format(L"Player mass : {}\nPlayer speed : {:.2f}\nPlaytime : {:.2f}", playerMass,
-		playerSpeed, GameState::playTime);
+	                              playerSpeed, GameState::playTime);
 	uiManager->RenderText(text);
 
 	// Render sprites
