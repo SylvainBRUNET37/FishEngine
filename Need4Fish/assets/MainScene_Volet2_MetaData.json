@@ -33,6 +33,10 @@
 	"ConchMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
 	"ClamMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
 	"SnailMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
-	"HornsheelMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" }
+	"HornsheelMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
+	"Coral1": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
+	"Coral2": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
+	"Coral3": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
+	"Coral4": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" }
   }
 }
