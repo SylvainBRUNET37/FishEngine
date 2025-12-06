@@ -388,8 +388,11 @@ void GameEngine::BuildPauseMenu()
 	// Resume Button
 	sprite = uiManager->LoadSprite("assets/ui/resumeButton.png", 0.f, 0.f, 1.0f);
 	uiManager->AlignSpriteXY(sprite, "center", "center");
+	auto hoverSprite = uiManager->LoadSprite("assets/ui/resumeButtonHovered.png", 0.f, 0.f, 1.0f);
+	uiManager->AlignSpriteXY(hoverSprite, "center", "center");
 	uiManager->AddSprite({
 		.sprite = sprite,
+		.hoverSprite = hoverSprite,
 		.onClick = [this] { ChangeGameStatus(); }
 	});
 
@@ -397,8 +400,12 @@ void GameEngine::BuildPauseMenu()
 	sprite = uiManager->LoadSprite("assets/ui/restartButton.png", 0.f, 0.f, 1.0f);
 	uiManager->AlignSpriteXY(sprite, "center", "center");
 	uiManager->TranslateSpriteX(sprite, -1.1f * sprite.texture.width);
+	hoverSprite = uiManager->LoadSprite("assets/ui/restartButtonHovered.png", 0.f, 0.f, 1.0f);
+	uiManager->AlignSpriteXY(hoverSprite, "center", "center");
+	uiManager->TranslateSpriteX(hoverSprite, -1.1f * hoverSprite.texture.width);
 	uiManager->AddSprite({
 		.sprite = sprite,
+		.hoverSprite = hoverSprite,
 		.onClick = [this] { RestartGame(); }
 	});
 
@@ -406,8 +413,12 @@ void GameEngine::BuildPauseMenu()
 	sprite = uiManager->LoadSprite("assets/ui/quitButton.png", 0.f, 0.f, 1.0f);
 	uiManager->AlignSpriteXY(sprite, "center", "center");
 	uiManager->TranslateSpriteX(sprite, 1.1f * sprite.texture.width);
+	hoverSprite = uiManager->LoadSprite("assets/ui/quitButtonHovered.png", 0.f, 0.f, 1.0f);
+	uiManager->AlignSpriteXY(hoverSprite, "center", "center");
+	uiManager->TranslateSpriteX(hoverSprite, 1.1f * hoverSprite.texture.width);
 	uiManager->AddSprite({
 		.sprite = sprite,
+		.hoverSprite = hoverSprite,
 		.onClick = [this] { GameState::currentState = GameState::FINISHED; }
 	});
 
@@ -416,8 +427,12 @@ void GameEngine::BuildPauseMenu()
 	sprite = uiManager->LoadSprite("assets/ui/optionsButton.png", 0.f, 0.f, 2.0f);
 	uiManager->AlignSpriteXY(sprite, "center", "center");
 	uiManager->TranslateSpriteY(sprite, sprite.texture.height / 2.f + oldHeigth / 2.f + 15.f);
+	hoverSprite = uiManager->LoadSprite("assets/ui/optionsButtonHovered.png", 0.f, 0.f, 1.0f);
+	uiManager->AlignSpriteXY(hoverSprite, "center", "center");
+	uiManager->TranslateSpriteY(hoverSprite, hoverSprite.texture.height / 2.f + oldHeigth / 2.f + 15.f);
 	uiManager->AddSprite({
 		.sprite = sprite,
+		.hoverSprite = hoverSprite,
 		.onClick = [this] { BuildOptionMenu(); }
 	});
 }
@@ -437,8 +452,12 @@ void GameEngine::BuildOptionMenu()
 	sprite = uiManager->LoadSprite("assets/ui/backButton.png", 0.0f, 0.0f, 1.0f);
 	uiManager->AlignSpriteXY(sprite, "center", "center");
 	uiManager->TranslateSpriteY(sprite, sprite.texture.height / 2.f + 90.0f);
+	auto spriteHover = uiManager->LoadSprite("assets/ui/backButtonHovered.png", 0.0f, 0.0f, 1.0f);
+	uiManager->AlignSpriteXY(spriteHover, "center", "center");
+	uiManager->TranslateSpriteY(spriteHover, spriteHover.texture.height / 2.f + 90.0f);
 	uiManager->AddSprite({
 		.sprite = sprite,
+		.hoverSprite = spriteHover,
 		.onClick = [this] { PauseGame(); }
 	});
 
@@ -450,9 +469,17 @@ void GameEngine::BuildOptionMenu()
 	Sprite2D clickSprite = uiManager->LoadSprite(clickFile, 0.0f, 0.0f, 1.0f);
 	uiManager->AlignSpriteXY(sprite, "center", "center");
 	uiManager->AlignSpriteXY(clickSprite, "center", "center");
+	std::string hoverFile = (isChecked) ? "assets/ui/checkedBoxHovered.png" : "assets/ui/uncheckedBoxHovered.png";
+	std::string clickedHoverFile = (!isChecked) ? "assets/ui/checkedBoxHovered.png" : "assets/ui/uncheckedBoxHovered.png";
+	spriteHover = uiManager->LoadSprite(hoverFile, 0.0f, 0.0f, 1.0f);
+	auto clickSpriteHover = uiManager->LoadSprite(clickedHoverFile, 0.0f, 0.0f, 1.0f);
+	uiManager->AlignSpriteXY(spriteHover, "center", "center");
+	uiManager->AlignSpriteXY(clickSpriteHover, "center", "center");
 	uiManager->AddSprite({
 		.sprite = sprite,
+		.hoverSprite = spriteHover,
 		.clickSprite = clickSprite,
+		.clickHoverSprite = clickSpriteHover,
 		.clickDelay = 0.1f,
 		.onClick = []
 		{
@@ -480,8 +507,12 @@ void GameEngine::BuildEndMenu()
 	sprite = uiManager->LoadSprite("assets/ui/restartButton.png", 0.f, 0.f, 1.0f);
 	uiManager->AlignSpriteXY(sprite, "center", "center");
 	uiManager->TranslateSpriteX(sprite, -.55f * sprite.texture.width);
+	auto spriteHover = uiManager->LoadSprite("assets/ui/restartButtonHovered.png", 0.0f, 0.0f, 1.0f);
+	uiManager->AlignSpriteXY(spriteHover, "center", "center");
+	uiManager->TranslateSpriteX(spriteHover, -.55f * sprite.texture.width);
 	uiManager->AddSprite({
 		.sprite = sprite,
+		.hoverSprite = spriteHover,
 		.onClick = [this] { RestartGame(); }
 	});
 
@@ -489,8 +520,12 @@ void GameEngine::BuildEndMenu()
 	sprite = uiManager->LoadSprite("assets/ui/quitButton.png", 0.f, 0.f, 1.0f);
 	uiManager->AlignSpriteXY(sprite, "center", "center");
 	uiManager->TranslateSpriteX(sprite, .55f * sprite.texture.width);
+	spriteHover = uiManager->LoadSprite("assets/ui/quitButtonHovered.png", 0.0f, 0.0f, 1.0f);
+	uiManager->AlignSpriteXY(spriteHover, "center", "center");
+	uiManager->TranslateSpriteX(spriteHover, .55f * sprite.texture.width);
 	uiManager->AddSprite({
 		.sprite = sprite,
+		.hoverSprite = spriteHover,
 		.onClick = [this] { GameState::currentState = GameState::FINISHED; }
 	});
 }

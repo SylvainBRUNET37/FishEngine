@@ -13,6 +13,7 @@ struct SpriteElement {
 
 	std::optional<Sprite2D> hoverSprite = std::nullopt;
 	std::optional<Sprite2D> clickSprite = std::nullopt;
+	std::optional<Sprite2D> clickHoverSprite = std::nullopt;
 
 	float clickDelay = 1.0f;
 
@@ -39,6 +40,11 @@ struct SpriteElement {
 			auto tmp = sprite;
 			sprite = clickSprite.value();
 			clickSprite = tmp;
+		}
+		if (hoverSprite.has_value() && clickHoverSprite.has_value()) {
+			auto tmp = hoverSprite;
+			hoverSprite = clickHoverSprite.value();
+			clickHoverSprite = tmp;
 		}
 	}
 
