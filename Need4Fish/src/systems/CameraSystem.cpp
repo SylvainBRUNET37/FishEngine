@@ -1,4 +1,4 @@
-#include "pch.h"
+Ôªø#include "pch.h"
 #include "systems/CameraSystem.h"
 #include "GameState.h"
 #include <physicsEngine/JoltSystem.h>
@@ -11,6 +11,9 @@
 #include <Jolt/Physics/Collision/ObjectLayer.h>
 #include <Jolt/Physics/Collision/Shape/SphereShape.h>
 #include <Jolt/Physics/Collision/ShapeCast.h>
+
+#undef min
+#undef max
 
 using namespace DirectX;
 
@@ -38,79 +41,151 @@ void CameraSystem::ComputeCameraPosition(Camera& camera, const Transform& transf
 	const XMVECTOR targetPos = XMLoadFloat3(&transform.position);
 	const XMVECTOR targetRotQuat = XMLoadFloat4(&transform.rotation);
 	const XMMATRIX targetRotMat = XMMatrixRotationQuaternion(targetRotQuat);
-
-	// Yaw actuel
 	const XMVECTOR forward = targetRotMat.r[2];
-	const float targetYaw = atan2f(XMVectorGetX(forward), XMVectorGetZ(forward));
 
-	// Yaw et pitch visÈs
+	// Yaw + pitch
+	const float targetYaw = atan2f(XMVectorGetX(forward), XMVectorGetZ(forward));
 	const float totalYaw = targetYaw + camera.yawOffset;
-	camera.targetYaw = totalYaw; // Pour la physique	
+	camera.targetYaw = totalYaw;
 	camera.targetPitch = camera.pitchAngle;
 
-	if (camera.mode == Camera::CameraMode::FIRST_PERSON)
+	// Base focus
+	XMVECTOR baseFocus = XMVectorAdd(targetPos, XMVectorSet(0, camera.heightOffset, 0, 0));
+
+	// FIRST PERSON
+	if (camera.mode == Camera::CameraMode::FIRST_PERSON || camera.isTemporaryFirstPerson)
 	{
-		// Position ‡ l'intÈrieur/devant le mosasaure
 		XMVECTOR fpOffset = XMLoadFloat3(&camera.firstPersonOffset);
 		XMVECTOR s = XMLoadFloat3(&transform.scale);
 		fpOffset = XMVectorMultiply(fpOffset, s);
-		
-		// Position selon la rotation avec l'offset
-		const XMVECTOR rotatedOffset = XMVector3Transform(fpOffset, targetRotMat);
+		camera.position = XMVectorAdd(targetPos, XMVector3Transform(fpOffset, targetRotMat));
+
+		// Forward bas√© sur yaw/pitch
+		const XMMATRIX yawPitchMat = XMMatrixRotationRollPitchYaw(camera.pitchAngle, camera.yawOffset + targetYaw, 0.0f);
+		XMVECTOR fpForward = XMVector3TransformNormal(XMVectorSet(0, 0, 1, 0), yawPitchMat);
+
+		camera.focus = XMVectorAdd(camera.position, XMVectorScale(fpForward, 100.0f));
+		camera.up = XMVectorSet(0, 1, 0, 0); // Up fixe
+
+		if (camera.mode == Camera::CameraMode::FIRST_PERSON && !camera.isTemporaryFirstPerson)
+			return;
+	}
+
+	// --- THIRD PERSON SpringArm ---
+	const float horizontalDist = camera.distance * cosf(camera.pitchAngle);
+	const float verticalDist = camera.distance * sinf(camera.pitchAngle);
+
+	XMVECTOR idealCameraPos = XMVectorSet(
+		XMVectorGetX(baseFocus) - horizontalDist * sinf(totalYaw),
+		XMVectorGetY(baseFocus) + verticalDist + camera.heightOffset,
+		XMVectorGetZ(baseFocus) - horizontalDist * cosf(totalYaw),
+		1.0f
+	);
+
+	XMVECTOR adjustedPos = idealCameraPos;
+	if (camera.enableSpringArm)
+	{
+		XMVECTOR dir = XMVectorSubtract(idealCameraPos, baseFocus);
+		float targetDist = XMVectorGetX(XMVector3Length(dir));
+		if (targetDist > 0.0001f)
+		{
+			dir = XMVector3Normalize(dir);
+			float safeDist = PerformSpringArmRaycast(baseFocus, idealCameraPos, targetDist);
+			adjustedPos = XMVectorAdd(baseFocus, XMVectorScale(dir, safeDist));
+		}
+	}
+
+	float achievedDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(adjustedPos, baseFocus)));
+
+	// --- Temporary 1st Person ---
+	constexpr float tempFPMinTime = 2.0f;
+	constexpr float fpEntryFactor = 0.1f;
+	constexpr float fpExitFactor = 1.05f;
+	constexpr float exitDistanceTolerance = 0.9f;
+	constexpr float reentryCooldown = 0.75f;
+
+	// Met a jour le cooldown
+	if (camera.tempFPExitCooldown > 0.0f)
+		camera.tempFPExitCooldown = std::max(0.0f, camera.tempFPExitCooldown - dt);
+
+	// D√©tecte l'entr√©e forc√©e en temporary 1st person
+	bool forceTempFP = camera.tempFPExitCooldown <= 0.0f &&
+		achievedDistance < camera.distance * fpEntryFactor;
+
+	if (!camera.isTemporaryFirstPerson && forceTempFP)
+	{
+		camera.isTemporaryFirstPerson = true;
+		camera.distanceBeforeTemporaryFP = camera.distance;
+		camera.tempFPTime = 0.0f;
+		camera.justEnteredTemporaryFP = true;
+	}
+
+	if (camera.isTemporaryFirstPerson)
+	{
+		camera.tempFPTime += dt;
+
+		// Position FP
+		XMVECTOR fpOffset = XMLoadFloat3(&camera.firstPersonOffset);
+		XMVECTOR s = XMLoadFloat3(&transform.scale);
+		fpOffset = XMVectorMultiply(fpOffset, s);
+		XMVECTOR rotatedOffset = XMVector3Transform(fpOffset, targetRotMat);
 		camera.position = XMVectorAdd(targetPos, rotatedOffset);
 
-		// On utilise directement le forward vector du mosasaure
-		const XMVECTOR lookDirection = XMVector3Normalize(forward);
-		camera.focus = XMVectorAdd(camera.position, XMVectorScale(lookDirection, 100.0f));
-	}
-	else // THIRD_PERSON
-	{
-		camera.focus = XMVectorAdd(targetPos, XMVectorSet(0, camera.heightOffset, 0, 0));
+		const float baseYaw = atan2f(XMVectorGetX(forward), XMVectorGetZ(forward));
+		const XMMATRIX yawPitchMat = XMMatrixRotationRollPitchYaw(camera.pitchAngle, camera.yawOffset + baseYaw, 0.0f);
+		XMVECTOR fpForward = XMVector3TransformNormal(XMVectorSet(0, 0, 1, 0), yawPitchMat);
 
-		const float horizontalDist = camera.distance * cosf(camera.pitchAngle);
-		const float verticalDist = camera.distance * sinf(camera.pitchAngle);
+		camera.focus = XMVectorAdd(camera.position, XMVectorScale(fpForward, 100.0f));
 
-		const XMVECTOR idealCameraPos = XMVectorSet(
-			XMVectorGetX(camera.focus) - horizontalDist * sinf(totalYaw),
-			XMVectorGetY(camera.focus) + verticalDist + camera.heightOffset,
-			XMVectorGetZ(camera.focus) - horizontalDist * cosf(totalYaw),
-			1.0f
-		);
+		// Condition de sortie de 1rst person temporaire
+		bool hasStayedMinTime = camera.tempFPTime >= tempFPMinTime;
+		bool distanceRecovered = achievedDistance >= camera.distanceBeforeTemporaryFP * exitDistanceTolerance ||
+			achievedDistance >= camera.distance * fpExitFactor;
 
-		// DÈtection de collision pour le Springarm
-		if (camera.enableSpringArm)
+		if (hasStayedMinTime && distanceRecovered)
 		{
-			const float desiredDistance = camera.distance;
+			// Reset les valeurs temporaires
+			camera.isTemporaryFirstPerson = false;
+			camera.tempFPExitCooldown = reentryCooldown;
+			camera.tempFPTime = 0.0f;
+			camera.justEnteredTemporaryFP = false;
 
-			if (Camera::currentDistance <= 0.0f)
-				Camera::currentDistance = desiredDistance;
-			float actualDistance = PerformSpringArmRaycast(camera.focus, idealCameraPos, desiredDistance);
+			// Restaurer la distance stock√©e
+			camera.distance = camera.distanceBeforeTemporaryFP;
 
-			// Interpolation progressive vers la nouvelle distance
-			const float t = std::clamp(camera.springArmSpeed * dt, 0.0f, 1.0f);
-			Camera::currentDistance = Lerp(Camera::currentDistance, actualDistance, t);
-
-			// Recalculer la position avec la distance ajustÈe
-			XMVECTOR dir = XMVectorSubtract(idealCameraPos, camera.focus);
-			const float dirLen = XMVectorGetX(XMVector3Length(dir));
-			if (dirLen > 0.0001f)
-			{
-				dir = XMVector3Normalize(dir);
-				XMVECTOR newPos = XMVectorAdd(camera.focus, XMVectorScale(dir, Camera::currentDistance));
-				camera.position = XMVectorSetW(newPos, 1.0f);
-			}
-			else
-			{
-				// fallback si dir trËs petit
-				camera.position = idealCameraPos;
-			}
+			// Placer la cam√©ra progressivement sur adjustedPos
+			camera.position = adjustedPos;
 		}
 		else
 		{
-			camera.position = idealCameraPos;
+			if (camera.justEnteredTemporaryFP)
+				camera.justEnteredTemporaryFP = false;
+
+			return;
 		}
 	}
+
+	// --- 3rd Person interpolation (apr√®s gestion temporaryFP) ---
+	float lerpSpeed = camera.springArmSpeed;
+	if (achievedDistance < camera.distance * 0.5f)
+		lerpSpeed *= 3.0f;
+
+	camera.position = adjustedPos;
+
+	// Focus lat√©ral
+	XMVECTOR idealToActual = XMVectorSubtract(camera.position, idealCameraPos);
+	float lateralDisplacement = XMVectorGetX(XMVector3Length(idealToActual));
+	if (lateralDisplacement > camera.distance * 0.005f)
+	{
+		XMVECTOR lateralDirection = XMVector3Normalize(idealToActual);
+		camera.focus = XMVectorAdd(baseFocus, XMVectorScale(lateralDirection, lateralDisplacement * 0.95f));
+	}
+	else
+		camera.focus = baseFocus;
+
+	Camera::currentDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(camera.position, camera.focus)));
 }
+
 
 void CameraSystem::ComputeCameraOrientation(Camera& camera)
 {
@@ -141,17 +216,16 @@ void CameraSystem::HandleRotation(Camera& cameraData)
 	const auto deltaX = static_cast<float>(currentCursorCoordinates.x - cameraData.cursorCoordinates.x);
 	const auto deltaY = static_cast<float>(currentCursorCoordinates.y - cameraData.cursorCoordinates.y);
 
-	static constexpr float deadzone = 2.0f; // Pixels de tolÈrance
+	static constexpr float deadzone = 2.0f; // Pixels de tol√©rance
 
-	// Appliquer la rotation seulement si le mouvement dÈpasse la deadzone
+	// Appliquer la rotation seulement si le mouvement d√©passe la deadzone
 	if (std::abs(deltaX) > deadzone || std::abs(deltaY) > deadzone)
 	{
-		// SensibilitÈ ajustÈe selon le mode
+		// Sensibilit√© ajust√©e selon le mode
 		float yawSensitivity, pitchSensitivity;
-		if (cameraData.mode == Camera::CameraMode::FIRST_PERSON)
-		{
-			yawSensitivity = 0.00005f;
-			pitchSensitivity = 0.0002f;
+		if (cameraData.mode == Camera::CameraMode::FIRST_PERSON || cameraData.isTemporaryFirstPerson) {
+			yawSensitivity = 0.00002f;
+			pitchSensitivity = 0.0004f;
 		}
 		else
 		{
@@ -169,7 +243,7 @@ void CameraSystem::HandleRotation(Camera& cameraData)
 	}
 	else
 	{
-		// Ramener progressivement vers zÈro quand pas de mouvement
+		// Ramener progressivement vers z√©ro quand pas de mouvement
 		if (std::abs(cameraData.yawOffset) > 0.001f)
 		{
 			float returnSpeed;
@@ -185,16 +259,16 @@ void CameraSystem::HandleRotation(Camera& cameraData)
 			const float returnStep = std::copysign(returnSpeed, -cameraData.yawOffset);
 			cameraData.yawOffset += returnStep;
 
-			// Snap ‡ zÈro si trËs proche
+			// Snap √† z√©ro si tr√®s proche
 			if (std::abs(cameraData.yawOffset) < returnSpeed)
 			{
 				cameraData.yawOffset = 0.0f;
 			}
 		}
-		
+
 	}
 
-	// Recentrer seulement si la souris s'Èloigne suffisament du centre
+	// Recentrer seulement si la souris s'√©loigne suffisament du centre
 	static constexpr float recenterThreshold = 100.0f;
 	const float distanceFromCenter = sqrtf(
 		powf(currentCursorCoordinates.x - cameraData.screenCenter.x, 2.0f) +
@@ -214,8 +288,8 @@ void CameraSystem::HandleRotation(Camera& cameraData)
 
 void CameraSystem::Rotate(Camera& cameraData, const float yawDelta, const float pitchDelta)
 {
-	// Limiter la camÈra
-	constexpr float maxOffset = XM_PIDIV4; // ±45 degrÈs dans toutes les directions
+	// Limiter la cam√©ra
+	constexpr float maxOffset = XM_PIDIV4; // ¬±45 degr√©s dans toutes les directions
 
 	cameraData.yawOffset = std::clamp(
 		cameraData.yawOffset + yawDelta,
@@ -245,19 +319,19 @@ void CameraSystem::SetMouseCursor()
 	Camera::screenCenter.x = (rect.right - rect.left) / 2;
 	Camera::screenCenter.y = (rect.bottom - rect.top) / 2;
 
-	// Convertir en repËre Ècran
+	// Convertir en rep√®re √©cran
 	ClientToScreen(hwnd, &Camera::screenCenter);
 
 	// Centrer le curseur
 	SetCursorPos(Camera::screenCenter.x, Camera::screenCenter.y);
 
-	// Initialiser les coordonnÈes de la camÈra
+	// Initialiser les coordonn√©es de la cam√©ra
 	Camera::cursorCoordinates = Camera::screenCenter;
 }
 
 void CameraSystem::ScaleCamera(float scaleFactor)
 {
-	// Calculer les valeurs ‡ atteindre
+	// Calculer les valeurs √† atteindre
 	const float targetDistance = Camera::distance * scaleFactor;
 	const float targetHeightOffset = Camera::heightOffset * scaleFactor;
 	const float targetMinDistance = Camera::minDistance * scaleFactor;
@@ -290,13 +364,13 @@ float CameraSystem::PerformSpringArmRaycast(const XMVECTOR& start, const XMVECTO
 	if (rayLength < 0.001f)
 		return maxDistance;
 
-	// CrÈer un cast "Èpais" pour ne pas voir les "intÈrieurs" de cÙtÈ
+	// Cr√©er un cast "√©pais" pour ne pas voir les "int√©rieurs" de c√¥t√©
 	JPH::RefConst<JPH::SphereShape> sphere = new JPH::SphereShape(Camera::cameraRadius);
 
 	JPH::RShapeCast shapeCast = JPH::RShapeCast::sFromWorldTransform(
 		sphere,
 		JPH::Vec3::sReplicate(1.0f),  // Scale
-		JPH::RMat44::sTranslation(rayStart),  // Position de dÈpart
+		JPH::RMat44::sTranslation(rayStart),  // Position de d√©part
 		rayDirection * rayLength  // Direction et longueur
 	);
 
@@ -380,9 +454,9 @@ float CameraSystem::PerformSpringArmRaycast(const XMVECTOR& start, const XMVECTO
 	{
 		const float hitDistance = collector.mHit.mFraction * rayLength;
 
-		// Offset pour tenir compte de la sphËre
+		// Offset pour tenir compte de la sph√®re
 		const float COLLISION_OFFSET = Camera::cameraRadius + Camera::collisionOffset;
-		return max(hitDistance - COLLISION_OFFSET, 0.1f);
+		return std::max(hitDistance - COLLISION_OFFSET, 0.1f);
 	}
 
 	return maxDistance;

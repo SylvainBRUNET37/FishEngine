@@ -18,9 +18,6 @@ RenderContext DeviceBuilder::CreateRenderContext(const HWND hwnd, const WindowDa
 		D3D_FEATURE_LEVEL_10_0
 	};
 
-	const size_t width = GetSystemMetrics(SM_CXSCREEN);
-	const size_t height = GetSystemMetrics(SM_CYSCREEN);
-
 	const auto swapChainDesc = CreateSwapChainDesc(hwnd, windowData);
 
 	ComPtr<ID3D11Device> device;
@@ -34,6 +31,7 @@ RenderContext DeviceBuilder::CreateRenderContext(const HWND hwnd, const WindowDa
 			D3D11_SDK_VERSION, &swapChainDesc, &swapChain, &device, nullptr, &context),
 		DXE_ERREURCREATIONDEVICE
 	);
+	SetDebugName(swapChain, "swapChainDesc-in-DeviceBuilder");
 
 	return RenderContext{device, context, swapChain, windowData};
 }

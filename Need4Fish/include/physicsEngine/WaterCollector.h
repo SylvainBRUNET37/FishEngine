@@ -25,7 +25,8 @@ private:
 	JPH::Vec3 mSurfaceNormal = JPH::Vec3(0, 1, 0); // default value
 	float mDeltaTime = 0.01f; // default value
 
-	float buoyancy = 1.0f; // 1 to cancel weight, < 1 sinks, 1 < floats
+	float fishBuoyancy = 1.0f; // 1 to cancel weight, < 1 sinks, 1 < floats
+	float decorBuoyancy = 0.01f;
 	float linearDrag = 0.0f;
 	float angularDrag = 0.0f;
 };

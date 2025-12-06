@@ -17,14 +17,21 @@ RenderSystem::RenderSystem(RenderContext* renderContext, const std::shared_ptr<U
                            std::vector<Material>&& materials)
 	: uiManager(uiManager),
 	  renderer(renderContext, std::move(materials)),
-	  frameBuffer(CreateDirectionnalLight()),
+	  frameBuffer(CreateDirectionalLight()),
 	  renderContext(renderContext)
 {
+	shadowMap = std::make_unique<ShadowMap>(renderContext->GetDevice(), SHADOW_MAP_SIZE, SHADOW_MAP_SIZE);
+
+	//GOOD code would determine these dynamically...
+	sceneBoundaries.Center = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	sceneBoundaries.Radius = sqrtf(7000.0f*7000.0f + 7010.5f*7010.5f);
 }
 
 void RenderSystem::RenderPostProcesses(const double deltaTime)
 {
-	GameState::postProcessSettings.enableVignette = Camera::mode == Camera::CameraMode::FIRST_PERSON ? 1 : 0;
+	GameState::postProcessSettings.enableVignette = 
+		(Camera::mode == Camera::CameraMode::FIRST_PERSON || Camera::isTemporaryFirstPerson) ? 1 : 0;
+
 	GameState::postProcessSettings.deltaTime = static_cast<float>(deltaTime);
 
 	static const auto& shaderBank = Locator::Get<ResourceManager>().GetShaderBank();
@@ -80,7 +87,26 @@ void RenderSystem::RenderMeshes(EntityManager& entityManager)
 		if (FrustumCuller::IsMeshCulled(mesh, transform))
 			continue;
 
-		renderer.Render(mesh, renderContext->GetContext(), transform);
+		renderer.RenderWithShadowMap(mesh, renderContext->GetContext(), transform, XMLoadFloat4x4(&shadowTransform), shadowMap->DepthMapSRV());
+	}
+}
+
+void RenderSystem::RenderMeshesToShadowMap(EntityManager& entityManager)
+{
+	renderContext->SetCullModeShadowMap();
+	// Render Meshes
+	for (const auto& [entity, transform, meshInstance] : entityManager.View<Transform, MeshInstance>())
+	{
+		// There's not point in checking if the mesh should be rendered or not with frustrum culling
+		// because the bounding box for a directional light would be the whole scene
+		auto& mesh = Locator::Get<ResourceManager>().GetMesh(meshInstance.meshIndex);
+		/*if (FrustumCuller::IsMeshCulled(mesh, transform))
+			continue;
+		*/
+		static auto& shaderBank = Locator::Get<ResourceManager>().GetShaderBank();
+		XMMATRIX view = XMLoadFloat4x4(&lightView);
+		XMMATRIX proj = XMLoadFloat4x4(&lightProj);
+		renderer.RenderToShadowMap(mesh, renderContext->GetContext(), transform, view, proj, shaderBank);
 	}
 }
 
@@ -134,6 +160,20 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 
 	UpdateFrameBuffer(deltaTime, entityManager, currentCamera);
 
+	BuildShadowTransform();
+	
+	//Below is equivalent to draw scene, so...
+	shadowMap->BindDsvAndSetNullRenderTarget(renderContext->GetContext());
+	DrawSceneToShadowMap(entityManager);
+	//renderContext->GetContext()->RSSetState(0);
+	renderContext->SetCullModeCullBack();
+
+	
+	//Restore back and depth buffer to OM stage (what's that? The output-merger stage?)
+	//How do I even mimic that?
+	renderer.UpdateScene();
+	renderContext->SetupViewPort();
+	
 	RenderMeshes(entityManager);
 	RenderBillboards(entityManager, currentCamera);
 
@@ -169,7 +209,7 @@ void RenderSystem::RenderUI(EntityManager& entityManager)
 		renderer.Render(sprite, renderContext->GetContext());
 }
 
-FrameBuffer RenderSystem::CreateDirectionnalLight()
+FrameBuffer RenderSystem::CreateDirectionalLight()
 {
 	return
 	{
@@ -183,4 +223,48 @@ FrameBuffer RenderSystem::CreateDirectionnalLight()
 			.pad = 0.0f
 		},
 	};
+}
+
+void RenderSystem::BuildShadowTransform() {
+	//Commençons par seulement la lumière directionnelle principale...
+	XMVECTOR lightDirection = XMLoadFloat3(&frameBuffer.dirLight.direction);
+	//uh, directional lights have no position
+	XMVECTOR targetPosition = XMLoadFloat3(&sceneBoundaries.Center);
+	XMVECTOR lightPosition = targetPosition - sceneBoundaries.Radius * lightDirection; //Can I fake it like this?
+	XMVECTOR upVector = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f); //Let's assume this is true because I can't find the code to confirm...
+
+	//XMMatrixLookAtLH = Build a Left Handed View Matrix from point of view (parameter 1) to target location (parameter 2)
+	XMMATRIX LightViewMatrix = XMMatrixLookAtLH(lightPosition, targetPosition, upVector);
+
+	//transform bounding sphere to light space
+	XMFLOAT3 sphereCenterLightSpace;
+	XMStoreFloat3(&sphereCenterLightSpace, XMVector3TransformCoord(targetPosition, LightViewMatrix));
+
+	//Orthographic frustrum in light space encloses scene...
+	float left = sphereCenterLightSpace.x - sceneBoundaries.Radius;
+	float bottom = sphereCenterLightSpace.y - sceneBoundaries.Radius;
+	float nnear = sphereCenterLightSpace.z - sceneBoundaries.Radius; //near is a reserved word, it seems
+	float right = sphereCenterLightSpace.x + sceneBoundaries.Radius;
+	float top = sphereCenterLightSpace.y + sceneBoundaries.Radius;
+	float ffar = sphereCenterLightSpace.z + sceneBoundaries.Radius; //far is a reserved word, it seems
+	XMMATRIX LightProjectionMatrix = XMMatrixOrthographicOffCenterLH(left, right, bottom, top, nnear, ffar);
+
+	//Transform NDC space [-1, +1]^2 to texture space [0,1]^2
+	XMMATRIX T(
+		0.5f,  0.0f, 0.0f, 0.0f,
+		0.0f, -0.5f, 0.0f, 0.0f,
+		0.0f,  0.0f, 1.0f, 0.0f,
+		0.5f,  0.5f, 0.0f, 1.0f
+	);
+
+	XMMATRIX ShadowTransform = LightViewMatrix * LightProjectionMatrix * T;
+
+	XMStoreFloat4x4(&lightView, LightViewMatrix);
+	XMStoreFloat4x4(&lightProj, LightProjectionMatrix);
+	XMStoreFloat4x4(&shadowTransform, ShadowTransform);
+}
+
+void RenderSystem::DrawSceneToShadowMap(EntityManager& entityManager)
+{
+	RenderMeshesToShadowMap(entityManager);
 }

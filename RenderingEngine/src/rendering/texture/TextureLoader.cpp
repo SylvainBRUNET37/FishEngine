@@ -79,6 +79,7 @@ ComPtr<ID3D11Texture2D> TextureLoader::CreateTexture(ID3D11Device* device, const
 	ComPtr<ID3D11Texture2D> texture;
 
 	DXEssayer(device->CreateTexture2D(&desc, nullptr, &texture), "Failed to create 2D texture");
+	SetDebugName(texture, "texture-in-TextureLoader");
 
 	ID3D11DeviceContext* context = nullptr;
 	device->GetImmediateContext(&context);
@@ -106,6 +107,7 @@ ComPtr<ID3D11ShaderResourceView> TextureLoader::CreateTextureView(ID3D11Device* 
 		device->CreateShaderResourceView(texture, &srvDesc, &textureView), 
 		"Failed to create texture view"
 	);
+	SetDebugName(textureView, "textureView-in-TextureLoader");
 
 	return textureView;
 }

@@ -6,6 +6,7 @@
 struct ObjectBuffer // b1 in the shader program
 {
 	DirectX::XMMATRIX matWorld;
+	DirectX::XMMATRIX shadowTransform;
 };
 
 #endif

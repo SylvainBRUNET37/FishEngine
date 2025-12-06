@@ -16,7 +16,7 @@ void FrustumCuller::Init(const BaseCameraData& camera)
 	viewMatrixInvert = XMMatrixInverse(nullptr, viewMatrix);
 	projectionMatrix = XMMatrixPerspectiveFovLH(camera.fov, camera.aspectRatio, camera.nearPlane, camera.farPlane);
 	
-	// Local furstum bounding box
+	// Local frustum bounding box
 	frustum = BoundingFrustum(projectionMatrix);
 	// Transform into the world space
 	frustum.Transform(frustum, viewMatrixInvert);

@@ -52,7 +52,8 @@ void GameEngine::Run()
 		// Pause/Unpause the game if ESC is pressed for exemple
 		HandleGameState();
 
-		if (GameState::currentState == GameState::FINISHED) return;
+		if (GameState::currentState == GameState::FINISHED) 
+			return;
 
 		const DWORD frameStartTime = GetTickCount();
 		const auto isGamePaused = GameState::currentState != GameState::PLAYING;
@@ -106,7 +107,6 @@ void GameEngine::HandleGameState()
 	// Restart the game if has been was pressed
 	if (GetAsyncKeyState('R') & 0x8000 && GameState::currentState != GameState::PAUSED)
 	{
-		uiManager->Clear();
 		RestartGame();
 	}
 
@@ -156,6 +156,8 @@ void GameEngine::HandleCollions()
 
 void GameEngine::ChangeGameStatus()
 {
+	WindowsApplication::mouseWheelDelta = 0;
+
 	switch (GameState::currentState)
 	{
 	case GameState::PAUSED:
@@ -186,7 +188,7 @@ void GameEngine::PauseGame()
 	ClipCursor(nullptr);
 	ReleaseCapture();
 
-	GameState::currentState = GameState::PAUSED;
+	GameState::currentState = GameState::PAUSED;	
 
 	BuildPauseMenu();
 }
@@ -215,7 +217,8 @@ void GameEngine::InitGame()
 	entityManager = EntityManagerFactory::Create(Locator::Get<ResourceManager>().GetSceneResource());
 	particleSystem.Reset();
 
-	// TODO: revise this
+	PowerSystem::ResetPowers();
+
 	const int screenWidth = GetSystemMetrics(SM_CXSCREEN);
 	const int screenHeight = GetSystemMetrics(SM_CYSCREEN);
 

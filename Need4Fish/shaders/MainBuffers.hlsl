@@ -9,7 +9,8 @@ struct VSOutput
 	float4 position : SV_Position;
 	float3 normal : TEXCOORD0;
 	float3 worldPosition : TEXCOORD1;
-	float2 textCoord : TEXCOORD2;
+    float2 textCoord : TEXCOORD2;
+    float4 ShadowPosH : TEXCOORD4;
 };
 
 struct DirectionLight

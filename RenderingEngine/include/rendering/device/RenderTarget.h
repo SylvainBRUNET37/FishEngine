@@ -8,7 +8,10 @@
 class RenderTarget
 {
 public:
+	RenderTarget() = default; // Use init after calling this constructor
 	RenderTarget(const ComPtr<ID3D11Device>& device, const ComPtr<IDXGISwapChain>& swapChain);
+
+	void Init(const ComPtr<ID3D11Device>& device, const ComPtr<IDXGISwapChain>& swapChain);
 
 	[[nodiscard]] ID3D11RenderTargetView* GetRenderTargetView() const { return renderTargetView; }
 

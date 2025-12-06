@@ -42,6 +42,9 @@ void ResourceManager::InitShaderBank()
 		.AddDesc<PixelShader>("shaders/DistPS.hlsl", "DistPS", "ps_5_0")
 
 		.AddDesc<PixelShader>("shaders/BubblePS.hlsl", "BubblePS", "ps_5_0")
+		
+		.AddDesc<VertexShader>("shaders/ShadowMapVS.hlsl", "main", "vs_5_0")
+		.AddDesc<PixelShader>("shaders/ShadowMapPS.hlsl", "main", "ps_5_0")
 		.AddDesc<PixelShader>("shaders/LavaPS.hlsl", "LavaPS", "ps_5_0")
 		.AddDesc<PixelShader>("shaders/WaterPS.hlsl", "WaterPS", "ps_5_0");
 

@@ -53,4 +53,10 @@ inline void SetDebugName(ID3D11Device* device, const std::string& name) {
 	}
 }
 
+inline void SetDebugName(IDXGISwapChain* swapChain, const std::string& name) {
+	if (swapChain != nullptr /*&& name != null*/) {
+		swapChain->SetPrivateData(WKPDID_D3DDebugObjectName, name.size(), name.c_str());
+	}
+}
+
 #endif

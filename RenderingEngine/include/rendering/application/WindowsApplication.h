@@ -1,8 +1,10 @@
 #ifndef WINDOWS_APPLICATION_H
 #define WINDOWS_APPLICATION_H
 
+#include <d3d11.h>
+
 #include "rendering/core/WindowData.h"
-#include "rendering/device/BlendState.h"
+#include "rendering/device/RenderContext.h"
 
 class WindowsApplication
 {
@@ -17,7 +19,7 @@ public:
 	WindowsApplication& operator=(WindowsApplication&&) = delete;
 
 	explicit WindowsApplication(const HINSTANCE hInstance, const LPCWSTR windowTitle, const LPCWSTR className)
-		: instance(hInstance), className(className), windowTitle(windowTitle)
+		: instance(hInstance), className(className), windowTitle(windowTitle), renderContext{nullptr}
 	{
 		windowData.screenWidth = GetSystemMetrics(SM_CXSCREEN);
 		windowData.screenHeight = GetSystemMetrics(SM_CYSCREEN);
@@ -25,6 +27,7 @@ public:
 	}
 
 	bool Init();
+	void SetRenderContext(RenderContext* renderContext_) { if (renderContext_) renderContext = renderContext_; }
 
 	[[nodiscard]] HWND& GetMainWindow() { return mainWindow; }
 	[[nodiscard]] WindowData GetWindowData() const noexcept { return windowData; }
@@ -40,10 +43,12 @@ private:
 
 	WindowData windowData{};
 
+	RenderContext* renderContext; // has to be set with the SetRenderContext function
+
 	[[nodiscard]] bool CreateMainWindow();
 	[[nodiscard]] ATOM RegisterWindowClass() const;
 
-	[[nodiscard]] static LRESULT ProcessWindowMessage(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp);
+	[[nodiscard]] LRESULT ProcessWindowMessage(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) const;
 	[[nodiscard]] static LRESULT CALLBACK HandleWindowsMessage(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 };
 

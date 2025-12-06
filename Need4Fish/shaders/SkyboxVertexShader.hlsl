@@ -30,8 +30,12 @@ VSOutput main(VSInput input)
     VSOutput output;
 
     float4 worldPos = mul(float4(input.POS, 1.0f), matWorld);
+    float4 clipPos = mul(worldPos, matViewProj); 
+	
+	// Avoid the culling by setting the clip pos at the maximum value of the clip space (1)
+    clipPos.z = clipPos.w; 
 
-    output.pos = mul(worldPos, matViewProj);
+    output.pos = clipPos;
     output.worldPosition = worldPos.xyz;
 
     float3 normalWorld = mul((float3x3) matWorld, input.NORMAL);

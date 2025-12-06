@@ -2,6 +2,7 @@
 #define VERBOSE_ASSERTION_H
 
 #include <source_location>
+#include <string>
 
 inline void VerboseAssertion(const bool expr, const char* exprStr,
                              const std::string& message = "",

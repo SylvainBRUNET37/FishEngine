@@ -14,6 +14,8 @@ DepthBuffer::DepthBuffer(const ComPtr<ID3D11Device>& device, const WindowData& w
 
 	DXEssayer(device->CreateDepthStencilView(texture, &stencilViewDesc, &depthStencilView),
 	          DXE_ERREURCREATIONDEPTHSTENCILTARGET);
+	SetDebugName(texture, "texture-in-DepthBuffer");
+	SetDebugName(depthStencilView, "depthStencilView-in-DepthBuffer");
 }
 
 D3D11_TEXTURE2D_DESC DepthBuffer::CreateDepthTextureDesc(const WindowData& windowData)
