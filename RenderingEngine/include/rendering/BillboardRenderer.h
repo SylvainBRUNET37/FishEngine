@@ -13,7 +13,11 @@ struct BaseCameraData;
 class BillboardRenderer
 {
 public:
-	static constexpr size_t MAX_BILLBOARDS = 63'000;
+#ifndef NDEBUG
+	static constexpr size_t MAX_BILLBOARDS = 1'500;
+#else
+	static constexpr size_t MAX_BILLBOARDS = 20'000;
+#endif
 
 	explicit BillboardRenderer(ID3D11Device* device);
 

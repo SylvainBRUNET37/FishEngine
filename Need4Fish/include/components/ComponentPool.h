@@ -8,7 +8,12 @@
 #include "Entity.h"
 
 // TODO: not the best way of doing it, using a sparse set would be better
-inline static constexpr size_t MAX_ENTITIES = 65536;
+#ifndef NDEBUG
+inline static constexpr size_t MAX_ENTITIES = 4'096;
+#else
+inline static constexpr size_t MAX_ENTITIES = 65'536;
+#endif
+
 
 // A container for the given component
 template <typename Component>

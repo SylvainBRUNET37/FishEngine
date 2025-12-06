@@ -243,11 +243,17 @@ void GameEngine::CreateParticleZones()
 	static const Texture bubbleTexture = TextureLoader::LoadTextureFromFile(
 		"assets/textures/bble.png", renderContext->GetDevice());
 
+#ifndef NDEBUG
+	static constexpr unsigned int NB_WORLD_PARTICLES = 500;
+#else
+	static constexpr unsigned int NB_WORLD_PARTICLES = 10'000;
+#endif
+
 	particleSystem.AddParticleZone(*entityManager,
 	                               {
 		                               .centerPosition = {0, 1300.0f, 0},
 		                               .halfExtends = {7000.0f,900.0f, 7000.0f},
-		                               .nbParticle = 10'000,
+		                               .nbParticle = NB_WORLD_PARTICLES,
 		                               .particleDurationMin = 3.0f,
 		                               .particleDurationMax = 15.0f,
 		                               .particleSpeedMin = 0.5f,
