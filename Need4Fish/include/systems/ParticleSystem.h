@@ -13,8 +13,11 @@ public:
 		unsigned int nbParticle;
 		float particleDurationMin;
 		float particleDurationMax;
-		float particleSpeed;
+		float particleSpeedMin;
+		float particleSpeedMax;
 		DirectX::XMFLOAT3 particleDirection; // must be a unit vector
+		Texture billboardTexture;
+		std::shared_ptr<ShaderProgram> billboardShader;
 	};
 
 	explicit ParticleSystem(ID3D11Device* device) : device{device}
@@ -33,7 +36,7 @@ private:
 		DirectX::XMFLOAT3 halfExtends;
 		float particleDurationMin;
 		float particleDurationMax;
-		float particleSpeed;
+		std::vector<float> particleSpeeds;
 		DirectX::XMFLOAT3 particleDirection; // must be a unit vector
 	};
 
@@ -41,7 +44,7 @@ private:
 	ID3D11Device* device;
 
 	static void MoveAndTeleportIfAtEndOfLife(EntityManager& entityManager, const Zone& zone, const Entity& entity,
-	                                  double deltaTime);
+	                                  double deltaTime, size_t indice);
 };
 
 #endif

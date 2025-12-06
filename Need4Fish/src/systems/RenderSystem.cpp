@@ -18,7 +18,8 @@ RenderSystem::RenderSystem(RenderContext* renderContext, const std::shared_ptr<U
 	: uiManager(uiManager),
 	  renderer(renderContext, std::move(materials)),
 	  frameBuffer(CreateDirectionalLight()),
-	  renderContext(renderContext)
+	  renderContext(renderContext),
+	  particleData(BillboardRenderer::MAX_BILLBOARDS)
 {
 	shadowMap = std::make_unique<ShadowMap>(renderContext->GetDevice(), SHADOW_MAP_SIZE, SHADOW_MAP_SIZE);
 
@@ -29,7 +30,7 @@ RenderSystem::RenderSystem(RenderContext* renderContext, const std::shared_ptr<U
 
 void RenderSystem::RenderPostProcesses(const double deltaTime)
 {
-	GameState::postProcessSettings.enableVignette = 
+	GameState::postProcessSettings.enableVignette =
 		(Camera::mode == Camera::CameraMode::FIRST_PERSON || Camera::isTemporaryFirstPerson) ? 1 : 0;
 
 	GameState::postProcessSettings.deltaTime = static_cast<float>(deltaTime);
@@ -37,7 +38,7 @@ void RenderSystem::RenderPostProcesses(const double deltaTime)
 	static const auto& shaderBank = Locator::Get<ResourceManager>().GetShaderBank();
 	static const auto vertexShader = shaderBank.Get<VertexShader>("shaders/PostProcessVS.hlsl").shader;
 	static const auto pixelShader = shaderBank.Get<PixelShader>("shaders/PostProcessPS.hlsl").shader;
-	
+
 	renderer.RenderPostProcess
 	(
 		vertexShader,
@@ -68,13 +69,38 @@ void RenderSystem::RenderBillboards(EntityManager& entityManager, const Camera& 
 	renderer.PrepareSceneForBillboard();
 	for (const auto& [entity, billboard] : entityManager.View<Billboard>())
 	{
-		const auto worldTransform = billboard.ComputeBillboardWorldMatrix();
+		const auto worldTransform =
+			billboard.type == Billboard::Type::CameraFacing
+				? billboard.ComputeCameraFacingBillboardWorldMatrix()
+				: billboard.ComputeCylindricBillboardWorldMatrix();
 		/* Culling has a higher cost than drawing a billboard, so it's disabled
 		if (FrustumCuller::IsBillboardCulled(billboard, worldTransform))
 			continue;
 		*/
 		renderer.Render(billboard, worldTransform, currentCamera);
 	}
+}
+
+// Not very well coded, will be improved if needed
+void RenderSystem::RenderParticles(EntityManager& entityManager, const Camera& currentCamera)
+{
+	renderer.PrepareSceneForBillboard();
+
+	Billboard* billboard{};
+	size_t i = 0;
+	for (const auto& [entity, particle] : entityManager.View<Particle>())
+	{
+		if (i == 0) [[unlikely]] // store the billboard object only once
+			billboard = &particle.billboard;
+
+		// Assume that: scale X = scale Y
+		particleData[i] = { particle.billboard.position, particle.billboard.scale.x };
+		++i;
+	}
+
+	vassert(billboard, "There should be particles in the world since RenderParticles is called");
+
+	renderer.RenderWithInstancing(*billboard, particleData, currentCamera);
 }
 
 void RenderSystem::RenderMeshes(EntityManager& entityManager)
@@ -154,7 +180,7 @@ void RenderSystem::UpdateFrameBuffer(const double deltaTime, EntityManager& enti
 void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 {
 	const auto currentCamera = entityManager.Get<Camera>(GameState::currentCameraEntity);
-	FrustumCuller::Init(static_cast<BaseCameraData>(currentCamera));// Prepare the frustum culler
+	FrustumCuller::Init(static_cast<BaseCameraData>(currentCamera)); // Prepare the frustum culler
 
 	renderer.UpdateScene();
 
@@ -176,6 +202,7 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 	
 	RenderMeshes(entityManager);
 	RenderBillboards(entityManager, currentCamera);
+	RenderParticles(entityManager, currentCamera);
 
 	ComputeDistortionZones(entityManager);
 	RenderPostProcesses(deltaTime);
@@ -200,7 +227,7 @@ void RenderSystem::RenderUI(EntityManager& entityManager)
 		break;
 	}
 	const auto text = std::format(L"Player mass : {}\nPlayer speed : {:.2f}\nPlaytime : {:.2f}", playerMass,
-		playerSpeed, GameState::playTime);
+	                              playerSpeed, GameState::playTime);
 	uiManager->RenderText(text);
 
 	// Render sprites
@@ -226,7 +253,7 @@ FrameBuffer RenderSystem::CreateDirectionalLight()
 }
 
 void RenderSystem::BuildShadowTransform() {
-	//Commençons par seulement la lumière directionnelle principale...
+	//Commenï¿½ons par seulement la lumiï¿½re directionnelle principale...
 	XMVECTOR lightDirection = XMLoadFloat3(&frameBuffer.dirLight.direction);
 	//uh, directional lights have no position
 	XMVECTOR targetPosition = XMLoadFloat3(&sceneBoundaries.Center);

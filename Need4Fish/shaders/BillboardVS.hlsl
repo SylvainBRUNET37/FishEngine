@@ -1,10 +1,14 @@
-cbuffer BillboardBuffer : register(b0)
+cbuffer BillboardCameraBuffer : register(b0)
 {
-    float4x4 matWorld;
     float4x4 matView;
     float4x4 matProj;
     float3 cameraPos;
     float pad;
+};
+
+cbuffer BillboardBuffer : register(b1)
+{
+    float4x4 matWorld;
 };
 
 struct VSInput

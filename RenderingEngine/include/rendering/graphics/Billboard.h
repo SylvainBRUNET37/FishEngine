@@ -31,10 +31,12 @@ struct Billboard
 
 	DirectX::BoundingBox boundingBox;
 
-	[[nodiscard]] DirectX::XMMATRIX ComputeBillboardWorldMatrix() const;
+	[[nodiscard]] DirectX::XMMATRIX ComputeCylindricBillboardWorldMatrix() const;
+	[[nodiscard]] DirectX::XMMATRIX ComputeCameraFacingBillboardWorldMatrix() const;
 
 private:
 	[[nodiscard]] static std::vector<VertexSprite> ComputeVertices();
+	[[nodiscard]] DirectX::XMMATRIX ComputeBillboardWorldMatrix(const DirectX::XMVECTOR& directionToCamera) const;
 
 };
 

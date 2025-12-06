@@ -1,6 +1,8 @@
 #ifndef RENDER_SYSTEM_H
 #define RENDER_SYSTEM_H
 
+#include <vector>
+
 #include "System.h"
 #include "rendering/Renderer.h"
 #include "rendering/device/RenderContext.h"
@@ -22,10 +24,13 @@ private:
 	FrameBuffer frameBuffer;
 	RenderContext* renderContext;
 
+	std::vector<BillboardData> particleData;
+
 	void RenderUI(EntityManager& entityManager);
 	void RenderPostProcesses(double deltaTime);
 	void ComputeDistortionZones(EntityManager& entityManager);
 	void RenderBillboards(EntityManager& entityManager, const Camera& currentCamera);
+	void RenderParticles(EntityManager& entityManager, const Camera& currentCamera);
 	void RenderMeshes(EntityManager& entityManager);
 	void RenderMeshesToShadowMap(EntityManager& entityManager);
 	void UpdatePointLights(EntityManager& entityManager);
