@@ -7,6 +7,8 @@
 //Move this to the appropriate folder later
 
 //Reference: Frank D. Luna
+
+//Note: La taille de la shadow map doit être définie dans RenderSystem.h mais aussi dans 
 class ShadowMap
 {
 public:

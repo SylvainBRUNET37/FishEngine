@@ -25,6 +25,7 @@ public:
 
 	void UpdateFrameBuffer(const FrameBuffer& frameBuffer_) { frameBuffer = frameBuffer_; };
 	void Render(const Mesh& mesh, ID3D11DeviceContext* context, const Transform& transform);
+	void RenderWithShadowMap(const Mesh& mesh, ID3D11DeviceContext* context, const Transform& transform, const DirectX::XMMATRIX shadowTransform, ID3D11ShaderResourceView* depthMapSRV);
 	void RenderToShadowMap(const Mesh& mesh, ID3D11DeviceContext* context, const Transform& transform, DirectX::XMMATRIX lightView, DirectX::XMMATRIX lightProjection, ShaderBank& shaderBank);
 	void Render(Sprite2D& sprite, ID3D11DeviceContext* context) const;
 	void Render(Billboard& billboard, const DirectX::XMMATRIX& worldMatrix, const BaseCameraData& baseCameraData);
@@ -47,6 +48,7 @@ private:
 	RenderContext* renderContext;
 	ComPtr<ID3D11SamplerState> textureSampler;
 	ComPtr<ID3D11SamplerState> causticSampler;
+	ComPtr<ID3D11SamplerState> shadowMapSamplerComparisonState;
 
 	BillboardRenderer billboardRenderer;
 
@@ -67,6 +69,7 @@ private:
 	void Draw(const Sprite2D& sprite) const;
 
 	static ObjectBuffer BuildConstantObjectBuffer(const Transform& transform);
+	static ObjectBuffer BuildConstantObjectBuffer(const Transform& transform, const DirectX::XMMATRIX shadowTransform);
 	static MaterialBuffer BuildConstantMaterialBuffer(const Material& material);
 	static ShadowMapLightWVPBuffer BuildConstantShadowMapLightWVPBuffer(const Transform& transformForWorldMatrix, const DirectX::XMMATRIX lightViewMatrix, const DirectX::XMMATRIX lightProjectionMatrix);
 };

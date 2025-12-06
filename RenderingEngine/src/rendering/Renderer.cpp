@@ -47,11 +47,26 @@ Renderer::Renderer(RenderContext* renderContext, std::vector<Material>&& materia
 	DXEssayer(renderContext->GetDevice()->CreateSamplerState(&causticSamplerDesc, &causticSampler));
 
 	SetDebugName(causticSampler, "causticSampler-in-Renderer");
+
+	D3D11_SAMPLER_DESC shadowMapSamplerComparisonStateDesc{};
+	shadowMapSamplerComparisonStateDesc.ComparisonFunc = D3D11_COMPARISON_LESS;
+	shadowMapSamplerComparisonStateDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
+	shadowMapSamplerComparisonStateDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
+	shadowMapSamplerComparisonStateDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
+	shadowMapSamplerComparisonStateDesc.BorderColor[0] = 0.0f;
+	shadowMapSamplerComparisonStateDesc.BorderColor[1] = 0.0f;
+	shadowMapSamplerComparisonStateDesc.BorderColor[2] = 0.0f;
+	shadowMapSamplerComparisonStateDesc.BorderColor[3] = 0.0f;
+	shadowMapSamplerComparisonStateDesc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
+
+	DXEssayer(renderContext->GetDevice()->CreateSamplerState(&shadowMapSamplerComparisonStateDesc, &shadowMapSamplerComparisonState));
+
+	SetDebugName(shadowMapSamplerComparisonState, "shadowMapSamplerComparisonState-in-Renderer");
 }
 
 void Renderer::Render(const Mesh& mesh,
-                      ID3D11DeviceContext* context,
-                      const Transform& transform)
+	ID3D11DeviceContext* context,
+	const Transform& transform)
 {
 	auto& material = materials[mesh.materialIndex];
 
@@ -75,6 +90,45 @@ void Renderer::Render(const Mesh& mesh,
 	context->PSSetShaderResources(1, 1, &causticTexture.texture);
 	context->PSSetSamplers(0, 1, &textureSampler);
 	context->PSSetSamplers(1, 1, &causticSampler);
+
+	if (material.name != "WaterMat") {
+		Draw(mesh);
+	}
+	else {
+		DoubleSidedDraw(mesh);
+	}
+}
+
+void Renderer::RenderWithShadowMap(const Mesh& mesh,
+                      ID3D11DeviceContext* context,
+                      const Transform& transform,
+					  const XMMATRIX shadowTransform,
+					  ID3D11ShaderResourceView* depthMapSRV)
+{
+	auto& material = materials[mesh.materialIndex];
+
+	// Update material constant buffer
+	const auto cbMaterialParams = BuildConstantMaterialBuffer(material);
+	material.constantBuffer.Update(context, cbMaterialParams);
+	material.constantBuffer.Bind(context);
+	material.shaderProgram->Bind(context);
+
+	// Update object constant buffer
+	const auto cbObjectParams = BuildConstantObjectBuffer(transform, shadowTransform);
+	objectConstantBuffer.Update(context, cbObjectParams);
+	objectConstantBuffer.Bind(context);
+
+	// Update frame constant buffer
+	frameConstantBuffer.Update(context, frameBuffer);
+	frameConstantBuffer.Bind(context);
+
+	// Bind textures and samplers
+	context->PSSetShaderResources(0, 1, &material.texture);
+	context->PSSetShaderResources(1, 1, &causticTexture.texture);
+	context->PSSetShaderResources(2, 1, &depthMapSRV);
+	context->PSSetSamplers(0, 1, &textureSampler);
+	context->PSSetSamplers(1, 1, &causticSampler);
+	context->PSSetSamplers(2, 1, &shadowMapSamplerComparisonState);
 
 	if (material.name != "WaterMat") {
 		Draw(mesh);
@@ -269,6 +323,16 @@ ObjectBuffer Renderer::BuildConstantObjectBuffer(const Transform& transform)
 	ObjectBuffer params;
 
 	params.matWorld = XMMatrixTranspose(transform.world);
+
+	return params;
+}
+
+ObjectBuffer Renderer::BuildConstantObjectBuffer(const Transform& transform, const XMMATRIX shadowTransform)
+{
+	ObjectBuffer params;
+
+	params.matWorld = XMMatrixTranspose(transform.world);
+	params.shadowTransform = XMMatrixTranspose(transform.world * shadowTransform);
 
 	return params;
 }

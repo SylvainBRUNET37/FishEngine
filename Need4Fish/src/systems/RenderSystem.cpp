@@ -85,7 +85,7 @@ void RenderSystem::RenderMeshes(EntityManager& entityManager)
 		if (FrustumCuller::IsMeshCulled(mesh, transform))
 			continue;
 
-		renderer.Render(mesh, renderContext->GetContext(), transform);
+		renderer.RenderWithShadowMap(mesh, renderContext->GetContext(), transform, XMLoadFloat4x4(&shadowTransform), shadowMap->DepthMapSRV());
 	}
 }
 
