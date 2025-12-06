@@ -16,13 +16,23 @@ public:
 	explicit BillboardRenderer(ID3D11Device* device);
 
 	void Render(Billboard& billboard, ID3D11DeviceContext* context, const DirectX::XMMATRIX& worldMatrix);
+	void RenderWithInstancing(Billboard& billboard, ID3D11DeviceContext* context, const std::vector<DirectX::XMMATRIX>& worldMatrices);
 	void UpdateCameraData(const BaseCameraData& baseCameraData, ID3D11DeviceContext* context, ID3D11ShaderResourceView* billboardSRV);
 
 private:
-	static constexpr int billboardCbRegisterNumber = 0;
+	static constexpr int billboardCameraCbRegisterNumber = 0;
+	static constexpr int billboardCbRegisterNumber = 1;
 
+	BillboardCameraBuffer billboardCameraBuffer{};
 	BillboardBuffer billboardBuffer{};
+
+	ConstantBuffer<BillboardCameraBuffer> billboardCameraConstantBuffer;
 	ConstantBuffer<BillboardBuffer> billboardConstantBuffer;
+
+	// For instancing
+	static constexpr size_t MAX_BILLBOARDS = 276;
+	ComPtr<ID3D11Buffer> billboardWorldBuffer;
+	ComPtr<ID3D11ShaderResourceView> billboardWorldSRV;
 
 	static void Draw(const Billboard& billboard, ID3D11DeviceContext* context);
 };

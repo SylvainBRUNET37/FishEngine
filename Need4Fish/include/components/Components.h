@@ -47,6 +47,7 @@ struct Particle
 {
 	double lifeTime{}; // Store in ms the age of the object
 	double lifeDuration{};
+	Billboard billboard;
 };
 
 // ===============================================================

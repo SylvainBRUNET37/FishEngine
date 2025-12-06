@@ -1,0 +1,31 @@
+#include "UnderwaterFogPS.hlsl"
+#include "UnderwaterAttenuationPS.hlsl"
+#include "Constants.hlsl"
+
+cbuffer BillboardCameraBuffer : register(b0)
+{
+	float4x4 matView;
+	float4x4 matProj;
+	float3 cameraPos;
+	float pad;
+};
+
+struct VSOutput
+{
+	float4 pos : SV_POSITION;
+	float2 uv : TEXCOORD0;
+	float3 worldPos : TEXCOORD1;
+};
+
+Texture2D tex : register(t0);
+SamplerState samp : register(s0);
+
+float4 BubbleInstancingPS(VSOutput input) : SV_Target
+{
+	float4 finalColor = tex.Sample(samp, input.uv);
+
+	finalColor.rgb = ApplyUnderwaterAttenuation(finalColor, input.worldPos, cameraPos, WATER_HEIGHT);
+	finalColor.rgb = ApplyUnderwaterFog(finalColor, input.worldPos, cameraPos, WATER_HEIGHT);
+
+	return finalColor;
+}

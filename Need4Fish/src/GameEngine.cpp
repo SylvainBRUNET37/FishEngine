@@ -50,7 +50,7 @@ void GameEngine::Run()
 		// Pause/Unpause the game if ESC is pressed for exemple
 		HandleGameState();
 
-		if (GameState::currentState == GameState::FINISHED) 
+		if (GameState::currentState == GameState::FINISHED)
 			return;
 
 		const DWORD frameStartTime = GetTickCount();
@@ -68,7 +68,7 @@ void GameEngine::Run()
 
 		for (const auto& system : systems)
 			system->Update(elapsedTime, *entityManager);
-		
+
 		WaitBeforeNextFrame(frameStartTime);
 	}
 }
@@ -159,7 +159,7 @@ void GameEngine::PauseGame()
 	ClipCursor(nullptr);
 	ReleaseCapture();
 
-	GameState::currentState = GameState::PAUSED;	
+	GameState::currentState = GameState::PAUSED;
 
 	BuildPauseMenu();
 }
@@ -203,7 +203,7 @@ void GameEngine::InitGame()
 	Camera::minDistance = 50.0f;
 	Camera::maxDistance = 170.0f;
 	Camera::zoomSpeed = 1.0f;
-	Camera::firstPersonOffset = { 0.0f,-1.7f,35.0f };
+	Camera::firstPersonOffset = {0.0f, -1.7f, 35.0f};
 	Camera::currentDistance = Camera::distance;
 
 	const auto cameraEntity = entityManager->CreateEntity();
@@ -231,21 +231,36 @@ void GameEngine::InitGame()
 
 void GameEngine::CreateParticleZones()
 {
-	// Add particles inside the world (TODO: make it fit the world size)
-	particleSystem.AddParticleZone(*entityManager,
-		{
-			.centerPosition = {0, 700.0f, 0},
-			.halfExtends = {250.0f, 250.0f, 250.0f},
-			.nbParticle = 1,
-			.particleDurationMin = 3.0f,
-			.particleDurationMax = 15.0f,
-			.particleSpeed = 3.0f,
-			.particleDirection = {0, 1, 0}
-		}
+	static auto& shaderBank = Locator::Get<ResourceManager>().GetShaderBank();
+
+	static const std::shared_ptr<ShaderProgram> bubbleShader = shaderBank.GetOrCreateShaderProgram
+	(
+		renderContext->GetDevice(),
+		"shaders/BubbleInstancingVS.hlsl",
+		"shaders/BubbleInstancingPS.hlsl"
 	);
 
+	static const Texture bubbleTexture = TextureLoader::LoadTextureFromFile(
+		"assets/textures/bble.png", renderContext->GetDevice());
+
+	particleSystem.AddParticleZone(*entityManager,
+	                               {
+		                               .centerPosition = {0, 700.0f, 0},
+		                               .halfExtends = {250.0f, 250.0f, 250.0f},
+		                               .nbParticle = 1,
+		                               .particleDurationMin = 3.0f,
+		                               .particleDurationMax = 15.0f,
+		                               .particleSpeed = 3.0f,
+		                               .particleDirection = {0, 1, 0},
+		                               .billboardTexture = bubbleTexture,
+		                               .billboardShader = bubbleShader
+
+	                               }
+	);
+	// Add particles inside the world (TODO: make it fit the world size)
+
 	// Add particle zone for geysers and currents
-	// It's not a pretty way of doing it but it works
+	// It's not a pretty way of doing it :/
 	for (const auto& [entity, sensor, transform, name] : entityManager->View<Sensor, Transform, Name>())
 	{
 		auto& bodyInterface = JoltSystem::GetBodyInterface();
@@ -259,20 +274,22 @@ void GameEngine::CreateParticleZones()
 
 #ifndef NDEBUG
 				static constexpr unsigned int NB_CURRENT_PARTICLES = 75;
-#else 
+#else
 				static constexpr unsigned int NB_CURRENT_PARTICLES = 200;
 #endif
 
 				particleSystem.AddParticleZone(*entityManager,
-					{
-						.centerPosition = transform.position,
-						.halfExtends = MeshUtil::ToDirectX(sensorBoxShape->GetHalfExtent()),
-						.nbParticle = NB_CURRENT_PARTICLES,
-						.particleDurationMin = 0.5f,
-						.particleDurationMax = 1.0f,
-						.particleSpeed = 10.0f,
-						.particleDirection = MeshUtil::ToDirectX(sensor.direction)
-					}
+				                               {
+					                               .centerPosition = transform.position,
+					                               .halfExtends = MeshUtil::ToDirectX(sensorBoxShape->GetHalfExtent()),
+					                               .nbParticle = NB_CURRENT_PARTICLES,
+					                               .particleDurationMin = 0.5f,
+					                               .particleDurationMax = 1.0f,
+					                               .particleSpeed = 10.0f,
+					                               .particleDirection = MeshUtil::ToDirectX(sensor.direction),
+					                               .billboardTexture = bubbleTexture,
+					                               .billboardShader = bubbleShader
+				                               }
 				);
 			}
 		}
@@ -289,20 +306,22 @@ void GameEngine::CreateParticleZones()
 
 #ifndef NDEBUG
 				static constexpr unsigned int NB_GEYSER_PARTICLES = 100;
-#else 
+#else
 				static constexpr unsigned int NB_GEYSER_PARTICLES = 5000;
 #endif
 
 				particleSystem.AddParticleZone(*entityManager,
-					{
-						.centerPosition = transform.position,
-						.halfExtends = {radius, halfHeight, radius},
-						.nbParticle = NB_GEYSER_PARTICLES,
-						.particleDurationMin = 0.5f,
-						.particleDurationMax = 1.0f,
-						.particleSpeed = 10.0f,
-						.particleDirection = MeshUtil::ToDirectX(sensor.direction)
-					}
+				                               {
+					                               .centerPosition = transform.position,
+					                               .halfExtends = {radius, halfHeight, radius},
+					                               .nbParticle = NB_GEYSER_PARTICLES,
+					                               .particleDurationMin = 0.5f,
+					                               .particleDurationMax = 1.0f,
+					                               .particleSpeed = 10.0f,
+					                               .particleDirection = MeshUtil::ToDirectX(sensor.direction),
+					                               .billboardTexture = bubbleTexture,
+					                               .billboardShader = bubbleShader
+				                               }
 				);
 			}
 		}
@@ -330,7 +349,7 @@ void GameEngine::BuildPauseMenu()
 	// Restart Button
 	sprite = uiManager->LoadSprite("assets/ui/restartButton.png", 0.f, 0.f, 1.0f);
 	uiManager->AlignSpriteXY(sprite, "center", "center");
-	uiManager->TranslateSpriteX(sprite, - 1.1f * sprite.texture.width);
+	uiManager->TranslateSpriteX(sprite, -1.1f * sprite.texture.width);
 	uiManager->AddSprite({
 		.sprite = sprite,
 		.onClick = [this] { RestartGame(); }
@@ -388,7 +407,8 @@ void GameEngine::BuildOptionMenu()
 		.sprite = sprite,
 		.clickSprite = clickSprite,
 		.clickDelay = 0.1f,
-		.onClick = [] {
+		.onClick = []
+		{
 			Camera::invertCamRotation ^= 1;
 			std::cout << Camera::invertCamRotation << std::endl;
 		}, // Theo's dark magic for boolean inversion
@@ -400,11 +420,13 @@ void GameEngine::BuildEndMenu()
 {
 	uiManager->Clear();
 
-	const std::string spriteFile = (GameState::currentState == GameState::DIED) ? "assets/ui/deathTitle.png" : "assets/ui/winTitle.png";
+	const std::string spriteFile = (GameState::currentState == GameState::DIED)
+		                               ? "assets/ui/deathTitle.png"
+		                               : "assets/ui/winTitle.png";
 	Sprite2D sprite = uiManager->LoadSprite(spriteFile);
 	uiManager->AlignSpriteXY(sprite, "center", "center");
 	uiManager->AddSprite({
-			.sprite = sprite,
+		.sprite = sprite,
 	});
 
 	// Restart Button

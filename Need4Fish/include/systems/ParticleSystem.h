@@ -15,6 +15,8 @@ public:
 		float particleDurationMax;
 		float particleSpeed;
 		DirectX::XMFLOAT3 particleDirection; // must be a unit vector
+		Texture billboardTexture;
+		std::shared_ptr<ShaderProgram> billboardShader;
 	};
 
 	explicit ParticleSystem(ID3D11Device* device) : device{device}

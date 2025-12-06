@@ -3,12 +3,16 @@
 
 #include <DirectXMath.h>
 
-struct alignas(16) BillboardBuffer
+struct alignas(16) BillboardCameraBuffer
 {
-	DirectX::XMFLOAT4X4 matWorld;
 	DirectX::XMFLOAT4X4 matView;
 	DirectX::XMFLOAT4X4 matProj;
 	DirectX::XMFLOAT3 cameraPos;
+};
+
+struct alignas(16) BillboardBuffer
+{
+	DirectX::XMFLOAT4X4 matWorld;
 };
 
 #endif

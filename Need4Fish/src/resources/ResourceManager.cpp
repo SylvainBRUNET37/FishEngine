@@ -36,7 +36,10 @@ void ResourceManager::InitShaderBank()
 		.AddDesc<PixelShader>("shaders/SuperBasicPixelShader.hlsl", "main", "ps_5_0")
 		
 		.AddDesc<VertexShader>("shaders/BillboardVS.hlsl", "BillboardVS", "vs_5_0")
-		.AddDesc<PixelShader>("shaders/BillboardPS.hlsl", "BillboardPS", "ps_5_0")
+		.AddDesc<PixelShader>("shaders/BillboardPS.hlsl", "BillboardPS", "ps_5_0")	
+
+		.AddDesc<VertexShader>("shaders/BubbleInstancingVS.hlsl", "BubbleInstancingVS", "vs_5_0")
+		.AddDesc<PixelShader>("shaders/BubbleInstancingPS.hlsl", "BubbleInstancingPS", "ps_5_0")
 
 		.AddDesc<VertexShader>("shaders/DistVS.hlsl", "DistVS", "vs_5_0")
 		.AddDesc<PixelShader>("shaders/DistPS.hlsl", "DistPS", "ps_5_0")

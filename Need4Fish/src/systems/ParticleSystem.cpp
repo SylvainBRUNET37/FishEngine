@@ -12,34 +12,25 @@ using namespace DirectX;
 
 void ParticleSystem::AddParticleZone(EntityManager& entityManager, const ParticleZoneParams& params)
 {
-	static auto& shaderBank = Locator::Get<ResourceManager>().GetShaderBank();
-
-	static const shared_ptr<ShaderProgram> billboardShader = shaderBank.GetOrCreateShaderProgram
-	(
-		device,
-		"shaders/BillboardVS.hlsl",
-		"shaders/BubblePS.hlsl"
-	);
-
-	static const Texture billboardTexture = TextureLoader::LoadTextureFromFile("assets/textures/bble.png", device);
-
 	vector<Entity> particles(params.nbParticle);
 
 	ranges::for_each(particles, [&](Entity& particle)
 	{
 		particle = entityManager.CreateEntity();
 		entityManager.AddComponent<Particle>(particle,
-		                                     MathsUtils::RandomBetween(params.particleDurationMin, params.particleDurationMax),
-		                                     params.particleDurationMax);
-		entityManager.AddComponent<Billboard>(particle, Billboard
-		                                      {
-			                                      billboardShader,
-			                                      billboardTexture,
-			                                      device,
-			                                      {},
-			                                      {0.0f, 0.0f},
-			                                      Billboard::CameraFacing
-		                                      });
+		                                     MathsUtils::RandomBetween(params.particleDurationMin,
+		                                                               params.particleDurationMax),
+		                                     params.particleDurationMax,
+		                                     Billboard
+		                                     {
+			                                     params.billboardShader,
+			                                     params.billboardTexture,
+			                                     device,
+			                                     XMFLOAT3{},
+			                                     XMFLOAT2{0.0f, 0.0f},
+			                                     Billboard::CameraFacing
+		                                     }
+		);
 	});
 
 	particleZones.emplace_back
@@ -69,12 +60,12 @@ void ParticleSystem::MoveAndTeleportIfAtEndOfLife(
 	EntityManager& entityManager, const Zone& zone, const Entity& entity, const double deltaTime)
 {
 	auto& particle = entityManager.Get<Particle>(entity);
-	auto& billboard = entityManager.Get<Billboard>(entity);
+	Billboard& billboard = particle.billboard;
 
 	particle.lifeTime += deltaTime;
 
-	const bool shouldBeTeleported = 
-		not MathsUtils::IsInsideAABB(billboard.position, zone.centerPosition, zone.halfExtends) || 
+	const bool shouldBeTeleported =
+		not MathsUtils::IsInsideAABB(billboard.position, zone.centerPosition, zone.halfExtends) ||
 		particle.lifeTime >= particle.lifeDuration;
 
 	if (shouldBeTeleported) [[unlikely]] // Teleport the particle
@@ -85,7 +76,7 @@ void ParticleSystem::MoveAndTeleportIfAtEndOfLife(
 		const auto scale = MathsUtils::RandomBetween(scaleMin, scaleMax);
 
 		billboard.position = MathsUtils::RandomPosInSquare(zone.centerPosition, zone.halfExtends);
-		billboard.scale = { scale, scale };
+		billboard.scale = {scale, scale};
 
 		particle.lifeDuration = MathsUtils::RandomBetween(zone.particleDurationMin, zone.particleDurationMax);
 		particle.lifeTime = 0.0f;

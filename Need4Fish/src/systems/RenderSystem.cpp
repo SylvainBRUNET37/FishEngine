@@ -72,6 +72,32 @@ void RenderSystem::RenderBillboards(EntityManager& entityManager, const Camera& 
 	}
 }
 
+// Not very well coded, will be improved if needed
+void RenderSystem::RenderParticles(EntityManager& entityManager, const Camera& currentCamera)
+{
+	renderer.PrepareSceneForBillboard();
+
+	static constexpr size_t NB_PARTICLE_MAX = 276;
+	vector<XMMATRIX> particleWorldMatrices;
+	particleWorldMatrices.reserve(NB_PARTICLE_MAX);
+
+	Billboard* billboard{};
+	size_t i = 0;
+	for (const auto& [entity, particle] : entityManager.View<Particle>())
+	{
+		if (i == 0) [[unlikely]] // store the billboard object only once
+		{
+			billboard = &particle.billboard;
+			++i;
+		}
+		particleWorldMatrices.emplace_back(particle.billboard.ComputeBillboardWorldMatrix());
+	}
+
+	vassert(billboard, "There should be particles in the world since RenderParticles is called");
+
+	renderer.RenderWithInstancing(*billboard, particleWorldMatrices, currentCamera);
+}
+
 void RenderSystem::RenderMeshes(EntityManager& entityManager)
 {
 	// Render Meshes
@@ -130,7 +156,7 @@ void RenderSystem::UpdateFrameBuffer(const double deltaTime, EntityManager& enti
 void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 {
 	const auto currentCamera = entityManager.Get<Camera>(GameState::currentCameraEntity);
-	FrustumCuller::Init(static_cast<BaseCameraData>(currentCamera));// Prepare the frustum culler
+	FrustumCuller::Init(static_cast<BaseCameraData>(currentCamera)); // Prepare the frustum culler
 
 	renderer.UpdateScene();
 
@@ -138,6 +164,7 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 
 	RenderMeshes(entityManager);
 	RenderBillboards(entityManager, currentCamera);
+	RenderParticles(entityManager, currentCamera);
 
 	ComputeDistortionZones(entityManager);
 	RenderPostProcesses(deltaTime);

@@ -24,6 +24,7 @@ private:
 	void RenderPostProcesses(double deltaTime);
 	void ComputeDistortionZones(EntityManager& entityManager);
 	void RenderBillboards(EntityManager& entityManager, const Camera& currentCamera);
+	void RenderParticles(EntityManager& entityManager, const Camera& currentCamera);
 	void RenderMeshes(EntityManager& entityManager);
 	void UpdatePointLights(EntityManager& entityManager);
 	void UpdateFrameBuffer(double deltaTime, EntityManager& entityManager, const Camera& currentCamera);
