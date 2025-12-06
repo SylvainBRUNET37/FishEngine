@@ -268,7 +268,7 @@ void PhysicsSimulationSystem::UpdateTransforms(EntityManager& entityManager)
 
 void PhysicsSimulationSystem::UpdateNPCs(EntityManager& entityManager)
 {
-	auto computeNewSpeed = [&](Body* body, AIController aiController, string name) {
+	auto computeNewSpeed = [&](const Entity& entity, Body* body, AIController aiController, string name) {
 		// Random device
 		static std::mt19937 rng(std::random_device{}());
 		
@@ -287,7 +287,12 @@ void PhysicsSimulationSystem::UpdateNPCs(EntityManager& entityManager)
 
 		// Panic mode
 		auto diff = body->GetPosition() - playerPosition;
-		const bool isPanicking = diff.Length() < aiController.safeDistance;
+
+		bool isApex = false;
+		if (entityManager.HasComponent<Eatable>(entity))
+			isApex = entityManager.Get<Eatable>(entity).isApex;
+
+		const bool isPanicking = !isApex && diff.Length() < aiController.safeDistance;
 
 		if (!isPanicking && aiController.remainingDelay > 0)
 		{
@@ -296,14 +301,13 @@ void PhysicsSimulationSystem::UpdateNPCs(EntityManager& entityManager)
 		}
 		else if (aiController.remainingDelay < 0)
 		{
-			aiController.remainingDelay = aiController.updateDelay;
+			static std::uniform_real_distribution<float> waitingTime(1.0f, 3.0f);
+			aiController.remainingDelay = waitingTime(rng);
 		}
-
 
 		// Take a random direction opposite to the player
 		static std::uniform_real_distribution<float> dist(-std::numbers::pi_v<float>, std::numbers::pi_v<float>);
 		float divider = isPanicking ? 3.0f : 1.0f;
-
 
 		//// Base direction (away from player)
 		JPH::Vec3 newDir = (isPanicking ? diff : forward).Normalized();
@@ -311,7 +315,6 @@ void PhysicsSimulationSystem::UpdateNPCs(EntityManager& entityManager)
 		//// Random direction
 		auto yaw = dist(rng) / divider;
 		JPH::Quat q = JPH::Quat::sRotation(up, yaw); // q is qYaw
-		cout << "Random yaw : " << yaw << std::endl;
 		if (isPanicking)
 		{
 			JPH::Quat qPitch = JPH::Quat::sRotation((q * right).Normalized(), dist(rng));
@@ -353,7 +356,7 @@ void PhysicsSimulationSystem::UpdateNPCs(EntityManager& entityManager)
 	// Update the NPC
 	for (const auto& [entity, rigidBody, aiController, name] : entityManager.View<RigidBody, AIController, Name>())
 	{
-		Vec3 newSpeed = computeNewSpeed(rigidBody.body, aiController, name.name);
+		Vec3 newSpeed = computeNewSpeed(entity, rigidBody.body, aiController, name.name);
 
 		Vec3 currentSpeed = JoltSystem::GetBodyInterface().GetLinearVelocity(rigidBody.body->GetID());
 		const auto theoreticalSpeed = currentSpeed + newSpeed;

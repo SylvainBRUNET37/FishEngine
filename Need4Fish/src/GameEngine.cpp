@@ -4,7 +4,7 @@
 #include <tuple>
 #include <algorithm>
 #include <Jolt/Physics/Collision/Shape/CylinderShape.h>
-
+#include <numbers> 
 
 #include "GameState.h"
 #include "entities/EntityManagerFactory.h"
@@ -120,7 +120,69 @@ void GameEngine::HandleCollions()
 	{
 		auto& [bodyId1, bodyId2] = GameState::detectedCollisions.front();
 		GameState::detectedCollisions.pop();
-		Eating::Eat(*entityManager, bodyId1, bodyId2);
+
+		auto entity1 = Eating::GetEntityFromBody(*entityManager, bodyId1);
+		auto entity2 = Eating::GetEntityFromBody(*entityManager, bodyId2);
+		if (entity1.has_value()
+			&& entityManager->HasComponent<Eatable>(entity1.value())
+			&& entity2.has_value()
+			&& entityManager->HasComponent<Eatable>(entity2.value()))
+		{
+			Eating::Eat(*entityManager, bodyId1, bodyId2); // TODO modify eat for opti
+		}
+		else
+		{
+			// Rotate da fishes around
+			if (entity1.has_value()
+				&& entityManager->HasComponent<Eatable>(entity1.value())
+				&& entityManager->HasComponent<AIController>(entity1.value())
+			)
+			{
+				// TODO
+
+				auto& bodyInterface = JoltSystem::GetBodyInterface();
+				auto& rigidBody = entityManager->Get<RigidBody>(entity1.value());
+				Vec3 axis = rigidBody.body->GetWorldTransform().GetColumn3(1).Normalized(); // up
+				
+				float angle = std::numbers::pi_v<float>;
+
+				// Vérifie l'angle pour éviter les problemes
+				if (angle > 0.0001f)
+				{
+					bodyInterface.SetPositionAndRotation(
+						rigidBody.body->GetID(),
+						rigidBody.body->GetPosition(),
+						(JPH::Quat::sRotation(axis, angle) * rigidBody.body->GetRotation()).Normalized(),
+						JPH::EActivation::Activate
+					);
+				}
+			}
+			if (entity2.has_value()
+				&& entityManager->HasComponent<Eatable>(entity2.value())
+				&& entityManager->HasComponent<AIController>(entity2.value())
+				)
+			{
+				// TODO
+
+				auto& bodyInterface = JoltSystem::GetBodyInterface();
+				auto& rigidBody = entityManager->Get<RigidBody>(entity2.value());
+				Vec3 axis = rigidBody.body->GetWorldTransform().GetColumn3(1).Normalized(); // up
+
+				float angle = std::numbers::pi_v<float>;
+				std::cout << angle << std::endl;
+
+				// Vérifie l'angle pour éviter les problemes
+				if (angle > 0.0001f)
+				{
+					bodyInterface.SetPositionAndRotation(
+						rigidBody.body->GetID(),
+						rigidBody.body->GetPosition(),
+						(JPH::Quat::sRotation(axis, angle) * rigidBody.body->GetRotation()).Normalized(),
+						JPH::EActivation::Activate
+					);
+				}
+			}
+		}
 		if (GameState::currentState != GameState::PLAYING) ChangeGameStatus();
 	}
 }

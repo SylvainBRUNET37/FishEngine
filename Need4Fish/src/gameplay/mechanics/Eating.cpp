@@ -50,6 +50,24 @@ static void KillRecursively(EntityManager& entityManager, const Entity preyEntit
 	return std::nullopt;
 }
 
+std::optional<Entity> Eating::GetEntityFromBody(EntityManager& entityManager, const JPH::BodyID& bodyId)
+{
+	auto eatables = entityManager.View<Eatable, RigidBody>();
+	auto it = std::find_if(
+		eatables.begin(),
+		eatables.end(),
+		[&](auto&& tuple)
+		{
+			auto& [entity, eatable, rigidBody] = tuple;
+			return rigidBody.body->GetID() == bodyId;
+		});
+	if (it != eatables.end())
+	{
+		const auto& [entity, _, __] = *it;
+		return entity;
+	}
+	return std::nullopt;
+}
 
 [[nodiscard]] static bool IsEntityAPlayer(EntityManager& entityManager, Entity SearchedEntity)
 {
