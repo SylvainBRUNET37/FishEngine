@@ -6,9 +6,14 @@
 #include <cstdarg>
 #include <format>
 #include <iostream>
+#include "entities/Entity.h"
+#include "entities/EntityManager.h"
 
 namespace JoltUtils
 {
+
+	void TurnFishAround(EntityManager& entityManager, const Entity& entity);
+
 	static void TraceImpl(const char* inFMT, ...)
 	{
 		va_list args;

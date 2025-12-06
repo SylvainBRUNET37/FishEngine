@@ -176,7 +176,9 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     <None Include="shaders\Constants.hlsl">
       <FileType>Document</FileType>
     </None>
+    <ClCompile Include="include\physicsEngine\utils\JoltUtils.cpp" />
     <ClCompile Include="src\systems\ParticleSystem.cpp" />
+    <ClCompile Include="src\utils\EntityManagerUtils.cpp" />
     <ClCompile Include="src\utils\MathsUtils.cpp" />
     <None Include="shaders\PostProcessPS.hlsl">
       <FileType>Document</FileType>
@@ -306,6 +308,7 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     <ClInclude Include="include\systems\System.h" />
     <ClInclude Include="include\physicsEngine\utils\MeshUtil.h" />
     <ClInclude Include="include\UIManager.h" />
+    <ClInclude Include="include\utils\EntityManagerUtils.h" />
     <ClInclude Include="include\utils\MathsUtils.h" />
     <ClInclude Include="pch.h" />
     <None Include="shaders\CausticsPS.hlsl">

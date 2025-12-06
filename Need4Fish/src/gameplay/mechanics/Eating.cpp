@@ -50,25 +50,6 @@ static void KillRecursively(EntityManager& entityManager, const Entity preyEntit
 	return std::nullopt;
 }
 
-std::optional<Entity> Eating::GetEntityFromBody(EntityManager& entityManager, const JPH::BodyID& bodyId)
-{
-	auto eatables = entityManager.View<Eatable, RigidBody>();
-	auto it = std::find_if(
-		eatables.begin(),
-		eatables.end(),
-		[&](auto&& tuple)
-		{
-			auto& [entity, eatable, rigidBody] = tuple;
-			return rigidBody.body->GetID() == bodyId;
-		});
-	if (it != eatables.end())
-	{
-		const auto& [entity, _, __] = *it;
-		return entity;
-	}
-	return std::nullopt;
-}
-
 [[nodiscard]] static bool IsEntityAPlayer(EntityManager& entityManager, Entity SearchedEntity)
 {
 	auto watchables = entityManager.View<Controllable>();
@@ -94,7 +75,6 @@ static void AcuallyEat(
 )
 {
 	float scaleFactor = CalculateGrowthFactor(predatorEatable.mass, preyEatable.mass);
-	std::cout << "growth factor : " << scaleFactor << std::endl;
 
 	// Apply power effect of the killed entity
 	if (entityManager.HasComponent<PowerSource>(preyEntity))
@@ -130,8 +110,6 @@ static void AcuallyEat(
 	const float F_GROWTH_STEPS = 60.0f;
 
 	trans.scaleStep = scaleFactor / F_GROWTH_STEPS;
-
-
 }
 
 static void LoseOrEat(
@@ -149,7 +127,7 @@ static void LoseOrEat(
 	}
 	else if (IsEntityAPlayer(entityManager, predatorEntity))
 	{
-		GameState::isGrowing = true; // TODO (maybe) also grow fishes ?
+		GameState::isGrowing = true;
 		AcuallyEat(entityManager, predatorEntity, predatorEatable, predatorBody, preyEntity, preyEatable);
 	}
 	// Else : nothing (fishes do not eat each other)

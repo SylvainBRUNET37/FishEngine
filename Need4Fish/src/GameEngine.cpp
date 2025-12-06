@@ -16,6 +16,8 @@
 #include "systems/PowerSystem.h"
 #include "systems/SensorSystem.h"
 #include "utils/MathsUtils.h"
+#include "utils/EntityManagerUtils.h"
+#include "physicsEngine/utils/JoltUtils.h"
 
 using namespace DirectX;
 using namespace JPH;
@@ -116,73 +118,38 @@ void GameEngine::HandleGameState()
 
 void GameEngine::HandleCollions()
 {
+	auto isAiFish = [](EntityManager& entityManager, const Entity& entity) {
+		return entityManager.HasComponent<Eatable>(entity) && entityManager.HasComponent<AIController>(entity);
+		};
+
 	while (!GameState::detectedCollisions.empty())
 	{
 		auto& [bodyId1, bodyId2] = GameState::detectedCollisions.front();
 		GameState::detectedCollisions.pop();
 
-		auto entity1 = Eating::GetEntityFromBody(*entityManager, bodyId1);
-		auto entity2 = Eating::GetEntityFromBody(*entityManager, bodyId2);
-		if (entity1.has_value()
-			&& entityManager->HasComponent<Eatable>(entity1.value())
-			&& entity2.has_value()
-			&& entityManager->HasComponent<Eatable>(entity2.value()))
+		auto optEntity1 = EntityManagerUtils::GetEntityFromBody(*entityManager, bodyId1);
+		auto optEntity2 = EntityManagerUtils::GetEntityFromBody(*entityManager, bodyId2);
+
+		if (!optEntity1.has_value() || !optEntity2.has_value())
+			continue;
+
+		const Entity entity1 = optEntity1.value();
+		const Entity entity2 = optEntity2.value();
+
+		if (entityManager->HasComponent<Eatable>(entity1)
+			&& entityManager->HasComponent<Eatable>(entity2))
 		{
-			Eating::Eat(*entityManager, bodyId1, bodyId2); // TODO modify eat for opti
+			Eating::Eat(*entityManager, bodyId1, bodyId2);
 		}
 		else
 		{
 			// Rotate da fishes around
-			if (entity1.has_value()
-				&& entityManager->HasComponent<Eatable>(entity1.value())
-				&& entityManager->HasComponent<AIController>(entity1.value())
-			)
-			{
-				// TODO
-
-				auto& bodyInterface = JoltSystem::GetBodyInterface();
-				auto& rigidBody = entityManager->Get<RigidBody>(entity1.value());
-				Vec3 axis = rigidBody.body->GetWorldTransform().GetColumn3(1).Normalized(); // up
-				
-				float angle = std::numbers::pi_v<float>;
-
-				// Vérifie l'angle pour éviter les problemes
-				if (angle > 0.0001f)
-				{
-					bodyInterface.SetPositionAndRotation(
-						rigidBody.body->GetID(),
-						rigidBody.body->GetPosition(),
-						(JPH::Quat::sRotation(axis, angle) * rigidBody.body->GetRotation()).Normalized(),
-						JPH::EActivation::Activate
-					);
-				}
-			}
-			if (entity2.has_value()
-				&& entityManager->HasComponent<Eatable>(entity2.value())
-				&& entityManager->HasComponent<AIController>(entity2.value())
-				)
-			{
-				// TODO
-
-				auto& bodyInterface = JoltSystem::GetBodyInterface();
-				auto& rigidBody = entityManager->Get<RigidBody>(entity2.value());
-				Vec3 axis = rigidBody.body->GetWorldTransform().GetColumn3(1).Normalized(); // up
-
-				float angle = std::numbers::pi_v<float>;
-				std::cout << angle << std::endl;
-
-				// Vérifie l'angle pour éviter les problemes
-				if (angle > 0.0001f)
-				{
-					bodyInterface.SetPositionAndRotation(
-						rigidBody.body->GetID(),
-						rigidBody.body->GetPosition(),
-						(JPH::Quat::sRotation(axis, angle) * rigidBody.body->GetRotation()).Normalized(),
-						JPH::EActivation::Activate
-					);
-				}
-			}
+			if (isAiFish(*entityManager, entity1))
+				JoltUtils::TurnFishAround(*entityManager, entity1);
+			if (isAiFish(*entityManager, entity2))
+				JoltUtils::TurnFishAround(*entityManager, entity2);
 		}
+
 		if (GameState::currentState != GameState::PLAYING) ChangeGameStatus();
 	}
 }
