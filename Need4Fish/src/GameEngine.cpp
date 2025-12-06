@@ -247,10 +247,11 @@ void GameEngine::CreateParticleZones()
 	                               {
 		                               .centerPosition = {0, 1300.0f, 0},
 		                               .halfExtends = {7000.0f,900.0f, 7000.0f},
-		                               .nbParticle = 30'000,
+		                               .nbParticle = 10'000,
 		                               .particleDurationMin = 3.0f,
 		                               .particleDurationMax = 15.0f,
-		                               .particleSpeed = 3.0f,
+		                               .particleSpeedMin = 0.5f,
+		                               .particleSpeedMax = 1.0f,
 		                               .particleDirection = {0, 1, 0},
 		                               .billboardTexture = bubbleTexture,
 		                               .billboardShader = bubbleShader
@@ -284,7 +285,8 @@ void GameEngine::CreateParticleZones()
 					                               .nbParticle = NB_CURRENT_PARTICLES,
 					                               .particleDurationMin = 0.5f,
 					                               .particleDurationMax = 1.0f,
-					                               .particleSpeed = 10.0f,
+												   .particleSpeedMin = 8.0f,
+				                               	   .particleSpeedMax = 12.0f,
 					                               .particleDirection = MeshUtil::ToDirectX(sensor.direction),
 					                               .billboardTexture = bubbleTexture,
 					                               .billboardShader = bubbleShader
@@ -316,7 +318,8 @@ void GameEngine::CreateParticleZones()
 					                               .nbParticle = NB_GEYSER_PARTICLES,
 					                               .particleDurationMin = 0.5f,
 					                               .particleDurationMax = 1.0f,
-					                               .particleSpeed = 10.0f,
+												   .particleSpeedMin = 5.0f,
+												   .particleSpeedMax = 12.0f,
 					                               .particleDirection = MeshUtil::ToDirectX(sensor.direction),
 					                               .billboardTexture = bubbleTexture,
 					                               .billboardShader = bubbleShader

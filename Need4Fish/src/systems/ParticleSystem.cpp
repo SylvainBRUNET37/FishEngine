@@ -13,9 +13,12 @@ using namespace DirectX;
 void ParticleSystem::AddParticleZone(EntityManager& entityManager, const ParticleZoneParams& params)
 {
 	vector<Entity> particles(params.nbParticle);
+	vector<float> particlesSpeed(params.nbParticle);
 
+	size_t i = 0;
 	ranges::for_each(particles, [&](Entity& particle)
 	{
+		particlesSpeed[i++] = MathsUtils::RandomBetween(params.particleSpeedMin, params.particleSpeedMax);
 		particle = entityManager.CreateEntity();
 		entityManager.AddComponent<Particle>(particle,
 		                                     MathsUtils::RandomBetween(params.particleDurationMin,
@@ -38,7 +41,7 @@ void ParticleSystem::AddParticleZone(EntityManager& entityManager, const Particl
 		std::move(particles),
 		params.centerPosition, params.halfExtends,
 		params.particleDurationMin, params.particleDurationMax,
-		params.particleSpeed, params.particleDirection
+		std::move(particlesSpeed), params.particleDirection
 	);
 }
 
@@ -48,16 +51,18 @@ void ParticleSystem::Update(const double deltaTime, EntityManager& entityManager
 	{
 		ranges::for_each(particleZones, [&](const Zone& zone)
 		{
+			size_t i = 0;
 			ranges::for_each(zone.particles, [&](const Entity& entity)
 			{
-				MoveAndTeleportIfAtEndOfLife(entityManager, zone, entity, deltaTime);
+				MoveAndTeleportIfAtEndOfLife(entityManager, zone, entity, deltaTime, i);
+				++i;
 			});
 		});
 	}
 }
 
 void ParticleSystem::MoveAndTeleportIfAtEndOfLife(
-	EntityManager& entityManager, const Zone& zone, const Entity& entity, const double deltaTime)
+	EntityManager& entityManager, const Zone& zone, const Entity& entity, const double deltaTime, const size_t indice)
 {
 	auto& particle = entityManager.Get<Particle>(entity);
 	Billboard& billboard = particle.billboard;
@@ -70,7 +75,7 @@ void ParticleSystem::MoveAndTeleportIfAtEndOfLife(
 
 	if (shouldBeTeleported) [[unlikely]] // Teleport the particle
 	{
-		static constexpr float scaleMin = 5.0f;
+		static constexpr float scaleMin = 3.0f;
 		static constexpr float scaleMax = 15.0f;
 
 		const auto scale = MathsUtils::RandomBetween(scaleMin, scaleMax);
@@ -86,6 +91,6 @@ void ParticleSystem::MoveAndTeleportIfAtEndOfLife(
 		const XMVECTOR position = XMLoadFloat3(&billboard.position);
 		const XMVECTOR direction = XMLoadFloat3(&zone.particleDirection);
 
-		XMStoreFloat3(&billboard.position, XMVectorAdd(position, direction * zone.particleSpeed));
+		XMStoreFloat3(&billboard.position, XMVectorAdd(position, direction * zone.particleSpeeds[indice]));
 	}
 }
