@@ -154,7 +154,7 @@ void CameraSystem::ComputeCameraPosition(Camera& camera, const Transform& transf
 			camera.distance = camera.distanceBeforeTemporaryFP;
 
 			// Placer la caméra progressivement sur adjustedPos
-			camera.position = XMVectorLerp(camera.position, adjustedPos, 0.6f);
+			camera.position = adjustedPos;
 		}
 		else
 		{
@@ -170,7 +170,7 @@ void CameraSystem::ComputeCameraPosition(Camera& camera, const Transform& transf
 	if (achievedDistance < camera.distance * 0.5f)
 		lerpSpeed *= 3.0f;
 
-	camera.position = XMVectorLerp(camera.position, adjustedPos, std::clamp(lerpSpeed * dt, 0.0f, 1.0f));
+	camera.position = adjustedPos;
 
 	// Focus latéral
 	XMVECTOR idealToActual = XMVectorSubtract(camera.position, idealCameraPos);
