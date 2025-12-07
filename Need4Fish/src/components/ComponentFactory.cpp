@@ -44,21 +44,28 @@ void ComponentFactory::CreateSensor(const nlohmann::json& componentData, EntityM
 
 	Body* body = nullptr;
 	if (componentData["bodyType"] == "boxSensor")
-		body = SensorFactory::CreateCubeCurrentSensor(transform, entity);
+	{
+		if (entityManager.HasComponent<MeshInstance>(entity))
+		{
+			const auto& meshInstance = entityManager.Get<MeshInstance>(entity);
+			const auto& mesh = Locator::Get<ResourceManager>().GetMesh(meshInstance.meshIndex);
+			body = SensorFactory::CreateCubeCurrentSensor(transform, mesh, entity);
+		}
+		else
+			body = SensorFactory::CreateCubeCurrentSensor(transform, entity);
+	}
 	else if (componentData["bodyType"] == "cylinderSensor")
 		body = SensorFactory::CreateCylinderSensor(transform, entity);
 	
 	vassert(body, "Sensor must have a body type");
 
-	const Sensor sensor
-	{
-		.direction = direction,
-		.body = body,
-		.pushStrength = pushStrength,
-		.type = type
-	};
-
-	entityManager.AddComponent<Sensor>(entity, std::move(sensor));
+	entityManager.AddComponent<Sensor>(entity, 
+		Sensor{
+		direction,
+		body,
+		pushStrength,
+		type
+	});
 }
 
 void ComponentFactory::CreateEatable(const nlohmann::json& componentData, EntityManager& entityManager,

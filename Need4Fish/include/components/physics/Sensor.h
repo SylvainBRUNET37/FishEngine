@@ -19,6 +19,26 @@ struct Sensor
 	JPH::Body* body;
 	float pushStrength{};
 	Type type;
+
+	Sensor(const JPH::Vec3 direction, JPH::Body* body, const float pushStrength, const Type type)
+		: direction(direction),
+		body(body),
+		pushStrength(pushStrength),
+		type(type)
+	{
+	}
+
+	Sensor() = default;
+	Sensor(const Sensor&) = delete;
+	Sensor& operator=(const Sensor&) = delete;
+
+	Sensor(Sensor&& other) noexcept;
+	Sensor& operator=(Sensor&& other) noexcept;
+
+	~Sensor() noexcept { RemoveAndDestroyBody(); }
+
+private:
+	void RemoveAndDestroyBody() noexcept;
 };
 
 #endif
