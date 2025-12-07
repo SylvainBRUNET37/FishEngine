@@ -26,7 +26,7 @@ SamplerComparisonState samShadow : register(s2);
 
 float4 PhongCausticsPS(VSOutput input) : SV_Target
 {
-    float3 shadowFactor = CalcShadowFactor(samShadow, gShadowMap, input.ShadowPosH);
+    float shadowFactor = CalcShadowFactor(samShadow, gShadowMap, input.ShadowPosH);
     
     float3 finalColor = ApplyBlingPhong(input, shadowFactor);
 
