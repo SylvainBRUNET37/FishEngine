@@ -3,6 +3,7 @@
 
 #include "rendering/graphics/Sprite2D.h"
 #include <optional>
+#include <string>
 #include <functional>
 
 #undef min
@@ -13,12 +14,18 @@ struct SpriteElement {
 
 	std::optional<Sprite2D> hoverSprite = std::nullopt;
 	std::optional<Sprite2D> clickSprite = std::nullopt;
+	std::optional<Sprite2D> clickHoverSprite = std::nullopt;
 
 	float clickDelay = 1.0f;
 
 	float remainingDelay = 0.0f;
 
 	std::function<void()> onClick = []{};
+
+	std::string alignX = "";
+	std::string alignY = "";
+	float offsetX = 0;
+	float offsetY = 0;
 
 	bool isCheckBox = false;
 
@@ -40,9 +47,14 @@ struct SpriteElement {
 			sprite = clickSprite.value();
 			clickSprite = tmp;
 		}
+		if (hoverSprite.has_value() && clickHoverSprite.has_value()) {
+			auto tmp = hoverSprite;
+			hoverSprite = clickHoverSprite.value();
+			clickHoverSprite = tmp;
+		}
 	}
 
-	const Sprite2D& UpdateAndGetDisplayedSprite() {
+	const Sprite2D& UpdateAndGetDisplayedSprite(int startX, int startY) {
 		static constexpr float FREQUENCE = 1.0f / 60.0f;
 		remainingDelay = std::max(0.0f, remainingDelay - FREQUENCE);
 
@@ -50,13 +62,13 @@ struct SpriteElement {
 		{
 			return clickSprite.value();
 		}
-		else if (hoverSprite.has_value() && isHovered())
+		else if (hoverSprite.has_value() && isHovered(startX, startY))
 			return hoverSprite.value();
 		else
 			return sprite;
 	}
 
-	bool isHovered() const {
+	bool isHovered(int startX, int startY) const {
 		POINT currentCursorCoordinates;
 
 		if (!GetCursorPos(&currentCursorCoordinates))
@@ -65,10 +77,10 @@ struct SpriteElement {
 		const auto cursorX = currentCursorCoordinates.x;
 		const auto cursorY = currentCursorCoordinates.y;
 
-		return (cursorX >= sprite.position.x
-			&& cursorX <= sprite.position.x + sprite.texture.width
-			&& cursorY >= sprite.position.y
-			&& cursorY <= sprite.position.y + sprite.texture.height);
+		return (cursorX >= startX + sprite.position.x
+			&& cursorX <= startX + sprite.position.x + sprite.texture.width
+			&& cursorY >= startY + sprite.position.y
+			&& cursorY <= startY + sprite.position.y + sprite.texture.height);
 	}
 };
 

@@ -207,6 +207,7 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 	ComputeDistortionZones(entityManager);
 	RenderPostProcesses(deltaTime);
 
+	uiManager->UpdateSprites(*renderContext);
 	RenderUI(entityManager);
 
 	Present();

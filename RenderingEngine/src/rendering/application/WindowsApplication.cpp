@@ -101,6 +101,15 @@ LRESULT WindowsApplication::ProcessWindowMessage(const HWND hWnd, const UINT msg
 			if (width > 0 && height > 0)
 				renderContext->Resize(width, height);
 		}
+		break;
+	}
+	case WM_MOVE:
+	{
+		int x = (int)(short)LOWORD(lp);
+		int y = (int)(short)HIWORD(lp);
+
+		if (x >= 0 && y >= 0 && renderContext)
+			renderContext->Move(x, y);
 	}
 	break;
 

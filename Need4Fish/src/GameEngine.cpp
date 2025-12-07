@@ -24,7 +24,7 @@ using namespace JPH;
 GameEngine::GameEngine(RenderContext* renderContext_)
 	: renderContext{renderContext_},
 	  particleSystem{renderContext->GetDevice()},
-	  uiManager{std::make_shared<UIManager>(renderContext->GetDevice())}
+	  uiManager{std::make_shared<UIManager>(renderContext)}
 {
 	CameraSystem::SetMouseCursor();
 
@@ -380,45 +380,58 @@ void GameEngine::BuildPauseMenu()
 	uiManager->Clear();
 	// Pause title
 	auto sprite = uiManager->LoadSprite("assets/ui/pauseTitle.png");
-	uiManager->AlignSpriteXY(sprite, "center", "center");
 	uiManager->AddSprite({
 		.sprite = sprite,
+		.alignX = "center",
+		.alignY = "center"
 	});
 
 	// Resume Button
 	sprite = uiManager->LoadSprite("assets/ui/resumeButton.png", 0.f, 0.f, 1.0f);
-	uiManager->AlignSpriteXY(sprite, "center", "center");
+	auto hoverSprite = uiManager->LoadSprite("assets/ui/resumeButtonHovered.png", 0.f, 0.f, 1.0f);
 	uiManager->AddSprite({
 		.sprite = sprite,
-		.onClick = [this] { ChangeGameStatus(); }
+		.hoverSprite = hoverSprite,
+		.onClick = [this] { ChangeGameStatus(); },
+		.alignX = "center",
+		.alignY = "center"
 	});
 
 	// Restart Button
 	sprite = uiManager->LoadSprite("assets/ui/restartButton.png", 0.f, 0.f, 1.0f);
-	uiManager->AlignSpriteXY(sprite, "center", "center");
-	uiManager->TranslateSpriteX(sprite, -1.1f * sprite.texture.width);
+	hoverSprite = uiManager->LoadSprite("assets/ui/restartButtonHovered.png", 0.f, 0.f, 1.0f);
 	uiManager->AddSprite({
 		.sprite = sprite,
-		.onClick = [this] { RestartGame(); }
+		.hoverSprite = hoverSprite,
+		.onClick = [this] { RestartGame(); },
+		.alignX = "center",
+		.alignY = "center",
+		.offsetX = -1.1f * sprite.texture.width
 	});
 
 	// Quit Button
 	sprite = uiManager->LoadSprite("assets/ui/quitButton.png", 0.f, 0.f, 1.0f);
-	uiManager->AlignSpriteXY(sprite, "center", "center");
-	uiManager->TranslateSpriteX(sprite, 1.1f * sprite.texture.width);
+	hoverSprite = uiManager->LoadSprite("assets/ui/quitButtonHovered.png", 0.f, 0.f, 1.0f);
 	uiManager->AddSprite({
 		.sprite = sprite,
-		.onClick = [this] { GameState::currentState = GameState::FINISHED; }
+		.hoverSprite = hoverSprite,
+		.onClick = [this] { GameState::currentState = GameState::FINISHED; },
+		.alignX = "center",
+		.alignY = "center",
+		.offsetX = 1.1f * sprite.texture.width
 	});
 
 	// Option Button
 	auto oldHeigth = sprite.texture.height;
 	sprite = uiManager->LoadSprite("assets/ui/optionsButton.png", 0.f, 0.f, 2.0f);
-	uiManager->AlignSpriteXY(sprite, "center", "center");
-	uiManager->TranslateSpriteY(sprite, sprite.texture.height / 2.f + oldHeigth / 2.f + 15.f);
+	hoverSprite = uiManager->LoadSprite("assets/ui/optionsButtonHovered.png", 0.f, 0.f, 1.0f);
 	uiManager->AddSprite({
 		.sprite = sprite,
-		.onClick = [this] { BuildOptionMenu(); }
+		.hoverSprite = hoverSprite,
+		.onClick = [this] { BuildOptionMenu(); },
+		.alignX = "center",
+		.alignY = "center",
+		.offsetY = sprite.texture.height / 2.f + oldHeigth / 2.f + 15.f
 	});
 }
 
@@ -428,38 +441,44 @@ void GameEngine::BuildOptionMenu()
 
 	// Option title
 	Sprite2D sprite = uiManager->LoadSprite("assets/ui/optionsTitle.png");
-	uiManager->AlignSpriteXY(sprite, "center", "center");
 	uiManager->AddSprite({
 		.sprite = sprite,
+		.alignX = "center",
+		.alignY = "center"
 	});
 
 	// Back button
 	sprite = uiManager->LoadSprite("assets/ui/backButton.png", 0.0f, 0.0f, 1.0f);
-	uiManager->AlignSpriteXY(sprite, "center", "center");
-	uiManager->TranslateSpriteY(sprite, sprite.texture.height / 2.f + 90.0f);
+	auto spriteHover = uiManager->LoadSprite("assets/ui/backButtonHovered.png", 0.0f, 0.0f, 1.0f);
 	uiManager->AddSprite({
 		.sprite = sprite,
-		.onClick = [this] { PauseGame(); }
+		.hoverSprite = spriteHover,
+		.onClick = [this] { PauseGame(); },
+		.alignX = "center",
+		.alignY = "center",
+		.offsetY = sprite.texture.height / 2.f + 90.0f
 	});
 
 	// Camera inversion
 	bool isChecked = Camera::invertCamRotation;
 	std::string spriteFile = (isChecked) ? "assets/ui/checkedBox.png" : "assets/ui/uncheckedBox.png";
 	std::string clickFile = (!isChecked) ? "assets/ui/checkedBox.png" : "assets/ui/uncheckedBox.png";
-	sprite = uiManager->LoadSprite(spriteFile, 0.0f, 0.0f, 1.0f);
-	Sprite2D clickSprite = uiManager->LoadSprite(clickFile, 0.0f, 0.0f, 1.0f);
-	uiManager->AlignSpriteXY(sprite, "center", "center");
-	uiManager->AlignSpriteXY(clickSprite, "center", "center");
+	std::string hoverFile = (isChecked) ? "assets/ui/checkedBoxHovered.png" : "assets/ui/uncheckedBoxHovered.png";
+	std::string clickedHoverFile = (!isChecked) ? "assets/ui/checkedBoxHovered.png" : "assets/ui/uncheckedBoxHovered.png";
 	uiManager->AddSprite({
-		.sprite = sprite,
-		.clickSprite = clickSprite,
+		.sprite = uiManager->LoadSprite(spriteFile, 0.0f, 0.0f, 1.0f),
+		.hoverSprite = uiManager->LoadSprite(hoverFile, 0.0f, 0.0f, 1.0f),
+		.clickSprite = uiManager->LoadSprite(clickFile, 0.0f, 0.0f, 1.0f),
+		.clickHoverSprite = uiManager->LoadSprite(clickedHoverFile, 0.0f, 0.0f, 1.0f),
 		.clickDelay = 0.1f,
 		.onClick = []
 		{
 			Camera::invertCamRotation ^= 1;
 			std::cout << Camera::invertCamRotation << std::endl;
 		}, // Theo's dark magic for boolean inversion
-		.isCheckBox = true,
+		.alignX = "center",
+		.alignY = "center",
+		.isCheckBox = true
 	});
 }
 
@@ -470,27 +489,31 @@ void GameEngine::BuildEndMenu()
 	const std::string spriteFile = (GameState::currentState == GameState::DIED)
 		                               ? "assets/ui/deathTitle.png"
 		                               : "assets/ui/winTitle.png";
-	Sprite2D sprite = uiManager->LoadSprite(spriteFile);
-	uiManager->AlignSpriteXY(sprite, "center", "center");
 	uiManager->AddSprite({
-		.sprite = sprite,
+		.sprite = uiManager->LoadSprite(spriteFile),
+		.alignX = "center",
+		.alignY = "center"
 	});
 
 	// Restart Button
-	sprite = uiManager->LoadSprite("assets/ui/restartButton.png", 0.f, 0.f, 1.0f);
-	uiManager->AlignSpriteXY(sprite, "center", "center");
-	uiManager->TranslateSpriteX(sprite, -.55f * sprite.texture.width);
+	auto sprite = uiManager->LoadSprite("assets/ui/restartButton.png", 0.f, 0.f, 1.0f);
 	uiManager->AddSprite({
 		.sprite = sprite,
-		.onClick = [this] { RestartGame(); }
+		.hoverSprite = uiManager->LoadSprite("assets/ui/restartButtonHovered.png", 0.0f, 0.0f, 1.0f),
+		.onClick = [this] { RestartGame(); },
+		.alignX = "center",
+		.alignY = "center",
+		.offsetX = -.55f * sprite.texture.width
 	});
 
 	// Quit Button
 	sprite = uiManager->LoadSprite("assets/ui/quitButton.png", 0.f, 0.f, 1.0f);
-	uiManager->AlignSpriteXY(sprite, "center", "center");
-	uiManager->TranslateSpriteX(sprite, .55f * sprite.texture.width);
 	uiManager->AddSprite({
 		.sprite = sprite,
-		.onClick = [this] { GameState::currentState = GameState::FINISHED; }
+		.hoverSprite = uiManager->LoadSprite("assets/ui/quitButtonHovered.png", 0.0f, 0.0f, 1.0f),
+		.onClick = [this] { GameState::currentState = GameState::FINISHED; },
+		.alignX = "center",
+		.alignY = "center",
+		.offsetX = .55f * sprite.texture.width
 	});
 }
