@@ -19,9 +19,9 @@ SamplerState samp : register(s0);
 float3 ApplyWaterColor(float noiseValue)
 {
 	// Water colors
-    static const float3 COLOR_DEEP = float3(0.15, 0.35, 0.70); // bleu déjà clair
-    static const float3 COLOR_DARKBLUE = float3(0.25, 0.55, 0.85); // bleu très lumineux
-    static const float3 COLOR_BLUE = float3(0.55, 0.80, 1.00); // bleu très clair / presque pastel
+    static const float3 COLOR_DEEP = float3(0.15, 0.35, 0.70);
+    static const float3 COLOR_DARKBLUE = float3(0.25, 0.55, 0.85);
+    static const float3 COLOR_BLUE = float3(0.55, 0.80, 1.00);
 
 	// Gradient segment width
     static const float GRADIENT_SEGMENT_WIDTH = 0.5;
