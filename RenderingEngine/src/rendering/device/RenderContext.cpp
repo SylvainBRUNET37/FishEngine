@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "rendering/device/RenderContext.h"
 
+#include "rendering/graphics/camera/BaseCamera.h"
 #include "rendering/utils/Util.h"
 
 RenderContext::RenderContext(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context,
@@ -94,6 +95,15 @@ void RenderContext::Resize(const UINT width, const UINT height)
 	windowData.screenWidth = width;
 	windowData.screenHeight = height;
 	depthBuffer = DepthBuffer{device, windowData};
+
+	BaseCameraData::aspectRatio = static_cast<float>(width) / static_cast<float>(height);
+
+	viewPort.Width = static_cast<FLOAT>(width);
+	viewPort.Height = static_cast<FLOAT>(height);
+	viewPort.TopLeftX = 0.0f;
+	viewPort.TopLeftY = 0.0f;
+	viewPort.MinDepth = 0.0f;
+	viewPort.MaxDepth = 1.0f;
 
 	// Update viewport and set new render target
 	SetRenderTarget();

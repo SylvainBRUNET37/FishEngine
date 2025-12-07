@@ -16,7 +16,7 @@ struct BaseCameraData
 	float farPlane = 16000.0f;
 	float fov = DirectX::XM_PI / 3.0f;
 
-	float aspectRatio = static_cast<float>(GetSystemMetrics(SM_CXSCREEN)) / static_cast<float>(GetSystemMetrics(SM_CYSCREEN));
+	inline static float aspectRatio = static_cast<float>(GetSystemMetrics(SM_CXSCREEN)) / static_cast<float>(GetSystemMetrics(SM_CYSCREEN));
 };
 
 #endif
