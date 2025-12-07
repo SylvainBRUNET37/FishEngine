@@ -73,14 +73,14 @@ void SensorSystem::ApplyBounceEffect(const double deltaTime, const Sensor& senso
 
 void SensorSystem::ApplySlowEffect(const double deltaTime, const BodyID objectId)
 {
-	static constexpr float HALF_PLAYER_SPEED = 100.0f;
+	static constexpr float MAX_SLOW = 150.0f;
 	static auto& bodyInterface = JoltSystem::GetBodyInterface();
 
 	const Vec3 objectVelocity = bodyInterface.GetLinearVelocity(objectId);
-	if (objectVelocity.Length() > HALF_PLAYER_SPEED)
+	if (objectVelocity.Length() > MAX_SLOW)
 	{
 		const Vec3 objectForward = bodyInterface.GetRotation(objectId).RotateAxisZ();
-		const Vec3 targetVelocity = objectForward * HALF_PLAYER_SPEED;
+		const Vec3 targetVelocity = objectForward * MAX_SLOW;
 
 		static constexpr float SLOW_DOWN_FACTOR = -15.0f;
 		const float velocityReducerFactor = 1.0f - exp(SLOW_DOWN_FACTOR * static_cast<float>(deltaTime));
