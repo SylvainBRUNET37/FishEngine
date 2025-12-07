@@ -19,7 +19,7 @@ namespace ShapeFactory
 	[[nodiscard]] JPH::Body* CreateSphereWithVelocity(const Transform& transform, const DirectX::XMFLOAT3& direction);
 	[[nodiscard]] JPH::Body* CreateFloor();
 	[[nodiscard]] JPH::Body* CreateMeshShape(const Transform& transform, const Mesh& mesh);
-	[[nodiscard]] JPH::Body* CreateConvexHullShape(const Transform& transform, const Mesh& mesh);
+	[[nodiscard]] JPH::Body* CreateConvexHullShape(const Transform& transform, const Mesh& mesh, bool isDecor = true);
 }
 
 #endif

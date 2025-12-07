@@ -326,7 +326,7 @@ JPH::Body* ShapeFactory::CreateMeshShape(const Transform& transform, const Mesh&
     return body;
 }
 
-Body* ShapeFactory::CreateConvexHullShape(const Transform& transform, const Mesh& mesh)
+Body* ShapeFactory::CreateConvexHullShape(const Transform& transform, const Mesh& mesh, const bool isDecor)
 {
     Array<Vec3> points;
     points.reserve(mesh.vertices.size());
@@ -349,7 +349,7 @@ Body* ShapeFactory::CreateConvexHullShape(const Transform& transform, const Mesh
 		position, 
 		rotation, 
 		EMotionType::Dynamic, 
-		Layers::MOVING_DECOR
+		isDecor ? Layers::MOVING_DECOR : Layers::MOVING
 	};
 
     BodyInterface& bodyInterface = JoltSystem::GetBodyInterface();

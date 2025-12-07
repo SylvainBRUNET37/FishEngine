@@ -1,3 +1,5 @@
+// ONE
+
 import bpy
 import json
 
@@ -19,3 +21,23 @@ data = {
 }
 
 obj["components"] = json.dumps(data["components"])
+
+// ALL
+
+import bpy
+import json
+
+data = {
+    "components": {
+        "rigidBody": {
+            "type": "meshShape"
+        }
+    }
+}
+
+components_json = json.dumps(data["components"])
+
+# Apply on every selected components
+for obj in bpy.context.selected_objects:
+    obj["components"] = components_json
+
