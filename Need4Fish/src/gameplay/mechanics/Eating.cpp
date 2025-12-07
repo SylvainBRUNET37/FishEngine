@@ -26,7 +26,13 @@ static void KillRecursively(EntityManager& entityManager, const Entity preyEntit
 [[nodiscard]] static float CalculateGrowthFactor(const float predatorMass, const float preyMass)
 {
 	// Linear proportionnal growth
-	return (predatorMass + preyMass) / predatorMass;
+	auto MAX = 2000.0f; // when this is reached, mass continues to grow but not the mesh / hitbox
+
+	if (predatorMass > MAX)
+		return 0.0f;
+
+	auto newMass = predatorMass + preyMass;
+	return (newMass <= MAX ? newMass : MAX) / predatorMass;
 }
 
 
@@ -75,7 +81,10 @@ static void AcuallyEat(
 	Eatable& preyEatable
 )
 {
-	float scaleFactor = CalculateGrowthFactor(predatorEatable.mass, preyEatable.mass);
+	const float GROWTH_RATE = 0.6;
+	auto weightedMass = preyEatable.mass * GROWTH_RATE;
+
+	float scaleFactor = CalculateGrowthFactor(predatorEatable.mass, weightedMass);
 
 	// Apply power effect of the killed entity
 	if (entityManager.HasComponent<PowerSource>(preyEntity))
@@ -83,9 +92,12 @@ static void AcuallyEat(
 	
 	// Eat and kill
 	if (preyEatable.isApex) GameState::currentState = GameState::WON;
-	predatorEatable.mass += preyEatable.mass;
+	predatorEatable.mass += weightedMass;
 
 	KillRecursively(entityManager, preyEntity);
+
+	if (scaleFactor < 0.01)
+		return;
 
 	// Grow the hitbox
 	auto currentShape = predatorBody.body->GetShape();
@@ -104,13 +116,14 @@ static void AcuallyEat(
 	// Scale mesh
 	auto& trans = entityManager.Get<Transform>(predatorEntity);
 	// We should be able to assume scaleFactor - scale > 0, but better safe than sorry
-	trans.deltaScale.x = std::abs(scaleFactor - trans.scale.x);
-	trans.deltaScale.y = std::abs(scaleFactor - trans.scale.y);
-	trans.deltaScale.z = std::abs(scaleFactor - trans.scale.z);
+	auto a = scaleFactor * trans.scale.x - trans.scale.x - trans.deltaScale.x;
+	trans.deltaScale.x += std::abs(scaleFactor * (trans.scale.x + trans.deltaScale.x) - trans.scale.x - trans.deltaScale.x);
+	trans.deltaScale.y += std::abs(scaleFactor * (trans.scale.y + trans.deltaScale.y) - trans.scale.y - trans.deltaScale.y);
+	trans.deltaScale.z += std::abs(scaleFactor * (trans.scale.z + trans.deltaScale.z) - trans.scale.z - trans.deltaScale.z);
 
 	const float F_GROWTH_STEPS = 60.0f;
 
-	trans.scaleStep = scaleFactor / F_GROWTH_STEPS;
+	trans.scaleStep = trans.deltaScale.x / F_GROWTH_STEPS;
 }
 
 static void LoseOrEat(

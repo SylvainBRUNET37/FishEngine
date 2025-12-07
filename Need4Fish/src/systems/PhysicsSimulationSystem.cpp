@@ -289,10 +289,12 @@ void PhysicsSimulationSystem::UpdateNPCs(EntityManager& entityManager)
 
 		Vec3 newSpeed{ 0.0f, 0.0f, 0.0f };
 		Vec3 playerPosition{ 0.0f, 0.0f, 0.0f };
+		float playerMass = 0;
 
-		for (const auto& [entity, rigidBody, controllable] : entityManager.View<RigidBody, Controllable>())
+		for (const auto& [entity, rigidBody, controllable, eatable] : entityManager.View<RigidBody, Controllable, Eatable>())
 		{
 			playerPosition = rigidBody.body->GetPosition();
+			playerMass = eatable.mass;
 		}
 
 		// Panic mode
@@ -301,8 +303,14 @@ void PhysicsSimulationSystem::UpdateNPCs(EntityManager& entityManager)
 		bool isApex = false;
 		if (entityManager.HasComponent<Eatable>(entity))
 			isApex = entityManager.Get<Eatable>(entity).isApex;
+		bool isSmaller = false;
+		if (entityManager.HasComponent<Eatable>(entity))
+			isSmaller = entityManager.Get<Eatable>(entity).mass < playerMass;
 
-		const bool isPanicking = !isApex && diff.Length() < aiController.safeDistance;
+		auto basePlayerMass = 100.0f; // TODO do not use a magic number 100 bc 100 is the base player mass
+		auto unsafeZone = aiController.safeDistance * (playerMass / basePlayerMass);
+
+		bool isPanicking = !isApex && isSmaller && diff.Length() < unsafeZone;
 
 		if (!isPanicking && aiController.remainingDelay > 0)
 		{
@@ -332,15 +340,9 @@ void PhysicsSimulationSystem::UpdateNPCs(EntityManager& entityManager)
 			newDir = (q * newDir).Normalized();
 		}
 
-		//// Ensure it's still opposite the player
-		//if (newDir.Dot(diff.Normalized()) < 0.f)
-		//{
-		//	newDir = -newDir;
-		//	// TODO change angle
-		//	q = JPH::Quat::sRotation(q * up, std::numbers::pi_v<float>) * q;
-		//}
-
-		newSpeed = newDir * (aiController.acceleration * 0.5f);
+		newSpeed = newDir * (aiController.acceleration);
+		if (!isPanicking)
+			newSpeed *= 0.5f;
 
 		//// FISH ROTATION
 		const Quat currentRotation = body->GetRotation();
