@@ -24,7 +24,7 @@ using namespace JPH;
 GameEngine::GameEngine(RenderContext* renderContext_)
 	: renderContext{renderContext_},
 	  particleSystem{renderContext->GetDevice()},
-	  uiManager{std::make_shared<UIManager>(renderContext->GetDevice())}
+	  uiManager{std::make_shared<UIManager>(renderContext)}
 {
 	CameraSystem::SetMouseCursor();
 
@@ -380,60 +380,58 @@ void GameEngine::BuildPauseMenu()
 	uiManager->Clear();
 	// Pause title
 	auto sprite = uiManager->LoadSprite("assets/ui/pauseTitle.png");
-	uiManager->AlignSpriteXY(sprite, "center", "center");
 	uiManager->AddSprite({
 		.sprite = sprite,
+		.alignX = "center",
+		.alignY = "center"
 	});
 
 	// Resume Button
 	sprite = uiManager->LoadSprite("assets/ui/resumeButton.png", 0.f, 0.f, 1.0f);
-	uiManager->AlignSpriteXY(sprite, "center", "center");
 	auto hoverSprite = uiManager->LoadSprite("assets/ui/resumeButtonHovered.png", 0.f, 0.f, 1.0f);
-	uiManager->AlignSpriteXY(hoverSprite, "center", "center");
 	uiManager->AddSprite({
 		.sprite = sprite,
 		.hoverSprite = hoverSprite,
-		.onClick = [this] { ChangeGameStatus(); }
+		.onClick = [this] { ChangeGameStatus(); },
+		.alignX = "center",
+		.alignY = "center"
 	});
 
 	// Restart Button
 	sprite = uiManager->LoadSprite("assets/ui/restartButton.png", 0.f, 0.f, 1.0f);
-	uiManager->AlignSpriteXY(sprite, "center", "center");
-	uiManager->TranslateSpriteX(sprite, -1.1f * sprite.texture.width);
 	hoverSprite = uiManager->LoadSprite("assets/ui/restartButtonHovered.png", 0.f, 0.f, 1.0f);
-	uiManager->AlignSpriteXY(hoverSprite, "center", "center");
-	uiManager->TranslateSpriteX(hoverSprite, -1.1f * hoverSprite.texture.width);
 	uiManager->AddSprite({
 		.sprite = sprite,
 		.hoverSprite = hoverSprite,
-		.onClick = [this] { RestartGame(); }
+		.onClick = [this] { RestartGame(); },
+		.alignX = "center",
+		.alignY = "center",
+		.offsetX = -1.1f * sprite.texture.width
 	});
 
 	// Quit Button
 	sprite = uiManager->LoadSprite("assets/ui/quitButton.png", 0.f, 0.f, 1.0f);
-	uiManager->AlignSpriteXY(sprite, "center", "center");
-	uiManager->TranslateSpriteX(sprite, 1.1f * sprite.texture.width);
 	hoverSprite = uiManager->LoadSprite("assets/ui/quitButtonHovered.png", 0.f, 0.f, 1.0f);
-	uiManager->AlignSpriteXY(hoverSprite, "center", "center");
-	uiManager->TranslateSpriteX(hoverSprite, 1.1f * hoverSprite.texture.width);
 	uiManager->AddSprite({
 		.sprite = sprite,
 		.hoverSprite = hoverSprite,
-		.onClick = [this] { GameState::currentState = GameState::FINISHED; }
+		.onClick = [this] { GameState::currentState = GameState::FINISHED; },
+		.alignX = "center",
+		.alignY = "center",
+		.offsetX = 1.1f * sprite.texture.width
 	});
 
 	// Option Button
 	auto oldHeigth = sprite.texture.height;
 	sprite = uiManager->LoadSprite("assets/ui/optionsButton.png", 0.f, 0.f, 2.0f);
-	uiManager->AlignSpriteXY(sprite, "center", "center");
-	uiManager->TranslateSpriteY(sprite, sprite.texture.height / 2.f + oldHeigth / 2.f + 15.f);
 	hoverSprite = uiManager->LoadSprite("assets/ui/optionsButtonHovered.png", 0.f, 0.f, 1.0f);
-	uiManager->AlignSpriteXY(hoverSprite, "center", "center");
-	uiManager->TranslateSpriteY(hoverSprite, hoverSprite.texture.height / 2.f + oldHeigth / 2.f + 15.f);
 	uiManager->AddSprite({
 		.sprite = sprite,
 		.hoverSprite = hoverSprite,
-		.onClick = [this] { BuildOptionMenu(); }
+		.onClick = [this] { BuildOptionMenu(); },
+		.alignX = "center",
+		.alignY = "center",
+		.offsetY = sprite.texture.height / 2.f + oldHeigth / 2.f + 15.f
 	});
 }
 
@@ -443,22 +441,22 @@ void GameEngine::BuildOptionMenu()
 
 	// Option title
 	Sprite2D sprite = uiManager->LoadSprite("assets/ui/optionsTitle.png");
-	uiManager->AlignSpriteXY(sprite, "center", "center");
 	uiManager->AddSprite({
 		.sprite = sprite,
+		.alignX = "center",
+		.alignY = "center"
 	});
 
 	// Back button
 	sprite = uiManager->LoadSprite("assets/ui/backButton.png", 0.0f, 0.0f, 1.0f);
-	uiManager->AlignSpriteXY(sprite, "center", "center");
-	uiManager->TranslateSpriteY(sprite, sprite.texture.height / 2.f + 90.0f);
 	auto spriteHover = uiManager->LoadSprite("assets/ui/backButtonHovered.png", 0.0f, 0.0f, 1.0f);
-	uiManager->AlignSpriteXY(spriteHover, "center", "center");
-	uiManager->TranslateSpriteY(spriteHover, spriteHover.texture.height / 2.f + 90.0f);
 	uiManager->AddSprite({
 		.sprite = sprite,
 		.hoverSprite = spriteHover,
-		.onClick = [this] { PauseGame(); }
+		.onClick = [this] { PauseGame(); },
+		.alignX = "center",
+		.alignY = "center",
+		.offsetY = sprite.texture.height / 2.f + 90.0f
 	});
 
 	// Camera inversion

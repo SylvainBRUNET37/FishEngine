@@ -10,12 +10,13 @@
 
 class UIManager
 {
+	RenderContext* renderContext;
 	ID3D11Device* device;
 
 	std::vector<SpriteElement> sprites;
 
 public:
-	explicit UIManager(ID3D11Device* device);
+	explicit UIManager(RenderContext* renderContext);
 
 	~UIManager();
 
@@ -38,8 +39,20 @@ public:
 
 	void RenderText(const std::wstring& text) const;
 
+	// WIP
+	void UpdateSprites(const RenderContext& renderContext) {
+		for (auto& sprite : sprites) {
+			UpdateAlignSpriteXY(renderContext, sprite);
+		}
+	}
+
+	void UpdateAlignSpriteX(const RenderContext& renderContext, SpriteElement& sprite);
+	void UpdateAlignSpriteY(const RenderContext& renderContext, SpriteElement& sprite);
+	void UpdateAlignSpriteXY(const RenderContext& renderContext, SpriteElement& sprite);
+
 private:
 	// Text rendering
+
 	TextRenderer* textRenderer;
 	Gdiplus::Font* textFont;
 

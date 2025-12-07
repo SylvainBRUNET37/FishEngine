@@ -99,3 +99,9 @@ void RenderContext::Resize(const UINT width, const UINT height)
 	SetRenderTarget();
 	SetupViewPort();
 }
+
+void RenderContext::Move(UINT x, UINT y)
+{
+	screenStartX = x;
+	screenStartY = y;
+}

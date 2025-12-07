@@ -19,6 +19,7 @@ public:
 
 	void Present() const;
 	void Resize(UINT width, UINT height);
+	void Move(UINT x, UINT y);
 
 	[[nodiscard]] ID3D11Device* GetDevice() const noexcept { return device; }
 	[[nodiscard]] ID3D11DeviceContext* GetContext() const noexcept { return context; }
@@ -43,6 +44,8 @@ public:
 
 	[[nodiscard]] size_t GetScreenWidth() const noexcept { return screenWidth; }
 	[[nodiscard]] size_t GetScreenHeight() const noexcept { return screenHeight; }
+	[[nodiscard]] size_t GetScreenStartX() const noexcept { return screenStartX; }
+	[[nodiscard]] size_t GetScreenStartY() const noexcept { return screenStartY; }
 
 	void EnableAlphaBlending() const
 	{
@@ -83,6 +86,9 @@ public:
 private:
 	size_t screenWidth;
 	size_t screenHeight;
+
+	size_t screenStartX;
+	size_t screenStartY;
 
 	ComPtr<ID3D11Device> device;
 	ComPtr<ID3D11DeviceContext> context;
