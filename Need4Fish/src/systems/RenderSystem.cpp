@@ -46,6 +46,8 @@ void RenderSystem::RenderPostProcesses(const double deltaTime, const Camera& cur
 	XMStoreFloat4x4(&GameState::postProcessSettings.viewProj,
 		XMMatrixTranspose(a));
 
+	XMStoreFloat3(&GameState::postProcessSettings.cameraPos, Camera::position);
+
 	static const auto& shaderBank = Locator::Get<ResourceManager>().GetShaderBank();
 	static const auto vertexShader = shaderBank.Get<VertexShader>("shaders/PostProcessVS.hlsl").shader;
 	static const auto pixelShader = shaderBank.Get<PixelShader>("shaders/PostProcessPS.hlsl").shader;

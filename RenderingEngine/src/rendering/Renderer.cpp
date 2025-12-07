@@ -309,7 +309,6 @@ void Renderer::DoubleSidedDraw(const Mesh& mesh) const
 	renderContext->SetCullModeCullNone();
 	Draw(mesh);
 	renderContext->SetCullModeCullBack();
-
 }
 
 void Renderer::Draw(const Sprite2D& sprite) const

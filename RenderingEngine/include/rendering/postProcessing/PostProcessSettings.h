@@ -5,12 +5,18 @@
 
 struct alignas(16) PostProcessSettings
 {
-    int enableVignette{};
-    int enableChromaticAberration{};
-    float deltaTime{};
-    DirectX::XMFLOAT4X4 invProjection{};
-    DirectX::XMFLOAT4X4 invView{};
-    DirectX::XMFLOAT4X4 viewProj{};
+    int enableVignette;
+    int enableChromaticAberration;
+    float deltaTime;
+    float padding0;
+
+    // Unused :/
+    DirectX::XMFLOAT4X4 invProjection;
+    DirectX::XMFLOAT4X4 invView;
+    DirectX::XMFLOAT4X4 viewProj;
+
+    DirectX::XMFLOAT3 cameraPos;
+    float padding1;
 };
 
 #endif

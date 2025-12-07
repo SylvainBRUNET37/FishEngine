@@ -6,6 +6,6 @@ struct VSOutput
 
 float4 DistPS(VSOutput input) : SV_Target
 {
-	// Return a white color
-	return float4(1, 1, 1, 1);
+	// Return a green color
+	return float4(0, 1, 0, 1);
 }

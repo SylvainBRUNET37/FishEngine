@@ -38,6 +38,9 @@ std::unique_ptr<EntityManager> EntityManagerFactory::Create(const SceneResource&
 			}
 			else if (node.name.find("Sensor") == std::string::npos) [[likely]]
 				entityManager->AddComponent<MeshInstance>(entity, MeshInstance{ .meshIndex = node.meshIndex });
+
+			if (node.name == "Eau")
+				entityManager->AddComponent<MeshInstance>(entity, MeshInstance{ .meshIndex = node.meshIndex });
 		}
 
 		// Set parent entity to node parent or root entity if he is orphan
