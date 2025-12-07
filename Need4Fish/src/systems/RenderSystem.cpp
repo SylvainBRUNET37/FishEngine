@@ -28,12 +28,23 @@ RenderSystem::RenderSystem(RenderContext* renderContext, const std::shared_ptr<U
 	sceneBoundaries.Radius = sqrtf(7000.0f*7000.0f + 7010.5f*7010.5f);
 }
 
-void RenderSystem::RenderPostProcesses(const double deltaTime)
+void RenderSystem::RenderPostProcesses(const double deltaTime, const Camera& currentCamera)
 {
 	GameState::postProcessSettings.enableVignette =
 		(Camera::mode == Camera::CameraMode::FIRST_PERSON || Camera::isTemporaryFirstPerson) ? 1 : 0;
 
 	GameState::postProcessSettings.deltaTime = static_cast<float>(deltaTime);
+
+	// Set camera data
+	XMStoreFloat4x4(&GameState::postProcessSettings.invProjection,
+		XMMatrixTranspose(XMMatrixInverse(nullptr, currentCamera.matProj)));
+	XMStoreFloat4x4(&GameState::postProcessSettings.invView, 
+	XMMatrixTranspose(XMMatrixInverse(nullptr, currentCamera.matView)));
+
+	const auto a = XMLoadFloat4x4(&frameBuffer.matViewProj);
+
+	XMStoreFloat4x4(&GameState::postProcessSettings.viewProj,
+		XMMatrixTranspose(a));
 
 	static const auto& shaderBank = Locator::Get<ResourceManager>().GetShaderBank();
 	static const auto vertexShader = shaderBank.Get<VertexShader>("shaders/PostProcessVS.hlsl").shader;
@@ -205,7 +216,7 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 	RenderParticles(entityManager, currentCamera);
 
 	ComputeDistortionZones(entityManager);
-	RenderPostProcesses(deltaTime);
+	RenderPostProcesses(deltaTime, currentCamera);
 
 	uiManager->UpdateSprites(*renderContext);
 	RenderUI(entityManager);

@@ -25,6 +25,8 @@ public:
 	[[nodiscard]] ID3D11DeviceContext* GetContext() const noexcept { return context; }
 	[[nodiscard]] IDXGISwapChain* GetSwapChain() const noexcept { return swapChain; }
 
+	[[nodiscard]] ID3D11ShaderResourceView* GetDepthSRV() const { return depthBuffer.GetDepthSRV(); }
+
 	[[nodiscard]] ID3D11RenderTargetView* GetRenderTargetView() const noexcept
 	{
 		return renderTarget.GetRenderTargetView();

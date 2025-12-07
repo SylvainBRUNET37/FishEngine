@@ -14,7 +14,8 @@ public:
         ID3D11RenderTargetView* backbuffer,
         ID3D11VertexShader* postProcessVertexShader,
         ID3D11PixelShader* postProcessPixelShader,
-        ID3D11ShaderResourceView* distortionSRV);
+        ID3D11ShaderResourceView* distortionSRV, 
+        ID3D11ShaderResourceView* depthSRV);
 
     [[nodiscard]] ID3D11RenderTargetView* GetRenderTargetView() const { return sceneRenderTargetView; }
     [[nodiscard]] ID3D11ShaderResourceView* GetShaderResourceView() const { return sceneShaderResourceView; }

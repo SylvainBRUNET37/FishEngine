@@ -65,8 +65,10 @@ void SensorSystem::ApplyBounceEffect(const double deltaTime, const Sensor& senso
 
 	const Vec3 objectForward = bodyInterface.GetRotation(objectId).RotateAxisZ();
 
-	const Vec3 impulse = -objectForward * sensor.pushStrength * WORLD_SIZE_FACTOR * static_cast<float>(deltaTime);
-	bodyInterface.AddForce(objectId, impulse);
+	Vec3 velocity = bodyInterface.GetLinearVelocity(objectId);
+	velocity += -objectForward * sensor.pushStrength;
+
+	bodyInterface.SetLinearVelocity(objectId, velocity);
 }
 
 void SensorSystem::ApplySlowEffect(const double deltaTime, const BodyID objectId)

@@ -32,7 +32,8 @@ PostProcess::PostProcess(ID3D11Device* device, const size_t screenWidth, const s
 
 void PostProcess::Draw(ID3D11DeviceContext* context, ID3D11RenderTargetView* backbuffer,
 	ID3D11VertexShader* postProcessVertexShader, ID3D11PixelShader* postProcessPixelShader, 
-    ID3D11ShaderResourceView* distortionSRV)
+    ID3D11ShaderResourceView* distortionSRV,
+    ID3D11ShaderResourceView* depthSRV)
 {
     // Switch render target to backbuffer
     context->OMSetRenderTargets(1, &backbuffer, nullptr);
@@ -42,12 +43,13 @@ void PostProcess::Draw(ID3D11DeviceContext* context, ID3D11RenderTargetView* bac
     context->PSSetShader(postProcessPixelShader, nullptr, 0);
 
     // Bind scene texture as input
-    ID3D11ShaderResourceView* srvs[2] =
+    ID3D11ShaderResourceView* srvs[3] =
     {
         sceneShaderResourceView,
-        distortionSRV
+        distortionSRV,
+        depthSRV
     };
-    context->PSSetShaderResources(0, 2, srvs);
+    context->PSSetShaderResources(0, 3, srvs);
 
     // Set post process sampler
     context->PSSetSamplers(0, 1, &postProcessSampler);

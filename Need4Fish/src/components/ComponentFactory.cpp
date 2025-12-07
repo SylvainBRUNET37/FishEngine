@@ -25,7 +25,7 @@ void ComponentFactory::CreateRigidBody(const nlohmann::json& componentData, Enti
 	else if (componentData["type"] == "meshShape")
 		entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateMeshShape(transform, mesh));
 	else if (componentData["type"] == "hullShape")
-		entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateConvexHullShape(transform, mesh));
+		entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateConvexHullShape(transform, mesh, !componentData.contains("isDecor")));
 }
 
 void ComponentFactory::CreateSensor(const nlohmann::json& componentData, EntityManager& entityManager,
@@ -44,21 +44,28 @@ void ComponentFactory::CreateSensor(const nlohmann::json& componentData, EntityM
 
 	Body* body = nullptr;
 	if (componentData["bodyType"] == "boxSensor")
-		body = SensorFactory::CreateCubeCurrentSensor(transform, entity);
+	{
+		if (entityManager.HasComponent<MeshInstance>(entity))
+		{
+			const auto& meshInstance = entityManager.Get<MeshInstance>(entity);
+			const auto& mesh = Locator::Get<ResourceManager>().GetMesh(meshInstance.meshIndex);
+			body = SensorFactory::CreateCubeCurrentSensor(transform, mesh, entity);
+		}
+		else
+			body = SensorFactory::CreateCubeCurrentSensor(transform, entity);
+	}
 	else if (componentData["bodyType"] == "cylinderSensor")
 		body = SensorFactory::CreateCylinderSensor(transform, entity);
 	
 	vassert(body, "Sensor must have a body type");
 
-	const Sensor sensor
-	{
-		.direction = direction,
-		.body = body,
-		.pushStrength = pushStrength,
-		.type = type
-	};
-
-	entityManager.AddComponent<Sensor>(entity, std::move(sensor));
+	entityManager.AddComponent<Sensor>(entity, 
+		Sensor{
+		direction,
+		body,
+		pushStrength,
+		type
+	});
 }
 
 void ComponentFactory::CreateEatable(const nlohmann::json& componentData, EntityManager& entityManager,

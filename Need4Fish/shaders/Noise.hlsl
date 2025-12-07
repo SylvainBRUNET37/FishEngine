@@ -46,3 +46,20 @@ float CreateNoise(float2 uv, float time)
 	    ApplyNoise(distordedUV * NOISE_FREQUENCE.z + time * NOISE_SPEED.z) * NOISE_AMPLITUDE.z;
 }
 
+float2 HeatwaveDistortion(float3 worldPos, float time)
+{
+    float n = sin(worldPos.x * 0.5 + time * 2.0)
+            * cos(worldPos.z * 0.5 + time * 2.0);
+
+    return float2(n, n * 0.5);
+
+    //const float speed = 3.0 + sin(time * 0.7) * 4.5;
+
+    //static const float AMPLITUDE = 0.020;
+    //const float wave1 = sin(uv.y * 45.0 + time * speed) * (AMPLITUDE * sin(time * 1.3));
+    //const float wave2 = cos(uv.x * 30.0 + time * speed) * (AMPLITUDE * cos(time * 1.6));
+
+    //const float noise = sin((uv.x + uv.y) * 80.0 + time * 5.0) * 0.003;
+
+    //return float2(wave1 + noise, wave2 - noise);
+}
