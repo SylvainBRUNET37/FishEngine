@@ -98,6 +98,8 @@
 	"SturgeonMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongWaterPS.hlsl" },
 	"JellyfishMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongWaterPS.hlsl" },
 	
-	"Scene_-_Root": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" }	
+	"SaphireMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
+	"DiamondMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
+	"RubyMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" }
   }
 }
