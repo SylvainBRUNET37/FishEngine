@@ -39,7 +39,7 @@ std::unique_ptr<EntityManager> EntityManagerFactory::Create(const SceneResource&
 			else if (node.name.find("Sensor") == std::string::npos) [[likely]]
 				entityManager->AddComponent<MeshInstance>(entity, MeshInstance{ .meshIndex = node.meshIndex });
 
-			if (node.name == "Eau")
+			if (node.name == "DistortionEau")
 				entityManager->AddComponent<MeshInstance>(entity, MeshInstance{ .meshIndex = node.meshIndex });
 		}
 
