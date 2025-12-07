@@ -205,7 +205,7 @@ void Renderer::RenderPostProcess(
 		renderContext->GetDistortionProcess().GetShaderResourceView();
 
 	renderContext->GetPostProcess().Draw(
-		context, renderTarget, postProcessVertexShader, postProcessPixelShader, distortionSRV);
+		context, renderTarget, postProcessVertexShader, postProcessPixelShader, distortionSRV, renderContext->GetDepthSRV());
 }
 
 void Renderer::UpdateScene() const

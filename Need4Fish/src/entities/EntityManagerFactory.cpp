@@ -31,7 +31,9 @@ std::unique_ptr<EntityManager> EntityManagerFactory::Create(const SceneResource&
 		if (node.meshIndex != UINT32_MAX)
 		{
 			// TODO: correct this: do not apply mesh to sensors in Blender
-			if (node.name.find("Sensor") == std::string::npos)
+			if (node.name.find("Distortion") != std::string::npos) [[unlikely]]
+				entityManager->AddComponent<DistortionMeshInstance>(entity, DistortionMeshInstance{ .meshIndex = node.meshIndex });
+			else if (node.name.find("Sensor") == std::string::npos) [[likely]]
 				entityManager->AddComponent<MeshInstance>(entity, MeshInstance{ .meshIndex = node.meshIndex });
 		}
 
