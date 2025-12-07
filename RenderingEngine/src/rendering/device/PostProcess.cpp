@@ -22,7 +22,7 @@ PostProcess::PostProcess(ID3D11Device* device, const size_t screenWidth, const s
     SetDebugName(sceneShaderResourceView, "sceneShaderResourceView-in-PostProcess");
 
     D3D11_SAMPLER_DESC sampDesc{};
-    sampDesc.Filter = D3D11_FILTER_MINIMUM_MIN_MAG_MIP_LINEAR;
+    sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
     sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
     sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
     sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
