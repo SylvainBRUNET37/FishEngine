@@ -306,7 +306,11 @@ void PhysicsSimulationSystem::UpdateNPCs(EntityManager& entityManager)
 		bool isSmaller = false;
 		if (entityManager.HasComponent<Eatable>(entity))
 			isSmaller = entityManager.Get<Eatable>(entity).mass < playerMass;
-		bool isPanicking = !isApex && isSmaller &&diff.Length() < aiController.safeDistance;
+
+		auto basePlayerMass = 100.0f; // TODO do not use a magic number 100 bc 100 is the base player mass
+		auto unsafeZone = aiController.safeDistance * (playerMass / basePlayerMass);
+
+		bool isPanicking = !isApex && isSmaller && diff.Length() < unsafeZone;
 
 		if (!isPanicking && aiController.remainingDelay > 0)
 		{
