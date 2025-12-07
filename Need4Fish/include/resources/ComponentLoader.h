@@ -63,6 +63,13 @@ private:
 					ComponentFactory::CreateSensor(componentData, entityManager, entity);
 				}
 			},
+			{
+				"aiController",
+				[](const nlohmann::json& componentData, EntityManager& entityManager, const Entity& entity)
+				{
+					ComponentFactory::CreateAIController(componentData, entityManager, entity);
+				}
+			},
 		}
 	};
 };

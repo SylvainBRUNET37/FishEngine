@@ -14,6 +14,7 @@ public:
 	static void CreateEatable(const nlohmann::json& componentData, EntityManager& entityManager, const Entity& entity);
 	static void CreateControllable(const nlohmann::json& componentData, EntityManager& entityManager, const Entity& entity);
 	static void CreatePowerSource(const nlohmann::json& componentData, EntityManager& entityManager, const Entity& entity);
+	static void CreateAIController(const nlohmann::json& componentData, EntityManager& entityManager, const Entity& entity);
 };
 
 #endif

@@ -88,3 +88,13 @@ void ComponentFactory::CreatePowerSource(const nlohmann::json& componentData, En
 	powerSource.power = static_cast<Power>(componentData["power"].get<int>());
 	powerSource.effectDuration = componentData["effectDuration"].get<double>();
 }
+
+void ComponentFactory::CreateAIController(const nlohmann::json& componentData, EntityManager& entityManager,
+	const Entity& entity)
+{
+	auto& aiController = entityManager.AddComponent<AIController>(entity, AIController{});
+
+	aiController.maxSpeed = componentData["maxSpeed"].get<double>();
+	aiController.acceleration = componentData["acceleration"].get<double>();
+	aiController.safeDistance = componentData["safeDistance"].get<double>();
+}
