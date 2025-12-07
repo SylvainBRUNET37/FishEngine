@@ -34,7 +34,7 @@ float3 ApplyBlingPhong(VSOutput input) : SV_Target
 	return finalColor;
 }
 
-float3 ApplyBlingPhong(VSOutput input, SamplerComparisonState samShadow, Texture2D gShadowMap, float4 shadowPosH) : SV_Target
+float3 ApplyBlingPhong(VSOutput input, float shadow) : SV_Target
 {
     float3 surfaceNormal = normalize(input.normal);
     float3 viewDirection = normalize(vCamera.xyz - input.worldPosition);
@@ -42,7 +42,7 @@ float3 ApplyBlingPhong(VSOutput input, SamplerComparisonState samShadow, Texture
     float3 finalColor = float3(0, 0, 0);
 
     // Directional light
-    finalColor += ComputeDirLight(surfaceNormal, viewDirection, samShadow, gShadowMap, shadowPosH);
+    finalColor += ComputeDirLight(surfaceNormal, viewDirection, shadow);
 
     // Point lights
     for (int i = 0; i < pointLightCount; i++)
