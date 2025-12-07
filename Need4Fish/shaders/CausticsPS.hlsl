@@ -105,3 +105,52 @@ float ApplyCaustics(
 
 	return intensity * causticTexture;
 }
+
+
+
+float ApplyCaustics(
+	float3 worldPos,
+	float3 dirLightDirection,
+	float elapsedTime,
+	float waterHeight,
+	float shadow
+)
+{
+    if (shadow <= 0.5f) 
+    {
+        return 0.0f;
+    }
+	// Horizontal positon of the ocean
+    const float2 surfXZ = worldPos.xz;
+
+    // Get the water normal
+    float3 waveNormal = GetWaveNormal(surfXZ, elapsedTime);
+
+    // Direction which goes toward the sky
+    const float3 UP_RAY = float3(0, 1, 0);
+
+    // Refract the ray into air
+    // Snell law: https://en.wikipedia.org/wiki/Snell%27s_law
+    const float ETA = AIR_INDICE_OF_REFRACTION / WATER_INDICE_OF_REFRACTION;
+    float3 refracted = refract(-UP_RAY, waveNormal, ETA);
+
+    // Sun direction
+    const float3 sunDirection = normalize(dirLightDirection);
+
+    // Compute the alignement/difference between the reracted ray and the sun dir
+    float alignment = saturate(dot(normalize(refracted), sunDirection));
+
+    // Add intensity to the caustic effect
+	// The higher the sharpness is, the lower the caustic will be bright
+    static const float BASE_SHARPNESS = 0.008;
+    const float pixelDepth = max(0.0f, waterHeight + 10 - worldPos.y);
+    float intensity = pow(alignment, pixelDepth * BASE_SHARPNESS);
+
+	// Project the refracted ray onto the scene geometry
+	// It's not physically realistic but it looks good
+    float3 projection = worldPos + refracted * worldPos.y;
+
+    float causticTexture = causticTex.Sample(causticSamp, projection.xz * UV_SCALE).r;
+
+    return intensity * causticTexture;
+}

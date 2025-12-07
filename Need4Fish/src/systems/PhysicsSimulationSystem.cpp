@@ -229,7 +229,10 @@ void PhysicsSimulationSystem::RotateTowardsCameraDirection(
 		constexpr float ROTATION_SPEED = 80.0f;
 		const Vec3 angularVelocity = axis * angle * ROTATION_SPEED;
 
-		rigidBody.body->SetAngularVelocity(angularVelocity);
+		// Jolt default max velocity, the test avoid a crash
+		static constexpr float MAX_VELOCITY = 0.25f * JPH_PI * 60.0f;
+		if (angularVelocity.Length() < MAX_VELOCITY)
+			rigidBody.body->SetAngularVelocity(angularVelocity);
 	}
 }
 

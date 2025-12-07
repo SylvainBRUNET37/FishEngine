@@ -42,9 +42,9 @@ D3D11_RASTERIZER_DESC Rasterizer::CreateShadowMapRasterizeDesc()
 	desc.CullMode = D3D11_CULL_BACK;
 	desc.FrontCounterClockwise = TRUE;
 	desc.DepthClipEnable = TRUE;
-	desc.DepthBias = -10000;
+	desc.DepthBias = -20000;
 	desc.DepthBiasClamp = 0.0f;
-	desc.SlopeScaledDepthBias = 1.0f;
+	desc.SlopeScaledDepthBias = -1.0f;
 
 	return desc;
 }

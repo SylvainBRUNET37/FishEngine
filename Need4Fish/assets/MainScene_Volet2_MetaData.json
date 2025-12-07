@@ -1,13 +1,45 @@
 {
   "materials": {
-    "": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongWaterPS.hlsl" },
-    "AquariumMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
-    "BasicFishMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongWaterPS.hlsl" },
-    "CoralFishMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongWaterPS.hlsl" },
-    "GroundMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
-    "MonticuleMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
-    "MosasaureMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongWaterPS.hlsl" },
-    "JellyFishMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongWaterPS.hlsl" },
+    "": {
+      "vs": "shaders/MainVS.hlsl",
+      "ps": "shaders/PhongWaterPS.hlsl"
+    },
+    "AquariumMat": {
+      "vs": "shaders/MainVS.hlsl",
+      "ps": "shaders/PhongCausticsPS.hlsl"
+    },
+    "BasicFishMat": {
+      "vs": "shaders/MainVS.hlsl",
+      "ps": "shaders/PhongWaterPS.hlsl"
+    },
+    "CoralFishMat": {
+      "vs": "shaders/MainVS.hlsl",
+      "ps": "shaders/PhongWaterPS.hlsl"
+    },
+    "GroundMat": {
+      "vs": "shaders/MainVS.hlsl",
+      "ps": "shaders/PhongCausticsPS.hlsl"
+    },
+    "StatueMaterial": {
+      "vs": "shaders/MainVS.hlsl",
+      "ps": "shaders/PhongCausticsPS.hlsl"
+    },
+    "TRMaterial": {
+      "vs": "shaders/MainVS.hlsl",
+      "ps": "shaders/PhongCausticsPS.hlsl"
+    },
+    "PRMaterial": {
+      "vs": "shaders/MainVS.hlsl",
+      "ps": "shaders/PhongCausticsPS.hlsl"
+    },
+    "MonticuleMat": {
+      "vs": "shaders/MainVS.hlsl",
+      "ps": "shaders/PhongCausticsPS.hlsl"
+    },
+    "JellyFishMat": {
+      "vs": "shaders/MainVS.hlsl",
+      "ps": "shaders/PhongWaterPS.hlsl"
+    },
     "WaterMat": {
       "vs": "shaders/MainVS.hlsl",
       "ps": "shaders/WaterPS.hlsl"
@@ -24,6 +56,37 @@
     "MidRockMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
     "BigRockMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
 	
-	"CheeseMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" }
+	"CheeseMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
+	"TortleMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongWaterPS.hlsl" },
+	
+	"BarkMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongWaterPS.hlsl" },
+	"BushMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongWaterPS.hlsl" },
+	"CoconutMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongWaterPS.hlsl" },
+	"LeafMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongWaterPS.hlsl" },
+	"BeachSmallStoneMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongWaterPS.hlsl" },
+	"BeachBigStoneMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongWaterPS.hlsl" },
+	
+	"ArchMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
+	"CrocoMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
+	
+	"CoralMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
+	"ConesheelMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
+	"ConchMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
+	"ClamMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
+	"SnailMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
+	"HornsheelMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
+	
+	"Coral1": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
+	"Coral2": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
+	"Coral3": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
+	"Coral4": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
+
+	"KelpMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
+	"Kelp2Mat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
+	
+	"VioletCoralMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
+	"WhiteCoralMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
+	"YellowCoralMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
+	"OrangeCoralMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" }
   }
 }
