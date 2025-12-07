@@ -37,7 +37,7 @@ struct AIController
 {
 	float maxSpeed = 50.0f; // TODO: tmp
 	float acceleration = 10.0f;
-	float safeDistance = 10.0f;
+	float safeDistance = 500.0f;
 	float updateDelay = 1.0f;
 	float remainingDelay = 0.0f;
 };
