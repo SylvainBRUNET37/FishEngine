@@ -26,6 +26,11 @@ static void KillRecursively(EntityManager& entityManager, const Entity preyEntit
 [[nodiscard]] static float CalculateGrowthFactor(const float predatorMass, const float preyMass)
 {
 	// Linear proportionnal growth
+	auto MAX = 2500.0f; // when this is reached, mass continues to grow but not the mesh / hitbox
+
+	if (predatorMass > MAX)
+		return 0.0f;
+
 	return (predatorMass + preyMass) / predatorMass;
 }
 
@@ -87,6 +92,9 @@ static void AcuallyEat(
 
 	KillRecursively(entityManager, preyEntity);
 
+	if (scaleFactor < 0.01)
+		return;
+
 	// Grow the hitbox
 	auto currentShape = predatorBody.body->GetShape();
 	auto& bodyInterface = JoltSystem::GetPhysicSystem().GetBodyInterface();
@@ -104,9 +112,9 @@ static void AcuallyEat(
 	// Scale mesh
 	auto& trans = entityManager.Get<Transform>(predatorEntity);
 	// We should be able to assume scaleFactor - scale > 0, but better safe than sorry
-	trans.deltaScale.x = std::abs(scaleFactor - trans.scale.x);
-	trans.deltaScale.y = std::abs(scaleFactor - trans.scale.y);
-	trans.deltaScale.z = std::abs(scaleFactor - trans.scale.z);
+	trans.deltaScale.x += std::abs(scaleFactor - trans.scale.x);
+	trans.deltaScale.y += std::abs(scaleFactor - trans.scale.y);
+	trans.deltaScale.z += std::abs(scaleFactor - trans.scale.z);
 
 	const float F_GROWTH_STEPS = 60.0f;
 
