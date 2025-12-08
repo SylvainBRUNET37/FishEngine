@@ -18,6 +18,7 @@ void ComponentFactory::CreateRigidBody(const nlohmann::json& componentData, Enti
 {
 	const auto& transform = entityManager.Get<Transform>(entity);
 	const auto& meshInstance = entityManager.Get<MeshInstance>(entity);
+	const auto& name = entityManager.Get<Name>(entity);
 	const auto& mesh = Locator::Get<ResourceManager>().GetMesh(meshInstance.meshIndex);
 
 	if (componentData["type"] == "boxShape")
