@@ -13,9 +13,9 @@ using namespace DirectX;
 namespace
 {
 #ifdef NDEBUG
-	constexpr float METEOR_SPAWN_INTERVAL = 0.05;
+	constexpr float METEOR_SPAWN_INTERVAL = 0.1;
 #else
-	constexpr float METEOR_SPAWN_INTERVAL = 0.3;
+	constexpr float METEOR_SPAWN_INTERVAL = 0.6;
 #endif
 
 	float Lerp(const float a, const float b, const float t)
