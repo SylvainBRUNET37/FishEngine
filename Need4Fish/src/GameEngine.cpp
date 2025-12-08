@@ -61,6 +61,7 @@ void GameEngine::Run()
 
 		prevTime = frameStartTime;
 		GameState::playTime += elapsedTime;
+		GameState::rDeltaTime = elapsedTime; // Pour hold 'R'
 
 		// End the loop if Windows want to terminate the program (+ process messages)
 		shouldContinue = WindowsApplication::ProcessWindowsMessages();
@@ -103,10 +104,22 @@ void GameEngine::HandleGameState()
 		uiManager->HandleClick();
 	leftButtonPreviouslyDown = leftButtonDown;
 
-	// Restart the game if has been was pressed
-	if (GetAsyncKeyState('R') & 0x8000 && GameState::currentState != GameState::PAUSED)
+	// Restart the game if 'R' has been pressed for some time
+	static float rHeldTime = 0.0f;
+	const bool rPressed = (GetAsyncKeyState('R') & 0x8000) != 0;
+	constexpr float REQUIRED_HOLD_TIME = 1.0f; // 1 seconde
+	if (rPressed && GameState::currentState != GameState::PAUSED)
 	{
-		RestartGame();
+		rHeldTime += GameState::rDeltaTime;
+		if (rHeldTime >= REQUIRED_HOLD_TIME)
+		{
+			RestartGame();
+			rHeldTime = 0.0f;
+		}
+	}
+	else
+	{
+		rHeldTime = 0.0f;
 	}
 
 	if (isEscapePressed && !wasEscapePressed && isPausableOrResumable)

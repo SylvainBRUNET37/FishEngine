@@ -34,6 +34,8 @@ struct GameState
 
     inline static bool isGrowing = false;
 
+    inline static double rDeltaTime = 0.0;
+
 private:
     inline static std::queue<std::pair<JPH::BodyID, JPH::BodyID>> detectedCollisions;
     static inline std::mutex pendingMutex;

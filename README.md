@@ -1,9 +1,9 @@
 # Need4Fish :fish::shark:
 
-&emsp;*Need4Fish* est un jeu de course contre la montre effréné dans lequel vous incarnez un mosasaure juvénile abandonné par sa mère avec un seul objectif en tête : se venger.<br>
+&emsp;_Need4Fish_ est un jeu de course contre la montre effréné dans lequel vous incarnez un mosasaure juvénile abandonné par sa mère avec un seul objectif en tête : se venger.<br>
 Pour cela, vous devez manger d'autres poissons afin de grandir et atteindre le sommet de la chaîne alimentaire et dévorer celle qui vous a jadis abandonné.
 
-*Need4Fish* est notre jeu de course pour la session d'hivers 2025 au DDJV et fonctionne grâce à *FishEngine*, notre moteur de rendu maison.
+_Need4Fish_ est notre jeu de course pour la session d'hivers 2025 au DDJV et fonctionne grâce à _FishEngine_, notre moteur de rendu maison.
 
 ## Développé par
 
@@ -27,8 +27,8 @@ Attention, un chemin de dossier trop long peut provoquer des erreurs !
 
 ## Contrôles
 
-- ESC pour mettre le jeu en pause (et récupérer la souris) ou sorrtir de pause
-- R pour redémarrer la partie
+- ESC pour mettre le jeu en pause (et récupérer la souris) ou sortir de pause
+- Maintenir R pour redémarrer la partie
 
 - Mouvements de la souris pour pivoter dans la direction désirée
 - W et S pour avancer et reculer
@@ -69,7 +69,7 @@ Tout comme le brouillard et l'atténuation, l'intensité des caustiques dépend 
 
 ### Billboards
 
-Nous avons utilisé des panneaux (billboards) afin de rendre des bulles pour notre jeu. Les billboards sont la base de notre *système de particules*.
+Nous avons utilisé des panneaux (billboards) afin de rendre des bulles pour notre jeu. Les billboards sont la base de notre _système de particules_.
 
 ![Billboards](./docs/static/img/billboards.png)
 
@@ -79,7 +79,7 @@ Afin de rendre la surface de l'eau et de la lave, un shader "génère" des textu
 
 ### Vignette
 
-La vignette donne un effet de vision *ensanglantée* lorsque le joueur passe à la première personne.
+La vignette donne un effet de vision _ensanglantée_ lorsque le joueur passe à la première personne.
 
 ![Vignette](./docs/static/img/vignette.png)
 
@@ -100,7 +100,7 @@ Le flou radial permet de donner l'impression de "God rays" ou rayons divins, qui
 Notre moteur de rendu supporte deux types de lumière:
 
 - Directionnelles:
-    - Utilisée pour représenter le soleil et éclairer l'ensemble de notre scène
+  - Utilisée pour représenter le soleil et éclairer l'ensemble de notre scène
 - Point:
   - Utilisée pour les crystaux lumineux de la caverne
   - Utilisée pour la lumière du poisson-lanterne.
@@ -116,11 +116,13 @@ Pour la gestion des ombres, nous avons fait usage de shadow maps.
 ![Shadow maps](./docs/static/img/shadow_maps.png)
 
 ### Skybox
+
 Le ciel est fait grâce à l'utilisation d'une boîte à ciel.
 
 ![Skybox](./docs/static/img/skybox.png)
 
 ### Distorsion
+
 Afin de représenter la chaleur extrême de la lave, un effet de distorsion est appliqué autour de la lave.
 
 ![Distorsoin](./docs/static/img/distorsion.png)
@@ -128,9 +130,10 @@ Afin de représenter la chaleur extrême de la lave, un effet de distorsion est 
 ### Mesures de performance
 
 Afin d'améliorer les performances de notre jeu, nous avons implémenté plusieurs mesures dans notre engin de rendu:
+
 - Backface culling (Élimination des faces arrières), activable ou non au choix selon les objets. La surface de l'eau n'en a pas besoin par exemple.
 - Frustum culling (Élimination hors du champs de vue): les objets en dehors du champs de vue n'ont pas besoin d'être rendus.
-- Instancing: les particules, qui sont présentes en grand nombres n'ont pas besoin d'être dessinées individuellement, on les regroupe alors dans un même appel de dessin, afin d'éviter de passer un grand temps CPU à faire *Draw calls* au GPU.
+- Instancing: les particules, qui sont présentes en grand nombres n'ont pas besoin d'être dessinées individuellement, on les regroupe alors dans un même appel de dessin, afin d'éviter de passer un grand temps CPU à faire _Draw calls_ au GPU.
 
 ## Étapes à suivre pour cloner (devs)
 
@@ -141,6 +144,7 @@ Afin d'améliorer les performances de notre jeu, nous avons implémenté plusieu
     ```bash
     ./build.bat
     ```
+
 ## Credits & remerciements
 
 Merci aux artistes dont nous avons utilisé les assets pour créer notre jeu.
@@ -148,10 +152,10 @@ Merci aux artistes dont nous avons utilisé les assets pour créer notre jeu.
 - [Coral fish](https://sketchfab.com/3d-models/coral-fish-ea8d002da75a4dd09658b962722279c5) by polyplant3D (Licence: CC Attribution)
 - [Basic fish](https://sketchfab.com/3d-models/anglerfish-0047a66766394a018fdab16279fee694) by Yimit (Licence: )CC Attribution
 - [Anglerfish](https://sketchfab.com/3d-models/anglerfish-0047a66766394a018fdab16279fee694) by Karstart (Licence: CC Attribution)
-- [Mosasaure](https://sketchfab.com/3d-models/mosasaurus-4a1feecff6c7468b8c07ba0ad439e0e0) by  (Licence: CC Attribution-NonCommercial)
+- [Mosasaure](https://sketchfab.com/3d-models/mosasaurus-4a1feecff6c7468b8c07ba0ad439e0e0) by (Licence: CC Attribution-NonCommercial)
 - [Méduse "Jellyfish_003"](https://skfb.ly/6VRXn) by n- (Licence: CC Attribution)
 - [Statue](https://skfb.ly/pyOO8) by Global Digital Heritage and GDH-Afrika (Licence: CC Attribution-NonCommercial)
-- [Texture Blue_marble_pxr128](https://renderman.pixar.com/pixar-one-twenty-eight) by  (Licence: CC Attribution 4.0 International)
+- [Texture Blue_marble_pxr128](https://renderman.pixar.com/pixar-one-twenty-eight) by (Licence: CC Attribution 4.0 International)
 - [Crocodile Skull](https://sketchfab.com/3d-models/crocodile-skull-86f6a2b477284fd1ab4e544e2846c014) by toaste (Licence: CC Attribution)
 - [Claret Tall Seaweed](https://sketchfab.com/3d-models/claret-tall-seaweed-6a07131b52b34d8992861d3c3ba82a29) by Ben Laret (Licence: CC Attribution)
 - [Stone Pack](https://sketchfab.com/3d-models/stone-pack-f3e0a67b9ca243b09119177649f21e17) by ashkan.fancy (Licence: CC Attribution)
