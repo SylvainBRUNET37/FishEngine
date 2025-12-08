@@ -17,6 +17,9 @@ struct alignas(16) PostProcessSettings
 
     DirectX::XMFLOAT3 cameraPos;
     float padding1;
+    DirectX::XMFLOAT3 sceneColorTint;
+
+    float padding2;
 };
 
 #endif

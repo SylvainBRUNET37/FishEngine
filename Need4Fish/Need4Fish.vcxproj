@@ -184,6 +184,7 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     </None>
     <ClCompile Include="src\components\physics\Sensor.cpp" />
     <ClCompile Include="src\GameState.cpp" />
+    <ClCompile Include="src\systems\ApocalypseSystem.cpp" />
     <ClCompile Include="src\systems\ParticleSystem.cpp" />
     <ClCompile Include="src\utils\EntityManagerUtils.cpp" />
     <ClCompile Include="src\utils\MathsUtils.cpp" />
@@ -308,6 +309,7 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
     <ClInclude Include="include\GameEngine.h" />
     <ClInclude Include="include\resources\SceneLoader.h" />
     <ClInclude Include="include\resources\SceneResource.h" />
+    <ClInclude Include="include\systems\ApocalypseSystem.h" />
     <ClInclude Include="include\systems\CameraSystem.h" />
     <ClInclude Include="include\systems\ParticleSystem.h" />
     <ClInclude Include="include\systems\PhysicsSimulationSystem.h" />

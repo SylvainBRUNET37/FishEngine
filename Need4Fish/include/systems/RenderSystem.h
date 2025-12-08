@@ -40,8 +40,6 @@ private:
 
 	void Present() const { renderContext->Present(); }
 
-	static FrameBuffer CreateDirectionalLight();
-
 	static const int SHADOW_MAP_SIZE = 4096; //shadow map size must also be defined in LightningPS.hlsl
 	//4096 seems to be the maximum before a performance hit
 	std::unique_ptr<ShadowMap> shadowMap; //mSmap

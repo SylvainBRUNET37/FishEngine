@@ -13,6 +13,7 @@
 #include "rendering/texture/TextureLoader.h"
 #include "gameplay/mechanics/Eating.h"
 #include "physicsEngine/utils/MeshUtil.h"
+#include "systems/ApocalypseSystem.h"
 #include "systems/PowerSystem.h"
 #include "systems/SensorSystem.h"
 #include "utils/MathsUtils.h"
@@ -35,6 +36,7 @@ GameEngine::GameEngine(RenderContext* renderContext_)
 	systems.emplace_back(std::make_unique<SensorSystem>());
 	systems.emplace_back(std::make_unique<CameraSystem>());
 	systems.emplace_back(std::make_unique<PowerSystem>());
+	systems.emplace_back(std::make_unique<ApocalypseSystem>());
 	systems.emplace_back(std::make_unique<RenderSystem>(renderContext, uiManager, std::move(sceneResources.materials)));
 
 	InitGame();

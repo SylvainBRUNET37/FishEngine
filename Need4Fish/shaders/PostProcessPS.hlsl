@@ -27,6 +27,8 @@ cbuffer PostProcessSettings : register(b0)
     float4x4 viewProj; // unused
     float3 cameraPos;
     float pad1;
+	float3 sceneColorTint;
+    float pad2;
 };
 
 Texture2D sceneTex : register(t0);
@@ -115,6 +117,8 @@ float4 PostProcessPS(VSOutput input) : SV_TARGET
 	{
         color += 0.1; // add a little bit of intsensity if not in the water
     }
+
+    color.rgb += sceneColorTint;
 
     if (enableVignette)
         color = ApplyVignette(color, uv);

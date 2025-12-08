@@ -17,7 +17,7 @@ RenderSystem::RenderSystem(RenderContext* renderContext, const std::shared_ptr<U
                            std::vector<Material>&& materials)
 	: uiManager(uiManager),
 	  renderer(renderContext, std::move(materials)),
-	  frameBuffer(CreateDirectionalLight()),
+	  frameBuffer(),
 	  renderContext(renderContext),
 	  particleData(BillboardRenderer::MAX_BILLBOARDS)
 {
@@ -47,6 +47,8 @@ void RenderSystem::RenderPostProcesses(const double deltaTime, const Camera& cur
 		XMMatrixTranspose(a));
 
 	XMStoreFloat3(&GameState::postProcessSettings.cameraPos, Camera::position);
+
+	GameState::postProcessSettings.sceneColorTint = GameState::colorTint;
 
 	static const auto& shaderBank = Locator::Get<ResourceManager>().GetShaderBank();
 	static const auto vertexShader = shaderBank.Get<VertexShader>("shaders/PostProcessVS.hlsl").shader;
@@ -194,6 +196,7 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 {
 	const auto currentCamera = entityManager.Get<Camera>(GameState::currentCameraEntity);
 	FrustumCuller::Init(static_cast<BaseCameraData>(currentCamera)); // Prepare the frustum culler
+	frameBuffer.dirLight = GameState::dirLight;
 
 	renderer.UpdateScene();
 
@@ -248,22 +251,6 @@ void RenderSystem::RenderUI(EntityManager& entityManager)
 	renderer.PrepareSceneForSprite();
 	for (auto& sprite : uiManager->GetSprites())
 		renderer.Render(sprite, renderContext->GetContext());
-}
-
-FrameBuffer RenderSystem::CreateDirectionalLight()
-{
-	return
-	{
-		.dirLight =
-		{
-			.ambient = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
-			.diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 0.8f),
-			.specular = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
-
-			.direction = XMFLOAT3(-0.5f, -1.0f, 0.5f),
-			.pad = 0.0f
-		},
-	};
 }
 
 void RenderSystem::BuildShadowTransform() {
