@@ -11,7 +11,7 @@ void ContactListenerImpl::OnContactAdded(const Body& inBody1, const Body& inBody
                                          const ContactManifold& inManifold, ContactSettings& ioSettings)
 {
 	LogBodyContact(inBody1, inBody2);
-	GameState::detectedCollisions.push({inBody1.GetID(), inBody2.GetID()});
+	GameState::AddCollision({inBody1.GetID(), inBody2.GetID()});
 
 	if (not inBody1.IsSensor() && not inBody2.IsSensor())
 		return;

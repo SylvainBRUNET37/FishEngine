@@ -121,10 +121,11 @@ void GameEngine::HandleCollions()
 		return entityManager.HasComponent<Eatable>(entity) && entityManager.HasComponent<AIController>(entity);
 		};
 
-	while (!GameState::detectedCollisions.empty())
+	auto& detectedCollisions = GameState::GetCollisions();
+	while (!detectedCollisions.empty())
 	{
-		auto& [bodyId1, bodyId2] = GameState::detectedCollisions.front();
-		GameState::detectedCollisions.pop();
+		auto& [bodyId1, bodyId2] = detectedCollisions.front();
+		detectedCollisions.pop();
 
 		auto optEntity1 = EntityManagerUtils::GetEntityFromBody(*entityManager, bodyId1);
 		auto optEntity2 = EntityManagerUtils::GetEntityFromBody(*entityManager, bodyId2);
@@ -279,11 +280,11 @@ void GameEngine::CreateParticleZones()
 
 	particleSystem.AddParticleZone(*entityManager,
 	                               {
-		                               .centerPosition = {0, 1300.0f, 0},
-		                               .halfExtends = {7000.0f,900.0f, 7000.0f},
+		                               .centerPosition = {0, 1000.0f, 0},
+		                               .halfExtends = {7000.0f,1000.0f, 7000.0f},
 		                               .nbParticle = NB_WORLD_PARTICLES,
 		                               .particleDurationMin = 3.0f,
-		                               .particleDurationMax = 15.0f,
+		                               .particleDurationMax = 5.0f,
 		                               .particleSpeedMin = 0.5f,
 		                               .particleSpeedMax = 1.0f,
 		                               .particleDirection = {0, 1, 0},
@@ -350,8 +351,8 @@ void GameEngine::CreateParticleZones()
 					                               .centerPosition = transform.position,
 					                               .halfExtends = {radius, halfHeight, radius},
 					                               .nbParticle = NB_GEYSER_PARTICLES,
-					                               .particleDurationMin = 0.5f,
-					                               .particleDurationMax = 1.0f,
+					                               .particleDurationMin = 0.25f,
+					                               .particleDurationMax = 0.4f,
 												   .particleSpeedMin = 5.0f,
 												   .particleSpeedMax = 12.0f,
 					                               .particleDirection = MeshUtil::ToDirectX(sensor.direction),

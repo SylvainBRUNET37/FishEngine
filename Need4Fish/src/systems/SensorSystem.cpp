@@ -6,8 +6,9 @@
 using namespace std;
 using namespace JPH;
 
-void SensorSystem::AddContact(pair<BodyID, BodyID> contact)
+void SensorSystem::AddContact(const pair<BodyID, BodyID>& contact)
 {
+	std::lock_guard lock(pendingMutex);
 	activeContacts.emplace_back(contact);
 }
 
