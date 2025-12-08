@@ -75,12 +75,12 @@ float3 ComputeGodRays(float2 uv)
 
 float2 HeatwaveDistortion(float2 uv, float time)
 {
-    float speed = 3.0 + sin(time * 0.7) * 1.5;
+    float speed = 6.0 + sin(time * 1.0) * 3.0;
 
-	float wave1 = sin(uv.y * 45.0 + time * speed) * (0.005 + 0.005 * sin(time * 1.3));
-	float wave2 = cos(uv.x * 30.0 + time * (speed * 0.8)) * (0.005 + 0.005 * cos(time * 1.7));
+    float wave1 = sin(uv.y * 70.0 + time * speed) * (0.012 + 0.01 * sin(time * 1.6));
+    float wave2 = cos(uv.x * 55.0 + time * (speed * 0.9)) * (0.012 + 0.01 * cos(time * 2.0));
 
-    float noise = sin((uv.x + uv.y) * 80.0 + time * 5.0) * 0.003;
+    float noise = sin((uv.x + uv.y) * 120.0 + time * 7.0) * 0.006;
 
     return float2(wave1 + noise, wave2 - noise);
 }
@@ -96,11 +96,10 @@ float4 PostProcessPS(VSOutput input) : SV_TARGET
     if (mask.g > 0.9)
     {
         float2 distortion = HeatwaveDistortion(uv, deltaTime);
-        float timeIntensity = 1.0 + 0.3 * sin(deltaTime * 6.0);
+        float timeIntensity = 0.5 + 0.3 * sin(deltaTime * 6.0);
         float2 distortedUV = uv + distortion * mask * timeIntensity;
 
-        if (specialMask.Sample(sampleState, distortedUV).r > 0.0)
-            color = sceneTex.Sample(sampleState, distortedUV);
+    	color = sceneTex.Sample(sampleState, distortedUV);
     }
 
     if (enableChromaticAberration)

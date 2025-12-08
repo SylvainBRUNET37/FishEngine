@@ -298,7 +298,7 @@ void GameEngine::CreateParticleZones()
 	for (const auto& [entity, sensor, transform, name] : entityManager->View<Sensor, Transform, Name>())
 	{
 		auto& bodyInterface = JoltSystem::GetBodyInterface();
-		if (name.name == "CurrentSensor")
+		if (name.name.find("CurrentSensor") != std::string::npos)
 		{
 			const RefConst<Shape> shape = bodyInterface.GetShape(sensor.body->GetID());
 
