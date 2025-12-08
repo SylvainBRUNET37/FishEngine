@@ -37,8 +37,9 @@ Attention, un chemin de dossier trop long peut provoquer des erreurs !
 - Roulette de la souris pour ajuster le zoom de la caméra
 - ALT + Entrée pour activer/désactiver le mode pleine écran
 
-## Gameplay loop
+## Boucle de jeu (Gameplay loop)
 
+### Boucle principale
 - L'objectif est de manger le grand mosasaure à l'extérieur du monticule
 - Il faut manger d'autres poissons plus petits avant, sinon c'est le grand mosasaure qui VOUS mange
 - Pour manger : simplement entrer en contact avec les autres êtres vivants.
@@ -48,6 +49,14 @@ Attention, un chemin de dossier trop long peut provoquer des erreurs !
 
 - Dans le moment, il n'est pas possible de savoir si on a plus de masse que l'autre avant d'entrer en contact.
 - Le joueur grandit lorqu'il mange des proies.
+
+### Apocalypse
+
+Si le joueur patiente trop à se venger, l'apocalypse arrive. Cet évènement arrive à partir d'un temps aléatoire entre 3 et 4 minutes pour mettre fin à l'existence des dinosaures.
+
+Durant cet évènement, des météorites tombent du ciel, l'ambiance devient rouge, le soleil bouge, s'assombrit et la mère se met en route pour vous dévorer.
+
+![Apocalypse](./docs/static/img/apocalypse.png)
 
 ## Techniques de rendu
 

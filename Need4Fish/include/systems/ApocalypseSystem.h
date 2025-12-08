@@ -13,8 +13,8 @@ private:
 	static constexpr double APOCALYPSE_START_MIN = 180; // in second
 	static constexpr double APOCALYPSE_START_MAX = 240; // in second
 
-	static constexpr double APOCALYPSE_TIME_MIN = 30; // in second
-	static constexpr double APOCALYPSE_TIME_MAX = 30; // in second
+	static constexpr double APOCALYPSE_TIME_MIN = 60; // in second
+	static constexpr double APOCALYPSE_TIME_MAX = 60; // in second
 
 	DirectX::XMFLOAT3 baseSceneTint;
 	DirectX::XMFLOAT3 apocalypseSceneTint;
