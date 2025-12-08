@@ -303,7 +303,7 @@ void PhysicsSimulationSystem::UpdateNPCs(EntityManager& entityManager)
 			Vec3 directionToPlayer = (playerPosition - body->GetPosition()).Normalized();
 
 			// Vitesse lente, mais constante
-			constexpr float MOMSASAURE_SPEED = 7.0f;
+			constexpr float MOMSASAURE_SPEED = 10.0f;
 			newSpeed = directionToPlayer * MOMSASAURE_SPEED;
 
 			// Rotation pour faire face au joueur

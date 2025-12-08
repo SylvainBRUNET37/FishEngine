@@ -53,8 +53,6 @@ ApocalypseSystem::ApocalypseSystem() : baseSceneTint{},
                                        apocalypseSceneTint{0.12f, 0.02f, 0.0f},
                                        baseLight{GameState::dirLight},
                                        apocalypseLight{CreateApocalypseLight()},
-                                       elapsedTime{0},
-                                       apocalypseElapsedTime{0},
                                        apocalypseStart
                                        {
 	                                       MathsUtils::RandomBetween(APOCALYPSE_START_MIN, APOCALYPSE_START_MAX)
@@ -73,10 +71,9 @@ ApocalypseSystem::ApocalypseSystem() : baseSceneTint{},
 
 void ApocalypseSystem::Update(const double deltaTime, EntityManager& entityManager)
 {
-	elapsedTime += deltaTime;
 
 	// Start the apocalypse if the time has been reached
-	if (elapsedTime >= apocalypseStart && !hasApocalypsePlayed)
+	if (GameState::playTime >= apocalypseStart && !hasApocalypsePlayed)
 	{
 		isApocalypse = true;
 		hasApocalypsePlayed = true;
@@ -85,16 +82,14 @@ void ApocalypseSystem::Update(const double deltaTime, EntityManager& entityManag
 	// !!! A P O C A L Y P S E !!!
 	if (isApocalypse)
 	{
-		apocalypseElapsedTime += deltaTime;
 
-		if (apocalypseElapsedTime >= apocalypseTime)
+		if (GameState::playTime >= apocalypseTime)
 		{
-			apocalypseElapsedTime = apocalypseTime;
 			isApocalypse = false;
 		}
 
 		// LIGHTS
-		float time = static_cast<float>(apocalypseElapsedTime / apocalypseTime);
+		float time = static_cast<float>(GameState::playTime / apocalypseTime);
 		time = std::clamp(time, 0.0f, 1.0f); // clamp to avoid problems
 
 		DirectionalLight current{};
