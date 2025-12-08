@@ -21,7 +21,7 @@ JoltSystem::JoltSystem()
 	RegisterTypes();
 
 	physicsSystem = std::make_unique<PhysicsSystem>();
-	physicsSystem->SetGravity(Vec3(0, -500, 0));
+	physicsSystem->SetGravity(Vec3(0, -1'750, 0));
 
 #ifndef NDEBUG
 	AssertFailed = JoltUtils::AssertFailedImpl;

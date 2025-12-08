@@ -43,10 +43,10 @@ private:
 
 	void ReadSceneMetaDatas(const aiScene* scene);
 
-	Mesh ProcessMesh(const aiMesh* mesh, const DirectX::XMMATRIX& transform) const;
+	Mesh ProcessMesh(const aiMesh* mesh, const DirectX::XMMATRIX& transform, unsigned int meshId) const;
 
 	Material ProcessMaterial(const std::filesystem::path& materialPath, const aiScene* scene,
-	                         const aiMaterial* material, ShaderBank& shaderBank);
+	                         const aiMaterial* material, ShaderBank& shaderBank, unsigned int materialId);
 	ComPtr<ID3D11ShaderResourceView> ProcessEmbededTexture(const aiTexture* embeddedTex);
 
 	void ProcessLights(const aiScene* scene, SceneResource& sceneRes);
