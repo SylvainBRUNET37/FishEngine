@@ -2,6 +2,9 @@
 #define GAME_STATE_H
 
 #include "pch.h"
+
+#include <mutex>
+
 #include "systems/CameraSystem.h"
 #include <queue>
 
@@ -20,7 +23,8 @@ struct GameState
 
     inline static PostProcessSettings postProcessSettings{};
 
-    inline static std::queue<std::pair<JPH::BodyID, JPH::BodyID>> detectedCollisions;
+    static void AddCollision(const std::pair<JPH::BodyID, JPH::BodyID>& collision);
+    static std::queue<std::pair<JPH::BodyID, JPH::BodyID>>& GetCollisions();
 
     inline static Entity currentCameraEntity = INVALID_ENTITY;
     inline static auto currentState = PLAYING;
@@ -29,6 +33,10 @@ struct GameState
     //inline static std::chrono::system_clock::time_point startTime;
 
     inline static bool isGrowing = false;
+
+private:
+    inline static std::queue<std::pair<JPH::BodyID, JPH::BodyID>> detectedCollisions;
+    static inline std::mutex pendingMutex;
 };
 
 #endif

@@ -183,6 +183,7 @@ xcopy /E /Y /I "$(ProjectDir)shaders\*" "$(TargetDir)shaders\"
       <FileType>Document</FileType>
     </None>
     <ClCompile Include="src\components\physics\Sensor.cpp" />
+    <ClCompile Include="src\GameState.cpp" />
     <ClCompile Include="src\systems\ParticleSystem.cpp" />
     <ClCompile Include="src\utils\EntityManagerUtils.cpp" />
     <ClCompile Include="src\utils\MathsUtils.cpp" />

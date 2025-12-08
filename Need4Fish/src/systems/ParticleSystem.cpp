@@ -69,11 +69,7 @@ void ParticleSystem::MoveAndTeleportIfAtEndOfLife(
 
 	particle.lifeTime += deltaTime;
 
-	const bool shouldBeTeleported =
-		not MathsUtils::IsInsideAABB(billboard.position, zone.centerPosition, zone.halfExtends) ||
-		particle.lifeTime >= particle.lifeDuration;
-
-	if (shouldBeTeleported) [[unlikely]] // Teleport the particle
+	if (particle.lifeTime >= particle.lifeDuration) [[unlikely]] // Teleport the particle
 	{
 		static constexpr float scaleMin = 3.0f;
 		static constexpr float scaleMax = 15.0f;
