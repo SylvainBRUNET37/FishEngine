@@ -139,17 +139,17 @@ void GameEngine::HandleCollions()
 	auto& detectedCollisions = GameState::GetCollisions();
 	while (!detectedCollisions.empty())
 	{
+		static auto& bodyInterface = JoltSystem::GetBodyInterface();
+
 		auto& [bodyId1, bodyId2] = detectedCollisions.front();
 		detectedCollisions.pop();
 
-		auto optEntity1 = EntityManagerUtils::GetEntityFromBody(*entityManager, bodyId1);
-		auto optEntity2 = EntityManagerUtils::GetEntityFromBody(*entityManager, bodyId2);
+		const Entity entity1 = to_entity(bodyInterface.GetUserData(bodyId1));
+		const Entity entity2 = to_entity(bodyInterface.GetUserData(bodyId2));
 
-		if (!optEntity1.has_value() || !optEntity2.has_value())
+
+		if (entity1 == INVALID_ENTITY || entity2 == INVALID_ENTITY)
 			continue;
-
-		const Entity entity1 = optEntity1.value();
-		const Entity entity2 = optEntity2.value();
 
 		if (entityManager->HasComponent<Eatable>(entity1)
 			&& entityManager->HasComponent<Eatable>(entity2))
@@ -258,12 +258,13 @@ void GameEngine::InitGame()
 
 	// Assign the controllable entity to the camera (it's not a pretty way of doing it but it works)
 	unsigned short nbControllable = 0;
-	for (const auto& [entity, controllable] : entityManager->View<Controllable>())
+	for (const auto& [playerEntity, controllable] : entityManager->View<Controllable>())
 	{
 		++nbControllable;
 		vassert(nbControllable == 1, "Currently, it's only possible to have 1 controllable entity.");
 
-		cameraComponent.targetEntity = entity;
+		cameraComponent.targetEntity = playerEntity;
+		GameState::playerEntity = playerEntity;
 	}
 
 	CreateParticleZones();

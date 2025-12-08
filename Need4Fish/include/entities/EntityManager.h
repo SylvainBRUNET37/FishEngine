@@ -2,6 +2,7 @@
 #define ENTITY_MANAGER_H
 
 #include <format>
+#include <iterator>
 
 #include "Entity.h"
 #include "components/ComponentPool.h"
@@ -107,10 +108,17 @@ public:
 
 		struct iterator
 		{
+			using iterator_concept = std::input_iterator_tag;
+			using iterator_category = std::input_iterator_tag;
+			using value_type = std::tuple<Entity, QueryComponents&...>;
+			using reference = value_type;
+			using difference_type = std::ptrdiff_t;
+
 			EntityManager* entityManager;
 			Entity::Index currentEntityIndex;
 			size_t nbEntity;
 
+			iterator() = default;
 			iterator(EntityManager* reg, const Entity::Index start)
 				: entityManager{reg}, currentEntityIndex{start}, nbEntity{reg->generations.size()}
 			{
@@ -143,12 +151,19 @@ public:
 				return *this;
 			}
 
-			bool operator!=(const iterator& other) const noexcept
+			iterator operator++(int)
 			{
-				return currentEntityIndex != other.currentEntityIndex or entityManager != other.entityManager;
+				iterator tmp = *this;
+				++*this;
+				return tmp;
 			}
 
-			std::tuple<Entity, QueryComponents&...> operator*()
+			bool operator==(const iterator& other) const noexcept
+			{
+				return currentEntityIndex == other.currentEntityIndex && entityManager == other.entityManager;
+			}
+
+			reference operator*() const
 			{
 				Entity entity
 				{

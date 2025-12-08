@@ -1,18 +1,26 @@
 #include "pch.h"
 #include "utils/EntityManagerUtils.h"
 #include <optional>
+#include <ranges>
 
-std::optional<Entity> EntityManagerUtils::GetEntityFromBody(EntityManager& entityManager, const JPH::BodyID& bodyId)
+using namespace std;
+using namespace JPH;
+
+std::optional<Entity> EntityManagerUtils::GetEntityFromBody(EntityManager& entityManager, const BodyID& bodyId)
 {
-	auto eatables = entityManager.View<RigidBody>();
-	auto it = std::find_if(
-		eatables.begin(),
-		eatables.end(),
-		[&](auto&& tuple)
+    const auto eatables = entityManager.View<RigidBody>();
+
+	const auto it = ranges::find_if
+	(
+		eatables,
+		[&](const auto& tup)
 		{
-			auto& [entity, rigidBody] = tuple;
+			const auto& [entity, rigidBody] = tup;
 			return rigidBody.body->GetID() == bodyId;
-		});
+		}
+	);
+
+
 	if (it != eatables.end())
 	{
 		const auto& [entity, _] = *it;

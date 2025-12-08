@@ -22,11 +22,11 @@ void ComponentFactory::CreateRigidBody(const nlohmann::json& componentData, Enti
 	const auto& mesh = Locator::Get<ResourceManager>().GetMesh(meshInstance.meshIndex);
 
 	if (componentData["type"] == "boxShape")
-		entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCube(transform, mesh));
+		entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateCube(transform, mesh, entity));
 	else if (componentData["type"] == "meshShape")
-		entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateMeshShape(transform, mesh));
+		entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateMeshShape(transform, mesh, entity));
 	else if (componentData["type"] == "hullShape")
-		entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateConvexHullShape(transform, mesh, !componentData.contains("isDecor")));
+		entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateConvexHullShape(transform, mesh, entity, !componentData.contains("isDecor")));
 }
 
 void ComponentFactory::CreateSensor(const nlohmann::json& componentData, EntityManager& entityManager,

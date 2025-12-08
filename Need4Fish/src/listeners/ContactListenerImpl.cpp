@@ -10,7 +10,9 @@ using namespace std;
 void ContactListenerImpl::OnContactAdded(const Body& inBody1, const Body& inBody2,
                                          const ContactManifold& inManifold, ContactSettings& ioSettings)
 {
+#ifndef NDEBUG
 	LogBodyContact(inBody1, inBody2);
+#endif
 	GameState::AddCollision({inBody1.GetID(), inBody2.GetID()});
 
 	if (not inBody1.IsSensor() && not inBody2.IsSensor())

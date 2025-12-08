@@ -26,7 +26,7 @@ namespace MeshUtil
 
     JPH::RMat44 ToJolt(const Transform& transform);
 	JPH::Vec3 getApproximateSize(const Mesh&);
-	JPH::TriangleList generateMeshTriangleList(const Mesh&);
+	JPH::TriangleList generateMeshTriangleList(const Mesh&, const JPH::Vec3& scale);
 }
 
 #endif

@@ -154,7 +154,7 @@ void ApocalypseSystem::Update(const double deltaTime, EntityManager& entityManag
 			const auto& mesh = rsManager.GetMesh(meteoriteMeshIndice);
 			const auto& rigidBody = entityManager.AddComponent<RigidBody>(metoriteEntity,
 			                                                        ShapeFactory::CreateCube(
-				                                                        transform, mesh, Layers::MOVING_DECOR));
+				                                                        transform, mesh, metoriteEntity, Layers::MOVING_DECOR));
 
 			static auto& bodyInterface = JoltSystem::GetBodyInterface();
 			bodyInterface.SetAngularVelocity(rigidBody.body->GetID(),

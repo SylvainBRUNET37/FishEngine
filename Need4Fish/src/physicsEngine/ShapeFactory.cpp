@@ -17,11 +17,13 @@
 #include "physicsEngine/utils/MeshUtil.h"
 #include "physicsEngine/utils/ConversionUtil.h"
 
+#include "entities/Entity.h"
+
 using namespace JPH;
 using namespace DirectX;
 using namespace JPH::literals;
 
-Body* ShapeFactory::CreateCube(const Transform& transform)
+Body* ShapeFactory::CreateCube(const Transform& transform, const Entity& entity)
 {
     // Apply scale to the box
     auto halfExtents = Vec3(1.f, 1.f, 1.f);
@@ -42,6 +44,7 @@ Body* ShapeFactory::CreateCube(const Transform& transform)
     );
 
     boxSettings.mLinearDamping = 1.f;
+    boxSettings.mUserData = to_uint64(entity);
 
     BodyInterface& bodyInterface = JoltSystem::GetBodyInterface();
     Body* body = bodyInterface.CreateBody(boxSettings);
@@ -52,7 +55,7 @@ Body* ShapeFactory::CreateCube(const Transform& transform)
     return body;
 }
 
-Body* ShapeFactory::CreateCube(const Transform& transform, const Mesh& mesh, JPH::ObjectLayer layer)
+Body* ShapeFactory::CreateCube(const Transform& transform, const Mesh& mesh, const Entity& entity, JPH::ObjectLayer layer)
 {
     // Apply scale to the box
     Vec3 size = MeshUtil::getApproximateSize(mesh);
@@ -76,7 +79,8 @@ Body* ShapeFactory::CreateCube(const Transform& transform, const Mesh& mesh, JPH
     boxSettings.mLinearDamping = 0.9f;
     boxSettings.mAngularDamping = 0.9f;
     boxSettings.mRestitution = 0.75f;
-    boxSettings.mMaxLinearVelocity = 10'000.0f;
+    boxSettings.mMaxLinearVelocity = 2'000.0f;
+    boxSettings.mUserData = to_uint64(entity);
 
     BodyInterface& bodyInterface = JoltSystem::GetBodyInterface();
     Body* body = bodyInterface.CreateBody(boxSettings);
@@ -87,7 +91,7 @@ Body* ShapeFactory::CreateCube(const Transform& transform, const Mesh& mesh, JPH
     return body;
 }
 
-Body* ShapeFactory::CreateSphereWithVelocity(const Transform& transform, const XMFLOAT3& direction)
+Body* ShapeFactory::CreateSphereWithVelocity(const Transform& transform, const XMFLOAT3& direction, const Entity& entity)
 {
     // Apply scale to the sphere... but Thierry does not know how to do this or what this multiplication by 0.5 is for...
     /*auto halfExtents = Vec3(0.5f, 0.5f, 0.5f);
@@ -99,13 +103,15 @@ Body* ShapeFactory::CreateSphereWithVelocity(const Transform& transform, const X
     const RVec3 position(transform.position.x, transform.position.y, transform.position.z);
     const Quat rotation(transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w);
 
-    const BodyCreationSettings sphereSettings(
+    BodyCreationSettings sphereSettings(
         shape,
         position,
         rotation,
         EMotionType::Dynamic,
         Layers::MOVING
     );
+
+    sphereSettings.mUserData = to_uint64(entity);
 
     BodyInterface& bodyInterface = JoltSystem::GetBodyInterface();
     Body* body = bodyInterface.CreateBody(sphereSettings);
@@ -124,20 +130,22 @@ Body* ShapeFactory::CreateSphereWithVelocity(const Transform& transform, const X
     return body;
 }
 
-JPH::Body* ShapeFactory::CreateFloor()
+JPH::Body* ShapeFactory::CreateFloor(const Entity& entity)
 {
     const RefConst shape = new PlaneShape(Plane(Vec4Arg(0.0f, 1.0f, 0.0f, 0.0f)));
     const RVec3 position(0.f, 0.f, 0.f);
     const Quat rotation(0.f, 0.f, 0.f, 1.f);
 
 
-    const BodyCreationSettings floorSettings(
+    BodyCreationSettings floorSettings(
         shape,
         position,
         rotation,
         EMotionType::Static,
         Layers::NON_MOVING
     );
+
+    floorSettings.mUserData = to_uint64(entity);
 
     BodyInterface& bodyInterface = JoltSystem::GetBodyInterface();
     Body* body = bodyInterface.CreateBody(floorSettings);
@@ -146,7 +154,7 @@ JPH::Body* ShapeFactory::CreateFloor()
     return body;
 }
 
-Body* ShapeFactory::CreatePlane(const Transform& transform)
+Body* ShapeFactory::CreatePlane(const Transform& transform, const Entity& entity)
 {
     // Apply scale to the box
 	auto halfExtents = Vec3(1.f, 0.05f, 1.f);
@@ -173,7 +181,7 @@ Body* ShapeFactory::CreatePlane(const Transform& transform)
 	return body;
 }
 
-Body* ShapeFactory::CreatePlane(const Transform& transform, const Mesh& mesh)
+Body* ShapeFactory::CreatePlane(const Transform& transform, const Mesh& mesh, const Entity& entity)
 {
     // Apply scale to the box
     /*auto size = mesh.getApproximateSize();
@@ -210,7 +218,7 @@ Body* ShapeFactory::CreatePlane(const Transform& transform, const Mesh& mesh)
     return body;
 }
 
-Body* ShapeFactory::CreateCapsule(const Transform& transform)
+Body* ShapeFactory::CreateCapsule(const Transform& transform, const Entity& entity)
 {
     // TODO: Hardcoded dimension of the capsule in blender 
     const float radius = transform.scale.x * (200.0f / 2.0f); //radius
@@ -237,7 +245,7 @@ Body* ShapeFactory::CreateCapsule(const Transform& transform)
     return body;
 }
 
-Body* ShapeFactory::CreateVerticalCapsule(const Transform& transform, const Mesh& mesh)
+Body* ShapeFactory::CreateVerticalCapsule(const Transform& transform, const Mesh& mesh, const Entity& entity)
 {
     Vec3 size = MeshUtil::getApproximateSize(mesh);
 
@@ -266,7 +274,7 @@ Body* ShapeFactory::CreateVerticalCapsule(const Transform& transform, const Mesh
     return body;
 }
 
-Body* ShapeFactory::CreateHorizontalCapsule(const Transform& transform, const Mesh& mesh)
+Body* ShapeFactory::CreateHorizontalCapsule(const Transform& transform, const Mesh& mesh, const Entity& entity)
 {
     Vec3 size = MeshUtil::getApproximateSize(mesh);
 
@@ -296,29 +304,25 @@ Body* ShapeFactory::CreateHorizontalCapsule(const Transform& transform, const Me
 }
 
 //Creates a Jolt AABB that perfectly matches the mesh, based on it's triangles (polygons)
-JPH::Body* ShapeFactory::CreateMeshShape(const Transform& transform, const Mesh& mesh)
+JPH::Body* ShapeFactory::CreateMeshShape(const Transform& transform, const Mesh& mesh, const Entity& entity)
 {
-    const TriangleList triangleList = MeshUtil::generateMeshTriangleList(mesh);
+    const TriangleList triangleList = MeshUtil::generateMeshTriangleList(mesh, MeshUtil::ToJolt(transform.scale));
 
     const RVec3 position(transform.position.x, transform.position.y, transform.position.z);
     const Quat rotation(transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w);
 
-    const auto meshSettings = new MeshShapeSettings(triangleList);
-
-    // Prevent dynamic objects from crossing the object
+    auto meshSettings = new MeshShapeSettings(triangleList);
     meshSettings->mActiveEdgeCosThresholdAngle = cos(90);
 
-    const RefConst scaledShapeSettings = new ScaledShapeSettings(
-        meshSettings, ConversionUtil::XMFloat3ToVec3Arg(transform.scale)
-    );
-
-    const BodyCreationSettings meshBodySettings(
-        scaledShapeSettings,
+    BodyCreationSettings meshBodySettings(
+        meshSettings,
         position,
         rotation,
         EMotionType::Static,
         Layers::NON_MOVING
     );
+
+    meshBodySettings.mUserData = to_uint64(entity);
 
     BodyInterface& bodyInterface = JoltSystem::GetBodyInterface();
     Body* body = bodyInterface.CreateBody(meshBodySettings);
@@ -327,7 +331,7 @@ JPH::Body* ShapeFactory::CreateMeshShape(const Transform& transform, const Mesh&
     return body;
 }
 
-Body* ShapeFactory::CreateConvexHullShape(const Transform& transform, const Mesh& mesh, const bool isDecor)
+Body* ShapeFactory::CreateConvexHullShape(const Transform& transform, const Mesh& mesh, const Entity& entity, const bool isDecor)
 {
     Array<Vec3> points;
     points.reserve(mesh.vertices.size());
@@ -344,7 +348,7 @@ Body* ShapeFactory::CreateConvexHullShape(const Transform& transform, const Mesh
     const RVec3 position(transform.position.x, transform.position.y, transform.position.z);
     const Quat rotation(transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w);
 
-    const BodyCreationSettings settings
+    BodyCreationSettings settings
 	{
         hullShape, 
 		position, 
@@ -352,6 +356,8 @@ Body* ShapeFactory::CreateConvexHullShape(const Transform& transform, const Mesh
 		EMotionType::Dynamic, 
 		isDecor ? Layers::MOVING_DECOR : Layers::MOVING
 	};
+
+    settings.mUserData = to_uint64(entity);
 
     BodyInterface& bodyInterface = JoltSystem::GetBodyInterface();
     Body* body = bodyInterface.CreateBody(settings);

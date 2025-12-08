@@ -243,8 +243,8 @@ void PhysicsSimulationSystem::UpdateTransforms(EntityManager& entityManager)
 	{
 		// Get jolt transform data
 		const RMat44& joltTransform = rigidBody.body->GetWorldTransform();
-		const Vec3 joltPos = joltTransform.GetTranslation();
-		const Quat joltRot = joltTransform.GetQuaternion();
+		const Vec3& joltPos = joltTransform.GetTranslation();
+		const Quat& joltRot = joltTransform.GetQuaternion();
 
 		transform.position = {joltPos.GetX(), joltPos.GetY(), joltPos.GetZ()};
 		transform.rotation = {joltRot.GetX(), joltRot.GetY(), joltRot.GetZ(), joltRot.GetW()};
@@ -291,11 +291,10 @@ void PhysicsSimulationSystem::UpdateNPCs(EntityManager& entityManager)
 		Vec3 playerPosition{ 0.0f, 0.0f, 0.0f };
 		float playerMass = 0;
 
-		for (const auto& [entity, rigidBody, controllable, eatable] : entityManager.View<RigidBody, Controllable, Eatable>())
-		{
-			playerPosition = rigidBody.body->GetPosition();
-			playerMass = eatable.mass;
-		}
+		const auto& playerEatable = entityManager.Get<Eatable>(GameState::playerEntity);
+		const Body* playerBody = entityManager.Get<RigidBody>(GameState::playerEntity).body;
+		playerPosition = playerBody->GetPosition();
+		playerMass = playerEatable.mass;
 
 		if (name == "Momsasaure" && GameState::playTime > GameState::apocalipseTime)
 		{
@@ -400,13 +399,14 @@ void PhysicsSimulationSystem::UpdateNPCs(EntityManager& entityManager)
 	for (const auto& [entity, rigidBody, aiController, name] : entityManager.View<RigidBody, AIController, Name>())
 	{
 		Vec3 newSpeed = computeNewSpeed(entity, rigidBody.body, aiController, name.name);
-
-		Vec3 currentSpeed = JoltSystem::GetBodyInterface().GetLinearVelocity(rigidBody.body->GetID());
+		;
+		static auto& bodyInterface = JoltSystem::GetBodyInterface();
+		Vec3 currentSpeed = bodyInterface.GetLinearVelocity(rigidBody.body->GetID());
 		const auto theoreticalSpeed = currentSpeed + newSpeed;
 
 		// Allow fishes to be influenced by currents
 		if (theoreticalSpeed.Length() < aiController.maxSpeed)
-			JoltSystem::GetBodyInterface().SetLinearVelocity(rigidBody.body->GetID(), currentSpeed + newSpeed);
+			bodyInterface.SetLinearVelocity(rigidBody.body->GetID(), currentSpeed + newSpeed);
 	}
 }
 

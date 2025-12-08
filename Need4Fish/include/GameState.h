@@ -22,6 +22,8 @@ struct GameState
         FINISHED
     };
 
+    inline static Entity playerEntity = INVALID_ENTITY;
+
     inline static PostProcessSettings postProcessSettings{};
 
     static void AddCollision(const std::pair<JPH::BodyID, JPH::BodyID>& collision);

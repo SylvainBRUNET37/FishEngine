@@ -33,22 +33,30 @@ Vec3 MeshUtil::getApproximateSize(const Mesh& mesh)
 	return Vec3(maxX - minX, maxY - minY, maxZ - minZ);
 }
 
-TriangleList MeshUtil::generateMeshTriangleList(const Mesh& mesh)
+TriangleList MeshUtil::generateMeshTriangleList(const Mesh& mesh, const Vec3& scale)
 {
-	const auto nIndices = mesh.indices.size();
-	assert(nIndices % 3 == 0); //If it doesn't, we won't be able to make triangles... TODO: Do this more elegantly?
-	TriangleList tList;
+    const auto nIndices = mesh.indices.size();
+    assert(nIndices % 3 == 0);
 
-	const vector<Vertex>* vertices = &mesh.vertices;
-	const vector<UINT>* indices = &mesh.indices;
-	for (auto i = 0; i < nIndices; i += 3)
-	{
-		tList.push_back(Triangle(
-				ConversionUtil::XMFloat3ToFloat3((*vertices)[(*indices)[i]].position),
-				ConversionUtil::XMFloat3ToFloat3((*vertices)[(*indices)[i + 1]].position),
-				ConversionUtil::XMFloat3ToFloat3((*vertices)[(*indices)[i + 2]].position))
-		);
-	}
+    TriangleList tList;
+    tList.reserve(nIndices / 3);
 
-	return tList;
+    const vector<Vertex>* vertices = &mesh.vertices;
+    const vector<UINT>* indices = &mesh.indices;
+
+    for (size_t i = 0; i < nIndices; i += 3)
+    {
+        Float3 v0 = ConversionUtil::XMFloat3ToFloat3((*vertices)[(*indices)[i]].position);
+        Float3 v1 = ConversionUtil::XMFloat3ToFloat3((*vertices)[(*indices)[i + 1]].position);
+        Float3 v2 = ConversionUtil::XMFloat3ToFloat3((*vertices)[(*indices)[i + 2]].position);
+
+        // Apply scale
+        v0 = Float3(v0.x * scale.GetX(), v0.y * scale.GetY(), v0.z * scale.GetZ());
+        v1 = Float3(v1.x * scale.GetX(), v1.y * scale.GetY(), v1.z * scale.GetZ());
+        v2 = Float3(v2.x * scale.GetX(), v2.y * scale.GetY(), v2.z * scale.GetZ());
+
+        tList.emplace_back(v0, v1, v2);
+    }
+
+    return tList;
 }
