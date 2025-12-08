@@ -28,10 +28,52 @@ RenderSystem::RenderSystem(RenderContext* renderContext, const std::shared_ptr<U
 	sceneBoundaries.Radius = sqrtf(7000.0f*7000.0f + 7010.5f*7010.5f);
 }
 
-void RenderSystem::RenderPostProcesses(const double deltaTime, const Camera& currentCamera)
+void RenderSystem::RenderPostProcesses(const double deltaTime, const Camera& currentCamera, EntityManager& entityManager)
 {
-	GameState::postProcessSettings.enableVignette =
-		(Camera::mode == Camera::CameraMode::FIRST_PERSON || Camera::isTemporaryFirstPerson) ? 1 : 0;
+	// Savoir si la vignette devrait apparaître
+	float playerMass = 0.0f;
+	XMFLOAT3 playerPos{ 0,0,0 };
+
+	// Position et masse du joueur
+	for (const auto& [entity, controllable, eatable, rigidBody]
+		: entityManager.View<Controllable, Eatable, RigidBody>())
+	{
+		playerMass = eatable.mass;
+
+		auto p = rigidBody.body->GetPosition();
+		playerPos = { p.GetX(), p.GetY(), p.GetZ() };
+		break;
+	}
+
+	bool isThreatNearby = false;
+	constexpr float DANGER_DISTANCE = 600.0f; // Distance de détection ajustable
+
+	// Parcourir les autres
+	for (const auto& [entity, eatable, rigidBody]
+		: entityManager.View<Eatable, RigidBody>())
+	{
+		if (eatable.mass <= playerMass)
+			continue;
+
+		// Regarder la distance
+		auto p = rigidBody.body->GetPosition();
+		XMFLOAT3 creaturePos{ p.GetX(), p.GetY(), p.GetZ() };
+
+		float dx = creaturePos.x - playerPos.x;
+		float dy = creaturePos.y - playerPos.y;
+		float dz = creaturePos.z - playerPos.z;
+		float distSq = dx * dx + dy * dy + dz * dz;
+
+		if (distSq < DANGER_DISTANCE * DANGER_DISTANCE)
+		{
+			isThreatNearby = true;
+			break;
+		}
+	}
+
+	// Vignette ou pas?
+	GameState::postProcessSettings.enableVignette = isThreatNearby ? 1 : 0;
+
 
 	GameState::postProcessSettings.deltaTime = static_cast<float>(deltaTime);
 
@@ -217,8 +259,9 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 	RenderBillboards(entityManager, currentCamera);
 	RenderParticles(entityManager, currentCamera);
 
-	ComputeDistortionZones(entityManager);
-	RenderPostProcesses(deltaTime, currentCamera);
+	ComputeDistortionZones(entityManager);	
+
+	RenderPostProcesses(deltaTime, currentCamera, entityManager);
 
 	uiManager->UpdateSprites(*renderContext);
 	RenderUI(entityManager);

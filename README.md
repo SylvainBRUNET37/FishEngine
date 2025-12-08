@@ -79,7 +79,7 @@ Afin de rendre la surface de l'eau et de la lave, un shader "génère" des textu
 
 ### Vignette
 
-La vignette donne un effet de vision _ensanglantée_ lorsque le joueur passe à la première personne.
+La vignette donne un effet de vision _ensanglantée_ lorsque le joueur passe près d'une créature plus grande (plus grande masse) que soi, permettant un temps de réaction pour éviter d'être mangé et de perdre la partie.
 
 ![Vignette](./docs/static/img/vignette.png)
 

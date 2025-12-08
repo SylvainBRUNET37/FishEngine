@@ -27,7 +27,7 @@ private:
 	std::vector<BillboardData> particleData;
 
 	void RenderUI(EntityManager& entityManager);
-	void RenderPostProcesses(double deltaTime, const Camera& currentCamera);
+	void RenderPostProcesses(double deltaTime, const Camera& currentCamera, EntityManager& entityManager);
 	void ComputeDistortionZones(EntityManager& entityManager);
 	void RenderBillboards(EntityManager& entityManager, const Camera& currentCamera);
 	void RenderParticles(EntityManager& entityManager, const Camera& currentCamera);
