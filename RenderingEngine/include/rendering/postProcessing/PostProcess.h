@@ -25,7 +25,6 @@ private:
     ComPtr<ID3D11RenderTargetView> sceneRenderTargetView;
     ComPtr<ID3D11ShaderResourceView> sceneShaderResourceView;
     ComPtr<ID3D11SamplerState> postProcessSampler;
-
 };
 
 #endif

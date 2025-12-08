@@ -9,6 +9,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+#include "GameState.h"
 #include "rendering/texture/TextureManager.h"
 #include "rendering/device/RenderContext.h"
 #include "rendering/graphics/Mesh.h"
@@ -72,13 +73,13 @@ SceneResource SceneLoader::LoadScene(const filesystem::path& filePath, ShaderBan
 	// Load meshes
 	sceneRes.meshes.reserve(scene->mNumMeshes);
 	for (unsigned int i = 0; i < scene->mNumMeshes; i++)
-		sceneRes.meshes.push_back(ProcessMesh(scene->mMeshes[i], XMMatrixIdentity()));
+		sceneRes.meshes.push_back(ProcessMesh(scene->mMeshes[i], XMMatrixIdentity(), i));
 
 	// Load materials
 	sceneRes.materials.reserve(scene->mNumMaterials);
 	for (unsigned int i = 0; i < scene->mNumMaterials; i++)
 			sceneRes.materials.push_back(
-			ProcessMaterial(filePath.parent_path(), scene, scene->mMaterials[i], shaderBank));
+			ProcessMaterial(filePath.parent_path(), scene, scene->mMaterials[i], shaderBank, i));
 
 	// Build node hierarchy
 	nodes.reserve(scene->mNumMeshes);
@@ -169,7 +170,7 @@ void SceneLoader::ReadSceneMetaDatas(const aiScene* scene)
 	sceneMetaData = metaDatas["materials"];
 }
 
-Mesh SceneLoader::ProcessMesh(const aiMesh* mesh, const XMMATRIX& transform) const
+Mesh SceneLoader::ProcessMesh(const aiMesh* mesh, const XMMATRIX& transform, unsigned int meshId) const
 {
 	std::vector<Vertex> vertices;
 	std::vector<UINT> indices;
@@ -212,6 +213,9 @@ Mesh SceneLoader::ProcessMesh(const aiMesh* mesh, const XMMATRIX& transform) con
 
 	const UINT materialIndex = mesh->mMaterialIndex;
 
+	if (mesh->mName.C_Str() == "Small_1_SMall_0"s) // meterotie
+		GameState::meteoriteMeshIndice = meshId;
+
 	return Mesh(std::move(vertices), std::move(indices), materialIndex, device);
 }
 
@@ -219,7 +223,7 @@ Material SceneLoader::ProcessMaterial(
 	const filesystem::path& materialPath,
 	const aiScene* scene,
 	const aiMaterial* material,
-	ShaderBank& shaderBank)
+	ShaderBank& shaderBank, unsigned int materialId)
 {
 	static constexpr int materialCbRegisterNumber = 2;
 

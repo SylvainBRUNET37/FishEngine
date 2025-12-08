@@ -297,6 +297,37 @@ void PhysicsSimulationSystem::UpdateNPCs(EntityManager& entityManager)
 			playerMass = eatable.mass;
 		}
 
+		if (name == "Momsasaure" && GameState::playTime > GameState::apocalipseTime)
+		{
+			// Direction vers le joueur
+			Vec3 directionToPlayer = (playerPosition - body->GetPosition()).Normalized();
+
+			// Vitesse lente, mais constante
+			constexpr float MOMSASAURE_SPEED = 7.0f;
+			newSpeed = directionToPlayer * MOMSASAURE_SPEED;
+
+			// Rotation pour faire face au joueur
+			Vec3 horizontalDir = Vec3(directionToPlayer.GetX(), 0.0f, directionToPlayer.GetZ()).Normalized();
+			float targetYaw = atan2f(horizontalDir.GetX(), horizontalDir.GetZ());
+
+			JPH::Quat targetRotation = JPH::Quat::sRotation(Vec3::sAxisY(), targetYaw);
+			const Quat currentRotation = body->GetRotation();
+			const Quat delta = (targetRotation * currentRotation.Conjugated()).Normalized();
+
+			Vec3 axis;
+			float angle;
+			delta.GetAxisAngle(axis, angle);
+
+			if (angle > 0.0001f)
+			{
+				constexpr float ROTATION_SPEED = 0.5f;
+				const Vec3 angularVelocity = axis * angle * ROTATION_SPEED;
+				body->SetAngularVelocity(angularVelocity);
+			}
+
+			return newSpeed;
+		}
+
 		// Panic mode
 		auto diff = body->GetPosition() - playerPosition;
 

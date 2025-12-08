@@ -17,7 +17,7 @@ private:
 
 	// The sensor if the first of the pair
 	inline static std::vector<std::pair<JPH::BodyID, JPH::BodyID>> activeContacts;
-	static inline std::mutex pendingMutex;
+	inline static std::mutex pendingMutex;
 
 	void Update(double deltaTime, EntityManager& entityManager) override;
 

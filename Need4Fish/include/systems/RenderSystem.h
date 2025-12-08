@@ -27,7 +27,7 @@ private:
 	std::vector<BillboardData> particleData;
 
 	void RenderUI(EntityManager& entityManager);
-	void RenderPostProcesses(double deltaTime, const Camera& currentCamera);
+	void RenderPostProcesses(double deltaTime, const Camera& currentCamera, EntityManager& entityManager);
 	void ComputeDistortionZones(EntityManager& entityManager);
 	void RenderBillboards(EntityManager& entityManager, const Camera& currentCamera);
 	void RenderParticles(EntityManager& entityManager, const Camera& currentCamera);
@@ -39,8 +39,6 @@ private:
 	void DrawSceneToShadowMap(EntityManager& entityManager);
 
 	void Present() const { renderContext->Present(); }
-
-	static FrameBuffer CreateDirectionalLight();
 
 	static const int SHADOW_MAP_SIZE = 4096; //shadow map size must also be defined in LightningPS.hlsl
 	//4096 seems to be the maximum before a performance hit

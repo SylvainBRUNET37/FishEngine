@@ -52,7 +52,7 @@ Body* ShapeFactory::CreateCube(const Transform& transform)
     return body;
 }
 
-Body* ShapeFactory::CreateCube(const Transform& transform, const Mesh& mesh)
+Body* ShapeFactory::CreateCube(const Transform& transform, const Mesh& mesh, JPH::ObjectLayer layer)
 {
     // Apply scale to the box
     Vec3 size = MeshUtil::getApproximateSize(mesh);
@@ -70,12 +70,13 @@ Body* ShapeFactory::CreateCube(const Transform& transform, const Mesh& mesh)
         position,
         rotation,
         EMotionType::Dynamic,
-        Layers::MOVING
+        layer
     );
 
     boxSettings.mLinearDamping = 0.9f;
     boxSettings.mAngularDamping = 0.9f;
     boxSettings.mRestitution = 0.75f;
+    boxSettings.mMaxLinearVelocity = 10'000.0f;
 
     BodyInterface& bodyInterface = JoltSystem::GetBodyInterface();
     Body* body = bodyInterface.CreateBody(boxSettings);
