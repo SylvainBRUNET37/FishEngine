@@ -83,13 +83,15 @@ void ApocalypseSystem::Update(const double deltaTime, EntityManager& entityManag
 	if (isApocalypse)
 	{
 
-		if (GameState::playTime >= apocalypseTime)
+		auto elapsed = GameState::playTime - apocalypseStart;
+
+		if (elapsed >= apocalypseTime)
 		{
 			isApocalypse = false;
 		}
 
 		// LIGHTS
-		float time = static_cast<float>(GameState::playTime / apocalypseTime);
+		float time = static_cast<float>(elapsed / apocalypseTime);
 		time = std::clamp(time, 0.0f, 1.0f); // clamp to avoid problems
 
 		DirectionalLight current{};
