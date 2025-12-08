@@ -284,10 +284,13 @@ void RenderSystem::BuildShadowTransform() {
 	//Orthographic frustrum in light space encloses scene...
 	float left = sphereCenterLightSpace.x - sceneBoundaries.Radius;
 	float bottom = sphereCenterLightSpace.y - sceneBoundaries.Radius;
+	//float bottom = -6500.0f; //magic number from blender for tighter frustrum
 	float nnear = sphereCenterLightSpace.z - sceneBoundaries.Radius; //near is a reserved word, it seems
+	//float nnear = 3050.0f; //magic number from blender for a tighter shadow map
 	float right = sphereCenterLightSpace.x + sceneBoundaries.Radius;
 	float top = sphereCenterLightSpace.y + sceneBoundaries.Radius;
 	float ffar = sphereCenterLightSpace.z + sceneBoundaries.Radius; //far is a reserved word, it seems
+	//float ffar = 15250.0f; //magic number from blender for a tighter frustrum
 	XMMATRIX LightProjectionMatrix = XMMatrixOrthographicOffCenterLH(left, right, bottom, top, nnear, ffar);
 
 	//Transform NDC space [-1, +1]^2 to texture space [0,1]^2
