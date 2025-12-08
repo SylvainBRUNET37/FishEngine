@@ -68,6 +68,7 @@ ApocalypseSystem::ApocalypseSystem() : baseSceneTint{},
                                        isApocalypse{false},
                                        hasApocalypsePlayed{false}
 {
+	GameState::apocalipseTime = apocalypseTime;
 }
 
 void ApocalypseSystem::Update(const double deltaTime, EntityManager& entityManager)

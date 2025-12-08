@@ -48,6 +48,7 @@ struct GameState
     };
 
     inline static UINT meteoriteMeshIndice = UINT32_MAX;
+    inline static double apocalipseTime{};
 
 private:
     inline static std::queue<std::pair<JPH::BodyID, JPH::BodyID>> detectedCollisions;
