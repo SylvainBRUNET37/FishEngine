@@ -22,9 +22,6 @@ private:
 	DirectionalLight baseLight;
 	DirectionalLight apocalypseLight;
 
-	double elapsedTime;
-	double apocalypseElapsedTime;
-
 	double apocalypseStart;
 	double apocalypseTime;
 
