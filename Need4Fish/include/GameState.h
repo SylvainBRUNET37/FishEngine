@@ -46,6 +46,8 @@ struct GameState
         .pad = 0.0f
     };
 
+    inline static UINT meteoriteMeshIndice = UINT32_MAX;
+
 private:
     inline static std::queue<std::pair<JPH::BodyID, JPH::BodyID>> detectedCollisions;
     inline static std::mutex pendingMutex;

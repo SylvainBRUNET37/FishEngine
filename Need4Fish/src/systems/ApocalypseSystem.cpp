@@ -2,12 +2,22 @@
 #include "systems/ApocalypseSystem.h"
 
 #include "GameState.h"
+#include "Locator.h"
+#include "physicsEngine/JoltSystem.h"
+#include "PhysicsEngine/ShapeFactory.h"
+#include "resources/ResourceManager.h"
 #include "utils/MathsUtils.h"
 
 using namespace DirectX;
 
 namespace
 {
+#ifdef NDEBUG
+	constexpr float METEOR_SPAWN_INTERVAL = 0.05;
+#else
+	constexpr float METEOR_SPAWN_INTERVAL = 0.3;
+#endif
+
 	float Lerp(const float a, const float b, const float t)
 	{
 		return a + (b - a) * t;
@@ -47,12 +57,14 @@ ApocalypseSystem::ApocalypseSystem() : baseSceneTint{},
                                        apocalypseElapsedTime{0},
                                        apocalypseStart
                                        {
-	                                       MathsUtils::RandomBetween(APOCALYPSE_START_MIN, APOCALYPSE_TIME_MAX)
+	                                       MathsUtils::RandomBetween(APOCALYPSE_START_MIN, APOCALYPSE_START_MAX)
                                        },
                                        apocalypseTime
                                        {
 	                                       MathsUtils::RandomBetween(APOCALYPSE_TIME_MIN, APOCALYPSE_TIME_MAX)
                                        },
+                                       meteorSpawnTimer(0),
+                                       meteorSpawnInterval(METEOR_SPAWN_INTERVAL),
                                        isApocalypse{false},
                                        hasApocalypsePlayed{false}
 {
@@ -80,6 +92,7 @@ void ApocalypseSystem::Update(const double deltaTime, EntityManager& entityManag
 			isApocalypse = false;
 		}
 
+		// LIGHTS
 		float time = static_cast<float>(apocalypseElapsedTime / apocalypseTime);
 		time = std::clamp(time, 0.0f, 1.0f); // clamp to avoid problems
 
@@ -97,6 +110,63 @@ void ApocalypseSystem::Update(const double deltaTime, EntityManager& entityManag
 		);
 
 		GameState::dirLight = current;
+
+		meteorSpawnTimer += deltaTime;
+
+		if (meteorSpawnTimer >= meteorSpawnInterval)
+		{
+			meteorSpawnTimer -= meteorSpawnInterval;
+
+			// Compute meteorite spawn zone
+			constexpr XMFLOAT3 middleSpawnPos = {0.0, 22000.0, 0.0};
+			constexpr XMFLOAT3 spawnHalfextend = {6000.0, 1000.0, 6000.0};
+			const XMFLOAT3 meteoritePos = MathsUtils::RandomPosInSquare(middleSpawnPos, spawnHalfextend);
+
+			// Random roation
+			const float yaw = MathsUtils::RandomBetween(0.0f, XM_2PI);
+			const float pitch = MathsUtils::RandomBetween(0.0f, XM_2PI);
+			const float roll = MathsUtils::RandomBetween(0.0f, XM_2PI);
+
+			XMVECTOR randomQuat = XMQuaternionRotationRollPitchYaw(pitch, yaw, roll);
+			randomQuat = XMQuaternionNormalize(randomQuat);
+
+			XMFLOAT4 meteoriteRotation;
+			XMStoreFloat4(&meteoriteRotation, randomQuat);
+
+			// random scale
+			const auto scale = MathsUtils::RandomBetween(0.3f, 5.0f);
+			const XMFLOAT3 meteoriteScale =
+			{
+				scale,
+				scale,
+				scale
+			};
+
+			// ROCKS
+			auto& rsManager = Locator::Get<ResourceManager>();
+			const auto meteoriteMeshIndice = GameState::meteoriteMeshIndice;
+			const auto metoriteEntity = entityManager.CreateEntity();
+			const auto& transform = entityManager.AddComponent<Transform>(metoriteEntity, Transform
+			                                                              {
+				                                                              .position = meteoritePos,
+				                                                              .rotation = meteoriteRotation,
+				                                                              .scale = meteoriteScale
+			                                                              });
+			entityManager.AddComponent<MeshInstance>(metoriteEntity, meteoriteMeshIndice);
+			const auto& mesh = rsManager.GetMesh(meteoriteMeshIndice);
+			const auto& rigidBody = entityManager.AddComponent<RigidBody>(metoriteEntity,
+			                                                        ShapeFactory::CreateCube(
+				                                                        transform, mesh, Layers::MOVING_DECOR));
+
+			static auto& bodyInterface = JoltSystem::GetBodyInterface();
+			bodyInterface.SetAngularVelocity(rigidBody.body->GetID(),
+			                                 JPH::Vec3
+				{
+												MathsUtils::RandomBetween(30.0f, 100.0f),
+												MathsUtils::RandomBetween(30.0f, 100.0f),
+												MathsUtils::RandomBetween(30.0f, 100.0f)
+			                                 });
+		}
 	}
 }
 

@@ -13,8 +13,8 @@ private:
 	static constexpr double APOCALYPSE_START_MIN = 2; // in second
 	static constexpr double APOCALYPSE_START_MAX = 4; // in second
 
-	static constexpr double APOCALYPSE_TIME_MIN = 30; // in second
-	static constexpr double APOCALYPSE_TIME_MAX = 45; // in second
+	static constexpr double APOCALYPSE_TIME_MIN = 15; // in second
+	static constexpr double APOCALYPSE_TIME_MAX = 30; // in second
 
 	DirectX::XMFLOAT3 baseSceneTint;
 	DirectX::XMFLOAT3 apocalypseSceneTint;
@@ -27,6 +27,9 @@ private:
 
 	double apocalypseStart;
 	double apocalypseTime;
+
+	double meteorSpawnTimer;
+	double meteorSpawnInterval;
 
 	bool isApocalypse;
 	bool hasApocalypsePlayed;
