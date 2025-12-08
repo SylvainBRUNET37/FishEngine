@@ -331,12 +331,14 @@ void CameraSystem::SetMouseCursor()
 
 void CameraSystem::ScaleCamera(float scaleFactor)
 {
+	float adjustedScaleFactor = scaleFactor * 0.9f;
+
 	// Calculer les valeurs à atteindre
-	const float targetDistance = Camera::distance * scaleFactor;
-	const float targetHeightOffset = Camera::heightOffset * scaleFactor;
-	const float targetMinDistance = Camera::minDistance * scaleFactor;
-	const float targetMaxDistance = Camera::maxDistance * scaleFactor;
-	const float targetZoomSpeed = Camera::zoomSpeed * scaleFactor;
+	const float targetDistance = Camera::distance * adjustedScaleFactor;
+	const float targetHeightOffset = Camera::heightOffset * adjustedScaleFactor;
+	const float targetMinDistance = Camera::minDistance * adjustedScaleFactor;
+	const float targetMaxDistance = Camera::maxDistance * adjustedScaleFactor;
+	const float targetZoomSpeed = Camera::zoomSpeed * adjustedScaleFactor;
 
 	// Calculer les deltas
 	Camera::deltaDistance = targetDistance - Camera::distance;

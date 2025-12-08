@@ -26,7 +26,7 @@ static void KillRecursively(EntityManager& entityManager, const Entity preyEntit
 [[nodiscard]] static float CalculateGrowthFactor(const float predatorMass, const float preyMass)
 {
 	// Linear proportionnal growth
-	auto MAX = 2000.0f; // when this is reached, mass continues to grow but not the mesh / hitbox
+	auto MAX = 1400.0f; // when this is reached, mass continues to grow but not the mesh / hitbox
 
 	if (predatorMass > MAX)
 		return 0.0f;
