@@ -32,25 +32,17 @@ struct GameState
     inline static Entity currentCameraEntity = INVALID_ENTITY;
     inline static auto currentState = PLAYING;
 
-    inline static float playTime = 0.0f;
-    //inline static std::chrono::system_clock::time_point startTime;
-
-    inline static bool isGrowing = false;
-
-    inline static double rDeltaTime = 0.0;
-    inline static DirectX::XMFLOAT3 colorTint = {0, 0, 0}; // color added as post process
-    inline static DirectionalLight dirLight
-    {
-        .ambient = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
-        .diffuse = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 0.8f),
-        .specular = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
-
-        .direction = DirectX::XMFLOAT3(-0.5f, -1.0f, 0.5f),
-        .pad = 0.0f
-    };
+    inline static float playTime{};
+    inline static double rDeltaTime{};
+    inline static bool isGrowing{};
+    inline static double apocalipseTime{};
+    
+    inline static DirectX::XMFLOAT3 colorTint{}; // color added as post process
+    inline static DirectionalLight dirLight{};
 
     inline static UINT meteoriteMeshIndice = UINT32_MAX;
-    inline static double apocalipseTime{};
+
+    static void Init();
 
 private:
     inline static std::queue<std::pair<JPH::BodyID, JPH::BodyID>> detectedCollisions;

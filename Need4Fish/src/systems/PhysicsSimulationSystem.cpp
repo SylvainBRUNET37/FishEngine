@@ -89,7 +89,7 @@ void PhysicsSimulationSystem::UpdateControllables(EntityManager& entityManager)
 		Vec3 newSpeed = Vec3(0.0f, 0.0f, 0.0f);
 		bool speedChanged = false;
 
-		// Reset du roll
+		// Init du roll
 		inputRoll = 0.0f;
 
 		if (GetAsyncKeyState('W') & 0x8000)

@@ -167,6 +167,11 @@ void ApocalypseSystem::Update(const double deltaTime, EntityManager& entityManag
 	}
 }
 
+void ApocalypseSystem::Reset()
+{
+	*this = {};
+}
+
 DirectionalLight ApocalypseSystem::CreateApocalypseLight()
 {
 	DirectionalLight apocalypseLight{};

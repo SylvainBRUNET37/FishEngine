@@ -27,9 +27,11 @@ GameEngine::GameEngine(RenderContext* renderContext_)
 	  particleSystem{renderContext->GetDevice()},
 	  uiManager{std::make_shared<UIManager>(renderContext)}
 {
-	CameraSystem::SetMouseCursor();
+	
 
 	auto& sceneResources = Locator::Get<ResourceManager>().LoadScene();
+
+	CameraSystem::SetMouseCursor();
 
 	// Care about the order of construction, it will be the order of update calls
 	systems.emplace_back(std::make_unique<PhysicsSimulationSystem>());
@@ -230,9 +232,12 @@ void GameEngine::RestartGame()
 void GameEngine::InitGame()
 {
 	entityManager = EntityManagerFactory::Create(Locator::Get<ResourceManager>().GetSceneResource());
-	particleSystem.Reset();
-
+	GameState::Init();
 	PowerSystem::ResetPowers();
+
+	particleSystem.Reset();
+	for (const auto& system : systems)
+		system->Reset();
 
 	const int screenWidth = GetSystemMetrics(SM_CXSCREEN);
 	const int screenHeight = GetSystemMetrics(SM_CYSCREEN);
@@ -254,7 +259,6 @@ void GameEngine::InitGame()
 	auto& cameraComponent = entityManager->AddComponent<Camera>(cameraEntity, camera);
 
 	GameState::currentCameraEntity = cameraEntity;
-	GameState::postProcessSettings = {};
 
 	// Assign the controllable entity to the camera (it's not a pretty way of doing it but it works)
 	unsigned short nbControllable = 0;

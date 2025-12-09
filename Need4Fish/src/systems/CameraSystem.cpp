@@ -144,7 +144,7 @@ void CameraSystem::ComputeCameraPosition(Camera& camera, const Transform& transf
 
 		if (hasStayedMinTime && distanceRecovered)
 		{
-			// Reset les valeurs temporaires
+			// Init les valeurs temporaires
 			camera.isTemporaryFirstPerson = false;
 			camera.tempFPExitCooldown = reentryCooldown;
 			camera.tempFPTime = 0.0f;

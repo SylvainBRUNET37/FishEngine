@@ -32,6 +32,7 @@ private:
 	bool hasApocalypsePlayed;
 
 	void Update(double deltaTime, EntityManager& entityManager) override;
+	void Reset() override;
 
 	static DirectionalLight CreateApocalypseLight();
 };

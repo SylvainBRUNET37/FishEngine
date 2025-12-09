@@ -9,12 +9,13 @@ struct System
 	System() = default;
 	virtual ~System() = default;
 
-	System(const System&) = delete;
-	System(System&&) = delete;
-	System& operator=(const System&) = delete;
-	System& operator=(System&&) = delete;
+	System(const System&) = default;
+	System(System&&) = default;
+	System& operator=(const System&) = default;
+	System& operator=(System&&) = default;
 
 	virtual void Update(double deltaTime, EntityManager& entityManager) = 0;
+	virtual void Reset() {}
 };
 
 #endif
