@@ -15,7 +15,7 @@ namespace
 #ifdef NDEBUG
 	constexpr float METEOR_SPAWN_INTERVAL = 0.1;
 #else
-	constexpr float METEOR_SPAWN_INTERVAL = 0.6;
+	constexpr float METEOR_SPAWN_INTERVAL = 2.0;
 #endif
 
 	float Lerp(const float a, const float b, const float t)
@@ -114,8 +114,8 @@ void ApocalypseSystem::Update(const double deltaTime, EntityManager& entityManag
 			meteorSpawnTimer -= meteorSpawnInterval;
 
 			// Compute meteorite spawn zone
-			constexpr XMFLOAT3 middleSpawnPos = {0.0, 22000.0, 0.0};
-			constexpr XMFLOAT3 spawnHalfextend = {6000.0, 1000.0, 6000.0};
+			constexpr XMFLOAT3 middleSpawnPos = {0.0,30000.0, 0.0};
+			constexpr XMFLOAT3 spawnHalfextend = {4000.0, 5000.0,4000.0};
 			const XMFLOAT3 meteoritePos = MathsUtils::RandomPosInSquare(middleSpawnPos, spawnHalfextend);
 
 			// Random roation

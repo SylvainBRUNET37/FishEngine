@@ -213,7 +213,7 @@ Mesh SceneLoader::ProcessMesh(const aiMesh* mesh, const XMMATRIX& transform, uns
 
 	const UINT materialIndex = mesh->mMaterialIndex;
 
-	if (mesh->mName.C_Str() == "Small_1_SMall_0"s) // meterotie
+	if (mesh->mName.C_Str() == "Small_5_SMall_0"s) // meteorite mesh
 		GameState::meteoriteMeshIndice = meshId;
 
 	return Mesh(std::move(vertices), std::move(indices), materialIndex, device);
