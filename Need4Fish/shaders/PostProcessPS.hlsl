@@ -72,7 +72,7 @@ float3 ComputeGodRays(float2 uv)
         decay *= GOD_RAY_DECAY;
     }
 
-    return illumination * GOD_RAY_INTENSITY;
+    return illumination * (GOD_RAY_INTENSITY - sceneColorTint.r * 3.5);
 }
 
 float2 HeatwaveDistortion(float2 uv, float time)
