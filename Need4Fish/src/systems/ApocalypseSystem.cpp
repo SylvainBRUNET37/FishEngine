@@ -71,7 +71,6 @@ ApocalypseSystem::ApocalypseSystem() : baseSceneTint{},
 
 void ApocalypseSystem::Update(const double deltaTime, EntityManager& entityManager)
 {
-
 	// Start the apocalypse if the time has been reached
 	if (GameState::playTime >= apocalypseStart && !hasApocalypsePlayed)
 	{
@@ -82,8 +81,7 @@ void ApocalypseSystem::Update(const double deltaTime, EntityManager& entityManag
 	// !!! A P O C A L Y P S E !!!
 	if (isApocalypse)
 	{
-
-		auto elapsed = GameState::playTime - apocalypseStart;
+		const auto elapsed = GameState::playTime - apocalypseStart;
 
 		if (elapsed >= apocalypseTime)
 		{
@@ -132,7 +130,7 @@ void ApocalypseSystem::Update(const double deltaTime, EntityManager& entityManag
 			XMStoreFloat4(&meteoriteRotation, randomQuat);
 
 			// random scale
-			const auto scale = MathsUtils::RandomBetween(0.3f, 5.0f);
+			const auto scale = MathsUtils::RandomBetween(0.3f, 3.0f);
 			const XMFLOAT3 meteoriteScale =
 			{
 				scale,
@@ -153,16 +151,17 @@ void ApocalypseSystem::Update(const double deltaTime, EntityManager& entityManag
 			entityManager.AddComponent<MeshInstance>(metoriteEntity, meteoriteMeshIndice);
 			const auto& mesh = rsManager.GetMesh(meteoriteMeshIndice);
 			const auto& rigidBody = entityManager.AddComponent<RigidBody>(metoriteEntity,
-			                                                        ShapeFactory::CreateCube(
-				                                                        transform, mesh, metoriteEntity, Layers::MOVING_DECOR));
+			                                                              ShapeFactory::CreateCube(
+				                                                              transform, mesh, metoriteEntity,
+				                                                              Layers::MOVING_DECOR));
 
 			static auto& bodyInterface = JoltSystem::GetBodyInterface();
 			bodyInterface.SetAngularVelocity(rigidBody.body->GetID(),
 			                                 JPH::Vec3
-				{
-												MathsUtils::RandomBetween(30.0f, 100.0f),
-												MathsUtils::RandomBetween(30.0f, 100.0f),
-												MathsUtils::RandomBetween(30.0f, 100.0f)
+			                                 {
+				                                 MathsUtils::RandomBetween(1.0f, 5.0f),
+				                                 MathsUtils::RandomBetween(1.0f, 5.0f),
+				                                 MathsUtils::RandomBetween(1.0f, 5.0f)
 			                                 });
 		}
 	}

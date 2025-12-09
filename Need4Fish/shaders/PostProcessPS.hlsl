@@ -18,7 +18,7 @@ struct VSOutput
 
 cbuffer PostProcessSettings : register(b0)
 {
-    int enableVignette;
+    float closestEnnemiDistance;
     int enableChromaticAberration;
     float deltaTime;
     float pad0;
@@ -120,8 +120,7 @@ float4 PostProcessPS(VSOutput input) : SV_TARGET
 
     color.rgb += sceneColorTint;
 
-    if (enableVignette)
-        color = ApplyVignette(color, uv);
+	color = ApplyVignette(color, uv, closestEnnemiDistance);
 
     return color;
 }

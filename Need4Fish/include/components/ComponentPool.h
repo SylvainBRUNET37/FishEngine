@@ -11,7 +11,7 @@
 #ifndef NDEBUG
 inline static constexpr size_t MAX_ENTITIES = 4'096;
 #else
-inline static constexpr size_t MAX_ENTITIES = 32'536;
+inline static constexpr size_t MAX_ENTITIES = 20'000;
 #endif
 
 

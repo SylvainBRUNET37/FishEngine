@@ -57,7 +57,7 @@ public:
 	}
 
 private:
-	static constexpr size_t TEMP_ALLOCATOR_SIZE_MB = 10;
+	static constexpr size_t TEMP_ALLOCATOR_SIZE_MB = 16;
 	static constexpr size_t TEMP_ALLOCATOR_SIZE = TEMP_ALLOCATOR_SIZE_MB * 1024 * 1024;
 
 	inline static std::unique_ptr<JPH::PhysicsSystem> physicsSystem = nullptr;

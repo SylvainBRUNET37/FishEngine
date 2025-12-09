@@ -5,7 +5,7 @@
 
 struct alignas(16) PostProcessSettings
 {
-    int enableVignette;
+    float closestEnnemiDistance;
     int enableChromaticAberration;
     float deltaTime;
     float padding0;

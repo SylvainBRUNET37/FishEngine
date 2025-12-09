@@ -25,68 +25,56 @@ RenderSystem::RenderSystem(RenderContext* renderContext, const std::shared_ptr<U
 
 	//GOOD code would determine these dynamically...
 	sceneBoundaries.Center = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	sceneBoundaries.Radius = sqrtf(7000.0f*7000.0f + 7010.5f*7010.5f);
+	sceneBoundaries.Radius = sqrtf(7000.0f * 7000.0f + 7010.5f * 7010.5f);
 }
 
-void RenderSystem::RenderPostProcesses(const double deltaTime, const Camera& currentCamera, EntityManager& entityManager)
+void RenderSystem::RenderPostProcesses(const double deltaTime, const Camera& currentCamera,
+                                       EntityManager& entityManager)
 {
-	// Savoir si la vignette devrait apparaître
-	float playerMass = 0.0f;
-	XMFLOAT3 playerPos{ 0,0,0 };
+	const auto& playerEatable = entityManager.Get<Eatable>(GameState::playerEntity);
+	const JPH::Body* playerBody = entityManager.Get<RigidBody>(GameState::playerEntity).body;
+	const auto playerJoltPos = playerBody->GetPosition();
 
-	// Position et masse du joueur
-	for (const auto& [entity, controllable, eatable, rigidBody]
-		: entityManager.View<Controllable, Eatable, RigidBody>())
-	{
-		playerMass = eatable.mass;
-
-		auto p = rigidBody.body->GetPosition();
-		playerPos = { p.GetX(), p.GetY(), p.GetZ() };
-		break;
-	}
-
-	bool isThreatNearby = false;
-	constexpr float DANGER_DISTANCE = 600.0f; // Distance de détection ajustable
+	const XMFLOAT3 playerPos = {playerJoltPos.GetX(), playerJoltPos.GetY(), playerJoltPos.GetZ()};
+	const float playerMass = playerEatable.mass;
 
 	// Parcourir les autres
+	float closestEnnemiDistance = FLT_MAX;
 	for (const auto& [entity, eatable, rigidBody]
-		: entityManager.View<Eatable, RigidBody>())
+	     : entityManager.View<Eatable, RigidBody>())
 	{
 		if (eatable.mass <= playerMass)
 			continue;
 
 		// Regarder la distance
 		auto p = rigidBody.body->GetPosition();
-		XMFLOAT3 creaturePos{ p.GetX(), p.GetY(), p.GetZ() };
+		const XMFLOAT3 creaturePos{p.GetX(), p.GetY(), p.GetZ()};
 
-		float dx = creaturePos.x - playerPos.x;
-		float dy = creaturePos.y - playerPos.y;
-		float dz = creaturePos.z - playerPos.z;
-		float distSq = dx * dx + dy * dy + dz * dz;
+		const float dx = creaturePos.x - playerPos.x;
+		const float dy = creaturePos.y - playerPos.y;
+		const float dz = creaturePos.z - playerPos.z;
 
-		if (distSq < DANGER_DISTANCE * DANGER_DISTANCE)
-		{
-			isThreatNearby = true;
-			break;
-		}
+		const float ennemiDistance = dx * dx + dy * dy + dz * dz;
+
+		if (ennemiDistance < closestEnnemiDistance)
+			closestEnnemiDistance = ennemiDistance;
 	}
 
-	// Vignette ou pas?
-	GameState::postProcessSettings.enableVignette = isThreatNearby ? 1 : 0;
-
+	// Vignette par rapport à la distance
+	GameState::postProcessSettings.closestEnnemiDistance = closestEnnemiDistance;
 
 	GameState::postProcessSettings.deltaTime = static_cast<float>(deltaTime);
 
 	// Set camera data
 	XMStoreFloat4x4(&GameState::postProcessSettings.invProjection,
-		XMMatrixTranspose(XMMatrixInverse(nullptr, currentCamera.matProj)));
-	XMStoreFloat4x4(&GameState::postProcessSettings.invView, 
-	XMMatrixTranspose(XMMatrixInverse(nullptr, currentCamera.matView)));
+	                XMMatrixTranspose(XMMatrixInverse(nullptr, currentCamera.matProj)));
+	XMStoreFloat4x4(&GameState::postProcessSettings.invView,
+	                XMMatrixTranspose(XMMatrixInverse(nullptr, currentCamera.matView)));
 
 	const auto a = XMLoadFloat4x4(&frameBuffer.matViewProj);
 
 	XMStoreFloat4x4(&GameState::postProcessSettings.viewProj,
-		XMMatrixTranspose(a));
+	                XMMatrixTranspose(a));
 
 	XMStoreFloat3(&GameState::postProcessSettings.cameraPos, Camera::position);
 
@@ -151,7 +139,7 @@ void RenderSystem::RenderParticles(EntityManager& entityManager, const Camera& c
 			billboard = &particle.billboard;
 
 		// Assume that: scale X = scale Y
-		particleData[i] = { particle.billboard.position, particle.billboard.scale.x };
+		particleData[i] = {particle.billboard.position, particle.billboard.scale.x};
 		++i;
 	}
 
@@ -170,7 +158,8 @@ void RenderSystem::RenderMeshes(EntityManager& entityManager)
 		if (FrustumCuller::IsMeshCulled(mesh, transform))
 			continue;
 
-		renderer.RenderWithShadowMap(mesh, renderContext->GetContext(), transform, XMLoadFloat4x4(&shadowTransform), shadowMap->DepthMapSRV());
+		renderer.RenderWithShadowMap(mesh, renderContext->GetContext(), transform, XMLoadFloat4x4(&shadowTransform),
+		                             shadowMap->DepthMapSRV());
 	}
 }
 
@@ -245,24 +234,24 @@ void RenderSystem::Update(const double deltaTime, EntityManager& entityManager)
 	UpdateFrameBuffer(deltaTime, entityManager, currentCamera);
 
 	BuildShadowTransform();
-	
+
 	//Below is equivalent to draw scene, so...
 	shadowMap->BindDsvAndSetNullRenderTarget(renderContext->GetContext());
 	DrawSceneToShadowMap(entityManager);
 	//renderContext->GetContext()->RSSetState(0);
 	renderContext->SetCullModeCullBack();
 
-	
+
 	//Restore back and depth buffer to OM stage (what's that? The output-merger stage?)
 	//How do I even mimic that?
 	renderer.UpdateScene();
 	renderContext->SetupViewPort();
-	
+
 	RenderMeshes(entityManager);
 	RenderBillboards(entityManager, currentCamera);
 	RenderParticles(entityManager, currentCamera);
 
-	ComputeDistortionZones(entityManager);	
+	ComputeDistortionZones(entityManager);
 
 	RenderPostProcesses(deltaTime, currentCamera, entityManager);
 
@@ -296,13 +285,15 @@ void RenderSystem::RenderUI(EntityManager& entityManager)
 		renderer.Render(sprite, renderContext->GetContext());
 }
 
-void RenderSystem::BuildShadowTransform() {
+void RenderSystem::BuildShadowTransform()
+{
 	//Commen�ons par seulement la lumi�re directionnelle principale...
 	XMVECTOR lightDirection = XMLoadFloat3(&frameBuffer.dirLight.direction);
 	//uh, directional lights have no position
 	XMVECTOR targetPosition = XMLoadFloat3(&sceneBoundaries.Center);
 	XMVECTOR lightPosition = targetPosition - sceneBoundaries.Radius * lightDirection; //Can I fake it like this?
-	XMVECTOR upVector = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f); //Let's assume this is true because I can't find the code to confirm...
+	XMVECTOR upVector = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	//Let's assume this is true because I can't find the code to confirm...
 
 	//XMMatrixLookAtLH = Build a Left Handed View Matrix from point of view (parameter 1) to target location (parameter 2)
 	XMMATRIX LightViewMatrix = XMMatrixLookAtLH(lightPosition, targetPosition, upVector);
@@ -325,10 +316,10 @@ void RenderSystem::BuildShadowTransform() {
 
 	//Transform NDC space [-1, +1]^2 to texture space [0,1]^2
 	XMMATRIX T(
-		0.5f,  0.0f, 0.0f, 0.0f,
+		0.5f, 0.0f, 0.0f, 0.0f,
 		0.0f, -0.5f, 0.0f, 0.0f,
-		0.0f,  0.0f, 1.0f, 0.0f,
-		0.5f,  0.5f, 0.0f, 1.0f
+		0.0f, 0.0f, 1.0f, 0.0f,
+		0.5f, 0.5f, 0.0f, 1.0f
 	);
 
 	XMMATRIX ShadowTransform = LightViewMatrix * LightProjectionMatrix * T;

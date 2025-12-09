@@ -76,10 +76,19 @@ Body* ShapeFactory::CreateCube(const Transform& transform, const Mesh& mesh, con
         layer
     );
 
-    boxSettings.mLinearDamping = 0.9f;
-    boxSettings.mAngularDamping = 0.9f;
-    boxSettings.mRestitution = 0.75f;
-    boxSettings.mMaxLinearVelocity = 2'000.0f;
+    if (layer != Layers::MOVING_DECOR)
+    {
+	    boxSettings.mLinearDamping = 0.9f;
+    	boxSettings.mAngularDamping = 0.9f;
+        boxSettings.mRestitution = 0.75f;
+    }
+    else
+    {
+	    boxSettings.mMaxLinearVelocity = 1'500.0f;
+        boxSettings.mRestitution = 0.05f;
+    }
+
+    
     boxSettings.mUserData = to_uint64(entity);
 
     BodyInterface& bodyInterface = JoltSystem::GetBodyInterface();
