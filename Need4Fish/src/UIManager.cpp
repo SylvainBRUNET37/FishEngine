@@ -17,7 +17,7 @@ UIManager::UIManager(RenderContext* renderContext) : device{ renderContext->GetD
 	const FontFamily family(L"Cascadia Code", nullptr);
 	textFont = new Font(&family, 24.0f, FontStyleRegular, UnitPixel);
 
-	textRenderer = new TextRenderer(device, 300, 100, textFont);
+	textRenderer = new TextRenderer(device, 350, 100, textFont);
 
 	textTexture.texture = textRenderer->GetTextureView();
 	textTexture.width = textRenderer->GetTextWidth();
