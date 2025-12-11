@@ -9,7 +9,7 @@ static const float4 COLOR = float4(1.0, 0.0, 0.0, 1.0);
 
 float4 ApplyVignette(float4 textureColor, float2 uv, float closestEnnemiDistance)
 {
-    static const float ENEMI_DISTANCE_CONSIDERATION = 600.0f * 600.0f;
+    static const float ENEMI_DISTANCE_CONSIDERATION = 600.0f * 600.0f; // squared distance
     if (closestEnnemiDistance < ENEMI_DISTANCE_CONSIDERATION)
     {
 	    const float2 centered = uv * 2.0 - 1.0;

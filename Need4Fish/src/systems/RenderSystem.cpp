@@ -8,8 +8,14 @@
 #include "systems/RenderSystem.h"
 
 #include <format>
+
+#include <Jolt/Physics/PhysicsSystem.h>
 #include <Jolt/Physics/Body/Body.h>
 
+#include "PhysicsEngine/JoltSystem.h"
+#include "utils/MathsUtils.h"
+
+using namespace JPH;
 using namespace DirectX;
 using namespace std;
 
@@ -19,7 +25,7 @@ RenderSystem::RenderSystem(RenderContext* renderContext, const std::shared_ptr<U
 	  renderer(renderContext, std::move(materials)),
 	  frameBuffer(),
 	  renderContext(renderContext),
-	  particleData(BillboardRenderer::MAX_BILLBOARDS)
+	  particleData(BillboardRenderer::MAX_BILLBOARDS), lightView(), lightProj(), shadowTransform()
 {
 	shadowMap = std::make_unique<ShadowMap>(renderContext->GetDevice(), SHADOW_MAP_SIZE, SHADOW_MAP_SIZE);
 
@@ -32,32 +38,22 @@ void RenderSystem::RenderPostProcesses(const double deltaTime, const Camera& cur
                                        EntityManager& entityManager)
 {
 	const auto& playerEatable = entityManager.Get<Eatable>(GameState::playerEntity);
-	const JPH::Body* playerBody = entityManager.Get<RigidBody>(GameState::playerEntity).body;
-	const auto playerJoltPos = playerBody->GetPosition();
-
-	const XMFLOAT3 playerPos = {playerJoltPos.GetX(), playerJoltPos.GetY(), playerJoltPos.GetZ()};
-	const float playerMass = playerEatable.mass;
+	const Body* playerBody = entityManager.Get<RigidBody>(GameState::playerEntity).body;
 
 	// Parcourir les autres
 	float closestEnnemiDistance = FLT_MAX;
-	for (const auto& [entity, eatable, rigidBody]
-	     : entityManager.View<Eatable, RigidBody>())
+	for (const auto& [entity, eatable, rigidBody] :
+	     entityManager.View<Eatable, RigidBody>())
 	{
-		if (eatable.mass <= playerMass)
+		if (entity == GameState::playerEntity)
+			continue;
+		if (eatable.mass <= playerEatable.mass)
 			continue;
 
-		// Regarder la distance
-		auto p = rigidBody.body->GetPosition();
-		const XMFLOAT3 creaturePos{p.GetX(), p.GetY(), p.GetZ()};
+		const float distance = MathsUtils::GetDistanceBetweenBodies(playerBody, rigidBody.body);
 
-		const float dx = creaturePos.x - playerPos.x;
-		const float dy = creaturePos.y - playerPos.y;
-		const float dz = creaturePos.z - playerPos.z;
-
-		const float ennemiDistance = dx * dx + dy * dy + dz * dz;
-
-		if (ennemiDistance < closestEnnemiDistance)
-			closestEnnemiDistance = ennemiDistance;
+		if (distance < closestEnnemiDistance)
+			closestEnnemiDistance = distance;
 	}
 
 	// Vignette par rapport à la distance

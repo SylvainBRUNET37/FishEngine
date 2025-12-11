@@ -3,12 +3,16 @@
 
 #include <numbers>
 #include <random>
+#include <Jolt/Geometry/ConvexSupport.h>
+#include <Jolt/Geometry/GJKClosestPoint.h>
 #include <Jolt/Physics/EActivation.h>
+#include <Jolt/Physics/Collision/Shape/ScaledShape.h>
 
 #include "physicsEngine/JoltSystem.h"
 
 using namespace std;
 using namespace DirectX;
+using namespace JPH;
 
 float MathsUtils::RandomBetween(const float min, const float max)
 {
@@ -43,7 +47,7 @@ void MathsUtils::TurnFishAround(EntityManager& entityManager, const Entity& enti
 {
 	auto& bodyInterface = JoltSystem::GetBodyInterface();
 	const auto& rigidBody = entityManager.Get<RigidBody>(entity);
-	const JPH::Vec3 axis = rigidBody.body->GetWorldTransform().GetColumn3(1).Normalized(); // up
+	const Vec3 axis = rigidBody.body->GetWorldTransform().GetColumn3(1).Normalized(); // up
 
 	static constexpr float angle = std::numbers::pi_v<float>;
 
@@ -53,8 +57,40 @@ void MathsUtils::TurnFishAround(EntityManager& entityManager, const Entity& enti
 		bodyInterface.SetPositionAndRotation(
 			rigidBody.body->GetID(),
 			rigidBody.body->GetPosition(),
-			(JPH::Quat::sRotation(axis, angle) * rigidBody.body->GetRotation()).Normalized(),
-			JPH::EActivation::Activate
+			(Quat::sRotation(axis, angle) * rigidBody.body->GetRotation()).Normalized(),
+			EActivation::Activate
 		);
 	}
 }
+
+static float ComputeBoundingRadius(const Shape* shape)
+{
+	const AABox bounds = shape->GetLocalBounds();
+	const Vec3 halfExtents = bounds.GetExtent();
+
+	return halfExtents.Length();
+}
+
+float MathsUtils::GetDistanceBetweenBodies(const Body* bodyA, const Body* bodyB)
+{
+	const Shape* shapeA = bodyA->GetShape();
+	const Shape* shapeB = bodyB->GetShape();
+
+	if (!shapeA || !shapeB)
+		return FLT_MAX;
+
+	const auto bodyPosA = bodyA->GetPosition();
+	const auto bodyPosB = bodyB->GetPosition();
+
+	const float dx = bodyPosA.GetX() - bodyPosB.GetX();
+	const float dy = bodyPosA.GetY() - bodyPosB.GetY();
+	const float dz = bodyPosA.GetZ() - bodyPosB.GetZ();
+
+	const float distance = dx * dx + dy * dy + dz * dz;
+
+	const float rA = ComputeBoundingRadius(shapeA);
+	const float rB = ComputeBoundingRadius(shapeB);
+
+	return distance - rA * rA - rB * rB;
+}
+

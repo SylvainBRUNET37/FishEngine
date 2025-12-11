@@ -50,13 +50,18 @@ void SensorSystem::Update(const double deltaTime, EntityManager& entityManager)
 
 void SensorSystem::ApplyPusherEffect(const double deltaTime, const Sensor& sensor, const BodyID objectId)
 {
+	static constexpr float MAX_SPEED = 400.0f;
 	static auto& bodyInterface = JoltSystem::GetBodyInterface();
-	static constexpr float SPEED_LIMIT = 400.0f;
 
-	if (bodyInterface.GetLinearVelocity(objectId).Length() < SPEED_LIMIT)
+	const Vec3 objectVelocity = bodyInterface.GetLinearVelocity(objectId);
+	if (objectVelocity.Length() < MAX_SPEED)
 	{
-		const Vec3 impulse = sensor.direction * sensor.pushStrength;
-		bodyInterface.AddForce(objectId, impulse * WORLD_SIZE_FACTOR);
+		const Vec3 targetVelocity = sensor.direction * MAX_SPEED;
+
+		const float velocityFactor = 1.0f - expf(-sensor.pushStrength * static_cast<float>(deltaTime));
+		const Vec3 newVelocity = objectVelocity + (targetVelocity - objectVelocity) * velocityFactor;
+
+		bodyInterface.SetLinearVelocity(objectId, newVelocity);
 	}
 }
 
