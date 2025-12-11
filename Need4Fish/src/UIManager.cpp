@@ -198,8 +198,6 @@ void UIManager::UpdateAlignSpriteXY(const RenderContext& renderContext, SpriteEl
 	auto updatePos = [&](Sprite2D& sprite_) {
 		const float newX = computeXPosition(renderContext, sprite_, sprite.alignX);
 		const float newY = computeYPosition(renderContext, sprite_, sprite.alignY);
-		std::cout << "nX : " << newX + sprite.offsetX << std::endl;
-		std::cout << "nY : " << newY + sprite.offsetY << std::endl;
 		EditSpritePosition(sprite_, newX + sprite.offsetX, newY + sprite.offsetY, sprite_.position.z);
 		};
 

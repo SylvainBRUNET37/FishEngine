@@ -258,11 +258,11 @@ void Renderer::PrepareSceneForBillboard()
 void Renderer::PrepareSceneForSprite()
 {
 	ID3D11DeviceContext* context = renderContext->GetContext();
-	static const float screenWidth = static_cast<float>(renderContext->GetScreenWidth());
-	static const float screenHeight = static_cast<float>(renderContext->GetScreenHeight());
+	const float screenWidth = static_cast<float>(renderContext->GetScreenWidth());
+	const float screenHeight = static_cast<float>(renderContext->GetScreenHeight());
 
 	// Orthographic projection to display the sprite in 2D "from the screne"
-	static const XMMATRIX matOrtho = XMMatrixOrthographicOffCenterRH
+	const XMMATRIX matOrtho = XMMatrixOrthographicOffCenterRH
 	(
 		0.f, screenWidth,
 		screenHeight, 0.f,
