@@ -31,7 +31,7 @@ private:
 	static void WaitBeforeNextFrame(DWORD frameStartTime);
 
 	void HandleGameState();
-	void HandleCollions();
+	void HandleCollisions();
 
 	void ChangeGameStatus();
 	void ResumeGame();

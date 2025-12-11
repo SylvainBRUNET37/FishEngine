@@ -94,7 +94,7 @@ void GameEngine::HandleGameState()
 		Eating::UpdatePlayerScale(*entityManager);
 
 	// Check if things get eaten
-	HandleCollions();
+	HandleCollisions();
 
 	static bool wasEscapePressed = false;
 	const bool isEscapePressed = GetAsyncKeyState(VK_ESCAPE) & 0x8000;
@@ -132,7 +132,7 @@ void GameEngine::HandleGameState()
 	wasEscapePressed = isEscapePressed;
 }
 
-void GameEngine::HandleCollions()
+void GameEngine::HandleCollisions()
 {
 	auto isAiFish = [](EntityManager& entityManager, const Entity& entity) {
 		return entityManager.HasComponent<Eatable>(entity) && entityManager.HasComponent<AIController>(entity);
