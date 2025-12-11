@@ -231,9 +231,9 @@ void GameEngine::RestartGame()
 // TODO: Init it properly
 void GameEngine::InitGame()
 {
+	PowerSystem::ResetPowers(*entityManager);
 	entityManager = EntityManagerFactory::Create(Locator::Get<ResourceManager>().GetSceneResource());
 	GameState::Init();
-	PowerSystem::ResetPowers();
 
 	particleSystem.Reset();
 	for (const auto& system : systems)
