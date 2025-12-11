@@ -36,7 +36,8 @@ private:
 		{
 		case Layers::NON_MOVING:	return "NON_MOVING";
 		case Layers::MOVING:		return "MOVING";
-		case Layers::MOVING_DECOR:		return "MOVING_DECOR";
+		case Layers::SINKS:			return "SINKS";
+		case Layers::FLOATS:		return "FLOATS";
 		case Layers::SENSOR:		return "SENSOR";
 		case Layers::VEHICLE:		return "VEHICLE";
 		case Layers::FOOD_CHAIN:	return "FOOD_CHAIN";

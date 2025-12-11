@@ -7,6 +7,7 @@
 #include "layers/Layers.h"
 #include "rendering/core/Transform.h"
 #include "rendering/graphics/Mesh.h"
+#include "components/physics/RigidBody.h"
 
 struct Entity;
 
@@ -22,7 +23,7 @@ namespace ShapeFactory
 	[[nodiscard]] JPH::Body* CreateSphereWithVelocity(const Transform& transform, const DirectX::XMFLOAT3& direction, const Entity& entity);
 	[[nodiscard]] JPH::Body* CreateFloor(const Entity& entity);
 	[[nodiscard]] JPH::Body* CreateMeshShape(const Transform& transform, const Mesh& mesh, const Entity& entity);
-	[[nodiscard]] JPH::Body* CreateConvexHullShape(const Transform& transform, const Mesh& mesh, const Entity& entity, bool isDecor = true);
+	[[nodiscard]] JPH::Body* CreateConvexHullShape(const Transform& transform, const Mesh& mesh, const Entity& entity, const RigidBody::Density density = RigidBody::NEUTRAL);
 }
 
 #endif

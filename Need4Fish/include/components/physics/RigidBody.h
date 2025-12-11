@@ -7,6 +7,13 @@
 class RigidBody
 {
 public:
+    enum Density : std::uint8_t
+    {
+        SINKS = 0,
+        NEUTRAL = 1,
+        FLOATS = 2
+    };
+
     JPH::Body* body;
 
     explicit RigidBody(JPH::Body* body) : body(body) {}

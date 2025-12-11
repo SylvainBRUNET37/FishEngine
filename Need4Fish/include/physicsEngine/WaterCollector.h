@@ -25,7 +25,8 @@ private:
 	float mDeltaTime = 0.01f; // default value
 
 	float fishBuoyancy = 1.0f; // 1 to cancel weight, < 1 sinks, 1 < floats
-	float decorBuoyancy = 0.01f;
+	float sinkingBuoyancy = 0.01f;
+	float floatingBuoyancy = 1.9f;
 	float linearDrag = 0.0f;
 	float angularDrag = 0.0f;
 };

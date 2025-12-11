@@ -13,15 +13,11 @@ void WaterCollector::AddHit(const BodyID& inBodyID)
 	if (body.IsActive())
 	{
 		// Apply gravity to decor objets (rocks, ...)
-		if (body.GetObjectLayer() == Layers::MOVING_DECOR)
-		{
-			body.ApplyBuoyancyImpulse(mSurfacePosition, mSurfaceNormal, decorBuoyancy, linearDrag, angularDrag,
-				Vec3::sZero(), JoltSystem::GetPhysicSystem().GetGravity(), mDeltaTime);
-		}
-		else
-		{
-			body.ApplyBuoyancyImpulse(mSurfacePosition, mSurfaceNormal, fishBuoyancy, linearDrag, angularDrag,
-			                          Vec3::sZero(), JoltSystem::GetPhysicSystem().GetGravity(), mDeltaTime);
-		}
+		float buoyancyValue = fishBuoyancy;
+		if (body.GetObjectLayer() == Layers::SINKS || body.GetObjectLayer() == Layers::FLOATS)
+			buoyancyValue = (body.GetObjectLayer() == Layers::SINKS) ? sinkingBuoyancy : floatingBuoyancy;
+
+		body.ApplyBuoyancyImpulse(mSurfacePosition, mSurfaceNormal, buoyancyValue, linearDrag, angularDrag,
+			                        Vec3::sZero(), JoltSystem::GetPhysicSystem().GetGravity(), mDeltaTime);
 	}
 }

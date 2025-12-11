@@ -26,7 +26,10 @@ void ComponentFactory::CreateRigidBody(const nlohmann::json& componentData, Enti
 	else if (componentData["type"] == "meshShape")
 		entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateMeshShape(transform, mesh, entity));
 	else if (componentData["type"] == "hullShape")
-		entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateConvexHullShape(transform, mesh, entity, !componentData.contains("isDecor")));
+	{
+		const auto density = (componentData.contains("density")) ? static_cast<RigidBody::Density>(componentData["density"].get<int>()) : RigidBody::NEUTRAL;
+		entityManager.AddComponent<RigidBody>(entity, ShapeFactory::CreateConvexHullShape(transform, mesh, entity, density));
+	}
 }
 
 void ComponentFactory::CreateSensor(const nlohmann::json& componentData, EntityManager& entityManager,

@@ -19,7 +19,9 @@ public:
 			return broadPhaseLayer == BroadPhaseLayers::MOVING;
 		case Layers::MOVING:
 			return true;
-		case Layers::MOVING_DECOR:
+		case Layers::SINKS:
+			return true;
+		case Layers::FLOATS:
 			return true;
 		case Layers::SENSOR:
 			return broadPhaseLayer == BroadPhaseLayers::MOVING;

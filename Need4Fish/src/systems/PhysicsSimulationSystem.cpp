@@ -137,7 +137,14 @@ void PhysicsSimulationSystem::UpdatePhysics()
 		waterBox,
 		waterCollector,
 		SpecifiedBroadPhaseLayerFilter(BroadPhaseLayers::MOVING),
-		SpecifiedObjectLayerFilter(Layers::MOVING_DECOR)
+		SpecifiedObjectLayerFilter(Layers::SINKS)
+	);
+
+	JoltSystem::GetPhysicSystem().GetBroadPhaseQuery().CollideAABox(
+		waterBox,
+		waterCollector,
+		SpecifiedBroadPhaseLayerFilter(BroadPhaseLayers::MOVING),
+		SpecifiedObjectLayerFilter(Layers::FLOATS)
 	);
 	
 	// Update physics

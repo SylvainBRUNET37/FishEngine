@@ -76,7 +76,7 @@ Body* ShapeFactory::CreateCube(const Transform& transform, const Mesh& mesh, con
         layer
     );
 
-    if (layer != Layers::MOVING_DECOR)
+    if (layer != Layers::SINKS)
     {
 	    boxSettings.mLinearDamping = 0.9f;
     	boxSettings.mAngularDamping = 0.9f;
@@ -340,7 +340,7 @@ JPH::Body* ShapeFactory::CreateMeshShape(const Transform& transform, const Mesh&
     return body;
 }
 
-Body* ShapeFactory::CreateConvexHullShape(const Transform& transform, const Mesh& mesh, const Entity& entity, const bool isDecor)
+Body* ShapeFactory::CreateConvexHullShape(const Transform& transform, const Mesh& mesh, const Entity& entity, const RigidBody::Density density)
 {
     Array<Vec3> points;
     points.reserve(mesh.vertices.size());
@@ -357,13 +357,17 @@ Body* ShapeFactory::CreateConvexHullShape(const Transform& transform, const Mesh
     const RVec3 position(transform.position.x, transform.position.y, transform.position.z);
     const Quat rotation(transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w);
 
+    JPH::ObjectLayer layer = Layers::MOVING;
+    if (density != RigidBody::NEUTRAL)
+        layer = (density == RigidBody::SINKS) ? Layers::SINKS : Layers::FLOATS;
+
     BodyCreationSettings settings
 	{
         hullShape, 
 		position, 
 		rotation, 
 		EMotionType::Dynamic, 
-		isDecor ? Layers::MOVING_DECOR : Layers::MOVING
+		layer
 	};
 
     settings.mUserData = to_uint64(entity);
