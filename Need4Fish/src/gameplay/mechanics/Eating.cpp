@@ -191,9 +191,6 @@ void Eating::UpdatePlayerScale(EntityManager& entityManager)
 					delta[i] -= transform.scaleStep;
 					scale[i] += transform.scaleStep;
 				}
-				if (i == 0) {
-					std::cout << scale[i] << std::endl;
-				}
 			}
 
 			// Mise à jour progressive de la caméra
