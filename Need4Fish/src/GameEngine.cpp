@@ -9,6 +9,7 @@
 #include "GameState.h"
 #include "entities/EntityManagerFactory.h"
 #include "Locator.h"
+#include "audio/AudioEngine.h"
 #include "rendering/application/WindowsApplication.h"
 #include "rendering/texture/TextureLoader.h"
 #include "gameplay/mechanics/Eating.h"
@@ -71,7 +72,6 @@ void GameEngine::Run()
 		shouldContinue = WindowsApplication::ProcessWindowsMessages();
 
 		particleSystem.Update(elapsedTime, *entityManager);
-
 		for (const auto& system : systems)
 			system->Update(elapsedTime, *entityManager);
 

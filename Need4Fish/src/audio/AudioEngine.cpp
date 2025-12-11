@@ -3,20 +3,21 @@
 
 #include <format>
 #include <fstream>
+#include <ranges>
 
 #include "Locator.h"
 #include "rendering/utils/Util.h"
 
 using namespace std;
 
-AudioEngine::AudioEngine(const std::vector<std::string>& filePaths)
+AudioEngine::AudioEngine(const std::vector<std::pair<std::string, bool>>& filePaths)
 {
     DXEssayer(CoInitializeEx(nullptr, COINIT_MULTITHREADED), "Error while creating a sound");
     DXEssayer(XAudio2Create(&xaudio, 0, XAUDIO2_USE_DEFAULT_PROCESSOR), "Error while creating a sound");
     DXEssayer(xaudio->CreateMasteringVoice(&masterVoice), "Error while creating a sound");
 
     for (const auto& filePath : filePaths)
-		sounds.emplace(filePath, Sound{ filePath });
+		sounds.emplace(filePath.first, Sound{ filePath.first, filePath.second });
 }
 
 AudioEngine::~AudioEngine()
@@ -29,9 +30,9 @@ AudioEngine::~AudioEngine()
     CoUninitialize();
 }
 
-Sound::Sound(const std::string& filePath)
+Sound::Sound(const std::string& filePath, const bool isLooped)
 {
-    Load(filePath);
+    Load(filePath, isLooped);
 }
 
 void Sound::Play() const
@@ -45,7 +46,7 @@ void Sound::Play() const
     DXEssayer(voice->Start(0), "Error while playing a sound");
 }
 
-void Sound::Load(const std::string& filePath)
+void Sound::Load(const std::string& filePath, const bool isLooped)
 {
 	ifstream soundFile{ filePath, std::ios::binary };
     if (not soundFile)
@@ -74,4 +75,5 @@ void Sound::Load(const std::string& filePath)
     buffer.AudioBytes = chunkSize;
     buffer.pAudioData = audioData.data();
     buffer.Flags = XAUDIO2_END_OF_STREAM;
+    buffer.LoopCount = isLooped ? XAUDIO2_LOOP_INFINITE : 1;
 }

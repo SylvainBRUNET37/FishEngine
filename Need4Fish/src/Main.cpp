@@ -57,9 +57,13 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 		JoltSystem joltSystem;
 
 		// Add services in the locator
+		vector<pair<string, bool>> sounds{ {"assets\\sounds\\miam.wav"s, false}, {"assets\\sounds\\miam2.wav"s, true} };
+		Locator::Set(make_shared<AudioEngine>(std::move(sounds)));
 		Locator::Set(make_shared<ResourceManager>(renderContext.GetDevice()));
-		Locator::Set(make_shared<AudioEngine>(vector{"assets\\sounds\\miam.wav"s}));
 
+		auto& audioEngine = Locator::Get<AudioEngine>();
+		audioEngine.PlaySoundEffect("assets\\sounds\\miam2.wav");
+			
 		// Init game engine and run the main loop !
 		auto* gameEngine = new GameEngine{ &renderContext };
 		gameEngine->Run();

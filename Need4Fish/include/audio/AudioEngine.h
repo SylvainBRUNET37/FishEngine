@@ -10,11 +10,12 @@
 class Sound
 {
 public:
-	explicit Sound(const std::string& filePath);
+	explicit Sound(const std::string& filePath, bool isLooped = false);
+
 	void Play() const;
 
 private:
-	void Load(const std::string& filePath);
+	void Load(const std::string& filePath, bool isLooped = false);
 
 	WAVEFORMATEX wfx{};
 	XAUDIO2_BUFFER buffer{};
@@ -25,7 +26,8 @@ private:
 class AudioEngine
 {
 public:
-	explicit AudioEngine(const std::vector<std::string>& filePaths);
+	// File path + isLooped boolean
+	explicit AudioEngine(const std::vector<std::pair<std::string, bool>>& filePaths);
 	~AudioEngine();
 
 	AudioEngine(const AudioEngine&) = delete;
