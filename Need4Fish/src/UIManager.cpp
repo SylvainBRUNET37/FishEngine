@@ -14,7 +14,7 @@ UIManager::UIManager(RenderContext* renderContext) : device{ renderContext->GetD
 	TextRenderer::Init();
 
 	// create a GDI+ font for the TextRenderer
-	const FontFamily family(L"Arial", nullptr);
+	const FontFamily family(L"Cascadia Code", nullptr);
 	textFont = new Font(&family, 24.0f, FontStyleRegular, UnitPixel);
 
 	textRenderer = new TextRenderer(device, 300, 100, textFont);

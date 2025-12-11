@@ -271,7 +271,7 @@ void RenderSystem::RenderUI(EntityManager& entityManager)
 		playerSpeed = rigiBody.body->GetLinearVelocity().Length();
 		break;
 	}
-	const auto text = std::format(L"Player mass : {}\nPlayer speed : {:.2f}\nPlaytime : {:.2f}", playerMass,
+	const auto text = std::format(L"Player mass  : {}\nPlayer speed : {:.2f}\nPlaytime     : {:.2f}", playerMass,
 	                              playerSpeed, GameState::playTime);
 	uiManager->RenderText(text);
 
