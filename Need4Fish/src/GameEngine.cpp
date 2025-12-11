@@ -324,7 +324,7 @@ void GameEngine::CreateParticleZones()
 #ifndef NDEBUG
 	static constexpr unsigned int NB_WORLD_PARTICLES = 500;
 #else
-	static constexpr unsigned int NB_WORLD_PARTICLES = 10'000;
+	static constexpr unsigned int NB_WORLD_PARTICLES = 15'000;
 #endif
 
 	particleSystem.AddParticleZone(*entityManager,
