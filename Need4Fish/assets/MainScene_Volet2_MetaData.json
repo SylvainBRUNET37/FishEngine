@@ -102,6 +102,8 @@
 	"DiamondMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
 	"RubyMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongCausticsPS.hlsl" },
 	
-	"SacabambaspisMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongWaterPS.hlsl" }
+	"SacabambaspisMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongWaterPS.hlsl" },
+	"FeatherFishMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongWaterPS.hlsl" },
+	"ClownBoxFishMat": { "vs": "shaders/MainVS.hlsl", "ps": "shaders/PhongWaterPS.hlsl" }
   }
 }
