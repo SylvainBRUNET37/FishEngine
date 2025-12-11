@@ -4,7 +4,7 @@
 #include <tuple>
 #include <algorithm>
 #include <Jolt/Physics/Collision/Shape/CylinderShape.h>
-#include <numbers> 
+#include <numbers>
 
 #include "GameState.h"
 #include "entities/EntityManagerFactory.h"
@@ -27,8 +27,6 @@ GameEngine::GameEngine(RenderContext* renderContext_)
 	  particleSystem{renderContext->GetDevice()},
 	  uiManager{std::make_shared<UIManager>(renderContext)}
 {
-	
-
 	auto& sceneResources = Locator::Get<ResourceManager>().LoadScene();
 
 	CameraSystem::SetMouseCursor();
@@ -134,9 +132,10 @@ void GameEngine::HandleGameState()
 
 void GameEngine::HandleCollisions()
 {
-	auto isAiFish = [](EntityManager& entityManager, const Entity& entity) {
+	auto isAiFish = [](EntityManager& entityManager, const Entity& entity)
+	{
 		return entityManager.HasComponent<Eatable>(entity) && entityManager.HasComponent<AIController>(entity);
-		};
+	};
 
 	auto& detectedCollisions = GameState::GetCollisions();
 	while (!detectedCollisions.empty())
@@ -271,6 +270,36 @@ void GameEngine::InitGame()
 		GameState::playerEntity = playerEntity;
 	}
 
+	// Add the tutorial billboard
+	for (const auto& [entity, name] : entityManager->View<Name>())
+	{
+		if (name.name == "Sacabambaspis" && 
+			entityManager->HasComponent<Hierarchy>(entity) && 
+			entityManager->HasComponent<Transform>(entity))
+		{
+			static auto& shaderBank = Locator::Get<ResourceManager>().GetShaderBank();
+			auto& hierarchy = entityManager->Get<Hierarchy>(entity);
+			const auto& transform = entityManager->Get<Transform>(entity);
+			const Entity billboardEntity = entityManager->CreateEntity();
+
+			// Create the hierarchy
+			hierarchy.children.emplace_back(billboardEntity);
+			entityManager->AddComponent<Hierarchy>(billboardEntity, Hierarchy{.parent = entity});
+
+			Billboard billboard{
+				shaderBank.GetOrCreateShaderProgram(
+					renderContext->GetDevice(), "shaders/BillboardVS.hlsl", "shaders/BillboardPS.hlsl"),
+				TextureLoader::LoadTextureFromFile("assets/textures/speech.png", renderContext->GetDevice()),
+				renderContext->GetDevice(),
+				{transform.position.x + 30, transform.position.y + 20, transform.position.z + 30},
+				XMFLOAT2{40, 40},
+				Billboard::Cylindric
+			};
+
+			entityManager->AddComponent<Billboard>(billboardEntity, std::move(billboard));
+		}
+	}
+
 	CreateParticleZones();
 
 	mainMenuEntity = entityManager->CreateEntity();
@@ -301,7 +330,7 @@ void GameEngine::CreateParticleZones()
 	particleSystem.AddParticleZone(*entityManager,
 	                               {
 		                               .centerPosition = {0, 1000.0f, 0},
-		                               .halfExtends = {7000.0f,1000.0f, 7000.0f},
+		                               .halfExtends = {7000.0f, 1000.0f, 7000.0f},
 		                               .nbParticle = NB_WORLD_PARTICLES,
 		                               .particleDurationMin = 3.0f,
 		                               .particleDurationMax = 5.0f,
@@ -340,8 +369,8 @@ void GameEngine::CreateParticleZones()
 					                               .nbParticle = NB_CURRENT_PARTICLES,
 					                               .particleDurationMin = 0.5f,
 					                               .particleDurationMax = 1.0f,
-												   .particleSpeedMin = 8.0f,
-				                               	   .particleSpeedMax = 12.0f,
+					                               .particleSpeedMin = 8.0f,
+					                               .particleSpeedMax = 12.0f,
 					                               .particleDirection = MeshUtil::ToDirectX(sensor.direction),
 					                               .billboardTexture = bubbleTexture,
 					                               .billboardShader = bubbleShader
@@ -373,8 +402,8 @@ void GameEngine::CreateParticleZones()
 					                               .nbParticle = NB_GEYSER_PARTICLES,
 					                               .particleDurationMin = 0.25f,
 					                               .particleDurationMax = 0.4f,
-												   .particleSpeedMin = 5.0f,
-												   .particleSpeedMax = 12.0f,
+					                               .particleSpeedMin = 5.0f,
+					                               .particleSpeedMax = 12.0f,
 					                               .particleDirection = MeshUtil::ToDirectX(sensor.direction),
 					                               .billboardTexture = bubbleTexture,
 					                               .billboardShader = bubbleShader
@@ -474,7 +503,9 @@ void GameEngine::BuildOptionMenu()
 	std::string spriteFile = (isChecked) ? "assets/ui/checkedBox.png" : "assets/ui/uncheckedBox.png";
 	std::string clickFile = (!isChecked) ? "assets/ui/checkedBox.png" : "assets/ui/uncheckedBox.png";
 	std::string hoverFile = (isChecked) ? "assets/ui/checkedBoxHovered.png" : "assets/ui/uncheckedBoxHovered.png";
-	std::string clickedHoverFile = (!isChecked) ? "assets/ui/checkedBoxHovered.png" : "assets/ui/uncheckedBoxHovered.png";
+	std::string clickedHoverFile = (!isChecked)
+		                               ? "assets/ui/checkedBoxHovered.png"
+		                               : "assets/ui/uncheckedBoxHovered.png";
 	uiManager->AddSprite({
 		.sprite = uiManager->LoadSprite(spriteFile, 0.0f, 0.0f, 1.0f),
 		.hoverSprite = uiManager->LoadSprite(hoverFile, 0.0f, 0.0f, 1.0f),
