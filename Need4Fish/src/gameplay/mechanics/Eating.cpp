@@ -88,7 +88,11 @@ static void AcuallyEat(
 
 	// Apply power effect of the killed entity
 	if (entityManager.HasComponent<PowerSource>(preyEntity))
+	{
+		auto& powerSource = entityManager.Get<PowerSource>(preyEntity);
+		powerSource.target = predatorEntity;
 		PowerSystem::AddEffect(entityManager.Get<PowerSource>(preyEntity));
+	}
 	
 	// Eat and kill
 	if (preyEatable.isApex) GameState::currentState = GameState::WON;
