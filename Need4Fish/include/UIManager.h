@@ -40,10 +40,12 @@ public:
 	void RenderText(const std::wstring& text) const;
 
 	// WIP
-	void UpdateSprites(const RenderContext& renderContext) {
+	void UpdateSprites(RenderContext& renderContext) {
+		if (!renderContext.GetMustUpdateUI()) return;
 		for (auto& sprite : sprites) {
 			UpdateAlignSpriteXY(renderContext, sprite);
 		}
+		renderContext.SetMustUpdateUI(false);
 	}
 
 	void UpdateAlignSpriteX(const RenderContext& renderContext, SpriteElement& sprite);

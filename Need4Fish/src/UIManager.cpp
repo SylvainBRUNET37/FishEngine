@@ -79,7 +79,9 @@ Sprite2D UIManager::LoadSprite(const std::string& filePath, const float position
 
 void UIManager::AddSprite(const SpriteElement& sprite)
 {
-	sprites.emplace_back(sprite);
+	auto sprite_ = sprite;
+	UpdateAlignSpriteXY(*renderContext, sprite_);
+	sprites.emplace_back(sprite_);
 }
 
 void UIManager::Clear()
@@ -127,30 +129,7 @@ void UIManager::EditSpritePosition(Sprite2D& sprite, const float positionX, cons
 	sprite.vertexBuffer = VertexBuffer(device, Sprite2D::ComputeVertices(sprite.position, sprite.texture));
 }
 
-static float computeXPosition(const Sprite2D& sprite, const std::string& alignment)
-{
-	const float screenWidth = static_cast<float>(GetSystemMetrics(SM_CXSCREEN));
-	float newX;
-	if (alignment == "left")
-	{
-		newX = 0.0f;
-	}
-	else if (alignment == "center")
-	{
-		newX = screenWidth / 2 - sprite.texture.width / 2;
-	}
-	else if (alignment == "right")
-	{
-		newX = screenWidth - sprite.texture.width;
-	}
-	else
-	{
-		return sprite.position.x;
-	}
-	return newX;
-}
-
-static float updateXPosition(const RenderContext& renderContext, Sprite2D& sprite, const std::string& alignment)
+static float computeXPosition(const RenderContext& renderContext, const Sprite2D& sprite, const std::string& alignment)
 {
 	const float screenWidth = static_cast<float>(renderContext.GetScreenWidth());
 	float newX;
@@ -173,7 +152,7 @@ static float updateXPosition(const RenderContext& renderContext, Sprite2D& sprit
 	return newX;
 }
 
-static float updateYPosition(const RenderContext& renderContext, Sprite2D& sprite, const std::string& alignment)
+static float computeYPosition(const RenderContext& renderContext, const Sprite2D& sprite, const std::string& alignment)
 {
 	const float screenHeight = static_cast<float>(renderContext.GetScreenHeight());
 	float newY;
@@ -196,52 +175,31 @@ static float updateYPosition(const RenderContext& renderContext, Sprite2D& sprit
 	return newY;
 }
 
-static float computeYPosition(const Sprite2D& sprite, const std::string& alignment)
-{
-	const float screenHeight = static_cast<float>(GetSystemMetrics(SM_CYSCREEN));
-	float newY;
-	if (alignment == "top")
-	{
-		newY = 0.0f;
-	}
-	else if (alignment == "center")
-	{
-		newY = screenHeight / 2 - sprite.texture.height / 2;
-	}
-	else if (alignment == "bottom")
-	{
-		newY = screenHeight - sprite.texture.height;
-	}
-	else
-	{
-		return sprite.position.y;
-	}
-	return newY;
-}
-
 void UIManager::AlignSpriteX(Sprite2D& sprite, const std::string& alignment)
 {
-	const float newX = computeXPosition(sprite, alignment);
+	const float newX = computeXPosition(*renderContext, sprite, alignment);
 	EditSpritePosition(sprite, newX, sprite.position.y, sprite.position.z);
 }
 
 void UIManager::UpdateAlignSpriteX(const RenderContext& renderContext, SpriteElement& sprite)
 {
-	const float newX = updateXPosition(renderContext, sprite.sprite, sprite.alignX);
+	const float newX = computeXPosition(renderContext, sprite.sprite, sprite.alignX);
 	EditSpritePosition(sprite.sprite, newX + sprite.offsetX, sprite.sprite.position.y, sprite.sprite.position.z);
 }
 
 void UIManager::UpdateAlignSpriteY(const RenderContext& renderContext, SpriteElement& sprite)
 {
-	const float newY = updateXPosition(renderContext, sprite.sprite, sprite.alignX);
+	const float newY = computeXPosition(renderContext, sprite.sprite, sprite.alignX);
 	EditSpritePosition(sprite.sprite, sprite.sprite.position.x, newY + sprite.offsetY, sprite.sprite.position.z);
 }
 
 void UIManager::UpdateAlignSpriteXY(const RenderContext& renderContext, SpriteElement& sprite)
 {
 	auto updatePos = [&](Sprite2D& sprite_) {
-		const float newX = updateXPosition(renderContext, sprite_, sprite.alignX);
-		const float newY = updateYPosition(renderContext, sprite_, sprite.alignY);
+		const float newX = computeXPosition(renderContext, sprite_, sprite.alignX);
+		const float newY = computeYPosition(renderContext, sprite_, sprite.alignY);
+		std::cout << "nX : " << newX + sprite.offsetX << std::endl;
+		std::cout << "nY : " << newY + sprite.offsetY << std::endl;
 		EditSpritePosition(sprite_, newX + sprite.offsetX, newY + sprite.offsetY, sprite_.position.z);
 		};
 
@@ -259,14 +217,14 @@ void UIManager::UpdateAlignSpriteXY(const RenderContext& renderContext, SpriteEl
 
 void UIManager::AlignSpriteY(Sprite2D& sprite, const std::string& alignment)
 {
-	const float newY = computeYPosition(sprite, alignment);
+	const float newY = computeYPosition(*renderContext, sprite, alignment);
 	EditSpritePosition(sprite, sprite.position.x, newY, sprite.position.z);
 }
 
 void UIManager::AlignSpriteXY(Sprite2D& sprite, const std::string& alignmentX, const std::string& alignmentY)
 {
-	const float newX = computeXPosition(sprite, alignmentX);
-	const float newY = computeYPosition(sprite, alignmentY);
+	const float newX = computeXPosition(*renderContext, sprite, alignmentX);
+	const float newY = computeYPosition(*renderContext, sprite, alignmentY);
 	EditSpritePosition(sprite, newX, newY, sprite.position.z);
 }
 

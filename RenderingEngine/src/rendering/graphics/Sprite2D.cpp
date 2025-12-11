@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "rendering/graphics/Sprite2D.h"
+#include <iostream>
 
 using namespace std;
 using namespace DirectX;
@@ -22,6 +23,8 @@ Sprite2D::Sprite2D(const std::shared_ptr<ShaderProgram>& shaderProgram_, const T
 
 std::vector<VertexSprite> Sprite2D::ComputeVertices(const SpritePosition& position, const Texture& texture)
 {
+	std::cout << "nX2 : " << position.x << std::endl;
+	std::cout << "nY2 : " << position.y << std::endl;
 	return
 	{
 		VertexSprite({position.x, position.y, 0}, {0, 0}), // top-left

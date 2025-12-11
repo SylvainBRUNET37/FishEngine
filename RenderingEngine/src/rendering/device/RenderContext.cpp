@@ -108,10 +108,13 @@ void RenderContext::Resize(const UINT width, const UINT height)
 	// Update viewport and set new render target
 	SetRenderTarget();
 	SetupViewPort();
+
+	mustUpdateUI = true;
 }
 
 void RenderContext::Move(UINT x, UINT y)
 {
 	screenStartX = x;
 	screenStartY = y;
+	mustUpdateUI = true;
 }

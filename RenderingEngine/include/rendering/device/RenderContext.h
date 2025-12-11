@@ -85,6 +85,9 @@ public:
 	void SetRenderTarget() const;
 	void SetupViewPort() const;
 
+	bool GetMustUpdateUI() const { return mustUpdateUI; }
+	void SetMustUpdateUI(bool b) { mustUpdateUI = b; }
+
 private:
 	size_t screenWidth;
 	size_t screenHeight;
@@ -104,6 +107,8 @@ private:
 	PostProcess postProcess;
 	DistortionProcess distortionProcess;
 	DepthState depthState;
+
+	bool mustUpdateUI = false;
 };
 
 #endif

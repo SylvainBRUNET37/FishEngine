@@ -239,8 +239,8 @@ void GameEngine::InitGame()
 	for (const auto& system : systems)
 		system->Reset();
 
-	const int screenWidth = GetSystemMetrics(SM_CXSCREEN);
-	const int screenHeight = GetSystemMetrics(SM_CYSCREEN);
+	const float screenWidth = renderContext->GetScreenWidth();
+	const float screenHeight = renderContext->GetScreenHeight();
 
 	Camera camera;
 	Camera::position = XMVectorSet(0, 5, -10, 1);
