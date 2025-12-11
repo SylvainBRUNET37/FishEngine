@@ -16,6 +16,8 @@ namespace MathsUtils
         const DirectX::XMFLOAT3& halfExtends);
 
     void TurnFishAround(EntityManager& entityManager, const Entity& entity);
+
+    [[nodiscard]] float GetDistanceBetweenBodies(const JPH::Body* bodyA, const JPH::Body* bodyB);
 }
 
 #endif
