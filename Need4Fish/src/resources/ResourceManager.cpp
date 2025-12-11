@@ -68,3 +68,8 @@ void ResourceManager::ReportLiveDeviceObjects() {
 		debug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
 	}
 }
+
+void ResourceManager::PlaySoundEffect()
+{
+
+}

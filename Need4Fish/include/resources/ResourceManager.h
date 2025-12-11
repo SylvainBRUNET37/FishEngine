@@ -15,7 +15,9 @@ public:
 	[[nodiscard]] ShaderBank& GetShaderBank() { return shaderBank; }
 	[[nodiscard]] SceneResource& GetSceneResource() { return sceneResource; }
 	[[nodiscard]] Mesh& GetMesh(const UINT meshIndex) { return sceneResource.meshes[meshIndex]; }
+
 	void ReportLiveDeviceObjects();
+	void PlaySoundEffect();
 
 private:
 	ID3D11Device* device;

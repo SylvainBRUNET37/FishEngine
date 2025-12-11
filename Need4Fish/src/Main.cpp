@@ -11,6 +11,7 @@
 
 #include "GameEngine.h"
 #include "Locator.h"
+#include "audio/AudioEngine.h"
 
 using namespace JPH;
 using namespace JPH::literals;
@@ -57,6 +58,7 @@ int APIENTRY _tWinMain(const HINSTANCE hInstance,
 
 		// Add services in the locator
 		Locator::Set(make_shared<ResourceManager>(renderContext.GetDevice()));
+		Locator::Set(make_shared<AudioEngine>(vector{"assets\\sounds\\miam.wav"s}));
 
 		// Init game engine and run the main loop !
 		auto* gameEngine = new GameEngine{ &renderContext };

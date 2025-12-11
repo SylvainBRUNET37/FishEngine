@@ -6,9 +6,20 @@
 #include "components/PowerSource.h"
 #include "systems/PowerSystem.h"
 #include <cmath>
+
+#include "Locator.h"
+#include "audio/AudioEngine.h"
 #include "entities/EntityManager.h"
 
 using namespace DirectX;
+
+namespace
+{
+	void PlatDeathSound()
+	{
+	
+	}
+}
 
 static void KillRecursively(EntityManager& entityManager, const Entity preyEntity)
 {
@@ -19,6 +30,9 @@ static void KillRecursively(EntityManager& entityManager, const Entity preyEntit
 		for (const Entity child : hierarchy.children)
 			KillRecursively(entityManager, child);
 	}
+
+	static auto& audioEngine = Locator::Get<AudioEngine>();
+	audioEngine.PlaySoundEffect("assets\\sounds\\miam.wav");
 
 	entityManager.Kill(preyEntity);
 }
