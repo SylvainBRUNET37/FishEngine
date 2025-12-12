@@ -231,6 +231,7 @@ void GameEngine::RestartGame()
 void GameEngine::InitGame()
 {
 	PowerSystem::ResetPowers(*entityManager);
+	entityManager = {};
 	entityManager = EntityManagerFactory::Create(Locator::Get<ResourceManager>().GetSceneResource());
 	GameState::Init();
 
@@ -324,7 +325,7 @@ void GameEngine::CreateParticleZones()
 #ifndef NDEBUG
 	static constexpr unsigned int NB_WORLD_PARTICLES = 500;
 #else
-	static constexpr unsigned int NB_WORLD_PARTICLES = 15'000;
+	static constexpr unsigned int NB_WORLD_PARTICLES = 10'000;
 #endif
 
 	particleSystem.AddParticleZone(*entityManager,
@@ -392,7 +393,7 @@ void GameEngine::CreateParticleZones()
 #ifndef NDEBUG
 				static constexpr unsigned int NB_GEYSER_PARTICLES = 100;
 #else
-				static constexpr unsigned int NB_GEYSER_PARTICLES = 2500;
+				static constexpr unsigned int NB_GEYSER_PARTICLES = 1500;
 #endif
 
 				particleSystem.AddParticleZone(*entityManager,
