@@ -185,3 +185,6 @@ Merci aux artistes dont nous avons utilisé les assets pour créer notre jeu.
 - [Discus 3](https://sketchfab.com/3d-models/discus-3-e284e187712e4e00b001ce773398ad51) by Comitre (Licence: CC Attribution)
 - [Gold Fish](https://sketchfab.com/3d-models/gold-fish-fc655111af5b49bf84722affc3ddba00) by Shahbriar Shahrabi (Licence: CC Attribution)
 - [PSX Tropical Pack V1](https://sketchfab.com/3d-models/psx-tropical-pack-v1-831f5ce303354977a6acb695571ac01b) by PROJEKTSANSSTUDIOS (Licence: CC Attribution)
+- [Feather Fish](https://sketchfab.com/3d-models/feather-fish-e6c3adec1dc34e3297d5f10c23147cb1) by gavinpgamer1 (Licence: CC Attribution)
+- [Sacabambaspis fish (Meme fish)](https://sketchfab.com/3d-models/sacabambaspis-fish-meme-fish-ee2ed83b2eb84968bb7a8eb597a4d958) by Aiden829 (Licence: CC Attribution)
+- [Fish Pet - 1 - Ocellaris clownfish Cubius](https://sketchfab.com/3d-models/fish-pet-1-ocellaris-clownfish-cubius-30b46c26b48c4359a7aa30dde185e4fb#download) by POLYTRICITY (Licence: CC Attribution)
