@@ -265,6 +265,26 @@ void PhysicsSimulationSystem::UpdateTransforms(EntityManager& entityManager)
 		transform.world = scaleMatrix * rotationMatrix * translationMatrix;
 	}
 
+	// Update transforms from sensor (TODO: do not duplicatie
+	for (const auto& [entity, transform, rigidBody, _] : entityManager.View<Transform, Sensor, AIController>())
+	{
+		// Get jolt transform data
+		const RMat44& joltTransform = rigidBody.body->GetWorldTransform();
+		const Vec3& joltPos = joltTransform.GetTranslation();
+		const Quat& joltRot = joltTransform.GetQuaternion();
+
+		transform.position = { joltPos.GetX(), joltPos.GetY(), joltPos.GetZ() };
+		transform.rotation = { joltRot.GetX(), joltRot.GetY(), joltRot.GetZ(), joltRot.GetW() };
+
+		// Uses Jolt position and rotation and keep the orginal scale of the transform
+		const auto scaleMatrix = XMMatrixScaling(transform.scale.x, transform.scale.y, transform.scale.z);
+		const auto rotationMatrix = XMMatrixRotationQuaternion(XMLoadFloat4(&transform.rotation));
+		const auto translationMatrix = XMMatrixTranslation(transform.position.x, transform.position.y,
+			transform.position.z);
+
+		transform.world = scaleMatrix * rotationMatrix * translationMatrix;
+	}
+
 	// Update transform from hierarchy
 	for (const auto& [entity, transform, hierarchy] : entityManager.View<Transform, Hierarchy>())
 	{
@@ -405,7 +425,7 @@ void PhysicsSimulationSystem::UpdateNPCs(EntityManager& entityManager)
 	// Update the NPC
 	for (const auto& [entity, rigidBody, aiController, name] : entityManager.View<RigidBody, AIController, Name>())
 	{
-		Vec3 newSpeed = computeNewSpeed(entity, rigidBody.body, aiController, name.name);
+		const Vec3 newSpeed = computeNewSpeed(entity, rigidBody.body, aiController, name.name);
 		;
 		static auto& bodyInterface = JoltSystem::GetBodyInterface();
 		Vec3 currentSpeed = bodyInterface.GetLinearVelocity(rigidBody.body->GetID());
@@ -414,6 +434,20 @@ void PhysicsSimulationSystem::UpdateNPCs(EntityManager& entityManager)
 		// Allow fishes to be influenced by currents
 		if (theoreticalSpeed.Length() < aiController.maxSpeed)
 			bodyInterface.SetLinearVelocity(rigidBody.body->GetID(), currentSpeed + newSpeed);
+	}
+
+	// For jellyfish (TODO: do not duplicate like this !)
+	for (const auto& [entity, sensor, aiController, name] : entityManager.View<Sensor, AIController, Name>())
+	{
+		const Vec3 newSpeed = computeNewSpeed(entity, sensor.body, aiController, name.name);
+		;
+		static auto& bodyInterface = JoltSystem::GetBodyInterface();
+		Vec3 currentSpeed = bodyInterface.GetLinearVelocity(sensor.body->GetID());
+		const auto theoreticalSpeed = currentSpeed + newSpeed;
+
+		// Allow fishes to be influenced by currents
+		if (theoreticalSpeed.Length() < aiController.maxSpeed)
+			bodyInterface.SetLinearVelocity(sensor.body->GetID(), currentSpeed + newSpeed);
 	}
 }
 

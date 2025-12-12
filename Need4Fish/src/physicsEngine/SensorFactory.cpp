@@ -29,6 +29,7 @@ Body* SensorFactory::CreateCubeCurrentSensor(const Transform& transform, const M
 	);
 
 	sensorSettings.mIsSensor = true;
+	sensorSettings.mCollideKinematicVsNonDynamic = true;
 	sensorSettings.mUserData = to_uint64(entity);
 
 	// Create sensor body
