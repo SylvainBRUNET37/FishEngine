@@ -1,7 +1,11 @@
 #ifndef ENTITY_MANAGER_UTILS_H
 #define ENTITY_MANAGER_UTILS_H
 
-#include "entities/EntityManagerFactory.h"
+#include <optional>
+
+#include "entities/Entity.h"
+
+class EntityManager;
 
 namespace EntityManagerUtils
 {

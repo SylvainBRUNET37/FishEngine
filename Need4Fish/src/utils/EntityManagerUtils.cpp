@@ -1,7 +1,10 @@
 #include "pch.h"
 #include "utils/EntityManagerUtils.h"
+
 #include <optional>
 #include <ranges>
+
+#include "entities/EntityManager.h"
 
 using namespace std;
 using namespace JPH;

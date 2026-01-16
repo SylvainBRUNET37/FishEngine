@@ -3,56 +3,67 @@
 
 #include <utility>
 #include <array>
-#include <optional>
+#include <new>
 
 #include "Entity.h"
 
-// TODO: not the best way of doing it, using a sparse set would be better
 #ifndef NDEBUG
 inline static constexpr size_t MAX_ENTITIES = 4'096;
 #else
 inline static constexpr size_t MAX_ENTITIES = 23'000;
 #endif
 
-
 // A container for the given component
+// TODO: not the best way of doing it, using a sparse set would be better ?
 template <typename Component>
 class ComponentPool
 {
 public:
     [[nodiscard]] bool Has(const Entity::Index entityIndex) const noexcept
     {
-        return entityIndex < components.size() && components[entityIndex].has_value();
+        return alive[entityIndex];
     }
 
     template <typename... ComponentArgs>
     Component& Emplace(const Entity::Index entityIndex, ComponentArgs&&... componentArgs)
     {
         // Construct the component with given args
-        components[entityIndex].emplace(std::forward<ComponentArgs>(componentArgs)...);
-        return *components[entityIndex];
+        alive[entityIndex] = true;
+        return *std::construct_at(GetComponentAddressOf(entityIndex), std::forward<ComponentArgs>(componentArgs)...);
     }
 
     void RemoveComponentOf(const Entity::Index entityIndex)
     {
-        if (entityIndex < components.size())
+        if (alive[entityIndex])
         {
-            components[entityIndex].reset(); // destroy the component if it exists
+            std::destroy_at(GetComponentAddressOf(entityIndex));
+            alive[entityIndex] = false;
         }
     }
 
     [[nodiscard]] Component& Get(const Entity::Index entityIndex)
     {
-        return *components[entityIndex];
+        return *GetComponentAddressOf(entityIndex);
     }
 
     [[nodiscard]] const Component& Get(const Entity::Index entityIndex) const
     {
-        return *components[entityIndex];
+        return *GetComponentAddressOf(entityIndex);
     }
 
 private:
-    std::array<std::optional<Component>, MAX_ENTITIES> components;
+    alignas(Component) std::byte componentStorage[MAX_ENTITIES][sizeof(Component)]{};
+    std::array<uint8_t, MAX_ENTITIES> alive{};
+
+    Component* GetComponentAddressOf(const Entity::Index entityIndex)
+    {
+        return std::launder(reinterpret_cast<Component*>(componentStorage[entityIndex]));
+    }
+
+    const Component* GetComponentAddressOf(const Entity::Index entityIndex) const
+    {
+        return std::launder(reinterpret_cast<const Component*>(componentStorage[entityIndex]));
+    }
 };
 
 #endif
