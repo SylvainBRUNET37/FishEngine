@@ -6,10 +6,10 @@ Need4Fish is a paced 3D race against the clock game made with it's homemade 3D g
 
 ## Contributors
 
-- Sylvain Brunet (brus4186)
-- Thierry Demers-Landry (demt6496)
-- Alexandre Gagnon (gaga1716)
-- Nell Truong (trun8382)
+- [Sylvain Brunet](https://www.linkedin.com/in/sylvainbrunet37/)
+- [Thierry Demers-Landry](https://www.linkedin.com/in/landrydemersthierry/)
+- [Alexandre Gagnon](https://www.linkedin.com/in/alexandre-gagnon-ultralex/)
+- [Nell Truong](https://www.linkedin.com/in/nell-truong/)
 
 ## Learnings
 
