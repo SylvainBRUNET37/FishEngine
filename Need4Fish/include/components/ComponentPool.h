@@ -19,6 +19,13 @@ template <typename Component>
 class ComponentPool
 {
 public:
+    ~ComponentPool() 
+	{
+        for (size_t i = 0; i < MAX_ENTITIES; ++i)
+            if (alive[i])
+                std::destroy_at(GetComponentAddressOf(i));
+    }
+
     [[nodiscard]] bool Has(const Entity::Index entityIndex) const noexcept
     {
         return alive[entityIndex];
@@ -43,17 +50,21 @@ public:
 
     [[nodiscard]] Component& Get(const Entity::Index entityIndex)
     {
+        assert(alive[entityIndex]);
+
         return *GetComponentAddressOf(entityIndex);
     }
 
     [[nodiscard]] const Component& Get(const Entity::Index entityIndex) const
     {
+        assert(alive[entityIndex]);
+
         return *GetComponentAddressOf(entityIndex);
     }
 
 private:
     alignas(Component) std::byte componentStorage[MAX_ENTITIES][sizeof(Component)]{};
-    std::array<uint8_t, MAX_ENTITIES> alive{};
+    std::array<bool, MAX_ENTITIES> alive{};
 
     Component* GetComponentAddressOf(const Entity::Index entityIndex)
     {

@@ -1,162 +1,239 @@
-# Need4Fish :fish::shark:
+# FishEngine & Need4Fish :fish::shark:
 
-&emsp;_Need4Fish_ est un jeu de course contre la montre effréné dans lequel vous incarnez un mosasaure juvénile abandonné par sa mère avec un seul objectif en tête : se venger.<br>
-Pour cela, vous devez manger d'autres poissons afin de grandir et atteindre le sommet de la chaîne alimentaire et dévorer celle qui vous a jadis abandonné.
+Need4Fish is a paced 3D race against the clock game made with it's homemade 3D game engine. In Need4Fish, you play as a juvenile mosasaur that was abandoned by their mother with one only goal: vengeance. To do that, you'll need to climb the food chain and become the new apex predator.
 
-_Need4Fish_ est notre jeu de course pour la session d'hivers 2025 au DDJV et fonctionne grâce à _FishEngine_, notre moteur de rendu maison.
+![Need4Fish](./docs/static/img/n4f/base.png)
 
-## Développé par
+## Contributors
 
 - Sylvain Brunet (brus4186)
 - Thierry Demers-Landry (demt6496)
 - Alexandre Gagnon (gaga1716)
 - Nell Truong (trun8382)
 
-## Étapes à suivre pour build le jeu
+## Learnings
 
-1. Dans le répertoire "FishEngine", exécuter :
-   ```bash
-   ./build.bat
-   ```
-2. Aller faire un café (~5min de build pour Assimp + Jolt)
-3. Lancer la solution "FishEngine.sln"
-4. Choisir "Need4Fish" comme projet de démarrage
-5. Lancer le projet en Release
+- Real-time rendering techniques and shader programming
+- Profiling and CPU performances optimization
+- Spatial optimizations (frustum culling, backface culling)
+- Graphics debugging and frame analysis using RenderDoc
+- Utilisation of a physics engine
+- Entity Component System (ECS)
+- 3D game engine architecture
+- Data oriented design
+- Asset integration
+- Gameplay features
 
-Attention, un chemin de dossier trop long peut provoquer des erreurs !
+## Controls
 
-## Contrôles
+- ESC to pause the game or resume
+- Hold R to restart the game
+- Mouse movement to rotate in the desired direction
+- W and S to move forward and backward
+- A and D to strafe left and right
+- Mouse wheel to adjust camera zoom
+- ALT + Enter to toggle fullscreen mode
 
-- ESC pour mettre le jeu en pause (et récupérer la souris) ou sortir de pause
-- Maintenir R pour redémarrer la partie
+## Gameplay
 
-- Mouvements de la souris pour pivoter dans la direction désirée
-- W et S pour avancer et reculer
-- A et D pour "strafe" à gauche et à droite
+### Main Loop
 
-- Roulette de la souris pour ajuster le zoom de la caméra
-- ALT + Entrée pour activer/désactiver le mode pleine écran
+- The objective is to eat the large mosasaur
+- You must eat smaller fish first; otherwise, the large mosasaur will eat YOU
+- To eat: simply make contact with other living beings
+  - If you have more mass, the other disappears and you gain mass
+  - If there is a tie, the physics is applied
+  - If the other has more mass, the game over screen appears
+- The player grows as they eat prey
 
-## Boucle de jeu (Gameplay loop)
+### Physics Mechanics
 
-### Boucle principale
-- L'objectif est de manger le grand mosasaure à l'extérieur du monticule
-- Il faut manger d'autres poissons plus petits avant, sinon c'est le grand mosasaure qui VOUS mange
-- Pour manger : simplement entrer en contact avec les autres êtres vivants.
-- Si on a plus de masse, l'autre disparaît et on gagne en masse.
-- S'il y a égalité, l'autre se fait "pousser".
-- Si l'autre a plus de masse, l'écran de fin de jeu apparaît et il faut recommencer ('R').
+- Player movement and control handling
+- Collision detection and response with multiple collider types
+- Dynamic box scaling after consuming fishes
+- Jellyfish entities that repel the player on contact
+- Seaweed areas that apply movement slow-down effects
+- Water currents and geysers that apply movement speed-up effects
+- Floating and sinking mechanics with buoyancy effects
 
-- Dans le moment, il n'est pas possible de savoir si on a plus de masse que l'autre avant d'entrer en contact.
-- Le joueur grandit lorqu'il mange des proies.
+### Camera
+
+We support both first-person and third-person camera modes.
 
 ### Apocalypse
 
-Si le joueur patiente trop à se venger, l'apocalypse arrive. Cet évènement arrive à partir d'un temps aléatoire entre 3 et 4 minutes pour mettre fin à l'existence des dinosaures.
+If the player waits too long to take revenge, the apocalypse begins. This event triggers at a random time between 3 and 4 minutes to bring an end to the existence of the dinosaurs. During this event, meteors fall from the sky, the atmosphere turns red, the sun moves and darkens, and the mother move off to devour you.
 
-Durant cet évènement, des météorites tombent du ciel, l'ambiance devient rouge, le soleil bouge, s'assombrit et la mère se met en route pour vous dévorer.
+![Apocalypse](./docs/static/img/n4f/apocalypse.png)
+![Apocalypse Tint](./docs/static/img/n4f/apocalypse-tint.png)
 
-![Apocalypse](./docs/static/img/apocalypse.png)
+## Rendering Techniques 
 
-## Techniques de rendu
+### Fog & Attenuation
 
-### Fog & atténuation
+To give the scene its aquatic atmosphere, fog and attenuation (Beer–Lambert law) shaders are applied to create a bluish ambiance. The intensity of the fog and attenuation depends on the depth at which the player is located.
 
-Afin de donner à la scène son ambiance aquatique, des shaders de brouillard (fog) et d'atténuation (Beer-Lambert) sont appliqués pour lui donner son ambiance bleutée.
+![Radial Blur](./docs/static/img/fog_attenuation.png)
 
-L'intensité du brouillard et de l'atténuation dépendent de la profondeur à laquelle se trouve le joueur.
+### Caustics
 
-![Flou Radial](./docs/static/img/fog_attenuation.png)
+Caustics help enhance the aquatic atmosphere of the scene. Just like fog and attenuation, the intensity of the caustics depends on the depth at which the player is located.
 
-### Caustiques (Caustics)
-
-Les caustiques permettent d'ajouter à l'ambiance aquatique de la scène.
-
-Tout comme le brouillard et l'atténuation, l'intensité des caustiques dépend de la profondeur à laquelle se trouve le joueur.
-
-![Caustiques](./docs/static/img/caustics.png)
+![Caustics](./docs/static/img/caustics.png)
 
 ### Billboards
 
-Nous avons utilisé des panneaux (billboards) afin de rendre des bulles pour notre jeu. Les billboards sont la base de notre _système de particules_.
+We used billboards to render bubbles in our game. Billboards are the foundation of our _particle system_.
 
-![Billboards](./docs/static/img/billboards.png)
+![Billboards](./docs/static/img/n4f/geyser.png)
 
-### Texture animées
+### Animated Textures
 
-Afin de rendre la surface de l'eau et de la lave, un shader "génère" des textures animées. Donnant l'effet d'eau et de lave qui bougent.
+To render the surface of water and lava, a shader "generates" animated textures, giving the effect of moving water and lava.
+
+![Water Animation](./docs/static/img/n4f/water-animation.gif)
 
 ### Vignette
 
-La vignette donne un effet de vision _ensanglantée_ lorsque le joueur passe près d'une créature plus grande (plus grande masse) que soi, permettant un temps de réaction pour éviter d'être mangé et de perdre la partie.
+The vignette creates a _bloodshot vision_ effect when the player gets close to a larger creature (greater mass than the player), providing a brief reaction window to avoid being eaten and losing the game.
 
-![Vignette](./docs/static/img/vignette.png)
+![Vignette](./docs/static/img/n4f/vignette-2.png)
 
-### Abbération Chromatique
+### Chromatic Aberration
 
-Le poisson globe poissons-globes étant connus pour posséder de puissantes neurotoxines manger un poisson globe donne au joueur un effet de maladie ou de drogue représenté par l'abbération chromatique.
+Since pufferfish are known to possess powerful neurotoxins, eating a pufferfish gives the player a sickness or drug-like effect represented by chromatic aberration.
 
-![Abberation chromatique](./docs/static/img/chromatic_abberation.png)
+![Chromatic Aberration](./docs/static/img/n4f/ca.png)
 
-### Flou Radial (Radial blur)
+### Radial Blur
 
-Le flou radial permet de donner l'impression de "God rays" ou rayons divins, qui apparaissent lorsqu'on regarde vers la surface de l'eau.
+Radial blur creates the impression of “God rays” or divine rays, which appear when looking toward the surface of the water.
 
-![Flou Radial](./docs/static/img/radial_blur.png)
+![Radial Blur1](./docs/static/img/radial_blur.png)
+![Radial Blur2](./docs/static/img/n4f/god-rays.png)
 
-### Lumières
+### Lighting
 
-Notre moteur de rendu supporte deux types de lumière:
-
-- Directionnelles:
-  - Utilisée pour représenter le soleil et éclairer l'ensemble de notre scène
+Our rendering engine supports two types of lights:
+- Directional:
+  - Used to represent the sun and illuminate the entire scene
 - Point:
-  - Utilisée pour les crystaux lumineux de la caverne
-  - Utilisée pour la lumière du poisson-lanterne.
+  - Used for the glowing crystals in the cave
+  - Used for the light of the anglerfish
 
-Lumière du poisson-lanterne éclairant les rochers:
+![Apocalypse Caverne](./docs/static/img/n4f/apocalypse-cavern.png)
 
-![Angler Fish](./docs/static/img/point_light.png)
+### Shadow Maps
 
-### Cartes d'ombres (Shadow maps)
+For shadow management, we made use of shadow maps.
 
-Pour la gestion des ombres, nous avons fait usage de shadow maps.
-
-![Shadow maps](./docs/static/img/shadow_maps.png)
+![Shadow Maps](./docs/static/img/shadow_maps.png)
 
 ### Skybox
 
-Le ciel est fait grâce à l'utilisation d'une boîte à ciel.
+The sky is created using a skybox.
 
 ![Skybox](./docs/static/img/skybox.png)
 
-### Distorsion
+### Distortion
 
-Afin de représenter la chaleur extrême de la lave, un effet de distorsion est appliqué autour de la lave.
+To represent the extreme heat of the lava, a distortion effect is applied around the lava.
 
-![Distorsoin](./docs/static/img/distorsion.png)
+![Distortion](./docs/static/img/distorsion.png)
 
-### Mesures de performance
+## Performance
 
-Afin d'améliorer les performances de notre jeu, nous avons implémenté plusieurs mesures dans notre engin de rendu:
+### Test Environment
 
-- Backface culling (Élimination des faces arrières), activable ou non au choix selon les objets. La surface de l'eau n'en a pas besoin par exemple.
-- Frustum culling (Élimination hors du champs de vue): les objets en dehors du champs de vue n'ont pas besoin d'être rendus.
-- Instancing: les particules, qui sont présentes en grand nombres n'ont pas besoin d'être dessinées individuellement, on les regroupe alors dans un même appel de dessin, afin d'éviter de passer un grand temps CPU à faire _Draw calls_ au GPU.
+The game's performance was evaluated on the following configuration:
 
-## Étapes à suivre pour cloner (devs)
+- Processor: 11th Gen Intel® Core™ i7-11800H @ 2.30 GHz (8 cores / 16 threads)
+- Memory: 32 GB DDR4
+- Graphics card: NVIDIA GeForce RTX 3070 (Laptop)
+
+The analyses were performed using the Visual Studio profiler as well as Intel VTune Profiler for more in-depth analysis.
+
+## Initialization
+
+When loading the scene, the approximate CPU usage is distributed as follows:
+
+- **30%**: texture loading  
+- **17%**: scene (.glb) loading via the *Assimp* library  
+- **9%**: render context creation (DirectX 11)  
+- **8%**: shader compilation  
+- **8%**: parsing of scene entity metadata for assigning components to entities  
+
+![Scene Loading](./docs/static/img/profiling/scene-loading.png)
+
+## Memory and Cache
+
+Memory behavior analysis shows good cache efficiency, with only **0.04%** of memory accesses resulting in *cache misses*.
+
+![Cache](./docs/static/img/profiling/cache.png)
+![Bandwidth](./docs/static/img/profiling/bandwidth.png)
+
+## GPU Usage
+
+The GPU is very lightly used during game execution. This is a small game, so this behavior is fairly normal.
+
+![GPU Utilization](./docs/static/img/profiling/gpu-utilisation.png)
+
+## CPU Usage
+
+The CPU spends a large portion of its time waiting. This is a small game, so this behavior is fairly normal.
+
+However, when considering only the time spent actively executing, the main CPU costs come from:
+
+- The particle system  
+- Entity iteration  
+- Text rendering  
+
+![CPU Waiting](./docs/static/img/profiling/waiting.png)
+![CPU Utilization](./docs/static/img/profiling/cpu-utilisation.png)
+
+Separating particle-type entities from other entities would have reduced the overhead caused by unnecessary iteration over them by other systems (rendering, physics, etc.).
+
+In addition, the *gdiplus* library is not well suited for real-time text rendering. Using a more specialized technology would have reduced this cost.
+
+Particle rendering also performs avoidable memory copies, which leads to performance loss.
+
+Finally, cache usage is suboptimal in the function handling particle movement and lifetime. Approximately one third of the program's *LLC misses* originate from this function.
+
+![Particles](./docs/static/img/profiling/particle.png)
+
+## Metrics
+
+- **CPI (Cycles Per Instruction)**: 1.197  
+- **Branch misprediction rate**: 1.33%
+
+These values are acceptable, and there does not appear to be any major issue with branch prediction or the CPU pipeline.
+
+![CPI Rate](./docs/static/img/profiling/cpi-rate.png)
+![Branch Prediction](./docs/static/img/profiling/branch-prediction.png)
+
+## Implemented Optimizations
+
+To improve the overall performance of the game, several optimizations were implemented:
+
+- **Entity Component System (ECS)**: architecture designed for better memory locality and efficient cache usage
+- **Backface culling**: removal of back-facing polygons, enabled depending on the object type (disabled for the water surface for example)
+- **Frustum culling**: exclusion of objects outside the camera's view frustum from rendering
+- **Instancing**: grouping particles into a reduced number of draw calls to limit the CPU cost of *draw calls*
+- **GPU billboarding**: sprite orientation to face the camera is computed on the GPU, as it was less heavily loaded than the CPU
+
+## Steps to Build the Game
 
 1.  ```bash
     git clone -b develop --recurse-submodules https://github.com/SylvainBRUNET37/FishEngine.git
     ```
-2.  Exécuter la commande :
+2.  Execute the command:
     ```bash
     ./build.bat
     ```
 
-## Credits & remerciements
+## Credits & Acknowledgements
 
-Merci aux artistes dont nous avons utilisé les assets pour créer notre jeu.
+Thanks to the artists whose assets we used to create our game.
 
 - [Coral fish](https://sketchfab.com/3d-models/coral-fish-ea8d002da75a4dd09658b962722279c5) by polyplant3D (Licence: CC Attribution)
 - [Basic fish](https://sketchfab.com/3d-models/anglerfish-0047a66766394a018fdab16279fee694) by Yimit (Licence: )CC Attribution
