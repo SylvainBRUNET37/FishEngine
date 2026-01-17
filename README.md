@@ -2,7 +2,9 @@
 
 Need4Fish is a paced 3D race against the clock game made with it's homemade 3D game engine. In Need4Fish, you play as a juvenile mosasaur that was abandoned by their mother with one only goal: vengeance. To do that, you'll need to climb the food chain and become the new apex predator.
 
-![Need4Fish](./docs/static/img/n4f/base.png)
+## [Gameplay Video](https://www.youtube.com/watch?v=gs732Tz94NQ)
+
+[![Need4Fish](./docs/static/img/n4f/base.png)](https://www.youtube.com/watch?v=gs732Tz94NQ)
 
 ## Contributors
 
@@ -58,7 +60,7 @@ Need4Fish is a paced 3D race against the clock game made with it's homemade 3D g
 
 ### Camera
 
-We support both first-person and third-person camera modes.
+The game supports both first-person and third-person camera modes, with a spring arm system implemented to prevent camera clipping.
 
 ### Apocalypse
 
