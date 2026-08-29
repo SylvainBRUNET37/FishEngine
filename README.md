@@ -89,9 +89,9 @@ We used billboards to render bubbles in our game. Billboards are the foundation 
 
 ![Billboards](./docs/static/img/n4f/geyser.png)
 
-### Animated Textures
+### Animated Procedural Textures
 
-To render the surface of water and lava, a shader "generates" animated textures, giving the effect of moving water and lava.
+To render the surface of water and lava, a shader generates procedurally animated textures, giving the effect of moving water and lava.
 
 ![Water Animation](./docs/static/img/n4f/water-animation.gif)
 
@@ -112,7 +112,6 @@ Since pufferfish are known to possess powerful neurotoxins, eating a pufferfish 
 Radial blur creates the impression of “God rays” or divine rays, which appear when looking toward the surface of the water.
 
 ![Radial Blur1](./docs/static/img/radial_blur.png)
-![Radial Blur2](./docs/static/img/n4f/god-rays.png)
 
 ### Lighting
 
@@ -143,85 +142,16 @@ To represent the extreme heat of the lava, a distortion effect is applied around
 
 ![Distortion](./docs/static/img/distorsion.png)
 
-## Performance
-
-### Test Environment
-
-The game's performance was evaluated on the following configuration:
-
-- Processor: 11th Gen Intel® Core™ i7-11800H @ 2.30 GHz (8 cores / 16 threads)
-- Memory: 32 GB DDR4
-- Graphics card: NVIDIA GeForce RTX 3070 (Laptop)
-
-The analyses were performed using the Visual Studio profiler as well as Intel VTune Profiler for more in-depth analysis.
-
-## Initialization
-
-When loading the scene, the approximate CPU usage is distributed as follows:
-
-- **30%**: texture loading  
-- **17%**: scene (.glb) loading via the *Assimp* library  
-- **9%**: render context creation (DirectX 11)  
-- **8%**: shader compilation  
-- **8%**: parsing of scene entity metadata for assigning components to entities  
-
-![Scene Loading](./docs/static/img/profiling/scene-loading.png)
-
-## Memory and Cache
-
-Memory behavior analysis shows good cache efficiency, with only **0.04%** of memory accesses resulting in *cache misses*.
-
-![Cache](./docs/static/img/profiling/cache.png)
-![Bandwidth](./docs/static/img/profiling/bandwidth.png)
-
-## GPU Usage
-
-The GPU is very lightly used during game execution. This is a small game, so this behavior is fairly normal.
-
-![GPU Utilization](./docs/static/img/profiling/gpu-utilisation.png)
-
-## CPU Usage
-
-The CPU spends a large portion of its time waiting. This is a small game, so this behavior is fairly normal.
-
-However, when considering only the time spent actively executing, the main CPU costs come from:
-
-- The particle system  
-- Entity iteration  
-- Text rendering  
-
-![CPU Waiting](./docs/static/img/profiling/waiting.png)
-![CPU Utilization](./docs/static/img/profiling/cpu-utilisation.png)
-
-Separating particle-type entities from other entities would have reduced the overhead caused by unnecessary iteration over them by other systems (rendering, physics, etc.).
-
-In addition, the *gdiplus* library is not well suited for real-time text rendering. Using a more specialized technology would have reduced this cost.
-
-Particle rendering also performs avoidable memory copies, which leads to performance loss.
-
-Finally, cache usage is suboptimal in the function handling particle movement and lifetime. Approximately one third of the program's *LLC misses* originate from this function.
-
-![Particles](./docs/static/img/profiling/particle.png)
-
-## Metrics
-
-- **CPI (Cycles Per Instruction)**: 1.197  
-- **Branch misprediction rate**: 1.33%
-
-These values are acceptable, and there does not appear to be any major issue with branch prediction or the CPU pipeline.
-
-![CPI Rate](./docs/static/img/profiling/cpi-rate.png)
-![Branch Prediction](./docs/static/img/profiling/branch-prediction.png)
-
-## Implemented Optimizations
+## Optimizations
 
 To improve the overall performance of the game, several optimizations were implemented:
 
 - **Entity Component System (ECS)**: architecture designed for better memory locality and efficient cache usage
-- **Backface culling**: removal of back-facing polygons, enabled depending on the object type (disabled for the water surface for example)
 - **Frustum culling**: exclusion of objects outside the camera's view frustum from rendering
-- **Instancing**: grouping particles into a reduced number of draw calls to limit the CPU cost of *draw calls*
-- **GPU billboarding**: sprite orientation to face the camera is computed on the GPU, as it was less heavily loaded than the CPU
+- **Backface culling**: removal of back-facing polygons, enabled depending on the object type (disabled for the water surface for example)
+- **Instancing**: group particle rendering by type into a single draw call to minimize CPU overhead
+
+The game has been profiled with VTune, and the results can be found in [Profiling](docs/static/PROFILING.md).
 
 ## Steps to Build the Game
 
@@ -238,7 +168,7 @@ To improve the overall performance of the game, several optimizations were imple
 Thanks to the artists whose assets we used to create our game.
 
 - [Coral fish](https://sketchfab.com/3d-models/coral-fish-ea8d002da75a4dd09658b962722279c5) by polyplant3D (Licence: CC Attribution)
-- [Basic fish](https://sketchfab.com/3d-models/anglerfish-0047a66766394a018fdab16279fee694) by Yimit (Licence: )CC Attribution
+- [Basic fish](https://sketchfab.com/3d-models/anglerfish-0047a66766394a018fdab16279fee694) by Yimit (Licence: CC Attribution)
 - [Anglerfish](https://sketchfab.com/3d-models/anglerfish-0047a66766394a018fdab16279fee694) by Karstart (Licence: CC Attribution)
 - [Mosasaure](https://sketchfab.com/3d-models/mosasaurus-4a1feecff6c7468b8c07ba0ad439e0e0) by (Licence: CC Attribution-NonCommercial)
 - [Méduse "Jellyfish_003"](https://skfb.ly/6VRXn) by n- (Licence: CC Attribution)
